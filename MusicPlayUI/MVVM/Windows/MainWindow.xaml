@@ -12,6 +12,7 @@
         xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
         xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
         xmlns:messagehelper="clr-namespace:MessageControl;assembly=MessageControl"
+        xmlns:command="clr-namespace:MusicPlayUI.Core.Commands"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
         WindowStyle="None"
@@ -27,118 +28,6 @@
         x:Name="Root"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}">
 
-    <Window.Resources>
-        <DrawingImage x:Key="Play">
-            <DrawingImage.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="{DynamicResource Primary}" Geometry="{DynamicResource PlayIcon}"/>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingImage.Drawing>
-        </DrawingImage>
-
-        <DrawingImage x:Key="Pause">
-            <DrawingImage.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="{DynamicResource Primary}" Geometry="{DynamicResource PauseIcon}"/>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingImage.Drawing>
-        </DrawingImage>
-        <DrawingImage x:Key="Previous">
-            <DrawingImage.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="{DynamicResource Primary}" Geometry="{DynamicResource PreviousIcon}"/>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingImage.Drawing>
-        </DrawingImage>
-        <DrawingImage x:Key="Next">
-            <DrawingImage.Drawing>
-                <DrawingGroup>
-                    <DrawingGroup.Children>
-                        <GeometryDrawing Brush="{DynamicResource Primary}" Geometry="{DynamicResource NextIcon}"/>
-                    </DrawingGroup.Children>
-                </DrawingGroup>
-            </DrawingImage.Drawing>
-        </DrawingImage>
-    </Window.Resources>
-    <!-- Keys Shortcuts -->
-    <Window.InputBindings>
-        <KeyBinding Key="MediaPlayPause" Command="{Binding PlayPauseCommand}"/>
-        <KeyBinding Key="MediaNextTrack" Command="{Binding NextTrackCommand}"/>
-        <KeyBinding Key="MediaPreviousTrack" Command="{Binding PreviousTrackCommand}"/>
-        <KeyBinding Gesture="Space" Command="{Binding PlayPauseCommand}"/>
-        <KeyBinding Key="Right" Modifiers="Shift" Command="{Binding NextTrackCommand}"/>
-        <KeyBinding Key="Left" Modifiers="Shift" Command="{Binding PreviousTrackCommand}"/>
-        <KeyBinding Key="Down" Modifiers="Shift" Command="{Binding DecreaseVolumeCommand}"/>
-        <KeyBinding Key="Up" Modifiers="Shift" Command="{Binding IncreaseVolumeCommand}"/>
-        <KeyBinding Key="S" Modifiers="Shift" Command="{Binding ShuffleCommand}"/>
-        <KeyBinding Key="R" Modifiers="Shift" Command="{Binding RepeatCommand}"/>
-        <KeyBinding Gesture="Ctrl+F" Command="{Binding FavoriteCommand}"/>
-        <KeyBinding Gesture="Ctrl+0" Command="{Binding RatingCommand}"
-                    CommandParameter="0"/>
-        <KeyBinding Gesture="Ctrl+1" Command="{Binding RatingCommand}"
-                    CommandParameter="1"/>
-        <KeyBinding Gesture="Ctrl+2" Command="{Binding RatingCommand}"
-                    CommandParameter="2"/>
-        <KeyBinding Gesture="Ctrl+3" Command="{Binding RatingCommand}"
-                    CommandParameter="3"/>
-        <KeyBinding Gesture="Ctrl+4" Command="{Binding RatingCommand}"
-                    CommandParameter="4"/>
-        <KeyBinding Gesture="Ctrl+5" Command="{Binding RatingCommand}"
-                    CommandParameter="5"/>
-        <KeyBinding Gesture="Alt+H" Command="{Binding NavigateCommand}"
-                    CommandParameter="Home"/>
-        <KeyBinding Gesture="Alt+D" Command="{Binding NavigateCommand}"
-                    CommandParameter="Albums"/>
-        <KeyBinding Gesture="Alt+A" Command="{Binding NavigateCommand}"
-                    CommandParameter="Artists"/>
-        <KeyBinding Gesture="Alt+P" Command="{Binding NavigateCommand}"
-                    CommandParameter="Playlists"/>
-        <KeyBinding Gesture="Alt+N" Command="{Binding NavigateCommand}"
-                    CommandParameter="NowPlaying"/>
-        <KeyBinding Gesture="Alt+I" Command="{Binding NavigateCommand}"
-                    CommandParameter="Import"/>
-        <KeyBinding Gesture="Alt+S" Command="{Binding NavigateCommand}"
-                    CommandParameter="Settings"/>
-        <KeyBinding Key="Esc" Command="{Binding EscapeFullScreenCommand}"/>
-        <KeyBinding Modifiers="Alt" Key="F" Command="{Binding SwitchFullScreenCommand}"/>
-    </Window.InputBindings>
-
-    <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="taskBarItemInfo"
-                     Description="{Binding QueueService.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}">
-            <TaskbarItemInfo.ThumbButtonInfos>
-                <ThumbButtonInfoCollection>
-                    <ThumbButtonInfo DismissWhenClicked="False"
-                                    Command="{Binding PreviousTrackCommand}"
-                                    Description="Previous Track"
-                                    ImageSource="{StaticResource Previous}"/>
-                    <ThumbButtonInfo DismissWhenClicked="True"
-                                    Command="{Binding PlayPauseCommand}"
-                                    Description="Play/Pause"
-                                    ImageSource="{StaticResource Pause}"
-                                    Visibility="{Binding AudioPlayback.IsPlaying, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                    <ThumbButtonInfo DismissWhenClicked="True"
-                                    Command="{Binding PlayPauseCommand}"
-                                    Description="Play/Pause"
-                                    ImageSource="{StaticResource Play}"
-                                    Visibility="{Binding AudioPlayback.IsPlaying, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverterInverted}}"/>
-                    
-                    <ThumbButtonInfo DismissWhenClicked="True"
-                                    Command="{Binding NextTrackCommand}"
-                                    Description="Next Track"
-                                    ImageSource="{StaticResource Next}"/>
-                </ThumbButtonInfoCollection>
-            </TaskbarItemInfo.ThumbButtonInfos>
-        </TaskbarItemInfo>
-    </Window.TaskbarItemInfo>
-    
     <!-- Root Border -->
     <Border x:Name="WindowBorder"
             Background="{DynamicResource Background}"
@@ -183,7 +72,7 @@
                     BorderThickness="0,0,0,1"
                     MouseDown="WindowTopBorder_MouseLeftButtonDown">
                 <Border.InputBindings>
-                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding MaximizeCommand}"/>
+                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding CommandsManager.MaximizeCommand}"/>
                 </Border.InputBindings>
                 <Grid x:Name="MenuBarGrid"
                       Grid.ColumnSpan="3">
@@ -219,16 +108,16 @@
                         </Grid.ColumnDefinitions>
 
                         <iconbtn:IconButton Style="{DynamicResource MinimizeBtn}"
-                                            Command="{Binding MinimizeCommand}"/>
+                                            Command="{Binding CommandsManager.MinimizeCommand}"/>
 
                         <iconbtn:IconButton Style="{DynamicResource MaximizeBtn}"
                                         Grid.Column="1"
                                            x:Name="MaximizeBtn"
-                                            Command="{Binding MaximizeCommand}"/>
+                                            Command="{Binding CommandsManager.MaximizeCommand}"/>
 
                         <iconbtn:IconButton Style="{DynamicResource CloseBtn}"
                                         Grid.Column="2"
-                                            Command="{Binding LeaveCommand}"/>
+                                            Command="{Binding CommandsManager.LeaveCommand}"/>
                     </Grid>
                 </Grid>
                 
@@ -255,7 +144,7 @@
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="0"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.IsFullScreen, ElementName=Root}" Value="True">
+                            <DataTrigger Binding="{Binding DataContext.NavigationService.IsFullScreen, ElementName=Root}" Value="True">
                                 <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
                             </DataTrigger>
                         </Style.Triggers>

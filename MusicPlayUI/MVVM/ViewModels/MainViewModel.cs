@@ -18,7 +18,6 @@ namespace MusicPlayUI.MVVM.ViewModels
 {
     public class MainViewModel : ViewModel, IOnMouseDownListener
     {
-        private readonly IAudioTimeService _audioTimeService;
         public IAudioPlayback AudioPlayback { get; }
         public IQueueService QueueService { get; }
 
@@ -50,6 +49,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
+        public ICommandsManager CommandsManager { get; }
         public bool IsModalOpen
         {
             get => _modalService.IsModalOpen;
@@ -79,25 +79,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             set { SetField(ref _queueDrawer, value); }
         }
 
-        public ICommand PlayPauseCommand { get; }
-        public ICommand NextTrackCommand { get; }
-        public ICommand PreviousTrackCommand { get; }
-        public ICommand DecreaseVolumeCommand { get; set; }
-        public ICommand IncreaseVolumeCommand { get; set; }
-        public ICommand SwitchFullScreenCommand { get; }
-        public ICommand EscapeFullScreenCommand { get; }
-        public ICommand ClosePopupCommand { get; }
-        public ICommand OpenCloseMenuCommand { get; }
-        public ICommand ShuffleCommand { get; }
-        public ICommand RepeatCommand { get; }
-        public ICommand NavigateCommand { get; }
-        public ICommand FavoriteCommand { get; }
-        public ICommand RatingCommand { get; }
-        public ICommand MinimizeCommand { get; }
-        public ICommand MaximizeCommand { get; }
-        public ICommand LeaveCommand { get; }
-        public MainViewModel(INavigationService navigationService, IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService, IAudioTimeService audioTimeService,
-             MainMenuViewModel mainMenuViewModel, QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel)
+        public MainViewModel(INavigationService navigationService, IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService,
+             MainMenuViewModel mainMenuViewModel, QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel, ICommandsManager commandsManager)
         {
             NavigationService = navigationService;
             AudioPlayback = audioPlayback;
@@ -105,102 +88,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             CurrentMenu = mainMenuViewModel;
             QueueDrawer = queueDrawerViewModel;
             CurrentPlayerControl = playerControlViewModel;
+            CommandsManager = commandsManager;
             ModalService = modalService;
-            _audioTimeService = audioTimeService;
-
-            PlayPauseCommand = new RelayCommand(_audioTimeService.PlayPause);
-
-            NextTrackCommand = new RelayCommand(() =>
-            {
-                queueService.NextTrack();
-            });
-
-            PreviousTrackCommand = new RelayCommand(() =>
-            {
-                queueService.PreviousTrack();
-            });
-
-            DecreaseVolumeCommand = new RelayCommand(() =>
-            {
-                audioPlayback.DecreaseVolume();
-            });
-
-            IncreaseVolumeCommand = new RelayCommand(() =>
-            {
-                audioPlayback.IncreaseVolume();
-            });
-
-            ShuffleCommand = new RelayCommand(() =>
-            {
-                Task.Run(queueService.Shuffle);
-            });
-
-            RepeatCommand = new RelayCommand(() =>
-            {
-                if (_audioTimeService.IsLooping)
-                {
-                    _audioTimeService.Loop(); // unloop
-                }
-                else
-                {
-                    if (queueService.IsOnRepeat)
-                    {
-                        _audioTimeService.Loop(); // loop
-                    }
-                    queueService.Repeat(); // repeat on/off
-                }
-            });
-
-            FavoriteCommand = new RelayCommand(() =>
-            {
-                queueService.UpdateFavorite(!queueService.PlayingTrack.IsFavorite); // invert favorite value of the playing track
-            });
-
-            RatingCommand = new RelayCommand<string>((value) =>
-            {
-                if (int.TryParse(value, out var rating))
-                    queueService.UpdateRating(rating);
-            });
-
-            NavigateCommand = new RelayCommand<string>((view) =>
-            {
-                NavigationService.NavigateTo(view);
-            });
-
-            SwitchFullScreenCommand = new RelayCommand(() =>
-            {
-                navigationService.SwitchFullScreen();
-            });
-
-            EscapeFullScreenCommand = new RelayCommand(() =>
-            {
-                if (NavigationService.IsFullScreen)
-                    navigationService.SwitchFullScreen();
-            });
-
-            ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);
-
-            MinimizeCommand = new RelayCommand(() =>
-            {
-                App.Current.MainWindow.WindowState = System.Windows.WindowState.Minimized;
-            });
-
-            MaximizeCommand = new RelayCommand(() =>
-            {
-                if (App.Current.MainWindow.WindowState == System.Windows.WindowState.Normal)
-                {
-                    App.Current.MainWindow.WindowState = System.Windows.WindowState.Maximized;
-                }
-                else
-                {
-                    App.Current.MainWindow.WindowState = System.Windows.WindowState.Normal;
-                }
-            });
-
-            LeaveCommand = new RelayCommand(() =>
-            {
-                App.Current.Shutdown();
-            });
         }
 
         public void OnClick(MouseButtonEventArgs e)

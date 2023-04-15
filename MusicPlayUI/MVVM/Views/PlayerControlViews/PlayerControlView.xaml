@@ -257,10 +257,10 @@
                   Grid.Row="1"
                   Margin="10,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.4*"/>
+                    <ColumnDefinition Width="0.1*"/>
                     <ColumnDefinition  Width="0.3*"/>
                     <ColumnDefinition Width="0.3*"/>
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="0.2*" MinWidth="50"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Volume -->
@@ -269,46 +269,35 @@
                         Margin="10,0"
                             VerticalAlignment="Center"
                             Background="Transparent">
-                    <StackPanel>
-                            <iconbtn:IconButton x:Name="VolumeIcon"
-                                                Margin="0,0,0,5"
-                                                FillColor="{DynamicResource OnPrimaryContainer}"
-                                                Command="{Binding MuteCommand}">
+                    <iconbtn:IconButton x:Name="VolumeIcon"
+                                        IconWidth="25"
+                                        IconHeight="25"
+                                        FillColor="{DynamicResource OnPrimaryContainer}"
+                                        Command="{Binding MuteCommand}">
                             <iconbtn:IconButton.Style>
                                 <Style TargetType="iconbtn:IconButton"
                                        BasedOn="{StaticResource BaseIconButton}">
-                                        <Setter Property="Icon" Value="{DynamicResource VolumeFullIcon}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=60}" Value="true">
+                                    <Setter Property="Icon" Value="{DynamicResource VolumeFullIcon}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=60}" Value="true">
                                             <Setter Property="Icon" Value="{DynamicResource VolumeMediumIcon}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=30}" Value="true">
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=30}" Value="true">
                                             <Setter Property="Icon" Value="{DynamicResource VolumeLowIcon}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding VolumePercentage}" Value="0">
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding VolumePercentage}" Value="0">
                                             <Setter Property="Icon" Value="{DynamicResource VolumeOffIcon}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </iconbtn:IconButton.Style>
-                            </iconbtn:IconButton>
-
-                            <TextBlock Text="{Binding VolumePercentage}"
-                                   FontSize="14"
-                                   Width="40"
-                                       Margin="0,5,0,0"
-                                       TextAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                   Foreground="{DynamicResource OnPrimaryContainer}"
-                                   VerticalAlignment="Center"/>
-                        </StackPanel>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </iconbtn:IconButton.Style>
+                        </iconbtn:IconButton>
                 </Border>
                 
                 <!-- Devices btn -->
                 <iconbtn:IconButton Grid.Column="2"
                                     Style="{DynamicResource BaseIconButton}"
                                     x:Name="DeviceIconBtn"
-                                    Margin="10"
                                     Height="45"
                                     Width="45"
                                     IconWidth="30"
@@ -323,7 +312,6 @@
                 
                 <iconbtn:IconButton Grid.Column="3"
                                      Icon="{DynamicResource QueueIcon}"
-                                    Margin="10"
                                     Width="45"
                                     Height="45"
                                     IconWidth="30"
@@ -357,29 +345,46 @@
                         <Setter Property="PlacementTarget" Value="{Binding ElementName=VolumeIcon}"/>
                         <Setter Property="Placement" Value="Top"/>
                         <Setter Property="IsOpen" Value="false"/>
-                        <Setter Property="HorizontalOffset" Value="-10"/>
-                        <Setter Property="VerticalOffset" Value="2"/>
+                        <Setter Property="HorizontalOffset" Value="-17"/>
+                        <Setter Property="VerticalOffset" Value="0"/>
                         <Setter Property="Child">
                             <Setter.Value>
                                 <Grid Background="#01000000"
                                         IsHitTestVisible="True">
                                    
-                                    <Border Height="120"
+                                    <Border Height="auto"
                                             Background="{DynamicResource Background}"
                                             BorderBrush="{DynamicResource Outline}"
                                             BorderThickness="1"
-                                            Width="28"
-                                            Margin="5"
+                                            Width="40"
+                                            Margin="8"
+                                            Padding="2,10"
                                             CornerRadius="5">
-                                        <Slider Value="{Binding Volume}"
-                                                IsMoveToPointEnabled="True"
-                                                Maximum="10000"
-                                                Minimum="0"
-                                                Orientation="Vertical"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Height="100">
-                                        </Slider>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="10"/>
+                                                <RowDefinition Height="auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Slider Value="{Binding Volume}"
+                                                    IsMoveToPointEnabled="True"
+                                                    Maximum="10000"
+                                                    Cursor="Hand"
+                                                    Minimum="0"
+                                                    Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Height="100">
+                                            </Slider>
+
+                                             <TextBlock Text="{Binding VolumePercentage}"
+                                                        Grid.Row="2"
+                                                   FontSize="14"
+                                                       TextAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                   Foreground="{DynamicResource OnPrimaryContainer}"
+                                                   VerticalAlignment="Center"/>
+                                        </Grid>
                                     </Border>
                                 </Grid>
                             </Setter.Value>
@@ -408,7 +413,7 @@
                         <Setter Property="Placement" Value="Top"/>
                         <Setter Property="IsOpen" Value="false"/>
                         <Setter Property="HorizontalOffset" Value="-110"/>
-                        <Setter Property="VerticalOffset" Value="-5"/>
+                        <Setter Property="VerticalOffset" Value="-8"/>
                         <Setter Property="Child">
                             <Setter.Value>
                                 <Border Height="auto"

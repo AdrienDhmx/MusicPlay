@@ -46,6 +46,7 @@ namespace MusicPlayUI.Core.Enums
         CreatePlaylist = 40,
         UpdatePlaylist = 41,
         ConfirmAction = 42,
+        TrackProperties = 43,
 
         // PopupViewModel Views
         TrackPopup = 50,
@@ -57,10 +58,10 @@ namespace MusicPlayUI.Core.Enums
         General = 60,
         AppTheme = 61,
         Language = 62,
+        Visualizer = 63,
+        Shortcuts = 64,
 
-        // Windows
-        TrackProperties = 70,
-        Visualizer = 71
+
     }
 
     public static class ViewNameEnumExt

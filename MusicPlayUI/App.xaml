@@ -116,6 +116,11 @@
             <DataTemplate DataType="{x:Type settingsviewmodels:VisualizerSettingViewModel}">
                 <settingsviews:VisualizerSettingView/>
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type settingsviewmodels:ShortcutSettingViewModel}">
+                <settingsviews:ShortcutSettingView/>
+            </DataTemplate>
+            
             <!-- Converters -->
             <converter:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converter:PercentageConverter x:Key="PercentageConverter" Invert="False"/>

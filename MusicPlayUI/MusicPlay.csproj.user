@@ -123,6 +123,9 @@
     <Compile Update="MVVM\Views\SettingsViews\LanguageSettingView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\SettingsViews\ShortcutSettingView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\SettingsViews\VisualizerSettingTemplateView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -174,6 +177,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\PopupViews\SortByPopupView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\SettingsViews\ShortcutSettingView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\SettingsViews\VisualizerSettingTemplateView.xaml">

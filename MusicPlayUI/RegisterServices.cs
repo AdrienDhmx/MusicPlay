@@ -17,6 +17,7 @@ using MusicPlayUI.MVVM.Views.SettingsViews;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using MusicPlayUI.Core.Services.Interfaces;
+using MusicPlayUI.Core.Commands;
 
 namespace MusicPlayUI
 {
@@ -43,7 +44,7 @@ namespace MusicPlayUI
                 services.AddSingleton<IModalService, ModalService>();
                 services.AddSingleton<IWindowService, WindowService>();
                 services.AddSingleton<IPlaylistService, PlaylistService>();
-
+                services.AddSingleton<ICommandsManager, CommandsManager>();
 
                 // Views with their ViewModel
                 services.AddSingleton<MainMenuView>();
@@ -130,6 +131,9 @@ namespace MusicPlayUI
 
                 services.AddTransient<VisualizerSettingView>();
                 services.AddTransient<VisualizerSettingViewModel>();
+
+                services.AddTransient<ShortcutSettingView>();
+                services.AddTransient<ShortcutSettingViewModel>();
 
                 services.AddTransient<EmptyViewModel>();
                 services.AddTransient<EmptyView>();
