@@ -1,0 +1,109 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.PopupViews.PlaylistPopupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views" 
+             xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PopupViewModels" 
+             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
+             d:DataContext="{d:DesignInstance Type=viewmodels:PlaylistPopupViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Border Background="{DynamicResource Background}"
+                        Padding="0,5,0,0"
+            MinWidth="200"
+            MaxWidth="350"
+            CornerRadius="4"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource Outline}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" MinHeight="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Track Info Card -->
+            <StackPanel Grid.Column="1"
+                        Margin="5,0,0,5"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                        Orientation="Horizontal">
+
+                <!-- User playlist Cover-->
+                <Border Grid.Row="1"
+                                CornerRadius="5"
+                                Height="60"
+                                Width="60"
+                                Visibility="{Binding ShowPathCover, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                HorizontalAlignment="Right">
+                    <Border.Background>
+                        <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource TNullImageConverter}}"
+                                            Stretch="UniformToFill"/>
+                    </Border.Background>
+                </Border>
+
+                <!--  Auto playlist Cover-->
+                <Border Grid.Row="1"
+                                CornerRadius="10"
+                                Height="60"
+                                Width="60"
+                                Visibility="{Binding ShowPathCover, Converter={StaticResource BoolToVisibilityConverter}}"
+                                HorizontalAlignment="Right">
+                    <Path Data="{Binding PathCover}"
+                                  Margin="10"
+                                  Fill="{DynamicResource Primary}"
+                                  Stretch="Uniform"/>
+                </Border>
+
+                <StackPanel Orientation="Vertical"
+                            VerticalAlignment="Center"
+                            MaxWidth="210"
+                            Margin="10,0">
+                    <TextBlock Text="{Binding Playlist.Name}"
+                               Style="{DynamicResource SStyle}"
+                               MaxHeight="50"
+                               MaxWidth="350"/>
+                    <TextBlock Text="{Binding Playlist.Description}"
+                               Style="{DynamicResource NSmallSecondayStyle}"
+                               MaxHeight="45"
+                               MaxWidth="350"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <textbtn:TextButton Text="{x:Static lang:Resources.Play_Next}"
+                                   Style="{DynamicResource PopupBtn}"
+                                    Command="{Binding PlayNextCommand}"/>
+
+                <textbtn:TextButton Text="{x:Static lang:Resources.Add_To_Queue}"
+                                    Grid.Row="1"
+                                   Style="{DynamicResource PopupBtn}"
+                                    Command="{Binding AddToQueueCommand}"/>
+
+                <textbtn:TextButton Text="{x:Static lang:Resources.Edit}"
+                                    Grid.Row="2"
+                                     x:Name="EditBorder"
+                                    IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
+                                    Command="{Binding EditPlaylistCommand}"
+                                    Style="{DynamicResource PopupBtn}"/>
+
+                <textbtn:TextButton Text="{x:Static lang:Resources.Delete}"
+                                    Grid.Row="3"
+                                    Height="40"
+                                    CornerRadius="0,0,4,4"
+                                    x:Name="DeleteBorder"
+                                    IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
+                                   Style="{DynamicResource PopupBtn}"
+                                    Command="{Binding DeletePlaylistCommand}"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

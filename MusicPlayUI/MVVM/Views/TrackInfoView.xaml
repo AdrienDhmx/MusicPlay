@@ -1,0 +1,233 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.TrackInfoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:rating="clr-namespace:RatingControl;assembly=RatingControl"
+             xmlns:cardexpander="clr-namespace:CardDropDown;assembly=CardDropDown"
+             xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
+             xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             d:DataContext="{d:DesignInstance Type=viewmodels:TrackInfoViewModel}"
+             x:Name="TrackInfoRootView"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Border>
+        <ScrollViewer x:Name="RootScroll"
+                      VerticalScrollBarVisibility="Hidden"
+                      PreviewMouseWheel="RootScroll_PreviewMouseWheel">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <cardexpander:CardDropDown Icon="{DynamicResource music_icon}"
+                                           Foreground="{DynamicResource WhiteForeground}"
+                                           Margin="5, 2"
+                                            Background="{DynamicResource ScdWhiteTransparent}"
+                                           BorderThickness="1.5"
+                                            BorderBrush="{DynamicResource Primary}"
+                                           FontSize="18"
+                                           FontWeight="DemiBold"
+                                           HeaderHeight="80"
+                                           Header="{x:Static lang:Resources.Main_Informations}"
+                                           HeaderDescription="{x:Static lang:Resources.Main_Informations_Dscpt}"
+                                            HeaderDescriptionFontSize="14"
+                                           HeaderDescriptionFontWeight="Normal"
+                                           HeaderDescriptionForeground="{DynamicResource WhiteForeground}">
+                    <ItemsControl ItemsSource="{Binding MainTracksInfo, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="10">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="5"
+                                        BorderThickness="0,0,0,1"
+                                        BorderBrush="{DynamicResource WhiteForeground}">
+                                    <Grid HorizontalAlignment="Stretch">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding InfoName}"
+                                                 Foreground="{DynamicResource WhiteForeground}"
+                                                 FontSize="18"
+                                                 FontWeight="Bold"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Stretch"/>
+
+                                        <TextBlock Text="{Binding InfoValue}"
+                                                 Grid.Column="1"
+                                                   Foreground="{DynamicResource WhiteForeground}"
+                                                 Margin="5,2"
+                                                   Style="{DynamicResource NTrackDataStyle}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </cardexpander:CardDropDown>
+
+                <cardexpander:CardDropDown Icon="{DynamicResource MusicFileIcon.Filled}"
+                                           IconWidth="20"
+                                           Grid.Row="1"
+                                           HeaderHeight="80"
+                                           Foreground="{DynamicResource WhiteForeground}"
+                                           Margin="5, 2"
+                                            Background="{DynamicResource ScdWhiteTransparent}"
+                                           BorderThickness="1.5"
+                                            BorderBrush="{DynamicResource Primary}"
+                                           FontSize="18"
+                                           FontWeight="DemiBold"
+                                           Header="{x:Static lang:Resources.File_Properties}"
+                                           HeaderDescription="{x:Static lang:Resources.File_Properties_Dscpt}"
+                                            HeaderDescriptionFontSize="14"
+                                           HeaderDescriptionFontWeight="Normal"
+                                           HeaderDescriptionForeground="{DynamicResource WhiteForeground}">
+                    <ItemsControl ItemsSource="{Binding FileProperties, UpdateSourceTrigger=PropertyChanged}"
+                                  Margin="10">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="5"
+                                        Height="40"
+                                        BorderThickness="0,0,0,1"
+                                        BorderBrush="{DynamicResource WhiteForeground}">
+                                    <Grid HorizontalAlignment="Stretch"
+                                          Height="auto">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="190"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding InfoName}"
+                                                 Foreground="{DynamicResource WhiteForeground}"
+                                                 FontSize="18"
+                                                 FontWeight="Bold"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Center"/>
+
+                                        <TextBlock Text="{Binding InfoValue}"
+                                                   Foreground="{DynamicResource WhiteForeground}"
+                                                 Grid.Column="1"
+                                                 Margin="5,2"
+                                                   Style="{DynamicResource NTrackDataStyle}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </cardexpander:CardDropDown>
+
+                <cardexpander:CardDropDown Icon="{DynamicResource PersonIcon}"
+                                           Grid.Row="2"
+                                           HeaderHeight="80"
+                                           Foreground="{DynamicResource WhiteForeground}"
+                                           Margin="5, 2"
+                                            Background="{DynamicResource ScdWhiteTransparent}"
+                                           BorderThickness="1.5"
+                                            BorderBrush="{DynamicResource Primary}"
+                                           FontSize="18"
+                                           FontWeight="DemiBold"
+                                           Header="{x:Static lang:Resources.Your_Interactions}"
+                                           HeaderDescription="{x:Static lang:Resources.Your_Interactions_Dscpt}"
+                                            HeaderDescriptionFontSize="14"
+                                           HeaderDescriptionFontWeight="Normal"
+                                           HeaderDescriptionForeground="{DynamicResource WhiteForeground}">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <!-- Rating -->
+                            <rating:RatingControl Fill="{DynamicResource Primary}"
+                                      MouseOverColor="{DynamicResource PrimaryHover}"
+                                                  HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Shape="{DynamicResource StarIcon}"
+                                      RatingValue="{Binding Rating, Mode=TwoWay}">
+
+                            </rating:RatingControl>
+
+                            <!-- Favorite -->
+                            <iconbtn:IconButton Grid.Column="3"
+                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Width="40"
+                                    Height="40"
+                                    IconWidth="25"
+                                    IconHeight="25"
+                                    IconStretch="Fill"
+                                    Margin="10,0"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    StrokeColor="{DynamicResource Primary}"
+                                    Command="{Binding IsFavoriteCommand}"
+                                    MouseOverBackground="Transparent"
+                                    FillColor="{DynamicResource Primary}">
+                                <iconbtn:IconButton.Style>
+                                    <Style TargetType="iconbtn:IconButton">
+                                        <Setter Property="Icon" Value="{DynamicResource HeartIcon}"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter Property="Icon" Value="{DynamicResource BrokenHeartIcon}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </iconbtn:IconButton.Style>
+                            </iconbtn:IconButton>
+
+                            <!-- Favorite -->
+                            <iconbtn:IconButton Grid.Column="3"
+                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                    Icon="{DynamicResource HeartIcon}"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Width="40"
+                                    Height="40"
+                                    Margin="10,0"
+                                    IconWidth="25"
+                                    IconHeight="25"
+                                    IconStretch="Fill"
+                                    MouseOverBackground="Transparent"
+                                    Command="{Binding IsFavoriteCommand}"
+                                    StrokeColor="{DynamicResource Primary}">
+                                <iconbtn:IconButton.Style>
+                                    <Style TargetType="iconbtn:IconButton">
+                                        <Setter Property="FillColor" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter Property="FillColor" Value="{DynamicResource PrimaryHover}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </iconbtn:IconButton.Style>
+                            </iconbtn:IconButton>
+                        </StackPanel>
+
+
+
+                        <TextBlock Text="{Binding PlayCount, UpdateSourceTrigger=PropertyChanged}"
+                                   Foreground="{DynamicResource WhiteForeground}"
+                                   FontSize="18"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Grid.Row="1"
+                                   Margin="0,10"/>
+
+                        <TextBlock Text="{Binding LastPlayed, UpdateSourceTrigger=PropertyChanged}"
+                                   Foreground="{DynamicResource WhiteForeground}"
+                                   FontSize="18"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Grid.Row="2"/>
+                    </Grid>
+
+                </cardexpander:CardDropDown>
+            </Grid>
+        </ScrollViewer>
+        
+    </Border>
+</UserControl>

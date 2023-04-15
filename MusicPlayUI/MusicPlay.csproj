@@ -1,0 +1,125 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+    <PackageIcon>Play.png</PackageIcon>
+    <ApplicationIcon>Resources\MusicPlayIcon.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>disable</ImplicitUsings>
+	<Version>2.3.1.3</Version>
+	<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))UI</RootNamespace>
+  </PropertyGroup>
+	
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="MVVM\ViewModels\WindowsViewModel\**" />
+    <Compile Remove="Resources\Images\**" />
+    <EmbeddedResource Remove="MVVM\ViewModels\WindowsViewModel\**" />
+    <EmbeddedResource Remove="Resources\Images\**" />
+    <None Remove="MVVM\ViewModels\WindowsViewModel\**" />
+    <None Remove="Resources\Images\**" />
+    <Page Remove="MVVM\ViewModels\WindowsViewModel\**" />
+    <Page Remove="Resources\Images\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="musicdb.db" />
+    <None Remove="Resources\DefaultArtistImage.jpg" />
+    <None Remove="Resources\DefaultImage.png" />
+    <None Remove="Resources\Next.png" />
+    <None Remove="Resources\Note-thumbnail.png" />
+    <None Remove="Resources\Play.png" />
+    <None Remove="Resources\Previous.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="musicdb.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="gong-wpf-dragdrop" Version="3.2.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AudioProcessor\AudioEngine.csproj" />
+    <ProjectReference Include="..\CardDropDown\CardDropDown.csproj" />
+    <ProjectReference Include="..\ColorCanvas\ColorCanvas.csproj" />
+    <ProjectReference Include="..\CustomCardControl\CustomCardControl.csproj" />
+    <ProjectReference Include="..\DataBaseConnection\DataBaseConnection.csproj" />
+    <ProjectReference Include="..\DynamicScrollViewer\DynamicScrollViewer.csproj" />
+    <ProjectReference Include="..\HistoryChart\HistoryChart.csproj" />
+    <ProjectReference Include="..\IconButton\IconButton.csproj" />
+    <ProjectReference Include="..\LoadingControl\LoadingControl.csproj" />
+    <ProjectReference Include="..\MessageControl\MessageControl.csproj" />
+    <ProjectReference Include="..\Modal\Modal.csproj" />
+    <ProjectReference Include="..\MusicPlay.Language\MusicPlay.Language.csproj" />
+    <ProjectReference Include="..\MusicPlayModels\MusicPlayModels.csproj" />
+    <ProjectReference Include="..\MusicProcessor\FilesProcessor.csproj" />
+    <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.csproj" />
+    <ProjectReference Include="..\RatingControl\RatingControl.csproj" />
+    <ProjectReference Include="..\SpectrumVisualizer\SpectrumVisualizer.csproj" />
+    <ProjectReference Include="..\Stepper\Stepper.csproj" />
+    <ProjectReference Include="..\TextBtn\TextBtn.csproj" />
+    <ProjectReference Include="..\VirtualizingControls\VirtualizingControls.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\DefaultArtistImage.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\DefaultImage.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Next.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Play.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Previous.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Bass.Net">
+      <HintPath>..\Bass.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="ManagedBass">
+      <HintPath>..\ManagedBass.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

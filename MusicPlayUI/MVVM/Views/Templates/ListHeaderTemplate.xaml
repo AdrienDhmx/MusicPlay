@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.Templates.ListHeaderTemplate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.Templates" xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton" xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
+             mc:Ignorable="d" 
+             x:Name="RootTemplate"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Border Style="{DynamicResource ListHeaderBorder}"
+            BorderThickness="0,0,0,1"
+            Padding="0"
+            BorderBrush="{DynamicResource Primary}">
+        <Grid HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <textbtn:TextButton Grid.ColumnSpan="4"
+                                HorizontalAlignment="Stretch"
+                                Text="{Binding Header, ElementName=RootTemplate}"
+                                Foreground="{DynamicResource Primary}"
+                                VerticalContentAlignment="Center"
+                                FontSize="26"
+                                Padding="10,0"
+                                FontWeight="SemiBold"
+                                CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                MouseOverBtnColor="{DynamicResource PrimaryHover}"
+                                Command="{Binding HeaderCommand, ElementName=RootTemplate}">
+            </textbtn:TextButton>
+
+            <iconbtn:IconButton Style="{DynamicResource QuickListPlayButton}"
+                                                Grid.Column="1"
+                                                Command="{Binding PlayCommand, ElementName=RootTemplate}"
+                                                CommandParameter="0"/>
+
+            <iconbtn:IconButton Style="{DynamicResource QuickListPlayShuffledButton}"
+                                                Grid.Column="2"
+                                                Command="{Binding PlayShuffledCommand, ElementName=RootTemplate}"
+                                                CommandParameter="1"/>
+
+            <iconbtn:IconButton Grid.Column="3"
+                                IconStretch="Uniform"
+                                Margin="20,0, 10, 0"
+                                x:Name="visibilityIcon"
+                                Icon="{DynamicResource CollapseArrow}"
+                                Command="{Binding HeaderCommand, ElementName=RootTemplate}">
+                <iconbtn:IconButton.Style>
+                    <Style BasedOn="{StaticResource QuickListButton}" TargetType="iconbtn:IconButton">
+                        <Setter Property="RenderTransform">
+                            <Setter.Value>
+                                <RotateTransform x:Name="noFreeze" Angle="0" CenterX="20" CenterY="20"/>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ContentVisibility, ElementName=RootTemplate}" Value="Collapsed">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="(iconbtn:IconButton.RenderTransform).(RotateTransform.Angle)"
+                                                         To="180" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="(iconbtn:IconButton.RenderTransform).(RotateTransform.Angle)"
+                                                         To="0" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </iconbtn:IconButton.Style>
+            </iconbtn:IconButton>
+        </Grid>
+    </Border>
+</UserControl>

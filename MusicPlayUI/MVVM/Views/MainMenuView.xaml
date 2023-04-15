@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.MainMenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views" 
+             xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
+             xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             d:DataContext="{d:DesignInstance Type=viewmodels:MainMenuViewModel}"
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             mc:Ignorable="d"
+             x:Name="RootView"
+             d:DesignHeight="50" d:DesignWidth="900">
+
+    <Grid Background="{DynamicResource Background}"
+            VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <iconbtn:IconButton Style="{DynamicResource BackButton}"
+                            CornerRadius="0"
+                            Width="40"
+                            ToolTip="Back"
+                            Command="{Binding NavigateBackCommand}"/>
+
+        <ItemsControl ItemsSource="{Binding Menu}"
+                      Margin="0,10"
+                          HorizontalAlignment="Center"
+                          Grid.Row="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <iconbtn:IconButton Icon="{Binding Icon}"
+                                            Width="40"
+                                            Height="50"
+                                            CornerRadius="0"
+                                            IconStretch="Uniform"
+                                            MouseOverBackground="{DynamicResource PrimaryHover}"
+                                            Command="{Binding DataContext.MenuNavigateCommand, ElementName=RootView}"
+                                            CommandParameter="{Binding .}"
+                                            ToolTip="{Binding Name}">
+                        <iconbtn:IconButton.Style>
+                            <Style TargetType="iconbtn:IconButton"
+                                       BasedOn="{StaticResource BaseIconButton}">
+                                <Setter Property="FillColor" Value="{DynamicResource OnBackground}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </iconbtn:IconButton.Style>
+                    </iconbtn:IconButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

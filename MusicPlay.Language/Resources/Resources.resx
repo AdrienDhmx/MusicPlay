@@ -1,0 +1,801 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Add_To_Favorite" xml:space="preserve">
+    <value>Add to Favorite</value>
+  </data>
+  <data name="Add_To_Playlist" xml:space="preserve">
+    <value>Add to Playlist</value>
+  </data>
+  <data name="Add_To_Queue" xml:space="preserve">
+    <value>Add to Queue</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="AlbumCover" xml:space="preserve">
+    <value>Album Cover</value>
+  </data>
+  <data name="Albums_View" xml:space="preserve">
+    <value>Albums</value>
+  </data>
+  <data name="Albums_View_Dscpt" xml:space="preserve">
+    <value>Display all your albums.</value>
+  </data>
+  <data name="Album_Artist" xml:space="preserve">
+    <value>Album Artist</value>
+  </data>
+  <data name="Album_Artists" xml:space="preserve">
+    <value>Album-Artists</value>
+  </data>
+  <data name="Album_Genre" xml:space="preserve">
+    <value>Album Genre</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Applied" xml:space="preserve">
+    <value>Applied</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="Artists_View" xml:space="preserve">
+    <value>Artists</value>
+  </data>
+  <data name="Artists_View_Dscpt" xml:space="preserve">
+    <value>Display all your artists.</value>
+  </data>
+  <data name="Artwork" xml:space="preserve">
+    <value>Artwork (Track Cover)</value>
+  </data>
+  <data name="ArtworkDeletedMsg" xml:space="preserve">
+    <value>The Artwork has been deleted for</value>
+  </data>
+  <data name="Artwork_Changed_Msg" xml:space="preserve">
+    <value>The artwork has been changed for </value>
+  </data>
+  <data name="Ascending_Year" xml:space="preserve">
+    <value>Ascending Year</value>
+  </data>
+  <data name="Audio_Bitrate" xml:space="preserve">
+    <value>Audio Bitrate</value>
+  </data>
+  <data name="Audio_Channels" xml:space="preserve">
+    <value>Audio Channels</value>
+  </data>
+  <data name="Audio_Sample_Rate" xml:space="preserve">
+    <value>Audio Sample Rate</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="AutoCover" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Bits_per_Sample" xml:space="preserve">
+    <value>Bits per Sample</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ChangeDirectory" xml:space="preserve">
+    <value>Change Folder</value>
+  </data>
+  <data name="Change_Artwork" xml:space="preserve">
+    <value>Change Artwork</value>
+  </data>
+  <data name="Change_Cover" xml:space="preserve">
+    <value>Change Cover</value>
+  </data>
+  <data name="Chinese_Cantonese_Lang" xml:space="preserve">
+    <value>Chinese (Cantonese)</value>
+  </data>
+  <data name="Chinese_Mandarin_Lang" xml:space="preserve">
+    <value>Chinese (Mandorin)</value>
+  </data>
+  <data name="CircledBar" xml:space="preserve">
+    <value>Cirlce with Bars</value>
+  </data>
+  <data name="CircledGraph" xml:space="preserve">
+    <value>Circle Graph</value>
+  </data>
+  <data name="CircledPoints" xml:space="preserve">
+    <value>Cirlce with Points</value>
+  </data>
+  <data name="ClearDatabase" xml:space="preserve">
+    <value>Clear Database</value>
+  </data>
+  <data name="Codec" xml:space="preserve">
+    <value>Codec</value>
+  </data>
+  <data name="Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="Composers" xml:space="preserve">
+    <value>Composers</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="CopyRight" xml:space="preserve">
+    <value>CopyRight</value>
+  </data>
+  <data name="CoverDeletedMsg" xml:space="preserve">
+    <value>The cover has been deleted for</value>
+  </data>
+  <data name="Cover_Changed_Msg" xml:space="preserve">
+    <value>The cover has been changed for</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Create_Playlist" xml:space="preserve">
+    <value>Create Playlist</value>
+  </data>
+  <data name="CurrentDirectory" xml:space="preserve">
+    <value>Current Folder: </value>
+  </data>
+  <data name="Dark_Theme" xml:space="preserve">
+    <value>Default Dark Theme</value>
+  </data>
+  <data name="DataBase_Cleared_Msg" xml:space="preserve">
+    <value>The DataBase has been deleted.</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>day</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>days</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Descending_Year" xml:space="preserve">
+    <value>Descending Year</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="English_Lang" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Error_Corrupted_File" xml:space="preserve">
+    <value>The current file is corrupted and cannot be played.</value>
+  </data>
+  <data name="Error_Not_Enough_Data_Radio" xml:space="preserve">
+    <value>There is not enough data to create a radio yet. Listen to more tracks and try again!</value>
+  </data>
+  <data name="Error_No_Connection" xml:space="preserve">
+    <value>No internet connection.</value>
+  </data>
+  <data name="ExtraLarge" xml:space="preserve">
+    <value>ExtraLarge</value>
+  </data>
+  <data name="ExtraThin" xml:space="preserve">
+    <value>ExtraThin</value>
+  </data>
+  <data name="Favorite" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="Favorite_Dscpt" xml:space="preserve">
+    <value>All of your Favorites tracks in one place!</value>
+  </data>
+  <data name="FileName" xml:space="preserve">
+    <value>File Name</value>
+  </data>
+  <data name="File_Path" xml:space="preserve">
+    <value>File Path</value>
+  </data>
+  <data name="File_Properties" xml:space="preserve">
+    <value>File Properties</value>
+  </data>
+  <data name="File_Properties_Dscpt" xml:space="preserve">
+    <value>Filename, Sample Rate,  Audio Bitrate...</value>
+  </data>
+  <data name="Fill" xml:space="preserve">
+    <value>Fill</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="Fisrt_Time_Playing" xml:space="preserve">
+    <value>First Time Playing!</value>
+  </data>
+  <data name="French_Lang" xml:space="preserve">
+    <value>French</value>
+  </data>
+  <data name="General_Setting" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Genres</value>
+  </data>
+  <data name="German_Lang" xml:space="preserve">
+    <value>German</value>
+  </data>
+  <data name="Good_Evening" xml:space="preserve">
+    <value>Good Evening</value>
+  </data>
+  <data name="Good_Morning" xml:space="preserve">
+    <value>Good Morning</value>
+  </data>
+  <data name="Gradient" xml:space="preserve">
+    <value>Gradient</value>
+  </data>
+  <data name="Has_been_Added_To" xml:space="preserve">
+    <value>has been added to</value>
+  </data>
+  <data name="Has_Been_Changed_To" xml:space="preserve">
+    <value>has been changed to</value>
+  </data>
+  <data name="Has_Been_Created" xml:space="preserve">
+    <value>has been created.</value>
+  </data>
+  <data name="Has_Been_Deleted" xml:space="preserve">
+    <value>has been deleted.</value>
+  </data>
+  <data name="Has_Been_Removed_From" xml:space="preserve">
+    <value>has been removed from</value>
+  </data>
+  <data name="Has_Been_Updated" xml:space="preserve">
+    <value>has been updated.</value>
+  </data>
+  <data name="Have_been_added_to" xml:space="preserve">
+    <value>Have been added to </value>
+  </data>
+  <data name="Hi" xml:space="preserve">
+    <value>Hi</value>
+  </data>
+  <data name="High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="Home_View" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>hour</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>hours</value>
+  </data>
+  <data name="ImportMsg1" xml:space="preserve">
+    <value>Looking for Artists...</value>
+  </data>
+  <data name="ImportMsg2" xml:space="preserve">
+    <value>Importing Albums and Tracks...</value>
+  </data>
+  <data name="ImportMsg3" xml:space="preserve">
+    <value>Updating Artists data...</value>
+  </data>
+  <data name="Import_Directory" xml:space="preserve">
+    <value>Scan a folder to import your library or add new tracks to it.</value>
+  </data>
+  <data name="Import_Library_View" xml:space="preserve">
+    <value>Scan Library</value>
+  </data>
+  <data name="Japanese_Lang" xml:space="preserve">
+    <value>Japanese</value>
+  </data>
+  <data name="Korean_Lang" xml:space="preserve">
+    <value>Korean</value>
+  </data>
+  <data name="Language_Changed_Msg" xml:space="preserve">
+    <value>The language has been changed to</value>
+  </data>
+  <data name="Language_Setting" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Large" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="Last_Played" xml:space="preserve">
+    <value>Last Played</value>
+  </data>
+  <data name="Last_Played_Dscpt" xml:space="preserve">
+    <value>Your playback history (up to 100 tracks).</value>
+  </data>
+  <data name="Leave" xml:space="preserve">
+    <value>Leave</value>
+  </data>
+  <data name="Light_Theme" xml:space="preserve">
+    <value>Default Light Theme</value>
+  </data>
+  <data name="LinearDownTapPoint" xml:space="preserve">
+    <value>Downward Tap Points</value>
+  </data>
+  <data name="LinearDownwardBar" xml:space="preserve">
+    <value>Downward Bars</value>
+  </data>
+  <data name="LinearDownwardGraph" xml:space="preserve">
+    <value>Downward Graph</value>
+  </data>
+  <data name="LinearDownwardPoints" xml:space="preserve">
+    <value>Downward Points</value>
+  </data>
+  <data name="LinearMirroredBar" xml:space="preserve">
+    <value>Mirrored Bars</value>
+  </data>
+  <data name="LinearMirroredGraph" xml:space="preserve">
+    <value>Mirrored Graph</value>
+  </data>
+  <data name="LinearMirroredPoints" xml:space="preserve">
+    <value>Mirrored Points</value>
+  </data>
+  <data name="LinearUpTapPoint" xml:space="preserve">
+    <value>Upward Tap Points</value>
+  </data>
+  <data name="LinearUpwardBar" xml:space="preserve">
+    <value>Upward Bars</value>
+  </data>
+  <data name="LinearUpwardGraph" xml:space="preserve">
+    <value>Upward Graph</value>
+  </data>
+  <data name="LinearUpwardPoints" xml:space="preserve">
+    <value>Upward Points</value>
+  </data>
+  <data name="Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Lyrics_View" xml:space="preserve">
+    <value>Lyrics</value>
+  </data>
+  <data name="Main_Informations" xml:space="preserve">
+    <value>Main Informations</value>
+  </data>
+  <data name="Main_Informations_Dscpt" xml:space="preserve">
+    <value>Title, Album, Performer, Genre, Copyright...</value>
+  </data>
+  <data name="Maximize" xml:space="preserve">
+    <value>Maximize</value>
+  </data>
+  <data name="Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="Minimize" xml:space="preserve">
+    <value>Minimize</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>minute</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>minutes</value>
+  </data>
+  <data name="Most_Played" xml:space="preserve">
+    <value>Most Played</value>
+  </data>
+  <data name="Most_Played_Dscpt" xml:space="preserve">
+    <value>Your Most Played Traks (Top 50).</value>
+  </data>
+  <data name="MyAlbums" xml:space="preserve">
+    <value>My Albums</value>
+  </data>
+  <data name="MyArtists" xml:space="preserve">
+    <value>My Artists</value>
+  </data>
+  <data name="MyPlaylists" xml:space="preserve">
+    <value>My Playlists</value>
+  </data>
+  <data name="Never_Played" xml:space="preserve">
+    <value>Never Played</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="NoDataFound" xml:space="preserve">
+    <value>No Data Found</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Now_Playing_View" xml:space="preserve">
+    <value>Now Playing</value>
+  </data>
+  <data name="No_Albums_Found" xml:space="preserve">
+    <value>No Albums Found</value>
+  </data>
+  <data name="No_Artists_Found" xml:space="preserve">
+    <value>No Artists Found</value>
+  </data>
+  <data name="No_Connection" xml:space="preserve">
+    <value>No Internet Access</value>
+  </data>
+  <data name="No_History" xml:space="preserve">
+    <value>No History</value>
+  </data>
+  <data name="No_Lyrics_Found" xml:space="preserve">
+    <value>No lyrics found</value>
+  </data>
+  <data name="No_Playlists_Found" xml:space="preserve">
+    <value>No Playlists Found</value>
+  </data>
+  <data name="Opcaity" xml:space="preserve">
+    <value>Opacity (%)</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="Performance_Warning" xml:space="preserve">
+    <value>Performance might be affected</value>
+  </data>
+  <data name="Performer" xml:space="preserve">
+    <value>Performer</value>
+  </data>
+  <data name="Performers" xml:space="preserve">
+    <value>Performers</value>
+  </data>
+  <data name="PermanentlyDeletedWarning" xml:space="preserve">
+    <value>will be permanently deleted.</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Playback_history_of" xml:space="preserve">
+    <value>Play Record of</value>
+  </data>
+  <data name="PlayCount" xml:space="preserve">
+    <value>Play Count</value>
+  </data>
+  <data name="PlayingFrom" xml:space="preserve">
+    <value>Playing from </value>
+  </data>
+  <data name="Playlist" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="Playlists_View" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="Playlist_Cover" xml:space="preserve">
+    <value>Playlist Cover (optional)</value>
+  </data>
+  <data name="Playlist_Created_Msg" xml:space="preserve">
+    <value>A new playlist has been created: </value>
+  </data>
+  <data name="Playlist_Description" xml:space="preserve">
+    <value>Playlist Description (optional)</value>
+  </data>
+  <data name="Playlist_Name" xml:space="preserve">
+    <value>Playlist Name</value>
+  </data>
+  <data name="Play_From_URL" xml:space="preserve">
+    <value>Play from a URL</value>
+  </data>
+  <data name="Play_Next" xml:space="preserve">
+    <value>Play Next</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="QueueCover_Settings" xml:space="preserve">
+    <value>Queue Covers Display Options</value>
+  </data>
+  <data name="Queue_View" xml:space="preserve">
+    <value>Queue</value>
+  </data>
+  <data name="Radio_Station_For_You" xml:space="preserve">
+    <value>Radio Stations for You</value>
+  </data>
+  <data name="Recently_Played_Albums" xml:space="preserve">
+    <value>Recently Played Albums</value>
+  </data>
+  <data name="Recently_Played_Artists" xml:space="preserve">
+    <value>Recently Played Artists</value>
+  </data>
+  <data name="RefreshRate" xml:space="preserve">
+    <value>Refresh Rate</value>
+  </data>
+  <data name="Remove_From_Favorite" xml:space="preserve">
+    <value>Remove from Favorite</value>
+  </data>
+  <data name="Remove_From_Playlist" xml:space="preserve">
+    <value>Remove From Playlist</value>
+  </data>
+  <data name="Repeat" xml:space="preserve">
+    <value>Reapeat</value>
+  </data>
+  <data name="Restart_App_To_Apply_Theme" xml:space="preserve">
+    <value>The theme will be applied the next time you open the application.</value>
+  </data>
+  <data name="Restart_To_Apply_Msg" xml:space="preserve">
+    <value>Restart the application to apply the change.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Save_As_Playlist" xml:space="preserve">
+    <value>Save as Playlist</value>
+  </data>
+  <data name="ScanFolder" xml:space="preserve">
+    <value>Scan Folder</value>
+  </data>
+  <data name="Scan_Done_Msg" xml:space="preserve">
+    <value>tracks have been imported.</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Second" xml:space="preserve">
+    <value>Second</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>seconds</value>
+  </data>
+  <data name="Select_an_Image" xml:space="preserve">
+    <value>Select an Image</value>
+  </data>
+  <data name="Settings_View" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="SortedBy" xml:space="preserve">
+    <value>Sorted by</value>
+  </data>
+  <data name="Spanish_Lang" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="Starting_View_Changed_Msg" xml:space="preserve">
+    <value>The starting view has been changed to</value>
+  </data>
+  <data name="Starting_View_Setting" xml:space="preserve">
+    <value>Starting View</value>
+  </data>
+  <data name="Starting_View_Setting_Dscpt" xml:space="preserve">
+    <value>Defines wich view the application shows first.</value>
+  </data>
+  <data name="StrokeThickness" xml:space="preserve">
+    <value>Outline Thickness</value>
+  </data>
+  <data name="Sub_StartingView_Changed_Msg" xml:space="preserve">
+    <value>The sub starting view for </value>
+  </data>
+  <data name="TheDatabase" xml:space="preserve">
+    <value>The database</value>
+  </data>
+  <data name="TheDataFor" xml:space="preserve">
+    <value>The data for</value>
+  </data>
+  <data name="Themes_Setting" xml:space="preserve">
+    <value>Themes</value>
+  </data>
+  <data name="Theme_Changed_Msg" xml:space="preserve">
+    <value>The theme has been changed to</value>
+  </data>
+  <data name="The_Album" xml:space="preserve">
+    <value>The album</value>
+  </data>
+  <data name="The_Artist" xml:space="preserve">
+    <value>The artist</value>
+  </data>
+  <data name="The_Queue" xml:space="preserve">
+    <value>the queue</value>
+  </data>
+  <data name="The_Track" xml:space="preserve">
+    <value>The track</value>
+  </data>
+  <data name="Thin" xml:space="preserve">
+    <value>Thin</value>
+  </data>
+  <data name="This_Month" xml:space="preserve">
+    <value>This Month</value>
+  </data>
+  <data name="This_Year" xml:space="preserve">
+    <value>This_Year</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="Tomorow" xml:space="preserve">
+    <value>Tomorow</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>Track</value>
+  </data>
+  <data name="TrackNotFoundMsg" xml:space="preserve">
+    <value>Track(s) not found and therefore deleted from the Database.</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Tracks</value>
+  </data>
+  <data name="Track_Info_View" xml:space="preserve">
+    <value>Track Info</value>
+  </data>
+  <data name="VCenterFreq" xml:space="preserve">
+    <value>Center Frequencies</value>
+  </data>
+  <data name="VColorDscpt" xml:space="preserve">
+    <value>The color of the objects composing the visualizer.</value>
+  </data>
+  <data name="VCutFreq" xml:space="preserve">
+    <value>Cut High Frequencies</value>
+  </data>
+  <data name="VCutPercentage" xml:space="preserve">
+    <value>Cut Percentage</value>
+  </data>
+  <data name="VDataQuantity" xml:space="preserve">
+    <value>Data quantity</value>
+  </data>
+  <data name="VeryHigh" xml:space="preserve">
+    <value>Very High</value>
+  </data>
+  <data name="VFillDscpt" xml:space="preserve">
+    <value>Fill the objects with the color.</value>
+  </data>
+  <data name="Visualizer" xml:space="preserve">
+    <value>Visualizer</value>
+  </data>
+  <data name="VisualizerSettings" xml:space="preserve">
+    <value>Visualizer Settings</value>
+  </data>
+  <data name="VObjectLength" xml:space="preserve">
+    <value>Objects Size</value>
+  </data>
+  <data name="VRepresentation" xml:space="preserve">
+    <value>Data representation</value>
+  </data>
+  <data name="VSmoothGraph" xml:space="preserve">
+    <value>Smooth Graph</value>
+  </data>
+  <data name="VStrokeThickness" xml:space="preserve">
+    <value>The thickness of the border of the objects, or the thickness of the line for the graphs representations.</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="Welcome_Back" xml:space="preserve">
+    <value>Welcome Back</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="Yesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="Your_Interactions" xml:space="preserve">
+    <value>Your Interactions</value>
+  </data>
+  <data name="Your_Interactions_Dscpt" xml:space="preserve">
+    <value>Rating, Favorite, PlayCount...</value>
+  </data>
+</root>

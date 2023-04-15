@@ -1,0 +1,224 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.PlaylistLibraryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views" 
+             xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
+             xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:loader="clr-namespace:LoadingControl;assembly=LoadingControl"
+             xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             xmlns:customSearchBar="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox"
+             d:DataContext="{d:DesignInstance Type=viewmodels:PlaylistLibraryViewModel}"
+             mc:Ignorable="d" 
+             x:Name="RootView"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid x:Name="RootGrid"
+          AllowDrop="True"
+        Drop="RootGrid_Drop"
+        DragEnter="RootGrid_DragEnter"
+          DragLeave="RootGrid_DragLeave"
+          helper:FileDragDropHelper.IsFileDragDropEnabled="True"
+          helper:FileDragDropHelper.FileDragDropTarget="{Binding .}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Border x:Name="DropIndicatorBorder"
+                Grid.Row="1"
+                Margin="2"
+                Background="{DynamicResource PrimaryHover}"
+                IsHitTestVisible="False"
+                BorderBrush="{DynamicResource Primary}"
+                BorderThickness="2"
+                Visibility="Hidden"/>
+
+        <loader:LoadingControl HorizontalAlignment="Left"
+                               Grid.Row="1"
+                                    VerticalAlignment="Top"
+                                    Margin="20,10"
+                                    Height="50"
+                                    Width="50"
+                                    MainColor="{DynamicResource Primary}"
+                                    Background="Transparent"
+                                    Visibility="{Binding FilesDropped, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+        <Grid Margin="30,10"> 
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.45*"/>
+                <ColumnDefinition Width="0.18*"/>
+                <ColumnDefinition Width="0.45*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="{x:Static lang:Resources.MyPlaylists}"
+                                       Style="{DynamicResource SLargeHeaderStyle}"/>
+
+                <TextBlock Text="{Binding PlaylistCount}"
+                                   HorizontalAlignment="Left"
+                                       Style="{DynamicResource NLargeSecondaryStyle}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center">
+                <iconbtn:IconButton Icon="{DynamicResource addSign}"
+                                      Style="{DynamicResource PlaylistIconButton}"
+                                        ToolTip="Create an empty playlist. You can also drop a folder here to create a playlist."
+                                            Command="{Binding CreatePlaylistCommand}"/>
+
+                <iconbtn:IconButton Icon="{DynamicResource PlaylistLibrary}"
+                                    Margin="20,0,0,0"
+                                         Style="{DynamicResource PlaylistIconButton}"
+                                        ToolTip="Create a radio based on a random track."
+                                            Command="{Binding CreateAutoPlaylistCommand}"/>
+            </StackPanel>
+
+            <Border Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    x:Name="searchBarBorder">
+                <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
+                                                    HorizontalAlignment="Right"
+                                                    MaxWidth="300"
+                                                    MinWidth="200"
+                                                    Width="{Binding ActualWidth, ElementName=searchBarBorder, Converter={StaticResource SubstractionConverter}, ConverterParameter=40, UpdateSourceTrigger=PropertyChanged}"
+                                                    Style="{DynamicResource SearchBarStyle}"
+                                                    Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                
+            </Border>
+        </Grid>
+
+        <Grid Margin="10,0"
+              Background="Transparent"
+                  Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="210"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <ItemsControl Grid.Row="0"
+                            x:Name="ConstAutoPlaylists"
+                                HorizontalAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                            ItemsSource="{Binding ConstAutoPlaylist}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel HorizontalAlignment="Center"
+                                                IsItemsHost="True"
+                                        VirtualizingPanel.IsVirtualizing="True"
+                                        VirtualizingPanel.VirtualizationMode="Recycling"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="180"
+                                    Height="200"
+                                    Margin="2,10,2,2"
+                                    x:Name="itemgrid">
+                            <Grid.InputBindings>
+                                <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToPlaylistCommand, Source={x:Reference RootView}}"
+                                              CommandParameter="{Binding .}"/>
+                                <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenPlaylistPopupCommand, Source={x:Reference RootView}}"
+                                              CommandParameter="{Binding .}"/>
+                            </Grid.InputBindings>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="150"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Border x:Name="MouseOverBorder"
+                                        Grid.Row="0"
+                                        Panel.ZIndex="2"
+                                        Opacity="0"
+                                        CornerRadius="10"
+                                         Width="150"
+                                        Height="150"
+                                        Background="{DynamicResource TransparentGradient}"/>
+
+                            <iconbtn:IconButton Icon="{Binding Cover}"
+                                                    Background="{DynamicResource SecondaryContainer}"
+                                                    FillColor="{DynamicResource OnSecondaryContainer}"
+                                                    Style="{DynamicResource BaseIconButton}"
+                                                    Width="150"
+                                                    Height="150"
+                                                    CornerRadius="{DynamicResource SecondaryCornerRadius}"
+                                                    IconHeight="100"
+                                                    IconWidth="100">
+                            </iconbtn:IconButton>
+
+                            <Grid Opacity="0"
+                                      VerticalAlignment="Bottom"
+                                      Panel.ZIndex="3"
+                                      Margin="25,5"
+                                      x:Name="BtnGrid">
+                                <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
+                                                        Command="{Binding DataContext.PlayPlaylistCommand, ElementName=RootView}"
+                                                        CommandParameter="{Binding .}"/>
+
+                                <iconbtn:IconButton Style="{DynamicResource CircledMoreOptionButton}"
+                                                Command="{Binding DataContext.OpenPlaylistPopupCommand, ElementName=RootView}"
+                                            CommandParameter="{Binding .}"/>
+                            </Grid>
+
+                            <TextBlock Text="{Binding Name}"
+                                            Style="{DynamicResource SListItemNameStyle}"
+                                            Grid.Row="1"/>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True" SourceName="itemgrid">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                          To="1" From="0"
+                                                          Storyboard.TargetName="MouseOverBorder"
+                                                         Storyboard.TargetProperty="Opacity">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                          To="1" From="0"
+                                                          Storyboard.TargetName="BtnGrid"
+                                                         Storyboard.TargetProperty="Opacity">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                          To="0" From="1"
+                                                          Storyboard.TargetName="MouseOverBorder"
+                                                         Storyboard.TargetProperty="Opacity">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Duration="0:0:0.1"
+                                                          To="0" From="1"
+                                                          Storyboard.TargetName="BtnGrid"
+                                                         Storyboard.TargetProperty="Opacity">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Border Grid.Row="1">
+                <listviews:PlaylistListView DataContext="{Binding DataContext, ElementName=RootView}"
+                                                Grid.Row="1"/>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <UseWPF>true</UseWPF>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>    
+	  <PackageReference Include="ManagedBass" Version="3.1.1" />    
+	  <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+    <PackageReference Include="TagLibSharp" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataBaseConnection\DataBaseConnection.csproj" />
+    <ProjectReference Include="..\MusicPlay.Language\MusicPlay.Language.csproj" />
+    <ProjectReference Include="..\MusicPlayModels\MusicPlayModels.csproj" />
+  </ItemGroup>
+
+</Project>

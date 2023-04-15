@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.ListViews.HorizontalAlbumListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             mc:Ignorable="d" 
+             x:Name="AlbumListView"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ItemsControl ItemsSource="{Binding Albums, ElementName=AlbumListView}"
+                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                  Style="{DynamicResource LibraryItemsControl}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Grid Style="{DynamicResource LibraryItemsRootGrid}"
+                      x:Name="itemgrid">
+                    <Grid.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToAlbumCommand, ElementName=AlbumListView}"
+                                                  CommandParameter="{Binding .}"/>
+                        <MouseBinding Gesture="RightClick"
+                                                    Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=AlbumListView}"
+                                                    CommandParameter="{Binding .}"/>
+                    </Grid.InputBindings>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border x:Name="MouseOverBorder"
+                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
+                            Grid.Row="0"
+                            Panel.ZIndex="2"
+                            Opacity="0"
+                            Background="{DynamicResource TransparentGradient}"/>
+
+                    <Border Style="{DynamicResource LibraryItemsRoundedImageBorder}"
+                            x:Name="BorderImage">
+                        <Border.Background>
+                            <ImageBrush ImageSource="{Binding AlbumCover, Converter={StaticResource MNullImageConverter}}"
+                                        Stretch="UniformToFill"
+                                        RenderOptions.BitmapScalingMode="Linear"
+                                        RenderOptions.EdgeMode="Aliased"/>
+                        </Border.Background>
+                    </Border>
+
+                    <Grid Opacity="0"
+                          VerticalAlignment="Bottom"
+                          Panel.ZIndex="3"
+                          Margin="15,5, 20, 5"
+                          x:Name="BtnGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
+                                            Command="{Binding DataContext.PlayAlbumCommand, ElementName=AlbumListView}"
+                                            CommandParameter="{Binding .}"/>
+
+                        <iconbtn:IconButton Style="{DynamicResource CircledMoreOptionButton}"
+                                                            Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=AlbumListView}"
+                                                        CommandParameter="{Binding .}"
+                                                        Grid.Column="2"/>
+                    </Grid>
+
+                    <TextBlock Text="{Binding Name}"
+                               Style="{DynamicResource SListItemNameStyle}"
+                               Panel.ZIndex="3"
+                               Grid.Row="1"/>
+                </Grid>
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True" SourceName="itemgrid">
+                        <Trigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0:0:0.1"
+                                                          To="1" From="0"
+                                                          Storyboard.TargetName="MouseOverBorder"
+                                                         Storyboard.TargetProperty="Opacity"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0:0:0.1"
+                                                          To="1" From="0"
+                                                          Storyboard.TargetName="BtnGrid"
+                                                         Storyboard.TargetProperty="Opacity"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.EnterActions>
+                        <Trigger.ExitActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0:0:0.1"
+                                                          To="0" From="1"
+                                                          Storyboard.TargetName="MouseOverBorder"
+                                                         Storyboard.TargetProperty="Opacity"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Duration="0:0:0.1"
+                                                          To="0" From="1"
+                                                          Storyboard.TargetName="BtnGrid"
+                                                         Storyboard.TargetProperty="Opacity"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.ExitActions>
+                    </Trigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+</UserControl>

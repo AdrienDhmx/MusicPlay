@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.ListViews.SelectedFilterListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             mc:Ignorable="d" 
+             x:Name="ListRootView"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <ItemsControl ItemsSource="{Binding DataContext.SelectedFilters, ElementName=ListRootView}"
+                       HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border x:Name="RootFilterBorder"
+                            Height="38"
+                            CornerRadius="19"
+                            Margin="5, 3"
+                            Background="{DynamicResource SecondaryContainer}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="{Binding Name}"
+                                   Style="{DynamicResource NChipStyle}"/>
+
+                            <iconbtn:IconButton Icon="{DynamicResource CloseIcon}"
+                                                Style="{DynamicResource BaseIconButton}"
+                                                Height="38"
+                                                Width="38"
+                                                IconWidth="15"
+                                                IconHeight="15"
+                                                Grid.Column="1"
+                                                CornerRadius="0,19,19,0"
+                                                FillColor="{DynamicResource OnSecondaryContainer}"
+                                                Command="{Binding DataContext.RemoveFilterCommand, ElementName=ListRootView}"
+                                                CommandParameter="{Binding .}"
+                                                MouseOverBackground="{DynamicResource SecondaryHover}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

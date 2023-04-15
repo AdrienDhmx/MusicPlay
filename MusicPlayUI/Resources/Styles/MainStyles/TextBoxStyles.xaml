@@ -1,0 +1,348 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+                    xmlns:searchBar="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox">
+
+    <!-- control template for TextBox -->
+    <ControlTemplate x:Key="TextBoxTemplateBase" TargetType="{x:Type TextBox}">
+        <Grid x:Name="root" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}">
+
+            <!-- main border -->
+            <Border x:Name="normalBorder" 
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"/>
+
+            <!-- TextBox uses a ScrollViewer named PART_ContentHost as its content-presenter -->
+            <ScrollViewer x:Name="PART_ContentHost"
+                          Padding="{TemplateBinding Padding}"
+                          BorderThickness="0" 
+                          IsTabStop="False" 
+                          Margin="2" 
+                          Background="{x:Null}"
+                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+
+        </Grid>
+    </ControlTemplate>
+
+    <Style x:Key="TextBoxBaseStyle" TargetType="{x:Type TextBox}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Template" Value="{DynamicResource TextBoxTemplateBase}"/>
+    </Style>
+
+    <Style x:Key="{x:Type TextBox}" 
+           TargetType="{x:Type TextBox}" 
+           BasedOn="{StaticResource TextBoxBaseStyle}" />
+
+    <!-- text style shared between all texts (or most of them => foreground and alignments change for some texts) -->
+    <Style x:Key="TextblockBaseStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+
+    <Style x:Key="{x:Type TextBlock}" 
+           TargetType="{x:Type TextBlock}" 
+           BasedOn="{StaticResource TextblockBaseStyle}" />
+
+    <!-- N for Normal (font weight) -->
+    <Style x:Key="NStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource TextblockBaseStyle}">
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+
+    <!-- mostly for data in list (tile, duration, album, artist, playlist, sorting option...) -->
+    <Style x:Key="NTrackDataStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NStyle}">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+    </Style>
+
+    <!-- For bigger texts like Menu, info about albums, artists, playlists-->
+    <Style x:Key="NLargeStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NStyle}">
+        <Setter Property="FontSize" Value="18"/>
+    </Style>
+
+    <!-- For chips, like filter chip -->
+    <Style x:Key="NChipStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NStyle}">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainer}"/>
+        <Setter  Property="Margin" Value="20,0,10,0"/>
+    </Style>
+
+    <!-- For secondary data like "X of Y" in library views -->
+    <Style x:Key="NLargeSecondaryStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NLargeStyle}">
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
+    </Style>
+
+    <!-- For smaller texts like performer, playing from... -->
+    <Style x:Key="NSmallStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NStyle}">
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
+    <!-- For smaller texts like performer -->
+    <Style x:Key="NSmallSecondayStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NSmallStyle}">
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
+    </Style>
+
+    <!-- For playing from -->
+    <Style x:Key="NRun" TargetType="Run">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
+    </Style>
+
+    <!-- S for SemiBold -->
+    <Style x:Key="SStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource TextblockBaseStyle}">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="18"/>
+    </Style>
+
+    <!-- For name of item in libraries (album name, artist name, playlist name...) -->
+    <Style x:Key="SListItemNameStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SStyle}">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="MaxHeight" Value="50"/>
+    </Style>
+
+    <!-- For libraries Header and data names in their views (album name, artist name...) -->
+    <Style x:Key="SValidationModalHeaderStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SStyle}">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,10"/>
+    </Style>
+
+    <!-- For libraries Header and data names in their views (album name, artist name...) -->
+    <Style x:Key="SLargeHeaderStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SStyle}">
+        <Setter Property="FontSize" Value="50"/>
+        <Setter Property="FontFamily" Value="Times New Roman"/>
+    </Style>
+
+    <!-- For sub data like the artist of the album -->
+    <Style x:Key="SSubDataStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SStyle}">
+        <Setter Property="FontSize" Value="22"/>
+    </Style>
+
+    <!-- For lists name (recent artist, recent albums...) -->
+    <Style x:Key="SlistInfoStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SStyle}">
+        <Setter Property="FontSize" Value="26"/>
+        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+    </Style>
+    
+    <Style x:Key="SListPlaceHolderStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SlistInfoStyle}">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <!-- For filters texts -->
+    <Style x:Key="SFilterStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SStyle}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainer}"/>
+        <Setter Property="Margin" Value="4,0"/>
+    </Style>
+
+    <!-- For filters Header -->
+    <Style x:Key="SFilterHeaderStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SFilterStyle}">
+        <Setter Property="FontSize" Value="18"/>
+    </Style>
+
+    <!-- B for Bold, for setting type header and welcome message -->
+    <Style x:Key="BStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource TextblockBaseStyle}">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="40"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Welcome message -->
+    <Style x:Key="BWelcomeMessageStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource BStyle}">
+        <Setter Property="FontSize" Value="50"/>
+        <Setter Property="FontFamily" Value="Times New Roman"/>
+    </Style>
+
+    <!-- For normal link (current track title) -->
+    <Style x:Key="NLStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- For current track performer -->
+    <Style x:Key="NLSmallSecondaryStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NSmallSecondayStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- For playing from -->
+    <Style x:Key="NLRun" TargetType="Run"
+           BasedOn="{StaticResource NRun}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!-- for link in track lists -->
+    <Style x:Key="NLTrackDataStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource NTrackDataStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- for link in track lists -->
+    <Style x:Key="SLStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- for link in track lists -->
+    <Style x:Key="SLSubDataStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SSubDataStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- for link/action in lists header (mainly toggle visibility) -->
+    <Style x:Key="SLlistInfoStyle" TargetType="TextBlock"
+           BasedOn="{StaticResource SlistInfoStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- For search bars -->
+    <Style x:Key="SearchBarStyle" TargetType="searchBar:PlaceholderTextBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="Padding" Value="4,0"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Outline}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource OnSurfaceVariant}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Placeholder" Value="{x:Static lang:Resources.Search}"/>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="true">
+                <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+                <Setter Property="BorderThickness" Value="1.2"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TextFieldStyle" TargetType="searchBar:PlaceholderTextBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Padding" Value="4,0,4,4"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Outline}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource OnSurfaceVariant}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OnBackground}"/>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="true">
+                <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+                <Setter Property="BorderThickness" Value="0,0,0,1.2"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <!--  ToolTip  -->
+    <Style x:Key="{x:Type ToolTip}"
+       TargetType="ToolTip">
+        <Setter Property="OverridesDefaultStyle"
+          Value="true" />
+        <Setter Property="HasDropShadow"
+          Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Name="Border"
+                            CornerRadius="5"
+                            Background="{DynamicResource Background}"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource Outline}"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            MaxWidth="300">
+                            <ContentPresenter Margin="4"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                              TextElement.Foreground="{DynamicResource OnBackground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

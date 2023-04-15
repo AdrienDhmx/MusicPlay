@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.SettingsViews.VisualizerSettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.SettingsViews" 
+             xmlns:stepper="clr-namespace:Stepper;assembly=Stepper" 
+             xmlns:colorPicker="clr-namespace:ColorCanvas;assembly=ColorCanvas" 
+             xmlns:cardexpander="clr-namespace:CardDropDown;assembly=CardDropDown"
+             mc:Ignorable="d" 
+             x:Name="Visualizer"
+              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language" 
+             xmlns:settingsviewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
+               xmlns:card="clr-namespace:CustomCardControl;assembly=CustomCardControl"
+             d:DataContext="{d:DesignInstance Type=settingsviewmodel:VisualizerSettingViewModel}"
+             d:DesignHeight="1000" d:DesignWidth="800">
+    <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
+          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
+          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Background="{DynamicResource PrimaryContainer}"
+              x:Name="StickyGrid"
+              MaxHeight="150"
+              Height="150"
+              MinHeight="110">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{x:Static lang:Resources.VisualizerSettings}"
+                       Style="{DynamicResource BStyle}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="0,10,0,0"/>
+
+            <card:CustomCardControl CardHeader="Open in Window"
+                                    Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                    VerticalAlignment="Bottom"
+                                        Margin="4"
+                                        IconMargin="5"
+                                    Background="{DynamicResource PrimaryHover}"
+                                        Icon="{DynamicResource OpenInWindowIcon}"
+                                        Style="{DynamicResource SimpleCardStyle}"
+                                        Command="{Binding OpenInWindowCommand}"/>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Hidden"
+                      x:Name="SettingScroll">
+                <local:VisualizerSettingTemplateView Margin="5, 10"/>
+        </ScrollViewer>
+    </Grid>
+
+</UserControl>

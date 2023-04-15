@@ -1,0 +1,169 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cardcontrol="clr-namespace:CustomCardControl;assembly=CustomCardControl"
+             xmlns:viewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels"
+             xmlns:chart="clr-namespace:HistoryChart;assembly=HistoryChart"
+              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             d:DataContext="{d:DesignInstance Type=viewmodel:HomeViewModel}"
+             Language="{Binding CurrentCulture}"
+             mc:Ignorable="d" 
+             x:Name="RootView"
+             d:DesignHeight="2000" 
+             d:DesignWidth="800">
+
+    <ScrollViewer x:Name="RootScroll"
+                      PreviewMouseWheel="RootScroll_PreviewMouseWheel"
+                      VerticalScrollBarVisibility="Hidden">
+        <Grid SizeChanged="Grid_SizeChanged">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="120"/>
+                <RowDefinition Height="180"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Hello Message -->
+            <Border Background="{DynamicResource PrimaryContainer}"
+                        CornerRadius="0">
+                <TextBlock Text="{Binding WelcomeMessage}"
+                           Style="{DynamicResource BWelcomeMessageStyle}"/>
+            </Border>
+
+            <!-- Library Info Cards -->
+            <Grid Grid.Row="1"
+                    Height="80"
+                    VerticalAlignment="Center"
+                    Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.33*"/>
+                    <ColumnDefinition Width="0.33*"/>
+                    <ColumnDefinition Width="0.33*"/>
+                </Grid.ColumnDefinitions>
+                <cardcontrol:CustomCardControl Icon="{DynamicResource mic}"
+                                                   CardHeader="{Binding NumberOfArtists}"
+                                                   Command="{Binding NavigateToArtistsCommand}"
+                                                   Style="{DynamicResource LibraryStatCardStyle}"/>
+
+                <cardcontrol:CustomCardControl Grid.Column="1"
+                                                   Style="{DynamicResource LibraryStatCardStyle}"
+                                                   Icon="{DynamicResource AlbumLibraryIcon}"
+                                                   CardHeader="{Binding NumberOfAlbums}"
+                                                   Command="{Binding NavigateToAlbumsCommand}"/>
+
+                <cardcontrol:CustomCardControl  Grid.Column="2"
+                                                   Style="{DynamicResource LibraryStatCardStyle}"
+                                                   Icon="{DynamicResource music_icon}"
+                                                   CardHeader="{Binding NumberOfTracks}"/>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                      Visibility="{Binding PlayHistory, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="600"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Border x:Name="TodayListenTime"
+                        Background="{DynamicResource SurfaceVariant}"
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                        Margin="40, 20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding TodayStats}"
+                                        Foreground="{DynamicResource OnSurfaceVariant}"
+                                        VerticalAlignment="Center"
+                                        FontSize="25"
+                                        FontWeight="SemiBold"
+                                        HorizontalAlignment="Center"
+                                        Margin="40, 20"
+                                   Visibility="{Binding TodayStats.Length, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <chart:HistoryChart Foreground="{DynamicResource OnSurfaceVariant}"
+                                            PrimaryColor="{DynamicResource Tertiary}"
+                                            SecondaryColor="{DynamicResource OnTertiaryContainer}"
+                                            Background="Transparent"
+                                            MouseOverBtnColor="{DynamicResource TertiaryHover}"
+                                            Grid.Row="2"
+                                            Margin="0,5"
+                                            x:Name="Chart"/>
+                    </Grid>
+                </Border>
+
+                <!-- Recently Played Artists -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border BorderThickness="0,0,0,1"
+                            BorderBrush="{DynamicResource Primary}"
+                            Margin="10,0,20,0">
+                        <TextBlock Text="{x:Static lang:Resources.Recently_Played_Artists}"
+                                   Style="{DynamicResource SlistInfoStyle}"/>
+                    </Border>
+
+                    <listviews:HorizontalArtistListView Artists="{Binding BindedArtists}"
+                                                            VerticalAlignment="Stretch"
+                                                            Grid.Row="1"
+                                                           Margin="4,0"
+                                                            ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                </Grid>
+
+                <!-- Recently Played Albums -->
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border BorderThickness="0,0,0,1"
+                            BorderBrush="{DynamicResource Primary}"
+                            Margin="10,0,20,0">
+                        <TextBlock Text="{x:Static lang:Resources.Recently_Played_Albums}"
+                                       Style="{DynamicResource SlistInfoStyle}"/>
+                    </Border>
+
+                    <listviews:HorizontalAlbumListView Albums="{Binding BindedAlbums}"
+                                             HorizontalAlignment="Stretch"
+                                             HorizontalContentAlignment="Stretch"
+                                                 Grid.Row="1"
+                                                 Margin="4"/>
+                </Grid>
+
+                <!-- Records -->
+                <Grid Grid.Row="3"
+                          Visibility="{Binding BindedPlaylists.Count, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border BorderThickness="0,0,0,1"
+                                BorderBrush="{DynamicResource Primary}"
+                                Margin="10,0,20,0">
+                        <TextBlock Text="{x:Static lang:Resources.Radio_Station_For_You}"
+                                       Style="{DynamicResource SlistInfoStyle}"/>
+                    </Border>
+
+                    <listviews:PlaylistListView DataContext="{Binding DataContext, ElementName=RootView}"
+                                                Grid.Row="1"
+                                                    Margin="4"/>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                      Visibility="{Binding PlayHistory, Converter={StaticResource BoolToVisibilityConverterInverted}}">
+                <TextBlock Text="Your history and daily playlists will be displayed here once you start listening to music!"
+                               MaxWidth="700"
+                               Style="{DynamicResource SListPlaceHolderStyle}"/>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
