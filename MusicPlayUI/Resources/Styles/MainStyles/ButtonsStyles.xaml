@@ -282,7 +282,7 @@
         <Setter Property="Height" Value="50"/>
         <Setter Property="IconHeight" Value="30"/>
         <Setter Property="IconWidth" Value="28"/>
-        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
     </Style>
 
     <Style x:Key="LargePlayButton" TargetType="IconButton:IconButton"

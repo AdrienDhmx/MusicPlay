@@ -174,7 +174,7 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <listview:ChipListView Genres="{Binding Chips}"
+                <listview:ChipListView Genres="{Binding Genres}"
                                         Margin="0,5,0,0"
                                         VerticalAlignment="Center"
                                        HorizontalAlignment="Center"/>

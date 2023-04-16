@@ -33,7 +33,7 @@ namespace MusicPlayUI.Core.Services
         public int ArtistInfluence { get; set; } = 40;
 
         /// <summary>
-        /// The min percentage of tracks included the radio having the same Chips as the track the radio is based on.
+        /// The min percentage of tracks included the radio having the same Genres as the track the radio is based on.
         /// </summary>
         public int GenreInfluence { get; set; } = 60;
 

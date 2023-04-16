@@ -596,6 +596,11 @@ namespace DataBaseConnection.DataAccess
             return new Query(Tables.TArtist).Where(Columns.Id, id).FirstAsync<ArtistModel>();
         }
 
+        public Task<List<ArtistModel>> GetArtists(IEnumerable<int> ids)
+        {
+            return new Query(Tables.TArtist).WhereIn(Columns.Id, ids).GetAsync<ArtistModel>();
+        }
+
         public Task<List<ArtistModel>> GetArtistFromGenre(int genreId)
         {
             Query query = new Query(Tables.TArtistGenres).Select(Columns.ArtistId).Where(Columns.GenreId, genreId);

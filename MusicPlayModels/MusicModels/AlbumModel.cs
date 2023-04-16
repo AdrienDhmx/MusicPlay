@@ -10,6 +10,8 @@ namespace MusicPlayModels.MusicModels
     {
         private string _albumCover = "";
 
+        private string _duration = "";
+
         public int Id { get; set; }
 
         public string Name { get; set; } = "";
@@ -36,7 +38,14 @@ namespace MusicPlayModels.MusicModels
 
         public List<GenreModel> Genres { get; set; } = new();
 
-        public string Duration { get; set; } = "";
+        public string Duration 
+        {
+            get => _duration;
+            set
+            {
+                SetField(ref _duration, value);
+            }
+        }
 
         public int Length { get; set; }
 

@@ -47,7 +47,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         }
 
         private List<GenreModel> _chips;
-        public List<GenreModel> Chips
+        public List<GenreModel> Genres
         {
             get => _chips;
             set
@@ -127,13 +127,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         private async void LoadArtists()
         {
             List<ArtistDataRelation> artistsRelations = Album.Artists.Order(false);
-            List<ArtistModel> artistModels = new List<ArtistModel>();
-            foreach (ArtistDataRelation a in artistsRelations)
-            {
-                artistModels.Add(await DataAccess.Connection.GetArtist(a.ArtistId));
-            }
-
-            Artists = new(artistModels);
+            Artists = new(await DataAccess.Connection.GetArtists(artistsRelations.Select(a => a.ArtistId)));
         }
 
         public override async void Update(BaseModel baseModel = null)
@@ -153,16 +147,15 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
             MainArtist = Album.GetAlbumArtist();
 
-            Chips = await DataAccess.Connection.GetAlbumGenre(Album.Id);
+            Genres = await DataAccess.Connection.GetAlbumGenre(Album.Id);
 
             List<TrackModel> tracks = new(await DataAccess.Connection.GetTracksFromAlbum(Album.Id));
             tracks = tracks.OrderTracks();
             await tracks.GetAlbumTrackProperties();
             AlbumTracks = new(tracks.ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover));
+            Album.Duration = AlbumTracks.GetTotalLength(out int _);
 
             LoadArtists();
-            Album.Duration = AlbumTracks.GetTotalLength(out int _);
-            OnPropertyChanged(nameof(Album));
         }
     }
 }

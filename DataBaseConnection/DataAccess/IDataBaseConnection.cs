@@ -318,6 +318,14 @@ namespace DataBaseConnection.DataAccess
         /// <param name="id"></param>
         /// <returns></returns>
         public Task<ArtistModel> GetArtist(int id);
+
+        /// <summary>
+        /// Get all the artist corresponding to the ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public Task<List<ArtistModel>> GetArtists(IEnumerable<int> ids);
+
         /// <summary>
         /// Get the playlist corresponding to the Id
         /// </summary>

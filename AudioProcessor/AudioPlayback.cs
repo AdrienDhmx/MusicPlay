@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using System.Timers;
 using AudioEngine.Enums;
 using AudioEngine.Models;
 using ManagedBass;
@@ -139,7 +132,7 @@ namespace AudioEngine
             }
         }
 
-        private static void ErrorHandler()
+        private void ErrorHandler()
         {
             switch (Bass.LastError)
             {
@@ -222,7 +215,14 @@ namespace AudioEngine
                     MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: you do not have EAX (Environmental Audio Extensions) support."));
                     break;
                 case Errors.NotPlaying:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, probably due to the file not being loaded correctly."));
+                    if(!Init(AudioOutput.GetDefaultdevice().Index, Frequency))
+                    {
+                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, the audio device could not be initialized correctly."));
+                    }
+                    else if(!RetryLoadingAndPLayingFile()) // device initalized successfully
+                    { 
+                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing and the device has successfully been initialized, the error might come from the file being corrupted."));
+                    }
                     break;
                 case Errors.SampleRate:
                     MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the sample rate of this file is not valid."));
@@ -341,6 +341,23 @@ namespace AudioEngine
                 {
                     ErrorHandler();
                 }
+            }
+        }
+
+        private bool RetryLoadingAndPLayingFile()
+        {
+            Load(_file);
+            if (Stream == -1)
+                return false;
+
+            if (Bass.ChannelPlay(Stream))
+            {
+                IsPlaying = true;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
