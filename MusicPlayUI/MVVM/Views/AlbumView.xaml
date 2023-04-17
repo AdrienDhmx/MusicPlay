@@ -162,6 +162,7 @@
                 </Grid>
             </Grid>
         </Border>
+        
         <ScrollViewer Background="Transparent"
                       x:Name="AlbumScroll"
                       Grid.Row="1"
@@ -174,7 +175,12 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
+<<<<<<< Updated upstream
                 <listview:ChipListView Genres="{Binding Chips}"
+=======
+                <listview:ChipListView Genres="{Binding Genres}"
+                                       NavigateToGenreCommand="{Binding NavigateToGenreCommand}"
+>>>>>>> Stashed changes
                                         Margin="0,5,0,0"
                                         VerticalAlignment="Center"
                                        HorizontalAlignment="Center"/>

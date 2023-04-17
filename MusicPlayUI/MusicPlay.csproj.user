@@ -15,6 +15,9 @@
     <Compile Update="MVVM\Views\EmptyView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\GenreView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\ListViews\AlbumArtistslistView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -143,6 +146,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="MVVM\Views\GenreView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\ListViews\AlbumArtistslistView.xaml">
       <SubType>Designer</SubType>
     </Page>

@@ -306,6 +306,11 @@ namespace DataBaseConnection.DataAccess
 
         public Task<List<ArtistModel>> GetArtistFromGenre(int genreId);
 
+        public Task<List<TrackModel>> GetTracksFromAlbums(IEnumerable<int> albumsId);
+
+        public Task<List<TrackModel>> GetTracksFromArtists(IEnumerable<int> artistsId);
+
+
         /// <summary>
         /// Get the album corresponding to the Id
         /// </summary>

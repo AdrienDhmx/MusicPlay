@@ -760,6 +760,20 @@ namespace DataBaseConnection.DataAccess
             throw new NotImplementedException();
         }
 
+        public async Task<List<TrackModel>> GetTracksFromAlbums(IEnumerable<int> albumsId)
+        {
+            List<TrackModel> tracks = await new Query(Tables.TTrack).WhereIn(Columns.AlbumId, albumsId).GetAsync<TrackModel>();
+            return await GetTracksArtists(tracks);
+        }
+
+        public async Task<List<TrackModel>> GetTracksFromArtists(IEnumerable<int> artistsId)
+        {
+            Query query = new Query(Tables.TTrackArtists).Select(Columns.TrackId).WhereIn(Columns.ArtistId, artistsId);
+            List<TrackModel> tracks = (await new Query(Tables.TTrack).WhereIn(Columns.Id, query).GetAsync<TrackModel>()).ToList();
+            return await GetTracksArtists(tracks);
+
+        }
+
         public async Task<TrackModel> GetTrackByPath(string path)
         {
             TrackModel track = await new Query(Tables.TTrack).Where(Columns.Path, path).FirstAsync<TrackModel>();

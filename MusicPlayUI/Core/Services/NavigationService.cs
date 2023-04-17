@@ -24,6 +24,16 @@ namespace MusicPlayUI.Core.Services
             }
         }
 
+        private bool _isQueueDrawerOpen;
+        public bool IsQueueDrawerOpen
+        {
+            get { return _isQueueDrawerOpen; }
+            set
+            {
+                SetField(ref _isQueueDrawerOpen, value);
+            }
+        }
+
         public event Action IsFullScreenChanged;
         private void OnIsFullScreenChanged()
         {
@@ -176,6 +186,10 @@ namespace MusicPlayUI.Core.Services
                     CurrentViewName = viewName;
                     NavigateTo<PlaylistViewModel>(parameter, saveView);
                     break;
+                case ViewNameEnum.SpecificGenre:
+                    CurrentViewName = viewName;
+                    NavigateTo<GenreViewModel>(parameter, saveView);
+                    break;
                 case ViewNameEnum.NowPlaying:
                     CurrentViewName = viewName;
                     NavigateTo<NowPlayingViewModel>(saveView: saveView);
@@ -276,9 +290,14 @@ namespace MusicPlayUI.Core.Services
             }
         }
 
-        public void SwitchFullScreen()
+        public void ToggleFullScreen()
         {
             IsFullScreen = !IsFullScreen;
+        }
+
+        public void ToggleQueueDrawer()
+        {
+            IsQueueDrawerOpen = !IsQueueDrawerOpen;
         }
     }
 }

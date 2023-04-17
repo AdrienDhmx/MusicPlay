@@ -24,13 +24,13 @@ namespace MusicPlayUI.Core.Enums
         Playlists = 4,
         Import = 5,
         Settings = 6,
+        NowPlaying = 7, // now in menu
 
         // Main Views (not in menu)
         SpecificAlbum = 10,
         SpecificArtist = 11,
         SpecificPlaylist = 12,
-
-        NowPlaying = 13, // now in menu
+        SpecificGenre = 13,
 
         // Secondary Views
         Queue = 20,

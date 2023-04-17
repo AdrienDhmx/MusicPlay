@@ -114,7 +114,7 @@
                     <listviews:HorizontalArtistListView Artists="{Binding BindedArtists}"
                                                             VerticalAlignment="Stretch"
                                                             Grid.Row="1"
-                                                           Margin="4,0"
+                                                           Margin="20,4"
                                                             ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
                 </Grid>
 
@@ -135,7 +135,7 @@
                                              HorizontalAlignment="Stretch"
                                              HorizontalContentAlignment="Stretch"
                                                  Grid.Row="1"
-                                                 Margin="4"/>
+                                                 Margin="20,4"/>
                 </Grid>
 
                 <!-- Records -->
