@@ -26,6 +26,7 @@ namespace MusicPlayUI.Core.Commands
         ICommand OpenTrackPopupCommand { get; }
         ICommand NextTrackCommand { get; }
         ICommand ToggleQueueDrawerCommand { get; }
+
         ICommand PlayPauseCommand { get; }
         ICommand PreviousTrackCommand { get; }
         ICommand RatingCommand { get; }

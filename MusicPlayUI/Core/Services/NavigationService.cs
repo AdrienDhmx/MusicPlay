@@ -222,6 +222,10 @@ namespace MusicPlayUI.Core.Services
                     ScdViewName = viewName;
                     NavigateToSecondaryView<VisualizerSettingViewModel>();
                     break;
+                case ViewNameEnum.Shortcuts:
+                    ScdViewName = viewName;
+                    NavigateToSecondaryView<ShortcutSettingViewModel>();
+                    break;
                 default:
                     ScdViewName = viewName;
                     NavigateTo<EmptyViewModel>(saveView: saveView);

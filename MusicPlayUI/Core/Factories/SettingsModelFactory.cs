@@ -77,7 +77,8 @@ namespace MusicPlayUI.Core.Factories
                 new(ViewNameEnum.General, Resources.General_Setting, "", true),
                 new(ViewNameEnum.AppTheme, Resources.Themes_Setting, ""),
                 new(ViewNameEnum.Language, Resources.Language_Setting, ""),
-                new(ViewNameEnum.Visualizer, Resources.Visualizer, "")
+                new(ViewNameEnum.Visualizer, Resources.Visualizer, ""),
+                new(ViewNameEnum.Shortcuts, "Shortcuts", ""),
             };
             return settings;
         }

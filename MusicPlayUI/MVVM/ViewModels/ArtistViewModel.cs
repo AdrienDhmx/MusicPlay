@@ -402,7 +402,9 @@ namespace MusicPlayUI.MVVM.ViewModels
             Genres = await DataAccess.Connection.GetArtistGenre(Artist.Id);
             Artist.Genres = Genres;
 
-            Tracks = (await (await ArtistServices.GetArtistTracks(Artist.Id)).GetAlbumTrackProperties()).ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover);
+            Tracks = (await (await ArtistServices.GetArtistTracks(Artist.Id))
+                            .GetAlbumTrackProperties())
+                            .ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover);
             Artist.Duration = Tracks.GetTotalLength(out int _);
 
             {
@@ -444,13 +446,11 @@ namespace MusicPlayUI.MVVM.ViewModels
             SinglesAndEPHeader = $"Singles & EP: {SinglesAndEP.Count}";
             FeaturedInHeader = $"Featured in {FeaturedInAlbum.Count} {(FeaturedInAlbum.Count == 1 ? Resources.Album : Resources.Albums_View)}";
 
-            {
-                List<UIOrderedTrackModel> artistTracks = (await (await DataAccess.Connection.GetTracksFromArtist(Artist.Id)).GetAlbumTrackProperties()).ToUIOrderedTrackModelWithTrackNumber(QueueService.AlbumCoverOnly, QueueService.AutoCover);
-                    
+            {                    
                 List<UIOrderedTrackModel> composedTracks = new();
                 List<UIOrderedTrackModel> performedTracks = new();
                 List<UIOrderedTrackModel> lyricistTracks = new();
-                foreach (UIOrderedTrackModel track in artistTracks.OrderBy(t => t.AlbumId))
+                foreach (UIOrderedTrackModel track in Tracks.OrderBy(t => t.AlbumId))
                 {
                     bool isComposer = track.IsComposer(Artist.Id, true);
                     bool isPerformer = track.IsPerformer(Artist.Id, true);

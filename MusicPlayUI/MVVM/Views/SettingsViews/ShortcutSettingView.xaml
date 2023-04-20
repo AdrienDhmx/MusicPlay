@@ -1,0 +1,132 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.SettingsViews.ShortcutSettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.SettingsViews"
+             xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" 
+             xmlns:settingsviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
+             d:DataContext="{d:DesignInstance Type=settingsviewmodels:ShortcutSettingViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
+          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
+          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Background="{DynamicResource PrimaryContainer}"
+              x:Name="StickyGrid"
+              MaxHeight="150"
+              Height="150"
+              MinHeight="80">
+            <TextBlock Text="Shortcuts"
+                       Style="{DynamicResource BStyle}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Hidden"
+                      x:Name="SettingScroll">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Grid MaxWidth="900"
+                      HorizontalAlignment="Center"
+                      Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="115"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border BorderBrush="{DynamicResource SurfaceVariant}"
+                            Padding="10,0"
+                            BorderThickness="1,0,1,0">
+                        <TextBlock Text="Command"
+                                   Style="{DynamicResource NTrackDataStyle}"/>
+                    </Border>
+
+
+                    <Border BorderBrush="{DynamicResource SurfaceVariant}"
+                            Grid.Column="1"
+                            Padding="10,0"
+                            BorderThickness="0,0,1,0">
+                        <TextBlock Text="Modifier"
+                                   Style="{DynamicResource NTrackDataStyle}"/>
+                    </Border>
+
+                    <Border BorderBrush="{DynamicResource SurfaceVariant}"
+                            Grid.Column="2"
+                            Padding="10,0"
+                            BorderThickness="0,0,1,0">
+                        <TextBlock Text="key"
+                                   Style="{DynamicResource NTrackDataStyle}"/>
+                    </Border>
+                </Grid>
+
+                <ItemsControl x:Name="Shortcuts"
+                              ItemsSource="{Binding Shortcuts}"
+                              MaxWidth="900"
+                              Grid.Row="1"
+                              HorizontalAlignment="Center"
+                              Margin="10">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource SurfaceVariant}"
+                                    BorderThickness="0,1,0,0"
+                                    Padding="6, 4">
+                                <Grid Height="45">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="300"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{Binding CommandName}"
+                                               Margin="10,0"
+                                               FontSize="18"
+                                               Style="{DynamicResource SlistInfoStyle}"/>
+
+                                    <Border Background="{DynamicResource SecondaryContainer}"
+                                            Grid.Column="1"
+                                            Padding="6,4"
+                                            Visibility="{Binding HasModifier, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=1}"
+                                            CornerRadius="{DynamicResource PrimaryCornerRadius}">
+                                        <TextBlock Text="{Binding ModifierName}"
+                                                   HorizontalAlignment="Center"
+                                                   FontSize="16"
+                                                   Foreground="{DynamicResource OnSecondaryContainer}"
+                                                   Style="{DynamicResource BStyle}"
+                                                   />
+                                    </Border>
+
+                                    <Border Background="{DynamicResource SecondaryContainer}" 
+                                             Grid.Column="3"
+                                            Padding="6,4"
+                                            CornerRadius="{DynamicResource PrimaryCornerRadius}">
+                                        <TextBlock Text="{Binding KeyName}"
+                                                   HorizontalAlignment="Center"
+                                                   FontSize="16"
+                                                   Foreground="{DynamicResource OnSecondaryContainer}"
+                                                   Style="{DynamicResource BStyle}"
+                                                   />
+                                    </Border>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

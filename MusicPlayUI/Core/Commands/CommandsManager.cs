@@ -180,7 +180,10 @@ namespace MusicPlayUI.Core.Commands
                 }
             });
 
-            LeaveCommand = new RelayCommand(Application.Current.Shutdown);
+            LeaveCommand = new RelayCommand(() =>
+            {
+                App.Current.Shutdown();
+            });
         }
 
         public ICommand GetCommand(CommandEnums commandEnums)

@@ -372,6 +372,7 @@
                                             <Slider Value="{Binding Volume}"
                                                     IsMoveToPointEnabled="True"
                                                     Maximum="10000"
+                                                    Cursor="Hand"
                                                     Minimum="0"
                                                     Orientation="Vertical"
                                                     HorizontalAlignment="Center"
@@ -416,7 +417,7 @@
                         <Setter Property="Placement" Value="Top"/>
                         <Setter Property="IsOpen" Value="false"/>
                         <Setter Property="HorizontalOffset" Value="-110"/>
-                        <Setter Property="VerticalOffset" Value="-5"/>
+                        <Setter Property="VerticalOffset" Value="-8"/>
                         <Setter Property="Child">
                             <Setter.Value>
                                 <Border Height="auto"

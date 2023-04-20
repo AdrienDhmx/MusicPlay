@@ -46,7 +46,6 @@ namespace MusicPlayUI
                 services.AddSingleton<IPlaylistService, PlaylistService>();
                 services.AddSingleton<ICommandsManager, CommandsManager>();
 
-
                 // Views with their ViewModel
                 services.AddSingleton<MainMenuView>();
                 services.AddSingleton<MainMenuViewModel>();
@@ -135,6 +134,9 @@ namespace MusicPlayUI
 
                 services.AddTransient<VisualizerSettingView>();
                 services.AddTransient<VisualizerSettingViewModel>();
+
+                services.AddTransient<ShortcutSettingView>();
+                services.AddTransient<ShortcutSettingViewModel>();
 
                 services.AddTransient<EmptyViewModel>();
                 services.AddTransient<EmptyView>();

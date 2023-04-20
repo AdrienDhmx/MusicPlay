@@ -12,6 +12,7 @@
         xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
         xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
         xmlns:messagehelper="clr-namespace:MessageControl;assembly=MessageControl"
+        xmlns:command="clr-namespace:MusicPlayUI.Core.Commands"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
         WindowStyle="None"
@@ -26,7 +27,6 @@
         Title="{Binding QueueService.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}"
         x:Name="Root"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}">
-    
     <!-- Root Border -->
     <Border x:Name="WindowBorder"
             Background="{DynamicResource Background}"
@@ -71,7 +71,7 @@
                     BorderThickness="0,0,0,1"
                     MouseDown="WindowTopBorder_MouseLeftButtonDown">
                 <Border.InputBindings>
-                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding MaximizeCommand}"/>
+                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding CommandsManager.MaximizeCommand}"/>
                 </Border.InputBindings>
                 <Grid x:Name="MenuBarGrid"
                       Grid.ColumnSpan="3">
@@ -107,16 +107,16 @@
                         </Grid.ColumnDefinitions>
 
                         <iconbtn:IconButton Style="{DynamicResource MinimizeBtn}"
-                                            Command="{Binding MinimizeCommand}"/>
+                                            Command="{Binding CommandsManager.MinimizeCommand}"/>
 
                         <iconbtn:IconButton Style="{DynamicResource MaximizeBtn}"
                                         Grid.Column="1"
                                            x:Name="MaximizeBtn"
-                                            Command="{Binding MaximizeCommand}"/>
+                                            Command="{Binding CommandsManager.MaximizeCommand}"/>
 
                         <iconbtn:IconButton Style="{DynamicResource CloseBtn}"
                                         Grid.Column="2"
-                                            Command="{Binding LeaveCommand}"/>
+                                            Command="{Binding CommandsManager.LeaveCommand}"/>
                     </Grid>
                 </Grid>
                 

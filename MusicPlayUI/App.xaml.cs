@@ -24,6 +24,7 @@ using MessageControl;
 using MusicPlayUI.Core.Commands;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
+using System.Windows.Input;
 
 namespace MusicPlayUI
 {
@@ -37,6 +38,7 @@ namespace MusicPlayUI
         public static readonly string defaultImage = "Resources\\DefaultImage.png";
         public static readonly string defaultArtistImage = "Resources\\DefaultArtistImage.jpg";
 
+        public static ShortcutsManager ShortcutsManager { get; private set; }
         private IServiceProvider _services;
         private IQueueService _queueService;
         protected override async void OnStartup(StartupEventArgs e)
@@ -61,7 +63,7 @@ namespace MusicPlayUI
                 MainWindow window = _services.GetRequiredService<MainWindow>();
                 window.Show();
 
-                ShortcutsManager shortcutsManager = new(_services.GetRequiredService<ICommandsManager>(), window);
+                ShortcutsManager = new(_services.GetRequiredService<ICommandsManager>(), window);
 
                 int deletedTracks = await ImportMusicLibrary.CheckTrackPaths();
                 if (deletedTracks > 0)

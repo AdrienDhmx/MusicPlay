@@ -134,7 +134,7 @@ namespace AudioHandler
             }
         }
 
-        private static void ErrorHandler()
+        private void ErrorHandler()
         {
             switch (Bass.LastError)
             {
@@ -217,7 +217,14 @@ namespace AudioHandler
                     MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: you do not have EAX (Environmental Audio Extensions) support."));
                     break;
                 case Errors.NotPlaying:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, probably due to the file not being loaded correctly."));
+                    if(!Init(AudioOutput.GetDefaultdevice().Index, Frequency))
+                    {
+                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, the audio device could not be initialized correctly."));
+                    }
+                    else if(!RetryLoadingAndPLayingFile()) // device initalized successfully
+                    { 
+                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing and the device has successfully been initialized, the error might come from the file being corrupted."));
+                    }
                     break;
                 case Errors.SampleRate:
                     MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the sample rate of this file is not valid."));
@@ -336,6 +343,23 @@ namespace AudioHandler
                 {
                     ErrorHandler();
                 }
+            }
+        }
+
+        private bool RetryLoadingAndPLayingFile()
+        {
+            Load(_file);
+            if (Stream == -1)
+                return false;
+
+            if (Bass.ChannelPlay(Stream))
+            {
+                IsPlaying = true;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
