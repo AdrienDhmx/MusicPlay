@@ -47,13 +47,13 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<GenreModel> _chips;
-        public List<GenreModel> Chips
+        private List<GenreModel> _genres;
+        public List<GenreModel> Genres
         {
-            get => _chips;
+            get => _genres;
             set
             {
-                SetField(ref _chips, value);
+                SetField(ref _genres, value);
             }
         }
 
@@ -99,13 +99,13 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             // play
             PlayAlbumCommand = new RelayCommand(() =>
-                this.QueueService.SetNewQueue(AlbumTracks.ToList(), Album.Name, ModelTypeEnum.Album, Album.AlbumCover, AlbumTracks[0], false, false));
+                this.QueueService.SetNewQueue(AlbumTracks.ToList(), new(Album.Name, ModelTypeEnum.Album, Album.Id), Album.AlbumCover, AlbumTracks[0], false, false));
             PlayShuffledAlbumCommand = new RelayCommand(() =>
-                this.QueueService.SetNewQueue(AlbumTracks.ToList(), Album.Name, ModelTypeEnum.Album, Album.AlbumCover, null, true, false));
+                this.QueueService.SetNewQueue(AlbumTracks.ToList(), new(Album.Name, ModelTypeEnum.Album, Album.Id), Album.AlbumCover, null, true, true));
             PlayTrackCommand = new RelayCommand<UIOrderedTrackModel>((track) =>
-                this.QueueService.SetNewQueue(AlbumTracks.ToList(), Album.Name, ModelTypeEnum.Album, Album.AlbumCover, track, false, false));
+                this.QueueService.SetNewQueue(AlbumTracks.ToList(), new(Album.Name, ModelTypeEnum.Album, Album.Id), Album.AlbumCover, track, false, false));
             PlayArtistCommand = new RelayCommand<ArtistModel>(async (artist) =>
-                this.QueueService.SetNewQueue(await DataAccess.Connection.GetTracksFromArtist(artist.Id), artist.Name, ModelTypeEnum.Artist, artist.Cover, null, false, false));
+                this.QueueService.SetNewQueue(await DataAccess.Connection.GetTracksFromArtist(artist.Id), new(artist.Name, ModelTypeEnum.Artist, artist.Id), artist.Cover, null, false, false));
 
             // navigate
             NavigateToArtistCommand = _commandsManager.NavigateToArtistCommand;
@@ -153,7 +153,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
             MainArtist = Album.GetAlbumArtist();
 
-            Chips = await DataAccess.Connection.GetAlbumGenre(Album.Id);
+            Genres = await DataAccess.Connection.GetAlbumGenre(Album.Id);
 
             List<TrackModel> tracks = new(await DataAccess.Connection.GetTracksFromAlbum(Album.Id));
             tracks = tracks.OrderTracks();

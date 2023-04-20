@@ -169,13 +169,13 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             SwitchFullScreenCommand = new RelayCommand(() =>
             {
-                navigationService.SwitchFullScreen();
+                navigationService.ToggleFullScreen();
             });
 
             EscapeFullScreenCommand = new RelayCommand(() =>
             {
                 if (NavigationService.IsFullScreen)
-                    navigationService.SwitchFullScreen();
+                    navigationService.ToggleFullScreen();
             });
 
             ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);

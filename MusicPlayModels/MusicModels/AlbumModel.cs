@@ -60,5 +60,17 @@ namespace MusicPlayModels.MusicModels
         {
             return !IsEP && !IsSingle;
         }
+
+        public List<int> GetArtistsId()
+        {
+            List<int> ids = new List<int>();
+
+            foreach (var artist in Artists)
+            {
+                ids.Add(artist.ArtistId);
+            }
+
+            return ids;
+        }
     }
 }

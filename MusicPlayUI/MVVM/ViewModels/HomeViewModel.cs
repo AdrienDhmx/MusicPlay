@@ -242,16 +242,16 @@ namespace MusicPlayUI.MVVM.ViewModels
         // Play methods
         private async void PlayArtist(ArtistModel artist)
         {
-            _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), artist.Name, ModelTypeEnum.Artist, artist.Cover, null, false, false, false);
+            _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), new(artist.Name, ModelTypeEnum.Artist, artist.Id), artist.Cover, null, false, false, false);
         }
         private async void PlayAlbum(AlbumModel album)
         {
             List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbum(album.Id);
-            _queueService.SetNewQueue(tracks, album.Name, ModelTypeEnum.Album, album.AlbumCover, null, false, false, true);
+            _queueService.SetNewQueue(tracks, new(album.Name, ModelTypeEnum.Album, album.Id), album.AlbumCover, null, false, false, true);
         }
         private void PlayPlaylist(PlaylistModel playlist)
         {
-            _queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), playlist.Name, ModelTypeEnum.Playlist, playlist.Cover, null);
+            _queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null);
         }
     }
 }

@@ -126,19 +126,19 @@ namespace MusicPlayUI.MVVM.ViewModels
             // play commands
             PlayGenreCommand = new RelayCommand<string>((shuffle) =>
             {
-                _queueService.SetNewQueue(Tracks.ToList(), Genre.Name, ModelTypeEnum.Genre, "", null, shuffle == "1");
+                _queueService.SetNewQueue(Tracks.ToList(), new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
             });
 
             PlayAlbumsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
             {
                 List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbums(Albums.Select(a => a.Id));
-                _queueService.SetNewQueue(tracks, Genre.Name, ModelTypeEnum.Genre, "", null, shuffle == "1");
+                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
             });
 
             PlayArtistsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
             {
                 List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromArtists(Artists.Select(a => a.Id));
-                _queueService.SetNewQueue(tracks, Genre.Name, ModelTypeEnum.Genre, "", null, shuffle == "1");
+                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
             });
 
             ShowHideArtistsCommand = new RelayCommand(() =>
@@ -177,31 +177,18 @@ namespace MusicPlayUI.MVVM.ViewModels
             Artists = new(await DataAccess.Connection.GetArtistFromGenre(Genre.Id));
             Albums = new(await DataAccess.Connection.GetAlbumFromGenre(Genre.Id));
 
-            int ar = 0;
             int al = 0;
             for (int i = 0; i < _maxNumberOfCoversToDisplay; i++)
             {
-                if(al == Albums.Count && ar == Artists.Count)
+                if(al == Albums.Count)
                 {
                     al = 0; // restart
-                    ar = 0;
                 }
+
                 if(al < Albums.Count) 
                 {
                     Covers.Add(Albums[al].AlbumCover);
                     al++;
-                }
-                else if(ar < Artists.Count)
-                {
-                    while (Covers.Contains(Artists[ar].Cover))
-                    {
-                        if (ar == Artists.Count - 1)
-                            break;
-
-                        ar++;
-                    }
-                    Covers.Add(Artists[ar].Cover);
-                    ar++;
                 }
             }
 
@@ -210,6 +197,32 @@ namespace MusicPlayUI.MVVM.ViewModels
             Tracks = new(tracks);
 
             Duration = tracks.GetTotalLength(out int _);
+        }
+
+        public int RemoveAlbum(int albumId)
+        {
+            for (int i = 0; i < Albums.Count; i++)
+            {
+                if (Albums[i].Id == albumId)
+                {
+                    Albums.RemoveAt(i);
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public int RemoveArtist(int artistId)
+        {
+            for (int i = 0; i < Artists.Count; i++)
+            {
+                if (Artists[i].Id == artistId)
+                {
+                    Artists.RemoveAt(i);
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }

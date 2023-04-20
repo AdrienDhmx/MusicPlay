@@ -190,7 +190,7 @@ namespace MusicPlayUI.Core.Commands
             _keyBindings.Add(CommandEnums.ToggleFullScreen, ToggleFullScreenGesture);
 
             ToggleQueueDrawer = _defaultToggleQueueDrawer.CreateKeyBinding(_commandsManager.ToggleQueueDrawerCommand);
-            _keyBindings.Add(CommandEnums.ToggleQueueDrawer, ToggleFullScreenGesture);
+            _keyBindings.Add(CommandEnums.ToggleQueueDrawer, ToggleQueueDrawer);
 
             _window.InputBindings.Clear();
             _window.InputBindings.AddRange(_keyBindings.Values);

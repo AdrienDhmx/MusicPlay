@@ -195,11 +195,11 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             if (IsAutoPlaylist)
             {
-                _queueService.SetNewQueue(PlaylistTracks.ToTrackModel(), Playlist.Name, ModelTypeEnum.Playlist, "", track, shuffle, false, false);
+                _queueService.SetNewQueue(PlaylistTracks.ToTrackModel(), new(Playlist.Name, ModelTypeEnum.Playlist, Playlist.Id), "", track, shuffle, false, false);
             }
             else
             {
-                _queueService.SetNewQueue(PlaylistTracks.ToTrackModel(), Playlist.Name, ModelTypeEnum.Playlist, Playlist.Cover, track, shuffle, false, false);
+                _queueService.SetNewQueue(PlaylistTracks.ToTrackModel(), new(Playlist.Name, ModelTypeEnum.Playlist, Playlist.Id), Playlist.Cover, track, shuffle, false, false);
             }
         }
 

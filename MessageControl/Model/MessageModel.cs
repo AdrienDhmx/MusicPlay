@@ -18,6 +18,10 @@ namespace MessageControl.Model
 
         public string UndoMessage { get; set; } = string.Empty;
 
+        public string UndoneMessage { get; set; } = string.Empty;
+
+        public string UndoneFailedMessage { get; set; } = string.Empty;
+
         public Geometry? Icon { get; set; }
 
         public Brush? IconBrush { get; set; }

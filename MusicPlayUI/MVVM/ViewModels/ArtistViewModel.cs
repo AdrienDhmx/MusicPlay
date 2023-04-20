@@ -298,7 +298,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (album is not null)
                 {
                     List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbum(album.Id);
-                    this.QueueService.SetNewQueue(tracks, album.Name, ModelTypeEnum.Album, album.AlbumCover, null, false, false, true);
+                    this.QueueService.SetNewQueue(tracks, new(album.Name, ModelTypeEnum.Album, album.Id), album.AlbumCover, null, false, false, true);
                 }
             });
             PlayAlbumsOnlyCommand = new RelayCommand<string>(async (string shuffled) =>
@@ -309,7 +309,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                     tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
                 }
 
-                this.QueueService.SetNewQueue(tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", false, false);
             });
             PlaySinglesAndEpCommand = new RelayCommand<string>(async (string shuffled) =>
             {
@@ -319,7 +319,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                     tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
                 }
 
-                this.QueueService.SetNewQueue(tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", false, false);
             });
             PlayFeaturedInAlbumsCommand = new RelayCommand<string>(async (string shuffled) =>
             {
@@ -329,17 +329,17 @@ namespace MusicPlayUI.MVVM.ViewModels
                     tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
                 }
 
-                this.QueueService.SetNewQueue(tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", false, false);
             });
             PlayComposedTracksCommand = new RelayCommand<string>((string shuffled) =>
             {
-                this.QueueService.SetNewQueue(ComposedTracks.ToList(), Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(ComposedTracks.ToList(), new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", shuffled == "1");
             });
             PlayPerformedTracksCommand = new RelayCommand<string>((string shuffled) =>
             {
-                this.QueueService.SetNewQueue(PerformedInTracks.ToList(), Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(PerformedInTracks.ToList(), new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", shuffled == "1");
             });
-            PlayLyricistOfTracksCommand = new RelayCommand<string>((string shuffled) => { this.QueueService.SetNewQueue(LyricistOfTracks.ToList(), Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false); });
+            PlayLyricistOfTracksCommand = new RelayCommand<string>((string shuffled) => { this.QueueService.SetNewQueue(LyricistOfTracks.ToList(), new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", shuffled == "1"); });
 
             // lists visibility
             ShowHideMainAlbumsCommand = new RelayCommand(() =>
@@ -385,7 +385,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void PlayArtist(bool shuffle = false, TrackModel startingTrack = null)
         {
-            QueueService.SetNewQueue(Tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, startingTrack, shuffle);
+            QueueService.SetNewQueue(Tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, startingTrack, shuffle);
         }
 
         public async override void Update(BaseModel baseModel = null)

@@ -1,19 +1,6 @@
-<<<<<<< Updated upstream
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
-using AudioEngine.Enums;
-using AudioEngine.Models;
-=======
-﻿using System.Timers;
 using AudioHandler.Enums;
 using AudioHandler.Models;
->>>>>>> Stashed changes
 using ManagedBass;
 using ManagedBass.Fx;
 using MessageControl;

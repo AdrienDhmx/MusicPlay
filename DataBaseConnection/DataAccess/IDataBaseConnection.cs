@@ -32,6 +32,8 @@ namespace DataBaseConnection.DataAccess
         /// <returns></returns>
         public Task<List<GenreModel>> GetAllGenres();
 
+        public Task<GenreModel> GetGenre(int id);
+
         /// <summary>
         /// Get the last queue playing stored in the database
         /// </summary>
@@ -373,6 +375,14 @@ namespace DataBaseConnection.DataAccess
         /// <param name="genreId"></param>
         /// <returns></returns>
         public Task RemoveAlbumGenre(int albumId, int genreId);
+
+        /// <summary>
+        /// Remove the relation btw the artist and the genre specified as well as all the albums from that artist
+        /// </summary>
+        /// <param name="albumId"></param>
+        /// <param name="genreId"></param>
+        /// <returns></returns>
+        public Task RemoveArtistGenre(int artistId, int genreId);
 
         /// <summary>
         /// Delete all the data in the database (no undo)

@@ -108,6 +108,9 @@
     <Compile Update="MVVM\Views\PopupViews\QueueDrawerView.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\PopupViews\GenreListPopupView.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\PopupViews\SortByPopupView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -177,6 +180,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\PlayerControlViews\NowPlayingPlayerControlView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\PopupViews\GenreListPopupView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\PopupViews\SortByPopupView.xaml">

@@ -109,7 +109,7 @@
                     
                     <StackPanel Grid.Row="1"
                                 Style="{DynamicResource ArtistLargePlayBtnStackPanel}"
-                                Margin="0,0,0,5"
+                                Margin="40,0,0,5"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center">
                         <iconbtn:IconButton Style="{DynamicResource LargePlayButton}"
@@ -118,11 +118,6 @@
                         <iconbtn:IconButton Style="{DynamicResource LargePlayShuffleButton}"
                                             Command="{Binding PlayGenreCommand}"
                                             CommandParameter="1"/>
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"/>
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -136,16 +131,12 @@
                 <iconbtn:IconButton Style="{DynamicResource SmallPlayShuffleButton}"
                                             Command="{Binding PlayGenreCommand}"
                                             CommandParameter="1"/>
-                <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"/>
             </StackPanel>
         </Grid>
 
 
         <ScrollViewer x:Name="ScrollPart"
+                      VerticalScrollBarVisibility="Hidden"
                       Grid.Row="1">
             <Grid>
                 <Grid.RowDefinitions>

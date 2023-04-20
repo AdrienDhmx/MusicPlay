@@ -596,6 +596,11 @@ namespace DataBaseConnection.DataAccess
             return new Query(Tables.TArtist).Where(Columns.Id, id).FirstAsync<ArtistModel>();
         }
 
+        public Task<GenreModel> GetGenre(int id)
+        {
+            return new Query(Tables.TGenre).Where(Columns.Id, id).FirstAsync<GenreModel>();
+        }
+
         public Task<List<ArtistModel>> GetArtistFromGenre(int genreId)
         {
             Query query = new Query(Tables.TArtistGenres).Select(Columns.ArtistId).Where(Columns.GenreId, genreId);
@@ -820,6 +825,11 @@ namespace DataBaseConnection.DataAccess
         public Task RemoveAlbumGenre(int albumId, int genreId)
         {
             return new Query(Tables.TAlbumGenres).Where(Tables.CreateAlbumGenresTable(albumId, genreId)).AsDelete().DeleteAsync();
+        }
+
+        public async Task RemoveArtistGenre(int artistId, int genreId)
+        {
+            await new Query(Tables.TArtistGenres).Where(Tables.CreateArtistGenresTable(artistId, genreId)).AsDelete().DeleteAsync();
         }
 
         public Task RemoveTrackFromPlaylist(PlaylistModel playlist, TrackModel track)

@@ -61,6 +61,8 @@ namespace MusicPlayUI
                 MainWindow window = _services.GetRequiredService<MainWindow>();
                 window.Show();
 
+                ShortcutsManager shortcutsManager = new(_services.GetRequiredService<ICommandsManager>(), window);
+
                 int deletedTracks = await ImportMusicLibrary.CheckTrackPaths();
                 if (deletedTracks > 0)
                 {

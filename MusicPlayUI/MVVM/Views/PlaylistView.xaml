@@ -81,7 +81,7 @@
 
                         <StackPanel Margin="0,5,0,0"
                                     HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Center">
+                                    VerticalAlignment="Top">
                             <!--  Artist Name -->
                             <TextBlock Text="{Binding Playlist.Name}"
                                        Style="{DynamicResource SLargeHeaderStyle}"
@@ -100,7 +100,7 @@
 
                         <StackPanel Orientation="Horizontal"
                                      Grid.Row="1"
-                                    Margin="0,5"
+                                    Margin="0,5, 0, 10"
                                         HorizontalAlignment="Left">
                             <TextBlock Text="{Binding PlaylistDuration}"
                                             Style="{DynamicResource NLargeSecondaryStyle}"/>
@@ -119,7 +119,7 @@
                                     Style="{DynamicResource LargePlaylistBtnStackPanel}"
                                     Orientation="Horizontal">
                             <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
-                                                                    Style="{DynamicResource LargePlayButton}"/>
+                                                Style="{DynamicResource LargePlayButton}"/>
 
                             <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
                                                                     Style="{DynamicResource LargePlayShuffleButton}"/>
@@ -347,7 +347,7 @@
                                         <ColumnDefinition Width="auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding Index}"
+                                    <TextBlock Text="{Binding TrackIndex}"
                                                        Style="{DynamicResource NTrackDataStyle}"/>
 
                                     <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
