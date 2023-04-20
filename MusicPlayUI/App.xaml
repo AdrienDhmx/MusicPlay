@@ -75,6 +75,9 @@
             <DataTemplate DataType="{x:Type viewmodels:NowPlayingViewModel}">
                 <views:NowPlayingView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:GenreViewModel}">
+                <views:GenreView/>
+            </DataTemplate>
 
 
             <DataTemplate DataType="{x:Type viewmodels:QueueViewModel}">

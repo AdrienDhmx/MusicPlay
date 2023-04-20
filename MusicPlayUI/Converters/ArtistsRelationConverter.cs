@@ -19,7 +19,7 @@ namespace MusicPlayUI.Converters
                 {
                     if (top > 0)
                     {
-                        artists = artists.Order();
+                        artists = artists.Exclude(false, false, false, true, false).Order();
                         if(artists.Count > top)
                             return artists.GetRange(0, top);
                         else return artists;

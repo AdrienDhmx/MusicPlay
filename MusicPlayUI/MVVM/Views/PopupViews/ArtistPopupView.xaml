@@ -55,6 +55,7 @@
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
 
@@ -72,8 +73,16 @@
                                     x:Name="AddToPlaylistBorder"
                                     Style="{DynamicResource PopupBtn}"/>
 
+                <textbtn:TextButton Text="Remove from Genre"
+                                Grid.Row="3"
+                                    Height="40"
+                                    Visibility="{Binding CanRemoveFromGenre, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2}"
+                                    Command="{Binding RemoveArtistGenreCommand}"
+                                x:Name="RemomveFromGenreBorder"
+                                Style="{DynamicResource PopupBtn}"/>
+
                 <textbtn:TextButton Text="{x:Static lang:Resources.Change_Cover}"
-                                    Grid.Row="3"
+                                    Grid.Row="4"
                                     CornerRadius="0,0,4,4"
                                    Style="{DynamicResource PopupBtn}"
                                     Command="{Binding ChangeCoverCommand}"/>

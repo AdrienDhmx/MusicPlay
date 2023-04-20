@@ -22,24 +22,25 @@ namespace MusicPlayUI.Core.Commands
             return $"{key.Key} + {key.Modifiers}";
         }
 
-        public static KeyBinding CreatekeyBinding(Key key, ModifierKeys modifier, ICommand command)
+        public static KeyBinding CreateKeyBinding(this KeyGesture keyGesture, ICommand command, object parameter = null)
         {
             return new()
             {
-                Key = key,
-                Modifiers = modifier,
+                Key = keyGesture.Key,
+                Modifiers = keyGesture.Modifier,
                 Command = command,
+                CommandParameter = parameter
             };
         }
 
-        public static KeyBinding CreatekeyBinding(Key key, ModifierKeys modifier, ICommand command, object paramter)
+        public static KeyBinding CreatekeyBinding(Key key, ModifierKeys modifier, ICommand command, object parameter = null)
         {
             return new()
             {
                 Key = key,
                 Modifiers = modifier,
                 Command = command,
-                CommandParameter = paramter,
+                CommandParameter = parameter,
             };
         }
 

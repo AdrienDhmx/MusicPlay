@@ -14,5 +14,6 @@ namespace MusicPlayUI.Core.Enums
         Album = 2,
         Artist = 3,
         Playlist = 4,
+        Genre,
     }
 }

@@ -4,14 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-using AudioEngine.Enums;
-using AudioEngine.Models;
+using AudioHandler.Enums;
+using AudioHandler.Models;
 using ManagedBass;
 
-namespace AudioEngine
+namespace AudioHandler
 {
     public static class AudioOutput
     {
+        /// <summary>
+        /// Get all the available audio endpoints
+        /// </summary>
+        /// <returns></returns>
         public static List<DeviceModel> GetAllDevices()
         {
             List<DeviceModel> devices = new();
@@ -36,6 +40,10 @@ namespace AudioEngine
         }
 
 
+        /// <summary>
+        /// Get the default audio endpoint currently available
+        /// </summary>
+        /// <returns>The default device that has been found</returns>
         public static DeviceModel GetDefaultdevice()
         {
             DeviceModel device = new();
@@ -48,11 +56,11 @@ namespace AudioEngine
                     DeviceTypeEnum deviceType = GetdeviceType(deviceInfo.Type);
                     device = new() 
                     { 
-                        Name = deviceInfo.Name, 
-                        Type = deviceType, 
-                        IsDefault = deviceInfo.IsDefault, 
-                        IsInitialized = deviceInfo.IsInitialized, 
-                        Index = i 
+                        Name = deviceInfo.Name,
+                        Type = deviceType,
+                        IsDefault = deviceInfo.IsDefault,
+                        IsInitialized = deviceInfo.IsInitialized,
+                        Index = i
                     };
                     return device;
                 }
@@ -62,25 +70,17 @@ namespace AudioEngine
 
         private static DeviceTypeEnum GetdeviceType(DeviceType type)
         {
-            switch (type)
+            return type switch
             {
-                case DeviceType.Network:
-                    return DeviceTypeEnum.Network;
-                case DeviceType.Speakers:
-                    return DeviceTypeEnum.Speakers;
-                case DeviceType.Headphones:
-                    return DeviceTypeEnum.HeadPhones;
-                case DeviceType.Headset:
-                    return DeviceTypeEnum.HeadSet;
-                case DeviceType.SPDIF:
-                    return DeviceTypeEnum.SPDIF;
-                case DeviceType.HDMI:
-                    return DeviceTypeEnum.HDMI;
-                case DeviceType.Handset:
-                    return DeviceTypeEnum.HeadSet;
-                default:
-                    return DeviceTypeEnum.UNKNOWN;
-            }
+                DeviceType.Network => DeviceTypeEnum.Network,
+                DeviceType.Speakers => DeviceTypeEnum.Speakers,
+                DeviceType.Headphones => DeviceTypeEnum.HeadPhones,
+                DeviceType.Headset => DeviceTypeEnum.HeadSet,
+                DeviceType.SPDIF => DeviceTypeEnum.SPDIF,
+                DeviceType.HDMI => DeviceTypeEnum.HDMI,
+                DeviceType.Handset => DeviceTypeEnum.HeadSet,
+                _ => DeviceTypeEnum.UNKNOWN,
+            };
         }
 
     }

@@ -201,6 +201,7 @@
     <!-- For normal link (current track title) -->
     <Style x:Key="NLStyle" TargetType="TextBlock"
            BasedOn="{StaticResource NStyle}">
+        <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>
@@ -211,6 +212,7 @@
     <!-- For current track performer -->
     <Style x:Key="NLSmallSecondaryStyle" TargetType="TextBlock"
            BasedOn="{StaticResource NSmallSecondayStyle}">
+        <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>
@@ -221,6 +223,7 @@
     <!-- For playing from -->
     <Style x:Key="NLRun" TargetType="Run"
            BasedOn="{StaticResource NRun}">
+        <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>
@@ -231,6 +234,7 @@
     <!-- for link in track lists -->
     <Style x:Key="NLTrackDataStyle" TargetType="TextBlock"
            BasedOn="{StaticResource NTrackDataStyle}">
+        <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>
@@ -241,6 +245,7 @@
     <!-- for link in track lists -->
     <Style x:Key="SLStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
+        <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>
@@ -251,6 +256,7 @@
     <!-- for link in track lists -->
     <Style x:Key="SLSubDataStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SSubDataStyle}">
+        <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>
@@ -261,6 +267,7 @@
     <!-- for link/action in lists header (mainly toggle visibility) -->
     <Style x:Key="SLlistInfoStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SlistInfoStyle}">
+        <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>

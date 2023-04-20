@@ -15,8 +15,18 @@ namespace MusicPlayUI.Core.Commands
         ICommand MinimizeCommand { get; }
         ICommand MuteVolumeCommand { get; }
         ICommand NavigateCommand { get; }
+        ICommand NavigateBackCommand { get; }
+        ICommand NavigateToAlbumByIdCommand { get; }
+        ICommand NavigateToArtistByIdCommand { get; }
+        ICommand NavigateToGenreCommand { get; }
+        ICommand NavigateToAlbumCommand { get; }
+        ICommand NavigateToArtistCommand { get; }
+        ICommand OpenAlbumPopupCommand { get; }
+        ICommand OpenArtistPopupCommand { get; }
+        ICommand OpenTrackPopupCommand { get; }
         ICommand NextTrackCommand { get; }
-        ICommand OpenCloseMenuCommand { get; }
+        ICommand ToggleQueueDrawerCommand { get; }
+
         ICommand PlayPauseCommand { get; }
         ICommand PreviousTrackCommand { get; }
         ICommand RatingCommand { get; }

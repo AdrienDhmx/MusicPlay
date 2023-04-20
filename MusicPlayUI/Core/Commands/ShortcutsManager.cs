@@ -60,6 +60,9 @@ namespace MusicPlayUI.Core.Commands
         private readonly KeyGesture _defaultNavigateToNowPlayingGesture = new(Key.N, ModifierKeys.Alt);
         private readonly KeyGesture _defaultNavigateToImportGesture = new(Key.I, ModifierKeys.Alt);
         private readonly KeyGesture _defaultNavigateToSettingsGesture = new(Key.S, ModifierKeys.Alt);
+        private readonly KeyGesture _defaultNavigateBackGesture = new(Key.B, ModifierKeys.Alt); 
+        
+        private readonly KeyGesture _defaultToggleQueueDrawer = new(Key.Q, ModifierKeys.Alt);
 
         private readonly KeyGesture _defaultEscapeFullScreenGesture = new(Key.Escape, ModifierKeys.None);
         private readonly KeyGesture _defaultToggleFullScreenGesture = new(Key.F, ModifierKeys.Alt);
@@ -91,7 +94,10 @@ namespace MusicPlayUI.Core.Commands
         public KeyBinding NavigateToNowPlayingGesture { get; private set; }
         public KeyBinding NavigateToImportGesture { get; private set; }
         public KeyBinding NavigateToSettingsGesture { get; private set; }
+        public KeyBinding NavigateBackGesture { get; private set; }
               
+        public KeyBinding ToggleQueueDrawer { get; private set; }
+
         public KeyBinding EscapeFullScreenGesture { get; private set; }
         public KeyBinding ToggleFullScreenGesture { get; private set; }
 
@@ -107,197 +113,90 @@ namespace MusicPlayUI.Core.Commands
         {
             _keyBindings = new();
 
-            PlayPauseGesture = new(_commandsManager.PlayPauseCommand, _defaultPlayPauseGesture.Key, _defaultPlayPauseGesture.Modifier);
+            PlayPauseGesture = _defaultPlayPauseGesture.CreateKeyBinding(_commandsManager.PlayPauseCommand);
             _keyBindings.Add(CommandEnums.PlayPause, PlayPauseGesture);
 
-            NextTrackGesture = new(_commandsManager.NextTrackCommand, _defaultNextTrackGesture.Key, _defaultNextTrackGesture.Modifier);
+            NextTrackGesture = _defaultNextTrackGesture.CreateKeyBinding(_commandsManager.NextTrackCommand);
             _keyBindings.Add(CommandEnums.NexTrack, NextTrackGesture);
 
-            PreviousTrackGesture =new(_commandsManager.PreviousTrackCommand, _defaultPreviousTrackGesture.Key, _defaultPreviousTrackGesture.Modifier);
+            PreviousTrackGesture = _defaultPreviousTrackGesture.CreateKeyBinding(_commandsManager.PreviousTrackCommand);
             _keyBindings.Add(CommandEnums.PreviousTrack, PreviousTrackGesture);
 
-            ShuffleGesture = new()
-            {
-                Key = _defaultShuffleGesture.Key,
-                Modifiers = _defaultShuffleGesture.Modifier,
-                Command = _commandsManager.ShuffleCommand
-            };
+            ShuffleGesture = _defaultShuffleGesture.CreateKeyBinding(_commandsManager.ShuffleCommand);
             _keyBindings.Add(CommandEnums.Shuffle, ShuffleGesture);
 
-            RepeatGesture = new()
-            {
-                Key = _defaultRepeatGesture.Key,
-                Modifiers = _defaultRepeatGesture.Modifier,
-                Command = _commandsManager.RepeatCommand
-            }; 
+            RepeatGesture = _defaultRepeatGesture.CreateKeyBinding(_commandsManager.RepeatCommand); 
             _keyBindings.Add(CommandEnums.Repeat, RepeatGesture);
 
-            DecreaseVolumeGesture = new()
-            {
-                Key = _defaultDecreaseVolumeGesture.Key,
-                Modifiers = _defaultDecreaseVolumeGesture.Modifier,
-                Command = _commandsManager.DecreaseVolumeCommand
-            };
+            DecreaseVolumeGesture = _defaultDecreaseVolumeGesture.CreateKeyBinding(_commandsManager.DecreaseVolumeCommand);
             _keyBindings.Add(CommandEnums.DecreaseVolume, DecreaseVolumeGesture);
 
-            IncreaseVolumeGesture = new()
-            {
-                Key = _defaultIncreaseVolumeGesture.Key,
-                Modifiers = _defaultIncreaseVolumeGesture.Modifier,
-                Command = _commandsManager.IncreaseVolumeCommand
-            }; 
+            IncreaseVolumeGesture = _defaultIncreaseVolumeGesture.CreateKeyBinding(_commandsManager.IncreaseVolumeCommand); 
             _keyBindings.Add(CommandEnums.IncreaseVolume, IncreaseVolumeGesture);
 
-            MuteVolumeGesture = new()
-            {
-                Key = _defaultMuteVolumeGesture.Key,
-                Modifiers = _defaultMuteVolumeGesture.Modifier,
-                Command = _commandsManager.MuteVolumeCommand
-            }; 
+            MuteVolumeGesture = _defaultMuteVolumeGesture.CreateKeyBinding(_commandsManager.MuteVolumeCommand);
             _keyBindings.Add(CommandEnums.MuteVolume, MuteVolumeGesture);
 
-            FavoriteGesture = new()
-            {
-                Key = _defaultFavoriteGesture.Key,
-                Modifiers = _defaultFavoriteGesture.Modifier,
-                Command = _commandsManager.FavoriteCommand
-            };
+            FavoriteGesture = _defaultFavoriteGesture.CreateKeyBinding(_commandsManager.FavoriteCommand);
             _keyBindings.Add(CommandEnums.ToggleFavorite, FavoriteGesture);
 
-            Rating0Gesture = new()
-            {
-                Key = _defaultRating0Gesture.Key,
-                Modifiers = _defaultRating0Gesture.Modifier,
-                Command = _commandsManager.RatingCommand,
-                CommandParameter = "0",
-            };
+            Rating0Gesture = _defaultRating0Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "0");
             _keyBindings.Add(CommandEnums.Rating0, Rating0Gesture);
 
-            Rating1Gesture = new()
-            {
-                Key = _defaultRating1Gesture.Key,
-                Modifiers = _defaultRating1Gesture.Modifier,
-                Command = _commandsManager.RatingCommand,
-                CommandParameter = "1",
-            };
+            Rating1Gesture = _defaultRating1Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "1");
             _keyBindings.Add(CommandEnums.Rating1, Rating1Gesture);
 
-            Rating2Gesture = new()
-            {
-                Key = _defaultRating2Gesture.Key,
-                Modifiers = _defaultRating2Gesture.Modifier,
-                Command = _commandsManager.RatingCommand,
-                CommandParameter = "2",
-            }; _keyBindings.Add(CommandEnums.Rating2, Rating2Gesture);
+            Rating2Gesture = _defaultRating2Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "2");
+            _keyBindings.Add(CommandEnums.Rating2, Rating2Gesture);
 
-            Rating3Gesture = new()
-            {
-                Key = _defaultRating3Gesture.Key,
-                Modifiers = _defaultRating3Gesture.Modifier,
-                Command = _commandsManager.RatingCommand,
-                CommandParameter = "3",
-            }; _keyBindings.Add(CommandEnums.Rating3, Rating3Gesture);
+            Rating3Gesture = _defaultRating3Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "3");
+            _keyBindings.Add(CommandEnums.Rating3, Rating3Gesture);
 
-            Rating4Gesture = new()
-            {
-                Key = _defaultRating4Gesture.Key,
-                Modifiers = _defaultRating4Gesture.Modifier,
-                Command = _commandsManager.RatingCommand,
-                CommandParameter = "4",
-            }; _keyBindings.Add(CommandEnums.Rating4, Rating4Gesture);
+            Rating4Gesture = _defaultRating4Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "4"); 
+            _keyBindings.Add(CommandEnums.Rating4, Rating4Gesture);
 
-            Rating5Gesture = new()
-            {
-                Key = _defaultRating5Gesture.Key,
-                Modifiers = _defaultRating5Gesture.Modifier,
-                Command = _commandsManager.RatingCommand,
-                CommandParameter = "5",
-            }; _keyBindings.Add(CommandEnums.Rating5, Rating5Gesture);
+            Rating5Gesture = _defaultRating5Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "5");
+            _keyBindings.Add(CommandEnums.Rating5, Rating5Gesture);
 
-            NavigateHomeGesture = new()
-            {
-                Key = _defaultNavigateHomeGesture.Key,
-                Modifiers = _defaultNavigateHomeGesture.Modifier,
-                Command = _commandsManager.NavigateCommand,
-                CommandParameter = ViewNameEnum.Home,
-            }; 
+            NavigateHomeGesture = _defaultNavigateHomeGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Home); 
             _keyBindings.Add(CommandEnums.Home, NavigateHomeGesture);
 
-            NavigateToAlbumsGesture = new()
-            {
-                Key = _defaultNavigateToAlbumsGesture.Key,
-                Modifiers = _defaultNavigateToAlbumsGesture.Modifier,
-                Command = _commandsManager.NavigateCommand,
-                CommandParameter = ViewNameEnum.Albums,
-            };
+            NavigateToAlbumsGesture = _defaultNavigateToAlbumsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Albums);
             _keyBindings.Add(CommandEnums.Albums, NavigateToAlbumsGesture);
 
-            NavigateToArtistsGesture = new()
-            {
-                Key = _defaultNavigateToArtistsGesture.Key,
-                Modifiers = _defaultNavigateToArtistsGesture.Modifier,
-                Command = _commandsManager.NavigateCommand,
-                CommandParameter = ViewNameEnum.Artists,
-            };
+            NavigateToArtistsGesture = _defaultNavigateToArtistsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Artists);
             _keyBindings.Add(CommandEnums.Artists, NavigateToArtistsGesture);
 
-            NavigateToImportGesture = new()
-            {
-                Key = _defaultNavigateToImportGesture.Key,
-                Modifiers = _defaultNavigateToImportGesture.Modifier,
-                Command = _commandsManager.NavigateCommand,
-                CommandParameter = ViewNameEnum.Import,
-            };
+            NavigateToImportGesture = _defaultNavigateToImportGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Import);
             _keyBindings.Add(CommandEnums.Import, NavigateToImportGesture);
 
-            NavigateToNowPlayingGesture = new()
-            {
-                Key = _defaultNavigateToNowPlayingGesture.Key,
-                Modifiers = _defaultNavigateToNowPlayingGesture.Modifier,
-                Command = _commandsManager.NavigateCommand,
-                CommandParameter = ViewNameEnum.NowPlaying,
-            };
+            NavigateToNowPlayingGesture = _defaultNavigateToNowPlayingGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.NowPlaying);
             _keyBindings.Add(CommandEnums.NowPlaying, NavigateToNowPlayingGesture);
 
-            NavigateToPlaylistsGesture = new()
-            {
-                Key = _defaultNavigateToPlaylistsGesture.Key,
-                Modifiers = _defaultNavigateToPlaylistsGesture.Modifier,
-                Command = _commandsManager.NavigateCommand,
-                CommandParameter = ViewNameEnum.Playlists,
-            };
+            NavigateToPlaylistsGesture = _defaultNavigateToPlaylistsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Playlists);
             _keyBindings.Add(CommandEnums.Playlists, NavigateToPlaylistsGesture);
 
-            NavigateToSettingsGesture = new()
-            {
-                Key = _defaultNavigateToSettingsGesture.Key,
-                Modifiers = _defaultNavigateToSettingsGesture.Modifier,
-                Command = _commandsManager.NavigateCommand,
-                CommandParameter = ViewNameEnum.Settings,
-            }; _keyBindings.Add(CommandEnums.Settings, NavigateToSettingsGesture);
+            NavigateToSettingsGesture = _defaultNavigateToSettingsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Settings); 
+            _keyBindings.Add(CommandEnums.Settings, NavigateToSettingsGesture);
 
-            EscapeFullScreenGesture = new()
-            {
-                Key = _defaultEscapeFullScreenGesture.Key,
-                Modifiers = _defaultEscapeFullScreenGesture.Modifier,
-                Command = _commandsManager.EscapeFullScreenCommand
-            };
+            NavigateBackGesture = _defaultNavigateBackGesture.CreateKeyBinding(_commandsManager.NavigateBackCommand);
+            _keyBindings.Add(CommandEnums.NavigateBack, NavigateBackGesture);
+
+            EscapeFullScreenGesture = _defaultEscapeFullScreenGesture.CreateKeyBinding(_commandsManager.EscapeFullScreenCommand);
             _keyBindings.Add(CommandEnums.EscapeFullScreen, EscapeFullScreenGesture);
 
-            ToggleFullScreenGesture = new()
-            {
-                Key = _defaultToggleFullScreenGesture.Key,
-                Modifiers = _defaultToggleFullScreenGesture.Modifier,
-                Command = _commandsManager.ToggleFullScreenCommand
-            };
+            ToggleFullScreenGesture = _defaultToggleFullScreenGesture.CreateKeyBinding(_commandsManager.ToggleFullScreenCommand);
             _keyBindings.Add(CommandEnums.ToggleFullScreen, ToggleFullScreenGesture);
+
+            ToggleQueueDrawer = _defaultToggleQueueDrawer.CreateKeyBinding(_commandsManager.ToggleQueueDrawerCommand);
+            _keyBindings.Add(CommandEnums.ToggleQueueDrawer, ToggleQueueDrawer);
 
             _window.InputBindings.Clear();
             _window.InputBindings.AddRange(_keyBindings.Values);
-            AddMediaShortCut();
+            AddMediaShortCuts();
         }
 
-        private void AddMediaShortCut()
+        private void AddMediaShortCuts()
         {
             _window.InputBindings.Add(new KeyBinding()
             {

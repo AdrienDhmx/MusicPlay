@@ -27,7 +27,6 @@
         Title="{Binding QueueService.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}"
         x:Name="Root"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}">
-
     <!-- Root Border -->
     <Border x:Name="WindowBorder"
             Background="{DynamicResource Background}"
@@ -184,7 +183,7 @@
                                 </Setter.Value>
                             </Setter>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding CurrentPlayerControl.IsQueueDrawerOpen}" Value="True">
+                                <DataTrigger Binding="{Binding NavigationService.IsQueueDrawerOpen}" Value="True">
                                     <DataTrigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>

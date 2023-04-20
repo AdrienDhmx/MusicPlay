@@ -46,7 +46,7 @@ namespace MusicPlayUI.Core.Services
             {
                 queue.Tracks = await queue.Tracks.GetAlbumTrackProperties();
 
-                SetNewQueue(queue.Tracks.ToUIOrderedTrackModel(AlbumCoverOnly, AutoCover), queue.PlayingFrom, queue.ModelType, queue.Cover, queue.PlayingTrack, queue.IsShuffled, queue.IsOnRepeat, true);
+                SetNewQueue(queue.Tracks.ToUIOrderedTrackModel(AlbumCoverOnly, AutoCover), new(queue.PlayingFrom, queue.ModelType, queue.PlayingFromId), queue.Cover, queue.PlayingTrack, queue.IsShuffled, queue.IsOnRepeat, true);
             }
         }
 
@@ -181,6 +181,7 @@ namespace MusicPlayUI.Core.Services
         }
 
         private UIOrderedTrackModel LastRemovedTrack { get; set; }
+        private int LastRemovedTrackIndex { get; set; }
 
         private void InitCoversSettings()
         {
@@ -219,7 +220,7 @@ namespace MusicPlayUI.Core.Services
             }
         }
 
-        public async void SetNewQueue(List<UIOrderedTrackModel> tracks, string playingFrom, ModelTypeEnum modelType, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false)
+        public async void SetNewQueue(List<UIOrderedTrackModel> tracks, QueuePlayingFromModel playingFrom, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false)
         {
             QueueDuration = tracks.GetTotalLength(out int length);
             QueueLength = length;
@@ -227,11 +228,7 @@ namespace MusicPlayUI.Core.Services
             IsShuffled = isShuffled;
             IsOnRepeat = isOnRepeat;
 
-            PlayingFrom = new()
-            {
-                PlayingFrom = playingFrom,
-                ModelType = modelType
-            };
+            PlayingFrom = playingFrom;
 
             QueueCover = cover;
 
@@ -260,11 +257,11 @@ namespace MusicPlayUI.Core.Services
             OnQueueChanged();
         }
 
-        public async void SetNewQueue(List<TrackModel> tracks, string playingFrom, ModelTypeEnum modelType, string cover, TrackModel playingTrack = null,
+        public async void SetNewQueue(List<TrackModel> tracks, QueuePlayingFromModel playingFrom, string cover, TrackModel playingTrack = null,
            bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false)
         {
             tracks = await tracks.GetAlbumTrackProperties();
-            SetNewQueue(tracks.ToUIOrderedTrackModel(AlbumCoverOnly, AutoCover), playingFrom, modelType, cover, playingTrack, isShuffled, isOnRepeat, orderTracks);
+            SetNewQueue(tracks.ToUIOrderedTrackModel(AlbumCoverOnly, AutoCover), playingFrom, cover, playingTrack, isShuffled, isOnRepeat, orderTracks);
         }
 
         public void DeleteQueue()
@@ -322,6 +319,7 @@ namespace MusicPlayUI.Core.Services
                 await Task.Delay(200);
 
                 LastRemovedTrack = QueueTracks[index];
+                LastRemovedTrackIndex = index; // keeping the index and not using the TrackIndex property of the track is needed in case the queue is shuffled
                 QueueTracks.RemoveAt(index);
 
                 QueueLength -= track.Length;
@@ -335,7 +333,8 @@ namespace MusicPlayUI.Core.Services
             if(LastRemovedTrack == null)
                 return false;
 
-            InsertTrack(LastRemovedTrack.TrackIndex - 1, LastRemovedTrack, false);
+            InsertTrack(LastRemovedTrackIndex, LastRemovedTrack, false);
+
             return true;
         }
 
@@ -573,17 +572,15 @@ namespace MusicPlayUI.Core.Services
             {
                 ViewNameEnum viewName;
                 BaseModel parameter;
-                int id;
+                int id = PlayingFrom.DataId;
                 switch (PlayingFrom.ModelType)
                 {
                     case ModelTypeEnum.Album:
                         viewName = ViewNameEnum.SpecificAlbum;
-                        id = await DataAccess.Connection.GetAlbumId(PlayingFrom.PlayingFrom);
                         parameter = await DataAccess.Connection.GetAlbum(id);
                         break;
                     case ModelTypeEnum.Artist:
                         viewName = ViewNameEnum.SpecificArtist;
-                        id = await DataAccess.Connection.GetArtistId(PlayingFrom.PlayingFrom);
                         parameter = await DataAccess.Connection.GetArtist(id);
                         break;
                     case ModelTypeEnum.Playlist:
@@ -606,9 +603,12 @@ namespace MusicPlayUI.Core.Services
                         }
                         else // user playlist
                         {
-                            id = await DataAccess.Connection.GetPlaylistId(PlayingFrom.PlayingFrom);
                             parameter = await DataAccess.Connection.GetPlaylist(id);
                         }
+                        break;
+                    case ModelTypeEnum.Genre:
+                        viewName = ViewNameEnum.SpecificGenre;
+                        parameter = await DataAccess.Connection.GetGenre(id);
                         break;
                     default:
                         viewName = ViewNameEnum.Empty;

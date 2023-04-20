@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace MusicPlayUI.Core.Helpers
 {
@@ -19,6 +20,8 @@ namespace MusicPlayUI.Core.Helpers
 
     public static class SliderDragHelper
     {
+        private static bool _isDragging = false;
+
         public static bool GetIsDragEnabled(DependencyObject obj)
         {
             return (bool)obj.GetValue(IsDragEnabledProperty);
@@ -56,6 +59,37 @@ namespace MusicPlayUI.Core.Helpers
                 {
                     thumb.DragStarted += OnDragStart;
                     thumb.DragCompleted += OnDragCompleted;
+
+                    if (slider.IsMoveToPointEnabled)
+                    {
+                        thumb.PreviewMouseLeftButtonUp += OnClick;
+                    }
+                }
+            }
+        }
+
+        private static void OnClick(object sender, MouseButtonEventArgs e)
+        {
+            if (!_isDragging)
+            {
+                DependencyObject d = sender as DependencyObject;
+                if (d == null) return;
+
+                // get slider
+                Slider slider = d.GetVisualAncestor<Slider>();
+                if (slider is null) return;
+
+                // get target binded to the slider
+                Object target = slider.GetValue(DragTargetProperty);
+                ISliderDragTarget dragTarget = target as ISliderDragTarget;
+                if (dragTarget != null)
+                {
+                    dragTarget.OnDragEnd(slider.Value);
+                    _isDragging = false;
+                }
+                else
+                {
+                    throw new Exception("Drag Target object must be of type ISliderDragTarget");
                 }
             }
         }
@@ -75,6 +109,7 @@ namespace MusicPlayUI.Core.Helpers
             if (dragTarget != null)
             {
                 dragTarget.OnDragEnd(slider.Value);
+                _isDragging = false;
             }
             else
             {
@@ -96,6 +131,7 @@ namespace MusicPlayUI.Core.Helpers
             ISliderDragTarget dragTarget = target as ISliderDragTarget;
             if (dragTarget != null)
             {
+                _isDragging = true;
                 dragTarget.OnDragStart(slider.Value);
             }
             else
@@ -120,12 +156,18 @@ namespace MusicPlayUI.Core.Helpers
 
         private static void Slider_Loaded(object sender, RoutedEventArgs e)
         {
-            GetThumb(sender as Slider);
+            Slider slider = sender as Slider;
+            GetThumb(slider);
             Thumb thumb = GetThumb(sender as Slider);
             if (thumb is not null)
             {
                 thumb.DragStarted += OnDragStart;
                 thumb.DragCompleted += OnDragCompleted;
+
+                if (slider.IsMoveToPointEnabled)
+                {
+                    thumb.PreviewMouseLeftButtonUp += OnClick;
+                }
             }
         }
     }

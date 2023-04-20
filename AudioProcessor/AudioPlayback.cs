@@ -1,13 +1,13 @@
-﻿using System.Timers;
-using AudioEngine.Enums;
-using AudioEngine.Models;
+using System.Timers;
+using AudioHandler.Enums;
+using AudioHandler.Models;
 using ManagedBass;
 using ManagedBass.Fx;
 using MessageControl;
 using MusicPlayModels;
 using Timer = System.Timers.Timer;
 
-namespace AudioEngine
+namespace AudioHandler
 {
     public class AudioPlayback : ObservableObject, IAudioPlayback
     {
@@ -114,6 +114,7 @@ namespace AudioEngine
         {
             Init();
 
+            // look for new connected devices
             deviceTimer = new Timer(2000);
         }
 
@@ -129,6 +130,7 @@ namespace AudioEngine
             else
             {
                 deviceTimer.Stop();
+                deviceTimer.Elapsed -= DeviceTimer_Elapsed;
             }
         }
 
@@ -283,8 +285,8 @@ namespace AudioEngine
             Dispose();
 
             // try init the new device
-            bool result = Init(device.Index, Frequency);
-            if (result)
+            bool initiliazed = Init(device.Index, Frequency);
+            if (initiliazed)
             {
                 Device = device;
                 LoadAnPlay(_file);
@@ -312,7 +314,7 @@ namespace AudioEngine
                 }
                 OnIsDeviceChanged();
             }
-            return result;
+            return initiliazed;
         }
 
         public void Load(string file)
@@ -470,7 +472,6 @@ namespace AudioEngine
         {
             if (loop)
             {
-
                 if (Bass.ChannelAddFlag(Stream, BassFlags.Loop))
                 {
                     IsLooping = true;

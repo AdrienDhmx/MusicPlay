@@ -1,4 +1,4 @@
-﻿using AudioEngine;
+﻿using AudioHandler;
 using MusicPlayModels.MusicModels;
 using Microsoft.Extensions.DependencyInjection;
 using MusicFilesProcessor;
@@ -284,7 +284,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 }
             });
 
-            SwitchFullScreenCommand = new RelayCommand(NavigationService.SwitchFullScreen);
+            SwitchFullScreenCommand = new RelayCommand(NavigationService.ToggleFullScreen);
 
             OpenCloseCoverCommand = new RelayCommand(() =>
             {

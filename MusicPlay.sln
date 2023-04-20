@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FilesProcessor", "MusicProcessor\FilesProcessor.csproj", "{226C40F0-5E6E-4A9A-B119-10223DC23397}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioEngine", "AudioProcessor\AudioEngine.csproj", "{268B05DC-3D90-4F29-B318-8FDBCFCAC704}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioHandler", "AudioProcessor\AudioHandler.csproj", "{268B05DC-3D90-4F29-B318-8FDBCFCAC704}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicPlay.Language", "MusicPlay.Language\MusicPlay.Language.csproj", "{7288A0C4-A515-462B-8CE1-4D477D810B20}"
 EndProject

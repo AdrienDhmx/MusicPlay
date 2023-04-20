@@ -57,7 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AudioProcessor\AudioEngine.csproj" />
+    <ProjectReference Include="..\AudioProcessor\AudioHandler.csproj" />
     <ProjectReference Include="..\CardDropDown\CardDropDown.csproj" />
     <ProjectReference Include="..\ColorCanvas\ColorCanvas.csproj" />
     <ProjectReference Include="..\CustomCardControl\CustomCardControl.csproj" />

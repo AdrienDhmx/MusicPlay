@@ -596,6 +596,12 @@ namespace DataBaseConnection.DataAccess
             return new Query(Tables.TArtist).Where(Columns.Id, id).FirstAsync<ArtistModel>();
         }
 
+
+        public Task<GenreModel> GetGenre(int id)
+        {
+            return new Query(Tables.TGenre).Where(Columns.Id, id).FirstAsync<GenreModel>();
+        }
+            
         public Task<List<ArtistModel>> GetArtists(IEnumerable<int> ids)
         {
             return new Query(Tables.TArtist).WhereIn(Columns.Id, ids).GetAsync<ArtistModel>();
@@ -765,6 +771,20 @@ namespace DataBaseConnection.DataAccess
             throw new NotImplementedException();
         }
 
+        public async Task<List<TrackModel>> GetTracksFromAlbums(IEnumerable<int> albumsId)
+        {
+            List<TrackModel> tracks = await new Query(Tables.TTrack).WhereIn(Columns.AlbumId, albumsId).GetAsync<TrackModel>();
+            return await GetTracksArtists(tracks);
+        }
+
+        public async Task<List<TrackModel>> GetTracksFromArtists(IEnumerable<int> artistsId)
+        {
+            Query query = new Query(Tables.TTrackArtists).Select(Columns.TrackId).WhereIn(Columns.ArtistId, artistsId);
+            List<TrackModel> tracks = (await new Query(Tables.TTrack).WhereIn(Columns.Id, query).GetAsync<TrackModel>()).ToList();
+            return await GetTracksArtists(tracks);
+
+        }
+
         public async Task<TrackModel> GetTrackByPath(string path)
         {
             TrackModel track = await new Query(Tables.TTrack).Where(Columns.Path, path).FirstAsync<TrackModel>();
@@ -811,6 +831,11 @@ namespace DataBaseConnection.DataAccess
         public Task RemoveAlbumGenre(int albumId, int genreId)
         {
             return new Query(Tables.TAlbumGenres).Where(Tables.CreateAlbumGenresTable(albumId, genreId)).AsDelete().DeleteAsync();
+        }
+
+        public async Task RemoveArtistGenre(int artistId, int genreId)
+        {
+            await new Query(Tables.TArtistGenres).Where(Tables.CreateArtistGenresTable(artistId, genreId)).AsDelete().DeleteAsync();
         }
 
         public Task RemoveTrackFromPlaylist(PlaylistModel playlist, TrackModel track)

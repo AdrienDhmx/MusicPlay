@@ -120,6 +120,18 @@ namespace MusicPlayUI.Core.Factories
             return message.CreateWarningMessage(7);
         }
 
+        public static MessageModel AlbumRemovedFromGenre(this string album, string genre, Func<bool> undoCallBack, Action closeCallBack)
+        {
+            string message = $"{Resources.The_Album} \"{album}\" {Resources.Has_Been_Removed_From} \"{genre}\"";
+            return message.CreateWarningMessageWithUndoAndClose(7, undoCallBack, closeCallBack);
+        }
+
+        public static MessageModel ArtistRemovedFromGenre(this string artist, string genre, Func<bool> undoCallBack, Action closeCallBack)
+        {
+            string message = $"{Resources.The_Artist} \"{artist}\" and all its albums have been removed from \"{genre}\"";
+            return message.CreateWarningMessageWithUndoAndClose(7, undoCallBack, closeCallBack);
+        }
+
         public static MessageModel CoverChangedMessage(this string name, bool artwork = false)
         {
             string message = $"{(artwork ? Resources.Artwork_Changed_Msg : Resources.Cover_Changed_Msg)} \"{name}\" ";
@@ -282,6 +294,26 @@ namespace MusicPlayUI.Core.Factories
                 IsUndoEnabled = true,
                 UndoCallBack = undoCallBack,
                 UndoMessage = "Undo"
+            };
+            return messageModel;
+        }
+
+        public static MessageModel CreateWarningMessageWithUndoAndClose(this string message, int iconType, Func<bool> undoCallBack, Action closeCallBack)
+        {
+            MessageModel messageModel = new()
+            {
+                Message = message,
+                Icon = GetIcon(iconType),
+                Foreground = MessageColors.OnWarningContainer,
+                IconBrush = MessageColors.OnWarningContainer,
+                Background = MessageColors.WarningContainer,
+                MouseOverBackground = MessageColors.WarningHover,
+                IsUndoEnabled = true,
+                UndoCallBack = undoCallBack,
+                UndoMessage = "Undo",
+                UndoneMessage = "The action has been undone.",
+                UndoneFailedMessage = "The action could not be undone.",
+                OnCloseCallBack = closeCallBack
             };
             return messageModel;
         }

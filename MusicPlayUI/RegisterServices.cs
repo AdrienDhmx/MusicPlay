@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using AudioEngine;
+using AudioHandler;
 using MusicPlayUI.MVVM.Views.Windows;
 using MusicPlayUI.MVVM.ViewModels.ModalViewModels;
 using MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels;
@@ -77,6 +77,9 @@ namespace MusicPlayUI
 
                 services.AddTransient<ArtistView>();
                 services.AddTransient<ArtistViewModel>();
+
+                services.AddTransient<GenreView>();
+                services.AddTransient<GenreViewModel>();
 
                 services.AddTransient<NowPlayingView>();
                 services.AddTransient<NowPlayingViewModel>();

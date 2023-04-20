@@ -1,4 +1,4 @@
-﻿using AudioEngine;
+﻿using AudioHandler;
 using DataBaseConnection.DataAccess;
 using MusicPlayModels.MusicModels;
 using MusicFilesProcessor.Helpers;
@@ -40,13 +40,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         {
             get { return _queueService; }
             set { SetField(ref _queueService, value); }
-        }
-
-        private bool _isQueueDrawerOpen;
-        public bool IsQueueDrawerOpen
-        {
-            get { return _isQueueDrawerOpen; }
-            set { SetField(ref _isQueueDrawerOpen, value); }
         }
 
         private int _volume => _audioPlayback.Volume;
@@ -232,7 +225,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             OpenCloseQueuePopupCommand = new RelayCommand(() =>
             {
-                IsQueueDrawerOpen = !IsQueueDrawerOpen;
+                _navigationService.ToggleQueueDrawer();
             });
 
             NavigateToPlayingFromCommand = new RelayCommand(_queueService.NavigateToPlayingFrom);

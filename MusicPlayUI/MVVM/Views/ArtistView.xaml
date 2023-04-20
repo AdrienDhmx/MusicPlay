@@ -153,6 +153,7 @@
 
                 <!-- Genres -->
                 <listview:ChipListView Genres="{Binding Genres}"
+                                       NavigateToGenreCommand="{Binding NavigateToGenreCommand}"
                                         Margin="0,10,0,0"
                                         VerticalAlignment="Center"
                                        HorizontalAlignment="Center"/>

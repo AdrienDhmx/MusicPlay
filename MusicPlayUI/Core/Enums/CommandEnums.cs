@@ -32,8 +32,13 @@ namespace MusicPlayUI.Core.Enums
         NowPlaying,
         Import,
         Settings,
+        NavigateBack,
+        NavigateToAlbumById,
+        NavigateToArtistById,
+        NavigateToGenre,
         EscapeFullScreen,
         ToggleFullScreen,
+        ToggleQueueDrawer,
     }
 
     public static class CommandEnumsExt 
@@ -64,8 +69,10 @@ namespace MusicPlayUI.Core.Enums
                 CommandEnums.NowPlaying => Resources.Now_Playing_View,
                 CommandEnums.Import => Resources.Import_Library_View,
                 CommandEnums.Settings => Resources.Settings_View,
+                CommandEnums.NavigateBack => "Navigate Back",
                 CommandEnums.EscapeFullScreen => "Escape Full Screen",
                 CommandEnums.ToggleFullScreen => "Toggle Full Screen",
+                CommandEnums.ToggleQueueDrawer => "Toggle Queue Drawer",
                 _ => "",
             };
         }

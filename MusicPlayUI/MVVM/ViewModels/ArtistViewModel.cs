@@ -25,7 +25,7 @@ namespace MusicPlayUI.MVVM.ViewModels
     {
         public IQueueService QueueService { get; }
         private readonly INavigationService _navigationService;
-
+        private readonly ICommandsManager _commandsManager;
         private string _mainAlbumsHeader;
         public string MainAlbumsHeader
         {
@@ -270,6 +270,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PlayPerformedTracksCommand { get; }
         public ICommand PlayLyricistOfTracksCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
+        public ICommand NavigateToGenreCommand { get; }
         public ICommand NavigateToAlbumByIdCommand { get; }
         public ICommand NavigateToArtistByIdCommand { get; }
         public ICommand OpenAlbumPopupCommand { get; }
@@ -282,10 +283,11 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand ShowHideComposedTracksCommand { get; }
         public ICommand ShowHidePerformedTracksCommand { get; }
         public ICommand ShowHideLyricistTracksCommand { get; }
-        public ArtistViewModel(INavigationService navigationService, IQueueService queueService)
+        public ArtistViewModel(INavigationService navigationService, IQueueService queueService, ICommandsManager commandsManager)
         {
             _navigationService = navigationService;
             this.QueueService = queueService;
+            _commandsManager = commandsManager;
 
             // play
             PlayArtistCommand = new RelayCommand(() => PlayArtist());
@@ -296,7 +298,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (album is not null)
                 {
                     List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbum(album.Id);
-                    this.QueueService.SetNewQueue(tracks, album.Name, ModelTypeEnum.Album, album.AlbumCover, null, false, false, true);
+                    this.QueueService.SetNewQueue(tracks, new(album.Name, ModelTypeEnum.Album, album.Id), album.AlbumCover, null, false, false, true);
                 }
             });
             PlayAlbumsOnlyCommand = new RelayCommand<string>(async (string shuffled) =>
@@ -307,7 +309,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                     tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
                 }
 
-                this.QueueService.SetNewQueue(tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", false, false);
             });
             PlaySinglesAndEpCommand = new RelayCommand<string>(async (string shuffled) =>
             {
@@ -317,7 +319,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                     tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
                 }
 
-                this.QueueService.SetNewQueue(tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", false, false);
             });
             PlayFeaturedInAlbumsCommand = new RelayCommand<string>(async (string shuffled) =>
             {
@@ -327,17 +329,17 @@ namespace MusicPlayUI.MVVM.ViewModels
                     tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
                 }
 
-                this.QueueService.SetNewQueue(tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", false, false);
             });
             PlayComposedTracksCommand = new RelayCommand<string>((string shuffled) =>
             {
-                this.QueueService.SetNewQueue(ComposedTracks.ToList(), Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(ComposedTracks.ToList(), new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", shuffled == "1");
             });
             PlayPerformedTracksCommand = new RelayCommand<string>((string shuffled) =>
             {
-                this.QueueService.SetNewQueue(PerformedInTracks.ToList(), Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false);
+                this.QueueService.SetNewQueue(PerformedInTracks.ToList(), new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", shuffled == "1");
             });
-            PlayLyricistOfTracksCommand = new RelayCommand<string>((string shuffled) => { this.QueueService.SetNewQueue(LyricistOfTracks.ToList(), Artist.Name, ModelTypeEnum.Artist, Artist.Cover, null, shuffled == "1", false, false); });
+            PlayLyricistOfTracksCommand = new RelayCommand<string>((string shuffled) => { this.QueueService.SetNewQueue(LyricistOfTracks.ToList(), new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, null, shuffled == "1", shuffled == "1"); });
 
             // lists visibility
             ShowHideMainAlbumsCommand = new RelayCommand(() =>
@@ -367,13 +369,14 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             // navigation
             NavigateToAlbumCommand = new RelayCommand<AlbumModel>((album) => _navigationService.NavigateTo(ViewNameEnum.SpecificAlbum, album));
-            NavigateBackCommand = new RelayCommand(_navigationService.NavigateBack);
-            NavigateToAlbumByIdCommand = new RelayCommand<int>(async (id) =>_navigationService.NavigateTo(ViewNameEnum.SpecificAlbum, await DataAccess.Connection.GetAlbum(id)));
-            NavigateToArtistByIdCommand = new RelayCommand<int>(async (int id) =>_navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id)));
+            NavigateToGenreCommand = _commandsManager.NavigateToGenreCommand;
+            NavigateBackCommand = _commandsManager.NavigateBackCommand;
+            NavigateToAlbumByIdCommand = _commandsManager.NavigateToAlbumByIdCommand;
+            NavigateToArtistByIdCommand = _commandsManager.NavigateToArtistByIdCommand;
 
             // open popup
-            OpenAlbumPopupCommand = new RelayCommand<AlbumModel>((album) => _navigationService.OpenPopup(ViewNameEnum.AlbumPopup, album));
-            OpenTrackPopupCommand = new RelayCommand<UIOrderedTrackModel>((track) => _navigationService.OpenPopup(ViewNameEnum.TrackPopup, track));
+            OpenAlbumPopupCommand = _commandsManager.OpenAlbumPopupCommand;
+            OpenTrackPopupCommand = _commandsManager.OpenTrackPopupCommand;
             OpenArtistPopupCommand = new RelayCommand(() => _navigationService.OpenPopup(ViewNameEnum.ArtistPopup, Artist));
 
             // load
@@ -382,7 +385,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void PlayArtist(bool shuffle = false, TrackModel startingTrack = null)
         {
-            QueueService.SetNewQueue(Tracks, Artist.Name, ModelTypeEnum.Artist, Artist.Cover, startingTrack, shuffle);
+            QueueService.SetNewQueue(Tracks, new(Artist.Name, ModelTypeEnum.Artist, Artist.Id), Artist.Cover, startingTrack, shuffle);
         }
 
         public async override void Update(BaseModel baseModel = null)

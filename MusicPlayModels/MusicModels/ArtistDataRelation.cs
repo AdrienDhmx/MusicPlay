@@ -92,6 +92,66 @@
             return sortedList;
         }
 
+        public static List<ArtistDataRelation> Select(this List<ArtistDataRelation> artists, bool albumArtist, bool performer, bool composer, bool lyricist, bool featured)
+        {
+            List<ArtistDataRelation> selectedList = new();
+
+            foreach (ArtistDataRelation artist in artists)
+            {
+                if(artist.IsAlbumArtist && albumArtist)
+                {
+                    selectedList.Add(artist);
+                }
+                else if(artist.IsPerformer && performer)
+                {
+                    selectedList.Add(artist);
+                }
+                else if(artist.IsComposer && composer)
+                {
+                    selectedList.Add(artist);
+                }
+                else if(artist.IsLyricist && lyricist)
+                {
+                    selectedList.Add(artist);
+                }
+                else if(artist.IsFeatured && featured)
+                {
+                    selectedList.Add(artist);
+                }
+            }
+            return selectedList;
+        }
+
+        public static List<ArtistDataRelation> Exclude(this List<ArtistDataRelation> artists, bool albumArtist, bool performer, bool composer, bool lyricist, bool featured)
+        {
+            List<ArtistDataRelation> selectedList = new();
+
+            foreach (ArtistDataRelation artist in artists)
+            {
+                if (artist.IsAlbumArtist && !albumArtist)
+                {
+                    selectedList.Add(artist);
+                }
+                else if (artist.IsPerformer && !performer)
+                {
+                    selectedList.Add(artist);
+                }
+                else if (artist.IsComposer && !composer)
+                {
+                    selectedList.Add(artist);
+                }
+                else if (artist.IsLyricist && !lyricist)
+                {
+                    selectedList.Add(artist);
+                }
+                else if (artist.IsFeatured && !featured)
+                {
+                    selectedList.Add(artist);
+                }
+            }
+            return selectedList;
+        }
+
         private static int GetScore(this ArtistDataRelation artist, bool acceptAlbumArtist = true)
         {
             int performerValue = 11;

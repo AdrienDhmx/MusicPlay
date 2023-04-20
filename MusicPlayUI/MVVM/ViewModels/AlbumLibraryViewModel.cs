@@ -193,7 +193,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                     List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbum(album.Id);
                     if (tracks is null || tracks.Count == 0)
                         return;
-                    _queueService.SetNewQueue(tracks, album.Name, ModelTypeEnum.Album, album.AlbumCover, null, false, false, true);
+                    _queueService.SetNewQueue(tracks, new(album.Name, ModelTypeEnum.Album, album.Id), album.AlbumCover, null, false, false, true);
                 }
             });
 

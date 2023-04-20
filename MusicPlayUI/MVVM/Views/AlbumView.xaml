@@ -162,6 +162,7 @@
                 </Grid>
             </Grid>
         </Border>
+        
         <ScrollViewer Background="Transparent"
                       x:Name="AlbumScroll"
                       Grid.Row="1"
@@ -175,6 +176,7 @@
                 </Grid.RowDefinitions>
 
                 <listview:ChipListView Genres="{Binding Genres}"
+                                       NavigateToGenreCommand="{Binding NavigateToGenreCommand}"
                                         Margin="0,5,0,0"
                                         VerticalAlignment="Center"
                                        HorizontalAlignment="Center"/>

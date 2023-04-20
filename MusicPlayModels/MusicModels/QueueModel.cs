@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class QueueModel : MusicPlayModels.BaseModel
+    public class QueueModel : BaseModel
     {
         private List<OrderedTrackModel> _tracks = new();
         private TrackModel _playingTrack = new();
@@ -15,6 +15,7 @@ namespace MusicPlayModels.MusicModels
         private bool _isOnRepeat = false;
         private string _playingFrom = "";
         private string _cover = "";
+        private int _playingFromId;
 
         public int Id { get; set; }
         public bool IsShuffled
@@ -46,6 +47,16 @@ namespace MusicPlayModels.MusicModels
                 OnPropertyChanged(nameof(PlayingFrom));
             }
         }
+
+        public int PlayingFromId
+        {
+            get => _playingFromId;
+            set
+            {
+                SetField(ref _playingFromId, value);
+            }
+        }
+
         public string Cover
         {
             get { return _cover; }
