@@ -292,18 +292,21 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public void Drop(IDropInfo dropInfo)
         {
-            if (!dropInfo.IsSameDragDropContextAsSource) // new track inserted
+            if(dropInfo.Data is UIOrderedTrackModel track)
             {
-                UIOrderedTrackModel sourceItem = dropInfo.Data as UIOrderedTrackModel;
+                if (!PlaylistTracks.Any(t => t.Id == track.Id)) // new track inserted
+                {
+                    UIOrderedTrackModel sourceItem = dropInfo.Data as UIOrderedTrackModel;
 
-                InsertTrack(sourceItem, dropInfo.InsertIndex);
-            }
-            else if (dropInfo.Data is UIOrderedTrackModel) // track moved
-            {
-                UIOrderedTrackModel track = dropInfo.Data as UIOrderedTrackModel;
-                int originalIndex = PlaylistTracks.IndexOf(track);
+                    InsertTrack(sourceItem, dropInfo.InsertIndex);
+                }
+                else if (dropInfo.Data is UIOrderedTrackModel) // track moved
+                {
+                    int originalIndex = PlaylistTracks.IndexOf(track);
 
-                MoveTrack(originalIndex, dropInfo.InsertIndex);
+                    // when the original index is lower than the insert one, the track gets inserted one index to high
+                    MoveTrack(originalIndex, dropInfo.InsertIndex > originalIndex ? dropInfo.InsertIndex - 1 : dropInfo.InsertIndex);
+                }
             }
         }
     }

@@ -1094,7 +1094,7 @@ namespace DataBaseConnection.DataAccess
             List<Query> queries = new List<Query>();
             foreach (OrderedTrackModel track in tracks)
             {
-                queries.Add(new Query(Tables.TPlaylistTracks).Where(Columns.TrackId, track.Id).WhereNot(Columns.Index, track.TrackIndex).AsUpdate(new Dictionary<string, object>()
+                queries.Add(new Query(Tables.TPlaylistTracks).Where(Columns.PlaylistId, playlistId).Where(Columns.TrackId, track.Id).AsUpdate(new Dictionary<string, object>()
                 {
                     { Columns.Index, track.TrackIndex },
                 }));

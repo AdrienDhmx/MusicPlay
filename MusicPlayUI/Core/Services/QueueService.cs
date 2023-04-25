@@ -568,7 +568,7 @@ namespace MusicPlayUI.Core.Services
 
         public async void NavigateToPlayingFrom()
         {
-            if (QueueTracks is not null || PlayingFrom is not null)
+            if (QueueTracks is not null && PlayingFrom is not null && PlayingFrom.DataId != -1)
             {
                 ViewNameEnum viewName;
                 BaseModel parameter;
