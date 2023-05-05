@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
-using AudioEngine.Enums;
-using AudioEngine.Models;
+using AudioHandler.Enums;
+using AudioHandler.Models;
 using ManagedBass;
 using ManagedBass.Fx;
 using MessageControl;
 using MusicPlayModels;
 using Timer = System.Timers.Timer;
 
-namespace AudioEngine
+namespace AudioHandler
 {
     public class AudioPlayback : ObservableObject, IAudioPlayback
     {
@@ -121,6 +114,7 @@ namespace AudioEngine
         {
             Init();
 
+            // look for new connected devices
             deviceTimer = new Timer(2000);
         }
 
@@ -136,10 +130,11 @@ namespace AudioEngine
             else
             {
                 deviceTimer.Stop();
+                deviceTimer.Elapsed -= DeviceTimer_Elapsed;
             }
         }
 
-        private static void ErrorHandler()
+        private void ErrorHandler()
         {
             switch (Bass.LastError)
             {
@@ -222,7 +217,14 @@ namespace AudioEngine
                     MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: you do not have EAX (Environmental Audio Extensions) support."));
                     break;
                 case Errors.NotPlaying:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, probably due to the file not being loaded correctly."));
+                    if(!Init(AudioOutput.GetDefaultdevice().Index, Frequency))
+                    {
+                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, the audio device could not be initialized correctly."));
+                    }
+                    else if(!RetryLoadingAndPLayingFile()) // device initalized successfully
+                    { 
+                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing and the device has successfully been initialized, the error might come from the file being corrupted."));
+                    }
                     break;
                 case Errors.SampleRate:
                     MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the sample rate of this file is not valid."));
@@ -283,8 +285,8 @@ namespace AudioEngine
             Dispose();
 
             // try init the new device
-            bool result = Init(device.Index, Frequency);
-            if (result)
+            bool initiliazed = Init(device.Index, Frequency);
+            if (initiliazed)
             {
                 Device = device;
                 LoadAnPlay(_file);
@@ -312,7 +314,7 @@ namespace AudioEngine
                 }
                 OnIsDeviceChanged();
             }
-            return result;
+            return initiliazed;
         }
 
         public void Load(string file)
@@ -341,6 +343,23 @@ namespace AudioEngine
                 {
                     ErrorHandler();
                 }
+            }
+        }
+
+        private bool RetryLoadingAndPLayingFile()
+        {
+            Load(_file);
+            if (Stream == -1)
+                return false;
+
+            if (Bass.ChannelPlay(Stream))
+            {
+                IsPlaying = true;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -453,7 +472,6 @@ namespace AudioEngine
         {
             if (loop)
             {
-
                 if (Bass.ChannelAddFlag(Stream, BassFlags.Loop))
                 {
                     IsLooping = true;

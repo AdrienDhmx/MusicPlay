@@ -1,4 +1,4 @@
-﻿using AudioEngine;
+﻿using AudioHandler;
 using GongSolutions.Wpf.DragDrop.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using MusicPlayUI.Core.Commands;
@@ -18,7 +18,6 @@ namespace MusicPlayUI.MVVM.ViewModels
 {
     public class MainViewModel : ViewModel, IOnMouseDownListener
     {
-        private readonly IAudioTimeService _audioTimeService;
         public IAudioPlayback AudioPlayback { get; }
         public IQueueService QueueService { get; }
 
@@ -50,6 +49,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
+        public ICommandsManager CommandsManager { get; }
         public bool IsModalOpen
         {
             get => _modalService.IsModalOpen;
@@ -79,25 +79,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             set { SetField(ref _queueDrawer, value); }
         }
 
-        public ICommand PlayPauseCommand { get; }
-        public ICommand NextTrackCommand { get; }
-        public ICommand PreviousTrackCommand { get; }
-        public ICommand DecreaseVolumeCommand { get; set; }
-        public ICommand IncreaseVolumeCommand { get; set; }
-        public ICommand SwitchFullScreenCommand { get; }
-        public ICommand EscapeFullScreenCommand { get; }
-        public ICommand ClosePopupCommand { get; }
-        public ICommand OpenCloseMenuCommand { get; }
-        public ICommand ShuffleCommand { get; }
-        public ICommand RepeatCommand { get; }
-        public ICommand NavigateCommand { get; }
-        public ICommand FavoriteCommand { get; }
-        public ICommand RatingCommand { get; }
-        public ICommand MinimizeCommand { get; }
-        public ICommand MaximizeCommand { get; }
-        public ICommand LeaveCommand { get; }
-        public MainViewModel(INavigationService navigationService, IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService, IAudioTimeService audioTimeService,
-             MainMenuViewModel mainMenuViewModel, QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel)
+        public MainViewModel(INavigationService navigationService, IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService,
+             MainMenuViewModel mainMenuViewModel, QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel, ICommandsManager commandsManager)
         {
             NavigationService = navigationService;
             AudioPlayback = audioPlayback;
@@ -105,6 +88,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             CurrentMenu = mainMenuViewModel;
             QueueDrawer = queueDrawerViewModel;
             CurrentPlayerControl = playerControlViewModel;
+            CommandsManager = commandsManager;
             ModalService = modalService;
             _audioTimeService = audioTimeService;
 
@@ -169,13 +153,13 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             SwitchFullScreenCommand = new RelayCommand(() =>
             {
-                navigationService.SwitchFullScreen();
+                navigationService.ToggleFullScreen();
             });
 
             EscapeFullScreenCommand = new RelayCommand(() =>
             {
                 if (NavigationService.IsFullScreen)
-                    navigationService.SwitchFullScreen();
+                    navigationService.ToggleFullScreen();
             });
 
             ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);
@@ -267,6 +251,5 @@ namespace MusicPlayUI.MVVM.ViewModels
             //if it's not a ContentElement/FrameworkElement, rely on VisualTreeHelper
             return VisualTreeHelper.GetParent(child);
         }
-
     }
 }

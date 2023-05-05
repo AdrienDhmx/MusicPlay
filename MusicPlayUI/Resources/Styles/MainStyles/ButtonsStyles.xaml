@@ -240,25 +240,28 @@
            BasedOn="{StaticResource BaseIconButton}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-        <Setter Property="IconWidth" Value="32"/>
-        <Setter Property="IconHeight" Value="34"/>
-        <Setter Property="Margin" Value="24,0"/>
+        <Setter Property="IconWidth" Value="30"/>
+        <Setter Property="IconHeight" Value="32"/>
+        <Setter Property="Margin" Value="18,0"/>
     </Style>
 
     <Style x:Key="ScdPlayBackButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource BaseIconButton}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-        <Setter Property="IconWidth" Value="30"/>
-        <Setter Property="IconHeight" Value="30"/>
+        <Setter Property="IconWidth" Value="28"/>
+        <Setter Property="IconHeight" Value="28"/>
     </Style>
     
     <Style x:Key="ThirdPlayBackButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource BaseIconButton}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="IconWidth" Value="22"/>
-        <Setter Property="IconHeight" Value="22"/>
-        <Setter Property="Margin" Value="28,0"/>
+        <Setter Property="IconWidth" Value="18"/>
+        <Setter Property="IconHeight" Value="18"/>
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Margin" Value="22,0"/>
+        <Setter Property="CornerRadius" Value="8"/>
     </Style>
 
     <Style x:Key="NowPlayingIconButton" TargetType="IconButton:IconButton"
@@ -282,7 +285,7 @@
         <Setter Property="Height" Value="50"/>
         <Setter Property="IconHeight" Value="30"/>
         <Setter Property="IconWidth" Value="28"/>
-        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
     </Style>
 
     <Style x:Key="LargePlayButton" TargetType="IconButton:IconButton"

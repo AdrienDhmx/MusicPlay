@@ -1,6 +1,6 @@
-﻿using AudioEngine.Models;
+﻿using AudioHandler.Models;
 
-namespace AudioEngine
+namespace AudioHandler
 {
     public interface IAudioPlayback
     {

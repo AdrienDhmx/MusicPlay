@@ -118,7 +118,7 @@
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Duration="0:0:0.01"
-                                            From="300" To="0"
+                                            From="260" To="0"
                                             Storyboard.TargetProperty="Width">
                             </DoubleAnimation>
                         </Storyboard>
@@ -150,7 +150,7 @@
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Duration="0:0:0.01"
-                                            From="0" To="300"
+                                            From="0" To="260"
                                             Storyboard.TargetProperty="Width">
                             </DoubleAnimation>
                         </Storyboard>

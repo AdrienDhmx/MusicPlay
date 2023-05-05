@@ -61,6 +61,8 @@ namespace MessageControl
                     OnCloseCallBack= message.OnCloseCallBack,
                     InteractionCallBack = message.ConfirmCallBack,
                     UndoCallBack= message.UndoCallBack,
+                    UndoneMessage = message.UndoneMessage,
+                    UndoneFailedMessage = message.UndoneFailedMessage,
                     FontSize = 16,
                     CornerRadius = new(8)
                 };

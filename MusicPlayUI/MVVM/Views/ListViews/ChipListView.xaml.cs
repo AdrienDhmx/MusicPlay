@@ -35,5 +35,14 @@ namespace MusicPlayUI.MVVM.Views.ListViews
 
         public static readonly DependencyProperty GenresProperty =
             DependencyProperty.Register("Genres", typeof(List<GenreModel>), typeof(ChipListView), new PropertyMetadata(new List<GenreModel>()));
+
+        public ICommand NavigateToGenreCommand
+        {
+            get { return (ICommand)GetValue(NavigateToGenreCommandProperty); }
+            set { SetValue(NavigateToGenreCommandProperty, value); }
+        }
+
+        public static readonly DependencyProperty NavigateToGenreCommandProperty =
+            DependencyProperty.Register("NavigateToGenreCommand", typeof(ICommand), typeof(ChipListView), new PropertyMetadata(null));
     }
 }

@@ -5,11 +5,14 @@ using MusicPlayUI.MVVM.Models;
 using System.Collections.Generic;
 using System.Windows.Input;
 using MusicPlayUI.Core.Services.Interfaces;
+using System;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class SettingsViewModel : ViewModel
     {
+        private readonly IWindowService _windowService;
+
         private INavigationService _navigationService;
         public INavigationService NavigationService 
         {
@@ -40,8 +43,6 @@ namespace MusicPlayUI.MVVM.ViewModels
         }
 
         private SettingModel _selectedSetting;
-        private readonly IWindowService _windowService;
-
         public SettingModel SelectedSetting
         {
             get
@@ -76,7 +77,9 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void Dispose()
         {
-            //NavigationService.DisposeSettingView();
+            NavigationService.SecondaryViewModel?.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         private void Init()

@@ -110,11 +110,11 @@ namespace MusicPlayUI.MVVM.ViewModels
                     if (playlist.PlaylistType == PlaylistTypeEnum.UserPlaylist)
                     {
                         List<OrderedTrackModel> tracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
-                        _queueService.SetNewQueue(tracks.ToTrackModel(), playlist.Name, ModelTypeEnum.Playlist, playlist.Cover, null, false, false, false);
+                        _queueService.SetNewQueue(tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
                     }
                     else
                     {
-                        _queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), playlist.Name, ModelTypeEnum.Playlist, playlist.Cover, null, false, false, false);
+                        _queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
                     }
                 }
             });

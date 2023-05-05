@@ -25,6 +25,7 @@
                                 Height="24"
                                 CornerRadius="12"
                                 Margin="3, 2"
+                        Cursor="Hand"
                                 Background="{DynamicResource SecondaryContainer}">
                     <Border.InputBindings>
                         <MouseBinding Gesture="LeftClick"

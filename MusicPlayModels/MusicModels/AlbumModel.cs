@@ -10,6 +10,8 @@ namespace MusicPlayModels.MusicModels
     {
         private string _albumCover = "";
 
+        private string _duration = "";
+
         public int Id { get; set; }
 
         public string Name { get; set; } = "";
@@ -36,7 +38,14 @@ namespace MusicPlayModels.MusicModels
 
         public List<GenreModel> Genres { get; set; } = new();
 
-        public string Duration { get; set; } = "";
+        public string Duration 
+        {
+            get => _duration;
+            set
+            {
+                SetField(ref _duration, value);
+            }
+        }
 
         public int Length { get; set; }
 
@@ -59,6 +68,18 @@ namespace MusicPlayModels.MusicModels
         public bool IsAlbum()
         {
             return !IsEP && !IsSingle;
+        }
+
+        public List<int> GetArtistsId()
+        {
+            List<int> ids = new List<int>();
+
+            foreach (var artist in Artists)
+            {
+                ids.Add(artist.ArtistId);
+            }
+
+            return ids;
         }
     }
 }

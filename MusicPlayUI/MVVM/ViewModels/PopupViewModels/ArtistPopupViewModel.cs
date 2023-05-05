@@ -12,6 +12,10 @@ using MusicPlayUI.Core.Helpers;
 using System.Collections.ObjectModel;
 using MusicPlayUI.Core.Factories;
 using MusicPlayModels.Enums;
+using MusicPlayUI.MVVM.Models;
+using MessageControl;
+using TagLib;
+using Humanizer.Localisation;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
@@ -44,12 +48,35 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
+        private bool _canRemoveFromGenre;
+        public bool CanRemoveFromGenre
+        {
+            get => _canRemoveFromGenre;
+            set
+            {
+                SetField(ref _canRemoveFromGenre, value);
+            }
+        }
+
+        private GenreModel _genre;
+        public GenreModel Genre
+        {
+            get => _genre;
+            set
+            {
+                SetField(ref _genre, value);
+            }
+        }
+
+        private MessageCancelClosedModel<GenreModel> _genreMessageCancelClosedModel { get; set; }
+        private int RemovedArtistGenreIndex { get; set; }
+
         public ICommand PlayNextCommand { get; }
         public ICommand AddToQueueCommand { get; }
         public ICommand AddToPlaylistCommand { get; }
         public ICommand ChangeCoverCommand { get; }
         public ICommand CreatePlaylistCommand { get; }
-
+        public ICommand RemoveArtistGenreCommand { get; }
         public ArtistPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService)
         {
             _navigationService = navigationService;
@@ -64,10 +91,38 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             AddToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) => AddToPlaylist(playlist));
             ChangeCoverCommand = new RelayCommand(ChangeCover);
             CreatePlaylistCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.CreatePlaylist, OnCreatePlaylistClosed));
+            RemoveArtistGenreCommand = new RelayCommand(() =>
+            {
+                if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
+                {
+                    RemovedArtistGenreIndex = genreViewModel.RemoveArtist(Artist.Id);
+                }
+
+                _genreMessageCancelClosedModel = new(Genre, RestoreGenre);
+                MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre(Artist.Name, Genre.Name, _genreMessageCancelClosedModel.Cancel, RemoveFromGenreCloseCallBack));
+            });
         }
 
         public override void Dispose()
         {
+        }
+
+        private bool RestoreGenre()
+        {
+            if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel &&
+                RemovedArtistGenreIndex != -1)
+            {
+                genreViewModel.Artists.Insert(RemovedArtistGenreIndex, Artist);
+            }
+            return true;
+        }
+
+        private async void RemoveFromGenreCloseCallBack()
+        {
+            if (!_genreMessageCancelClosedModel.IsCanceled)
+            {
+                await DataAccess.Connection.RemoveArtistGenre(Artist.Id, _genreMessageCancelClosedModel.Data.Id);
+            }
         }
 
         private async void PlayNext(bool end = false)
@@ -125,6 +180,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         private async void LoadData()
         {
             Artist = (ArtistModel)_navigationService.PopupViewParameter;
+
+            if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
+            {
+                CanRemoveFromGenre = true;
+                Genre = genreViewModel.Genre;
+            }
+
             await GetUserPlaylists();
         }
     }

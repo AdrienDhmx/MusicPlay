@@ -44,6 +44,7 @@ namespace MusicFilesProcessor
                         dest.Save(path);
                     }
                 }   
+                ImageHelper.SaveFileToNewPath(path, path);
             }
             else
             {

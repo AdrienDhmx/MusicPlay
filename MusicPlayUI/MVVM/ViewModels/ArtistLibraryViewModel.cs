@@ -1,4 +1,4 @@
-﻿using AudioEngine;
+﻿using AudioHandler;
 using DataBaseConnection.DataAccess;
 using MusicPlay.Language;
 using MusicPlayModels;
@@ -158,7 +158,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 if (artist is not null)
                 {
-                    _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), artist.Name, ModelTypeEnum.Artist, artist.Cover, null, false);
+                    _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), new(artist.Name, ModelTypeEnum.Artist, artist.Id), artist.Cover, null, false);
                 }
             });
 

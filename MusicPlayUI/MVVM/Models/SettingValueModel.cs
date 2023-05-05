@@ -11,14 +11,6 @@ namespace MusicPlayUI.MVVM.Models
     {
         private bool _isSelected = false;
 
-        public SettingValueModel(string name, string description, T value, bool isSelected = false)
-        {
-            Name = name;
-            Description = description;
-            Value = value;
-            IsSelected = isSelected;
-        }
-
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -37,5 +29,13 @@ namespace MusicPlayUI.MVVM.Models
         /// Is an id used for handling preferences (avoid languages issues). It often is an Enum and is stored as an int in the config file
         /// </summary>
         public T Value { get; set; }
+
+        public SettingValueModel(string name, string description, T value, bool isSelected = false)
+        {
+            Name = name;
+            Description = description;
+            Value = value;
+            IsSelected = isSelected;
+        }
     }
 }

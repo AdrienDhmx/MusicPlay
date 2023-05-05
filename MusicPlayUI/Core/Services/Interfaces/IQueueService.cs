@@ -42,8 +42,8 @@ namespace MusicPlayUI.Core.Services.Interfaces
         bool PreviousTrack();
         void RemoveTrack(TrackModel track);
         void Repeat();
-        void SetNewQueue(List<UIOrderedTrackModel> tracks, string playingFrom, ModelTypeEnum modelType, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
-        void SetNewQueue(List<TrackModel> tracks, string playingFrom, ModelTypeEnum modelType, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
+        void SetNewQueue(List<UIOrderedTrackModel> tracks, QueuePlayingFromModel playingFrom, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
+        void SetNewQueue(List<TrackModel> tracks, QueuePlayingFromModel playingFrom, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
         void Shuffle();
         Task UpdateFavorite(bool isFavorite);
         void UpdateRating(int rating);

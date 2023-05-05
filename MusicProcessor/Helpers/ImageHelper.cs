@@ -71,7 +71,8 @@ namespace MusicFilesProcessor.Helpers
         {
             if(file.ValidPath() && !string.IsNullOrWhiteSpace(newPath))
             {
-                File.Copy(file, newPath, true); // original version
+                if(file != newPath)
+                    File.Copy(file, newPath, true); // copy original version
 
                 string mediumFileNamePath = GetModifiedCoverPath(newPath, true);
                 string thumbnailFileNamePath = GetModifiedCoverPath(newPath, false);

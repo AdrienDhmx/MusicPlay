@@ -69,35 +69,37 @@
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Play_Next}"
                                    Style="{DynamicResource PopupBtn}"
-                                    Command="{Binding PlayNextCommand}">
-                    
-                </textbtn:TextButton>
+                                    Command="{Binding PlayNextCommand}"/>
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Add_To_Queue}"
                                     Grid.Row="1"
                                    Style="{DynamicResource PopupBtn}"
-                                    Command="{Binding AddToQueueCommand}">
-
-                </textbtn:TextButton>
+                                    Command="{Binding AddToQueueCommand}"/>
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Add_To_Playlist}"
                                     Grid.Row="2"
                                     x:Name="AddToPlaylistBorder"
-                                    Style="{DynamicResource PopupBtn}">
+                                    Style="{DynamicResource PopupBtn}"/>
 
-                </textbtn:TextButton>
+                <textbtn:TextButton Text="Remove from Genre"
+                                    Grid.Row="3"
+                                        Height="40"
+                                        Visibility="{Binding CanRemoveFromGenre, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2}"
+                                    Command="{Binding RemoveAlbumGenreCommand}"
+                                    x:Name="RemomveFromGenreBorder"
+                                    Style="{DynamicResource PopupBtn}"/>    
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Change_Cover}"
-                                    Grid.Row="3"
+                                    Grid.Row="4"
                                     CornerRadius="0,0,4,4"
                                    Style="{DynamicResource PopupBtn}"
-                                    Command="{Binding ChangeCoverCommand}">
-                </textbtn:TextButton>
+                                    Command="{Binding ChangeCoverCommand}"/>
             </Grid>
             <!-- Playlists Popup -->
             <Popup AllowsTransparency="True"
@@ -123,11 +125,8 @@
                                 <Setter Property="IsOpen" Value="True"/>
                             </DataTrigger>
                         </Style.Triggers>
-
                     </Style>
                 </Popup.Style>
-
-
             </Popup>
         </Grid>
     </Border>
