@@ -10,10 +10,10 @@ namespace MessageControl
 {
     public static class DefaultMessageFactory
     {
-        private static MessageModel? ErrorMessageStyle { get; set; }
-        private static MessageModel? WarningMessageStyle { get; set; }
-        private static MessageModel? SuccessMessageStyle { get; set; }
-        private static MessageModel? InfoMessageStyle { get; set; }
+        public static MessageModel? ErrorMessageStyle { get; private set; }
+        public static MessageModel? WarningMessageStyle { get; private set; }
+        public static MessageModel? SuccessMessageStyle { get; private set; }
+        public static MessageModel? InfoMessageStyle { get; private set; }
 
         public static void RegisterErrorMessageStyle(Brush background, Brush foreground, Brush mouseOver, Geometry icon)
         {

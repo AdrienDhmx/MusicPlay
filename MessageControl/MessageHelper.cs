@@ -57,6 +57,7 @@ namespace MessageControl
                     IsTimeDisplayed = message.IsDateTimeDisplayed,
                     IsInteractive = message.IsInteractive,
                     IsInteractiveWithCancel = message.IsInteractiveWithCancel,
+                    IsUndoneChangeThemeEnabled = message.IsUndoneChangeThemeEnabled,
                     IsUndoBtnVisible = message.IsUndoEnabled,
                     OnCloseCallBack= message.OnCloseCallBack,
                     InteractionCallBack = message.ConfirmCallBack,

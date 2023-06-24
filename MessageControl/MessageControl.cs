@@ -1,19 +1,9 @@
-﻿using IconButton;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using TextBtn;
 
@@ -86,6 +76,12 @@ namespace MessageControl
         public static readonly DependencyProperty IsInteractiveWithCancelProperty =
             DependencyProperty.Register("IsInteractiveWithCancel", typeof(bool), typeof(MessageControl), new PropertyMetadata(false));
 
+
+        public bool IsUndoneChangeThemeEnabled
+        {
+            get { return (bool)GetValue(IsUndoneChangeThemeEnabledProperty); }
+            set { SetValue(IsUndoneChangeThemeEnabledProperty, value); }
+        }
 
         public Action<bool> InteractionCallBack
         {
@@ -192,6 +188,9 @@ namespace MessageControl
         public static readonly DependencyProperty IsInteractiveProperty =
             DependencyProperty.Register("IsInteractive", typeof(bool), typeof(MessageControl), new PropertyMetadata(false));
 
+        public static readonly DependencyProperty IsUndoneChangeThemeEnabledProperty =
+            DependencyProperty.Register("IsUndoneChangeThemeEnabled", typeof(bool), typeof(MessageControl), new PropertyMetadata(true));
+
         public static readonly DependencyProperty IsTimeDisplayedProperty =
             DependencyProperty.Register("IsTimeDisplayed", typeof(bool), typeof(MessageControl), new PropertyMetadata(true));
 
@@ -266,6 +265,8 @@ namespace MessageControl
             _buttonCancel.Visibility = IsInteractiveWithCancel ? Visibility.Visible : Visibility.Collapsed;
 
             _buttonClose.Visibility = _buttonUndo.Visibility;
+
+            FontSize = 15;
 
             _buttonClose.Command = new RelayCommand(Close);
             _buttonCancel.Command = new RelayCommand(() => Close(false));
@@ -348,10 +349,30 @@ namespace MessageControl
             if (UndoCallBack.Invoke())
             {
                 Message = UndoneMessage;
+
+                // change message style to success
+                if (IsUndoneChangeThemeEnabled && DefaultMessageFactory.SuccessMessageStyle != null)
+                {
+                    Icon = DefaultMessageFactory.SuccessMessageStyle.Icon ?? Icon;
+                    FillColor = DefaultMessageFactory.SuccessMessageStyle.IconBrush ?? FillColor;
+                    Background = DefaultMessageFactory.SuccessMessageStyle.Background;
+                    Foreground = DefaultMessageFactory.SuccessMessageStyle.Foreground;
+                    MouseOverBackground = DefaultMessageFactory.SuccessMessageStyle.MouseOverBackground ?? MouseOverBackground;
+                }
             }
             else
             {
                 Message = UndoneFailedMessage;
+
+                // change message style to error
+                if (IsUndoneChangeThemeEnabled && DefaultMessageFactory.ErrorMessageStyle != null)
+                {
+                    Icon = DefaultMessageFactory.ErrorMessageStyle.Icon ?? Icon;
+                    FillColor = DefaultMessageFactory.ErrorMessageStyle.IconBrush ?? FillColor;
+                    Background = DefaultMessageFactory.ErrorMessageStyle.Background;
+                    Foreground = DefaultMessageFactory.ErrorMessageStyle.Foreground;
+                    MouseOverBackground = DefaultMessageFactory.ErrorMessageStyle.MouseOverBackground ?? MouseOverBackground;
+                }
             }
             _buttonUndo.Visibility = Visibility.Collapsed;
 

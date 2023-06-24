@@ -26,10 +26,12 @@ namespace MusicPlayUI.Core.Factories
         private static PathGeometry SettingIcon => (PathGeometry)App.IconDic["SettingsIcon"]; // 5
         private static PathGeometry CircledAddIcon => (PathGeometry)App.IconDic["CircledAddIcon"]; // 6
         private static PathGeometry CircledRemoveIcon => (PathGeometry)App.IconDic["CircledRemoveIcon"]; // 7
+        private static PathGeometry SuccessIcon => (PathGeometry)App.IconDic["CheckBox.Checked"]; // 8
 
-        public static void RegisterErrorMessagesStyle()
-        { 
+        public static void RegisterMessagesStyles()
+        {
             DefaultMessageFactory.RegisterErrorMessageStyle(MessageColors.ErrorContainer, MessageColors.OnErrorContainer, MessageColors.ErrorHover, ErrorIcon);
+            DefaultMessageFactory.RegisterSuccessMessageStyle(MessageColors.SuccessContainer, MessageColors.OnSuccessContainer, MessageColors.SuccessHover, SuccessIcon);
         }
 
         public static MessageModel ErrorMessage(ErrorEnum errorType)
@@ -46,9 +48,9 @@ namespace MusicPlayUI.Core.Factories
                 message = $"No new files were found.";
                 return message.CreateWarningMessage(2);
             }
-            else 
-            { 
-                message = $"{numberOfTrackImported} {Resources.Scan_Done_Msg}"; 
+            else
+            {
+                message = $"{numberOfTrackImported} {Resources.Scan_Done_Msg}";
                 return message.CreateSuccessMessage(4);
             }
         }
@@ -188,7 +190,8 @@ namespace MusicPlayUI.Core.Factories
         public static MessageModel TrackRemovedFromQueueWithUndo(this string name, Func<bool> callback)
         {
             string message = $"{Resources.The_Track} \"{name}\" {Resources.Has_Been_Removed_From} {Resources.The_Queue}.";
-            return message.CreateWarningMessageWithUndo(7, callback);
+            string undoneMessage = $"\"{name}\" has been restored!";
+            return message.CreateWarningMessageWithUndo(7, callback, undoneMessage);
         }
 
         private static MessageModel CreateErrorMessage(this string message)
@@ -281,7 +284,7 @@ namespace MusicPlayUI.Core.Factories
             return messageModel;
         }
 
-        private static MessageModel CreateWarningMessageWithUndo(this string message, int iconType, Func<bool> undoCallBack)
+        private static MessageModel CreateWarningMessageWithUndo(this string message, int iconType, Func<bool> undoCallBack, string undoMessage = "The action has been undone.")
         {
             MessageModel messageModel = new()
             {
@@ -293,7 +296,9 @@ namespace MusicPlayUI.Core.Factories
                 MouseOverBackground = MessageColors.WarningHover,
                 IsUndoEnabled = true,
                 UndoCallBack = undoCallBack,
-                UndoMessage = "Undo"
+                UndoMessage = "Undo",
+                UndoneMessage = undoMessage,
+                UndoneFailedMessage = "The action could not be undone.",
             };
             return messageModel;
         }

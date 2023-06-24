@@ -58,7 +58,7 @@ namespace MusicPlayUI
             {
                 LanguageService.SetLanguage(((SettingsValueEnum)ConfigurationService.GetPreference(SettingsEnum.Language)).GetLanguageCulture());
                 AppThemeService.InitializeAppTheme();
-                MessageFactory.RegisterErrorMessagesStyle();
+                MessageFactory.RegisterMessagesStyles();
 
                 MainWindow window = _services.GetRequiredService<MainWindow>();
                 window.Show();
