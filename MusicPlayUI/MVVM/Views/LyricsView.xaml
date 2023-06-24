@@ -44,7 +44,7 @@
                             x:Name="BorderBackground"/>
 
                     <stepper:Stepper Width="auto"
-                                     Height="34"
+                                     Height="30"
                                      Background="Transparent"
                                      BtnBackgroundColor="Transparent"
                                      CornerRadius="4"
@@ -53,7 +53,7 @@
                                      BorderBrush="{DynamicResource WhiteForeground}"
                                      Foreground="{DynamicResource WhiteForeground}"
                                      CaretBrush="{DynamicResource WhiteForeground}"
-                                     MouseOverBtnColor="{DynamicResource PrimaryHover}"
+                                     MouseOverBtnColor="{DynamicResource ScdWhiteTransparent}"
                                      IsReadOnly="True"
                                      IsReadOnlyCaretVisible="False"
                                      FontSize="18"
@@ -80,7 +80,7 @@
                                     <DataTrigger Binding="{Binding DataContext.IsSaved, ElementName=RootLyricsView, UpdateSourceTrigger=PropertyChanged}"
                                                  Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                        <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding DataContext.CanSave, ElementName=RootLyricsView, UpdateSourceTrigger=PropertyChanged}"
                                                  Value="false">
@@ -120,7 +120,7 @@
                                     <DataTrigger Binding="{Binding DataContext.IsTimed, ElementName=RootLyricsView}"
                                                  Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                        <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -144,7 +144,7 @@
                                             FillColor="{DynamicResource WhiteForeground}"
                                             Margin="10,0"
                                             Width="auto"
-                                            Height="40"
+                                            Height="34"
                                             IconHeight="12"
                                             IconWidth="22"
                                             IconMargin="5,0"
@@ -168,7 +168,7 @@
                                 <Setter Property="Background" Value="Transparent"/>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>

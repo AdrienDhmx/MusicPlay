@@ -20,7 +20,7 @@
         <!-- Track header -->
         <Grid HorizontalAlignment="Stretch"
                       VerticalAlignment="Center"
-                      MaxWidth="1200"
+                      MaxWidth="1250"
                       Height="30"
                       Margin="10,20, 10, 0">
             <Grid.ColumnDefinitions>
@@ -92,7 +92,7 @@
                             dd:DragDrop.IsDragSource="True"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top"
-                            MaxWidth="1200"
+                            MaxWidth="1250"
                             Margin="10, 10, 10,20"
                               x:Name="Tracks">
             <dd:DragDrop.EffectMoveAdornerTemplate>
@@ -129,7 +129,10 @@
                                     MaxHeight="110"
                                     HorizontalAlignment="Stretch"
                                     MinWidth="550"
-                                    CornerRadius="4">
+                            Padding="0,10"
+                            BorderThickness="0,1,0,0"
+                            BorderBrush="{DynamicResource SurfaceVariant}"
+                                    CornerRadius="0">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Background" Value="Transparent"/>
@@ -146,64 +149,59 @@
                             <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenTrackPopupCommand, ElementName=RootListview}"
                                                               CommandParameter="{Binding .}"/>
                         </Border.InputBindings>
-                        <Border BorderThickness="0,1,0,0"
-                                        Padding="0,10"
-                                        Margin="4,0"
-                                        BorderBrush="{DynamicResource SurfaceVariant}">
-                            <Grid Margin="10,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.03*" MinWidth="40"/>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition Width="0.4*"/>
-                                    <ColumnDefinition Width="0.5*"/>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition  Width="70"/>
-                                </Grid.ColumnDefinitions>
+                        <Grid Margin="10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.03*" MinWidth="40"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="0.4*"/>
+                                <ColumnDefinition Width="0.5*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition  Width="70"/>
+                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="{Binding TrackIndex}"
+                            <TextBlock Text="{Binding TrackIndex}"
                                            Style="{DynamicResource NTrackDataStyle}"/>
 
-                                <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                            <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
                                         Grid.Column="1"
                                         Visibility="{Binding CoverVisibility, ElementName=RootListview}"
                                         Height="50"
                                         Width="50">
-                                    <Border.Background>
-                                        <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource ONullImageConverter}}"
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource ONullImageConverter}}"
                                                     Stretch="UniformToFill"/>
-                                    </Border.Background>
-                                </Border>
+                                </Border.Background>
+                            </Border>
 
-                                <TextBlock Text="{Binding Title}"
+                            <TextBlock Text="{Binding Title}"
                                                     Grid.Column="2"
                                                    Margin="10,0,4,0"
                                                     Style="{DynamicResource NTrackDataStyle}"/>
 
-                                <listview:ArtistsRelationListView Artists="{Binding Artists}"
+                            <listview:ArtistsRelationListView Artists="{Binding Artists}"
                                                                            Command="{Binding DataContext.NavigateToArtistByIdCommand, ElementName=RootListview}"
                                                                            VerticalAlignment="Center"
                                                                            Grid.Column="3"
                                                                             HorizontalAlignment="Left"/>
 
-                                <TextBlock Text="{Binding AlbumName}"
+                            <TextBlock Text="{Binding AlbumName}"
                                                     Grid.Column="4"
                                            Width="180"
                                            Margin="4,0"
                                            Visibility="{Binding AlbumVisibility, ElementName=RootListview}"
                                                     Style="{DynamicResource NLTrackDataStyle}">
-                                    <TextBlock.InputBindings>
-                                        <MouseBinding Gesture="LeftClick" 
+                                <TextBlock.InputBindings>
+                                    <MouseBinding Gesture="LeftClick" 
                                                       Command="{Binding DataContext.NavigateToAlbumByIdCommand, ElementName=RootListview}"
                                                       CommandParameter="{Binding AlbumId}"/>
-                                    </TextBlock.InputBindings>
-                                </TextBlock>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
 
-                                <TextBlock Text="{Binding Duration}"
+                            <TextBlock Text="{Binding Duration}"
                                                     Grid.Column="5"
                                                    HorizontalAlignment="Center"
                                                     Style="{DynamicResource NTrackDataStyle}"/>
-                            </Grid>
-                        </Border>
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

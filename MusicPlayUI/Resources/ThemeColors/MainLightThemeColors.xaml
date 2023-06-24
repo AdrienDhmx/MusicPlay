@@ -108,7 +108,7 @@
                      Color="#80ffffff"/>
     
     <SolidColorBrush x:Key="ScdWhiteTransparent"
-                     Color="#40ffffff"/>
+                     Color="#20ffffff"/>
 
     <SolidColorBrush x:Key="BlackTransparent"
                      Color="#65000000"/>

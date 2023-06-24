@@ -95,36 +95,29 @@ namespace MusicPlayUI.MVVM.Models
         {
             List<UIOrderedTrackModel> output = new();
 
-            foreach (OrderedTrackModel qt in tracks)
+            foreach (OrderedTrackModel t in tracks)
             {
-                if(qt.TrackIndex - 1 >= output.Count)
+                if(output.Count > 1 && output.Last().TrackIndex > t.TrackIndex) // need to insert before the higher indexes
                 {
-                    if(output.Count > 1 && output.Last().TrackIndex > qt.TrackIndex) // need to insert before the higher indexes
+                    // find the index to insert the track to
+                    int index = 0;
+                    while (index<output.Count && output[index].TrackIndex < t.TrackIndex)
                     {
-                        // find the index to insert the track to
-                        int index = 0;
-                        while (index<output.Count && output[index].TrackIndex < qt.TrackIndex)
-                        {
-                            index++;
-                        }
+                        index++;
+                    }
 
-                        if (index >= output.Count)
-                        {
-                            output.Add(new(qt, albumCover, autoCover));
-                        }
-                        else
-                        {
-                            output.Insert(index, new(qt, albumCover, autoCover));
-                        }
+                    if (index >= output.Count)
+                    {
+                        output.Add(new(t, albumCover, autoCover));
                     }
                     else
                     {
-                        output.Add(new(qt, albumCover, autoCover));
+                        output.Insert(index, new(t, albumCover, autoCover));
                     }
                 }
                 else
                 {
-                    output.Insert(qt.TrackIndex - 1, new(qt, albumCover, autoCover));
+                    output.Add(new(t, albumCover, autoCover));
                 }
             }
 

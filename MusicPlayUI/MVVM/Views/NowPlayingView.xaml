@@ -75,7 +75,7 @@
                                 <DataTrigger Binding="{Binding DataContext.SpectrumVisibility, ElementName=RootView}"
                                                      Value="true">
                                     <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -97,7 +97,7 @@
                                 <DataTrigger Binding="{Binding DataContext.IsCoverOpen, ElementName=RootView}"
                                              Value="true">
                                     <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -119,7 +119,7 @@
                                 <DataTrigger Binding="{Binding DataContext.IsQueueOpen, ElementName=RootView}"
                                                 Value="true">
                                     <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -137,7 +137,7 @@
                                 <DataTrigger Binding="{Binding DataContext.IsLyricsOpen, ElementName=RootView}"
                                                 Value="true">
                                     <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -155,7 +155,7 @@
                                 <DataTrigger Binding="{Binding DataContext.IsTrackInfoOpen, ElementName=RootView}"
                                                 Value="true">
                                     <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -176,7 +176,7 @@
                                 <DataTrigger Binding="{Binding DataContext.NavigationService.IsFullScreen, ElementName=RootView}"
                                                 Value="true">
                                     <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                 </DataTrigger>
                             </Style.Triggers>
 

@@ -50,6 +50,9 @@ namespace MusicPlayUI.Core.Commands
         public ICommand OpenTrackPopupCommand { get; }
         public ICommand ClosePopupCommand { get; }
 
+        //Covers
+        public ICommand UpdateAlbumCover { get; }
+
         // others
         public ICommand FavoriteCommand { get; }
         public ICommand RatingCommand { get; }
@@ -162,6 +165,17 @@ namespace MusicPlayUI.Core.Commands
             });
 
             ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);
+
+            UpdateAlbumCover = new RelayCommand<AlbumModel>((album) =>
+            {
+                if (CoverService.ChangeCover(album))
+                {
+                    if (_navigationService.CurrentViewName == ViewNameEnum.Albums || _navigationService.CurrentViewName == ViewNameEnum.SpecificAlbum)
+                    {
+                        _navigationService.CurrentViewModel.Update();
+                    }
+                }
+            });
 
             MinimizeCommand = new RelayCommand(() =>
             {

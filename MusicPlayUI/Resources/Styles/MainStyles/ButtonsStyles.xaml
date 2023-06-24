@@ -269,14 +269,14 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="IconWidth" Value="25"/>
-        <Setter Property="IconHeight" Value="25"/>
-        <Setter Property="Width" Value="40"/>
-        <Setter Property="Height" Value="40"/>
+        <Setter Property="IconWidth" Value="22"/>
+        <Setter Property="IconHeight" Value="22"/>
+        <Setter Property="Width" Value="36"/>
+        <Setter Property="Height" Value="36"/>
         <Setter Property="Margin" Value="2,0"/>
         <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
         <Setter Property="IconStretch" Value="Uniform"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
+        <Setter Property="MouseOverBackground" Value="{DynamicResource ScdWhiteTransparent}"/>
     </Style>
 
     <Style x:Key="LargeBtn" TargetType="IconButton:IconButton"

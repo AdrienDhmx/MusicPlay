@@ -114,6 +114,7 @@ namespace MusicFilesProcessor.Lyrics.Helper
                     timedLyricsLines.Add(timedLyrics);
                 }
             }
+
             return timedLyricsLines;
         }
 

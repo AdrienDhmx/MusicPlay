@@ -136,7 +136,8 @@
                                                 IconWidth="28"
                                                     Icon="{DynamicResource MoreOptionIcon}"
                                                     Margin="6,0"
-                                                    Command="{Binding OpenAlbumPopupCommand}"/>
+                                                    Command="{Binding OpenAlbumPopupCommand}"
+                                                CommandParameter="{Binding Album}"/>
                         </StackPanel>
                     </Grid>
 
@@ -157,7 +158,8 @@
                                                 IconWidth="28"
                                                     Icon="{DynamicResource MoreOptionIcon}"
                                                     Margin="6,0"
-                                                    Command="{Binding OpenAlbumPopupCommand}"/>
+                                                    Command="{Binding OpenAlbumPopupCommand}"
+                                            CommandParameter="{Binding Album}"/>
                     </StackPanel>
                 </Grid>
             </Grid>

@@ -391,6 +391,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             LyricsModel.IsTimed = true;
             IsTimed = true;
             TimedLyrics = new(LyricsModel.TimedLyrics);
+            AddEmptyLineToLyrics();
         }
 
         public override void Dispose()
@@ -448,10 +449,28 @@ namespace MusicPlayUI.MVVM.ViewModels
             SavedLyrics = Lyrics;
             OnPropertyChanged(nameof(Lyrics));
             TimedLyrics = new(LyricsModel.TimedLyrics);
+            AddEmptyLineToLyrics();
 
             LyricsFound = IsSaved || IsURLValid;
             CanSave = LyricsFound;
             CanCopy = !string.IsNullOrWhiteSpace(Lyrics) || Lyrics != Resources.No_Lyrics_Found;
+        }
+
+        private void AddEmptyLineToLyrics()
+        {
+            if(TimedLyrics == null || TimedLyrics.Count == 0) return;
+
+            for (int i = 0; i < 4; i++)
+            {
+                int index = TimedLyrics.Last().index + i + 1;
+                TimedLyrics.Add(new()
+                {
+                    Lyrics = "  ",
+                    index = index,
+                    LengthInMilliseconds = TimedLyrics.Last().LengthInMilliseconds + index * 2000,
+                    IsPlaying = false,
+                });
+            }
         }
 
 
