@@ -610,7 +610,7 @@ namespace DataBaseConnection.DataAccess
         public Task<List<ArtistModel>> GetArtistFromGenre(int genreId)
         {
             Query query = new Query(Tables.TArtistGenres).Select(Columns.ArtistId).Where(Columns.GenreId, genreId);
-            return new Query(Tables.TArtist).WhereIn(Columns.Id, query).GetAsync<ArtistModel>();
+            return new Query(Tables.TArtist).WhereIn(Columns.Id, query).Where(Columns.IsAlbumArtist, true).GetAsync<ArtistModel>();
         }
 
         public Task<List<GenreModel>> GetArtistGenre(int artistId)

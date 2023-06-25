@@ -36,6 +36,8 @@ namespace MusicPlayUI.Core.Commands
         ICommand ShuffleCommand { get; }
         ICommand ToggleFullScreenCommand { get; }
 
+        ICommand ToggleThemeCommand { get; }
+
         ICommand GetCommand(CommandEnums commandEnums);
     }
 }

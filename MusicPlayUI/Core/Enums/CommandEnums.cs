@@ -33,12 +33,15 @@ namespace MusicPlayUI.Core.Enums
         Import,
         Settings,
         NavigateBack,
-        NavigateToAlbumById,
-        NavigateToArtistById,
-        NavigateToGenre,
         EscapeFullScreen,
         ToggleFullScreen,
         ToggleQueueDrawer,
+        ToggleTheme,
+
+        // not shorcuts
+        NavigateToAlbumById,
+        NavigateToArtistById,
+        NavigateToGenre,
     }
 
     public static class CommandEnumsExt 
@@ -62,17 +65,18 @@ namespace MusicPlayUI.Core.Enums
                 CommandEnums.Rating3 => "Rating 3 Stars",
                 CommandEnums.Rating4 => "Rating 4 Stars",
                 CommandEnums.Rating5 => "Rating 5 Stars",
-                CommandEnums.Home => Resources.Home_View,
-                CommandEnums.Albums => Resources.Albums_View,
-                CommandEnums.Artists => Resources.Artists_View,
-                CommandEnums.Playlists => Resources.Playlists_View,
-                CommandEnums.NowPlaying => Resources.Now_Playing_View,
-                CommandEnums.Import => Resources.Import_Library_View,
-                CommandEnums.Settings => Resources.Settings_View,
+                CommandEnums.Home => "Navigate " + Resources.Home_View,
+                CommandEnums.Albums => "Navigate " + Resources.Albums_View,
+                CommandEnums.Artists => "Navigate " + Resources.Artists_View,
+                CommandEnums.Playlists => "Navigate " + Resources.Playlists_View,
+                CommandEnums.NowPlaying => "Navigate " + Resources.Now_Playing_View,
+                CommandEnums.Import => "Navigate " + Resources.Import_Library_View,
+                CommandEnums.Settings => "Navigate " + Resources.Settings_View,
                 CommandEnums.NavigateBack => "Navigate Back",
                 CommandEnums.EscapeFullScreen => "Escape Full Screen",
                 CommandEnums.ToggleFullScreen => "Toggle Full Screen",
                 CommandEnums.ToggleQueueDrawer => "Toggle Queue Drawer",
+                CommandEnums.ToggleTheme => "Toggle Theme",
                 _ => "",
             };
         }

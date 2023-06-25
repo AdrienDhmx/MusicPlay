@@ -28,24 +28,32 @@ namespace MusicPlayUI.MVVM.Views.Windows
         public MainWindow()
         {
             InitializeComponent();
-            PreviewKeyDown += OnPreviewKeyDownHandler;
+            //PreviewKeyDown += OnPreviewKeyDownHandler;
             Focus();
         }
 
-        private void OnPreviewKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            if(e.Key == Key.Space ||
-                e.Key == Key.Left || e.Key == Key.Right ||
-                 e.Key == Key.Up || e.Key == Key.Down)
-            {
-                var element = Keyboard.FocusedElement;
-                if(element != null && element as TextBox == null && element as MainWindow == null)
-                {
-                    FocusManager.SetFocusedElement(this, this);
-                }
-                e.Handled = false; // not handled because we want the input bindings to call their commands (play, previous, next...)
-            }
-        }
+        //private void OnPreviewKeyDownHandler(object sender, KeyEventArgs e)
+        //{
+
+        //    IInputElement element = Keyboard.FocusedElement;
+
+        //    // the focused element is not a textbox
+        //    if(element != null && element as TextBox == null)
+        //    {
+
+        //    }
+
+        //    if (e.Key == Key.Space ||
+        //        e.Key == Key.Left || e.Key == Key.Right ||
+        //         e.Key == Key.Up || e.Key == Key.Down)
+        //    {
+        //        if(element != null && element as TextBox == null && element as MainWindow == null)
+        //        {
+        //            FocusManager.SetFocusedElement(this, this);
+        //        }
+        //        e.Handled = false; // not handled because we want the input bindings to call their commands (play, previous, next...)
+        //    }
+        //}
 
         private void WindowTopBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

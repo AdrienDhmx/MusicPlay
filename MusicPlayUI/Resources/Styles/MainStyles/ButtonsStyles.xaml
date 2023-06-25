@@ -14,7 +14,7 @@
                   BottomRight="12" BottomLeft="12"/>
 
     <Style x:Key="Basestyle" TargetType="{x:Type Control}">
-        <Setter  Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
     
     <Style x:Key="BaseBtn" TargetType="{x:Type Button}">
@@ -128,6 +128,18 @@
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
+    <Style TargetType="{x:Type IconButton:IconButton}" x:Key="NormalIconBtn"
+           BasedOn="{StaticResource BaseIconButton}">
+        <Setter Property="Width" Value="42"/>
+        <Setter Property="Height" Value="42"/>
+        <Setter Property="IconWidth" Value="28"/>
+        <Setter Property="IconHeight" Value="28"/>
+        <Setter Property="IconStretch" Value="Uniform"/>
+        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
+        <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
+        <Setter Property="StrokeColor" Value="{DynamicResource PrimaryHover}"/>
+    </Style>
+    
     <Style TargetType="IconButton:IconButton" x:Key="QuickPlayButton"
            BasedOn="{StaticResource BaseIconButton}">
         <Setter Property="Width" Value="40"/>
@@ -506,12 +518,25 @@
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
     </Style>
 
+    <Style x:Key="Normalbtn" TargetType="{x:Type textbtn:TextButton}"
+           BasedOn="{StaticResource BaseTextBtn}">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+    </Style>
+
     <Style x:Key="EditBtn" TargetType="textbtn:TextButton"
            BasedOn="{StaticResource BaseTextBtn}">
         <Setter Property="Width" Value="150"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
         <Setter Property="Text" Value="{x:Static lang:Resources.Edit}"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="BorderBrush" Value="{DynamicResource Error}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Error}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="ConfirmActionTextBtn" TargetType="textbtn:TextButton"

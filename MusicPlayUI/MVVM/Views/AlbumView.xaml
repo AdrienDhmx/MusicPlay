@@ -210,6 +210,7 @@
                                        Style="{DynamicResource SlistInfoStyle}"/>
 
                             <TextBlock Text=" artists related to this album"
+                                       Margin="0"
                                        Style="{DynamicResource SlistInfoStyle}"/>
                         </StackPanel>
                     </Border>

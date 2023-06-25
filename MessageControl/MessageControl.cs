@@ -264,7 +264,7 @@ namespace MessageControl
             _buttonUndo.Visibility = IsUndoBtnVisible ? Visibility.Visible : Visibility.Collapsed;
             _buttonCancel.Visibility = IsInteractiveWithCancel ? Visibility.Visible : Visibility.Collapsed;
 
-            _buttonClose.Visibility = _buttonUndo.Visibility;
+            _buttonClose.Visibility = _buttonUndo.IsVisible || _buttonConfirm.IsVisible ? Visibility.Visible : Visibility.Collapsed;
 
             FontSize = 15;
 
@@ -322,7 +322,7 @@ namespace MessageControl
         {
             base.OnMouseLeave(e);
 
-            if(!IsUndoBtnVisible)
+            if(!IsUndoBtnVisible && !IsInteractive)
                 _buttonClose.Visibility = Visibility.Collapsed;
         }
 

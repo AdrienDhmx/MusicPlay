@@ -301,41 +301,16 @@
                 
                 <!-- Devices btn -->
                 <iconbtn:IconButton Grid.Column="2"
-                                    Style="{DynamicResource BaseIconButton}"
+                                    Style="{DynamicResource NormalIconBtn}"
                                     x:Name="DeviceIconBtn"
-                                    Height="45"
-                                    Width="45"
-                                    IconWidth="30"
-                                    IconHeight="30"
-                                    MouseOverBackground="{DynamicResource PrimaryHover}"
                                     Icon="{Binding CurrentDevice.Icon, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                    IconStretch="Uniform"
-                                    IconMargin="8"
-                                    FillColor="{DynamicResource OnPrimaryContainer}"
-                                    StrokeColor="Transparent"
                                     Command="{Binding OpenDevicesPopupCommand}"/>
-                
+
+
                 <iconbtn:IconButton Grid.Column="3"
+                                    Style="{DynamicResource NormalIconBtn}"
                                      Icon="{DynamicResource QueueIcon}"
-                                    Width="45"
-                                    Height="45"
-                                    IconWidth="30"
-                                    IconHeight="30"
-                                    IconStretch="Uniform"
-                                    Command="{Binding OpenCloseQueuePopupCommand}"
-                                    StrokeColor="{DynamicResource OnPrimaryContainer}"
-                                    FillColor="{DynamicResource OnPrimaryContainer}">
-                    <iconbtn:IconButton.Style>
-                        <Style TargetType="iconbtn:IconButton"
-                               BasedOn="{StaticResource BaseIconButton}">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </iconbtn:IconButton.Style>
+                                    Command="{Binding OpenCloseQueuePopupCommand}">
                 </iconbtn:IconButton>
             </Grid>
 

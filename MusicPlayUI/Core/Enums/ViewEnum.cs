@@ -47,6 +47,10 @@ namespace MusicPlayUI.Core.Enums
         UpdatePlaylist = 41,
         ConfirmAction = 42,
         TrackProperties = 43,
+        AlbumProperties = 44,
+        Artistproperties = 45,
+        GenreProperties = 46,
+        UpdateShortcut = 47,
 
         // PopupViewModel Views
         TrackPopup = 50,

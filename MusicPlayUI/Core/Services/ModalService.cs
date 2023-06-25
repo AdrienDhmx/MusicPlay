@@ -74,6 +74,9 @@ namespace MusicPlayUI.Core.Services
                 case ViewNameEnum.ConfirmAction:
                     Modal = _viewFactory.Invoke(typeof(ValidationModalViewModel));
                     break;
+                case ViewNameEnum.UpdateShortcut:
+                    Modal = _viewFactory.Invoke(typeof(UpdateShortcutViewModel));
+                    break;
             }
         }
 

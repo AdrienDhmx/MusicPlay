@@ -96,12 +96,6 @@ namespace MusicPlayUI
                 services.AddTransient<PlaylistLibraryView>();
                 services.AddTransient<PlaylistLibraryViewModel>();
 
-                services.AddTransient<CreatePlaylistView>();
-                services.AddTransient<CreatePlaylistViewModel>();
-
-                services.AddTransient<ValidationModalView>();
-                services.AddTransient<ValidationModalViewModel>();
-
                 services.AddTransient<PlaylistView>();
                 services.AddTransient<PlaylistViewModel>();
 
@@ -140,6 +134,17 @@ namespace MusicPlayUI
 
                 services.AddTransient<EmptyViewModel>();
                 services.AddTransient<EmptyView>();
+
+
+                // Modals
+                services.AddTransient<CreatePlaylistView>();
+                services.AddTransient<CreatePlaylistViewModel>();
+
+                services.AddTransient<ValidationModalView>();
+                services.AddTransient<ValidationModalViewModel>();
+
+                services.AddTransient<UpdateShortcutView>();
+                services.AddTransient<UpdateShortcutViewModel>();
 
                 // Windows
                 services.AddSingleton(provider => new MainWindow()

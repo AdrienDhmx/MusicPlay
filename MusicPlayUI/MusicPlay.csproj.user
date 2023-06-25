@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_LastSelectedProfileId>C:\dev\C#\MusicPlay-private\MusicPlayUI\Properties\PublishProfiles\_myrepo_.azurecr.io.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>C:\dev\C#\MusicPlay-private\MusicPlayUI\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
@@ -52,6 +52,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\MainMenuView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\ModalViews\ValidationModalView.xaml.cs">
@@ -177,6 +180,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\ListViews\TrackListView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\ModalViews\ValidationModalView.xaml">

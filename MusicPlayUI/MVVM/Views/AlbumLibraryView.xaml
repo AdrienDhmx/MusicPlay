@@ -64,7 +64,8 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <iconbtn:IconButton Command="{Binding OpenCloseFiltersCommand}"
-                                        Style="{DynamicResource FilterButton}"/>
+                                    Style="{DynamicResource NormalIconBtn}"
+                                    Icon="{DynamicResource Filter.Filled}"/>
 
                 <listviews:SelectedFilterListView HorizontalAlignment="Left"
                                                     Grid.Column="1"

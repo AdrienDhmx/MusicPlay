@@ -323,6 +323,24 @@ namespace MusicPlayUI.Core.Factories
             return messageModel;
         }
 
+
+        public static MessageModel CreateInfoMessageWithConfirmAction(this string message, int iconType, Action<bool> ConfirmCallBack, string confirmMsg = "Confirm")
+        {
+            MessageModel messageModel = new()
+            {
+                Message = message,
+                Icon = GetIcon(iconType),
+                Foreground = MessageColors.OnInfoContainer,
+                IconBrush = MessageColors.OnInfoContainer,
+                Background = MessageColors.InfoContainer,
+                MouseOverBackground = MessageColors.InfoHover,
+                IsInteractive = true,
+                ConfirmCallBack = ConfirmCallBack,
+                ConfirmMessage = confirmMsg,
+            };
+            return messageModel;
+        }
+
         private static PathGeometry GetIcon(int iconType)
         {
             switch (iconType)
