@@ -49,6 +49,8 @@ namespace MusicPlayUI.Core.Enums
         VAutoColor = 61,
         VCenterFreq = 62,
 
+        AutoForeground = 63,
+
         // filters and orders
         ArtistFilter = 70,
         ArtistOrder = 71,

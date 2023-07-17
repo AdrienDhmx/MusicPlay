@@ -87,10 +87,8 @@ namespace MusicPlayUI.Core.Services
             track.AlbumCover = album.AlbumCover;
 
             ArtistDataRelation ArtistDataRelation = album.GetAlbumArtist();
-            if(ArtistDataRelation == null)
-            {
-                ArtistDataRelation = album.Artists[0];
-            }
+            ArtistDataRelation ??= album.Artists[0];
+
             ArtistModel artist = await DataAccess.Connection.GetArtist(ArtistDataRelation.ArtistId);
 
             List<GenreModel> genres = await DataAccess.Connection.GetAlbumGenre(album.Id);
@@ -99,7 +97,8 @@ namespace MusicPlayUI.Core.Services
             List<AlbumModel> albums = new();
 
             PlaylistModel radio = new();
-            radio.Name = $"{track.Title} Radio";
+            radio.Name = $"{track.Title} - Radio";
+            radio.Description = $"A radio based on the track '{track.Title}' by {album.GetAlbumArtist()?.Name}.";
             radio.PlaylistType = MusicPlayModels.Enums.PlaylistTypeEnum.Radio;
             radio.Cover = string.IsNullOrWhiteSpace(track.Artwork) ? track.AlbumCover : track.Artwork;
 
@@ -131,6 +130,7 @@ namespace MusicPlayUI.Core.Services
 
             Tracks = TrackListHelper.Shuffle(Tracks).ToList();
 
+            RadioTracks = RadioTracks.DistinctBy(t => t?.Id).ToList();
             if(Tracks.Count >= RadioStationTrackNumber)
             {
                 RadioTracks = Tracks.GetRange(0, RadioStationTrackNumber);

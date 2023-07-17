@@ -89,18 +89,76 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
                             <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="6"/>
+                            <ColumnDefinition Width="20"/>
                         </Grid.ColumnDefinitions>
                         
                         <!-- Title -->
                         <TextBlock Text="{Binding QueueService.PlayingTrack.Title}"
                                Style="{DynamicResource SLStyle}"
-                                   MaxWidth="{Binding ActualWidth, ElementName=PlayingTrackInfoGrid, Converter={StaticResource SubstractionConverter}, ConverterParameter=20}"
-                                   Margin="0,0,10,0"
+                                   MaxWidth="{Binding ActualWidth, ElementName=PlayingTrackInfoGrid, Converter={StaticResource SubstractionConverter}, ConverterParameter=40}"
+                                   Margin="0,0,5,0"
                                 MaxHeight="30">
                             <TextBlock.InputBindings>
                                 <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToAlbumCommand}"/>
                             </TextBlock.InputBindings>
                         </TextBlock>
+
+                        <!-- Favorite -->
+                        <iconbtn:IconButton Grid.Column="1"
+                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Width="20"
+                                    Height="20"
+                                    IconWidth="16"
+                                    IconHeight="14"
+                                    IconMargin="0"
+                                    IconStretch="Fill"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    StrokeColor="Transparent"
+                                            Cursor="Hand"
+                                    Command="{Binding IsFavoriteCommand}"
+                                    MouseOverBackground="Transparent"
+                                    FillColor="{DynamicResource Primary}">
+                            <iconbtn:IconButton.Style>
+                                <Style TargetType="iconbtn:IconButton">
+                                    <Setter Property="Icon" Value="{DynamicResource HeartIcon}"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter Property="Icon" Value="{DynamicResource BrokenHeartIcon}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </iconbtn:IconButton.Style>
+                        </iconbtn:IconButton>
+
+                        <!-- Favorite -->
+                        <iconbtn:IconButton Grid.Column="1"
+                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                    Icon="{DynamicResource HeartIcon}"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                            Cursor="Hand"
+                                    Width="20"
+                                    Height="20"
+                                    IconWidth="16"
+                                    IconHeight="14"
+                                    IconMargin="0"
+                                    IconStretch="Fill"
+                                    MouseOverBackground="Transparent"
+                                    Command="{Binding IsFavoriteCommand}"
+                                    StrokeColor="{DynamicResource Primary}">
+                            <iconbtn:IconButton.Style>
+                                <Style TargetType="iconbtn:IconButton">
+                                    <Setter Property="FillColor" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter Property="FillColor" Value="{DynamicResource PrimaryHover}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </iconbtn:IconButton.Style>
+                        </iconbtn:IconButton>
 
                         <!-- More Option Button -->
                         <iconbtn:IconButton Style="{DynamicResource BaseIconButton}"
@@ -108,7 +166,7 @@
                                             FillColor="{DynamicResource OnBackground}"
                                             IconStretch="Uniform"
                                             IsHitTestVisible="True"
-                                            Grid.Column="1"
+                                            Grid.Column="3"
                                             HorizontalAlignment="Left"
                                             Command="{Binding OpenTrackPopupCommand}">
                         </iconbtn:IconButton>
@@ -261,9 +319,9 @@
                   Grid.Row="1"
                   Margin="10,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.4*"/>
+                    <ColumnDefinition Width="0.15*"/>
                     <ColumnDefinition  Width="0.2*"/>
-                    <ColumnDefinition Width="0.2*"/>
+                    <ColumnDefinition Width="0.45*"/>
                     <ColumnDefinition Width="0.2*"/>
                 </Grid.ColumnDefinitions>
 

@@ -233,11 +233,11 @@ namespace MusicPlayUI.Core.Commands
 
                 if (AppThemeService.IsSystemSync)
                 {
-                    MessageHelper.PublishMessage(MessageFactory.CreateInfoMessageWithConfirmAction("The theme is based on the system theme. Changing it will remove this option.", 0, ChangeTheme, "Change Theme"));
+                    MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the system theme. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
                 } 
                 else if (AppThemeService.IsSunsetSunrise)
                 {
-                    MessageHelper.PublishMessage(MessageFactory.CreateInfoMessageWithConfirmAction("The theme is based on the time of day. Changing it will remove this option.", 0, ChangeTheme, "Change Theme"));
+                    MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the time of day. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
                 } else
                 {
                     ChangeTheme(true);

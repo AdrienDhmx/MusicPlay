@@ -266,8 +266,6 @@ namespace MessageControl
 
             _buttonClose.Visibility = _buttonUndo.IsVisible || _buttonConfirm.IsVisible ? Visibility.Visible : Visibility.Collapsed;
 
-            FontSize = 15;
-
             _buttonClose.Command = new RelayCommand(Close);
             _buttonCancel.Command = new RelayCommand(() => Close(false));
             _buttonConfirm.Command = new RelayCommand(() => Close(true));

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Humanizer;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.MVVM.Models;
 

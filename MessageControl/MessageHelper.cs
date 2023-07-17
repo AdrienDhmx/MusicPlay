@@ -64,7 +64,7 @@ namespace MessageControl
                     UndoCallBack= message.UndoCallBack,
                     UndoneMessage = message.UndoneMessage,
                     UndoneFailedMessage = message.UndoneFailedMessage,
-                    FontSize = 16,
+                    FontSize = 15,
                     CornerRadius = new(8)
                 };
 

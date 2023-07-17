@@ -106,7 +106,7 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel TrackAddedToPlaylist(this string track, string playlistName)
         {
-            string message = $"{Resources.The_Track} \"{track}\" {Resources.Has_been_Added_To} \"{playlistName}\"";
+            string message = $"\"{track}\" {Resources.Has_been_Added_To} \"{playlistName}\"";
             return message.CreateInfoMessage(6);
         }
 
@@ -118,19 +118,19 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel TrackRemovedFromPlaylist(this string track, string playlistName)
         {
-            string message = $"{Resources.The_Track} \"{track}\" {Resources.Has_Been_Removed_From} \"{playlistName}\"";
+            string message = $"\"{track}\" {Resources.Has_Been_Removed_From} \"{playlistName}\"";
             return message.CreateWarningMessage(7);
         }
 
         public static MessageModel AlbumRemovedFromGenre(this string album, string genre, Func<bool> undoCallBack, Action closeCallBack)
         {
-            string message = $"{Resources.The_Album} \"{album}\" {Resources.Has_Been_Removed_From} \"{genre}\"";
+            string message = $"\"{album}\" {Resources.Has_Been_Removed_From} \"{genre}\"";
             return message.CreateWarningMessageWithUndoAndClose(7, undoCallBack, closeCallBack);
         }
 
         public static MessageModel ArtistRemovedFromGenre(this string artist, string genre, Func<bool> undoCallBack, Action closeCallBack)
         {
-            string message = $"{Resources.The_Artist} \"{artist}\" and all its albums have been removed from \"{genre}\"";
+            string message = $"\"{artist}\" and all its albums have been removed from \"{genre}\"";
             return message.CreateWarningMessageWithUndoAndClose(7, undoCallBack, closeCallBack);
         }
 
@@ -154,7 +154,7 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel DataUpdated(this string name)
         {
-            string message = $"{Resources.TheDataFor} \"{name}\" {Resources.Has_Been_Updated}";
+            string message = $"\"{name}\" {Resources.Has_Been_Updated}";
             return message.CreateSuccessMessage(1);
         }
 
@@ -189,7 +189,7 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel TrackRemovedFromQueueWithUndo(this string name, Func<bool> callback)
         {
-            string message = $"{Resources.The_Track} \"{name}\" {Resources.Has_Been_Removed_From} {Resources.The_Queue}.";
+            string message = $"\"{name}\" {Resources.Has_Been_Removed_From} {Resources.The_Queue}.";
             string undoneMessage = $"\"{name}\" has been restored!";
             return message.CreateWarningMessageWithUndo(7, callback, undoneMessage);
         }
@@ -324,16 +324,16 @@ namespace MusicPlayUI.Core.Factories
         }
 
 
-        public static MessageModel CreateInfoMessageWithConfirmAction(this string message, int iconType, Action<bool> ConfirmCallBack, string confirmMsg = "Confirm")
+        public static MessageModel CreateWraningMessageWithConfirmAction(this string message, int iconType, Action<bool> ConfirmCallBack, string confirmMsg = "Confirm")
         {
             MessageModel messageModel = new()
             {
                 Message = message,
                 Icon = GetIcon(iconType),
-                Foreground = MessageColors.OnInfoContainer,
-                IconBrush = MessageColors.OnInfoContainer,
-                Background = MessageColors.InfoContainer,
-                MouseOverBackground = MessageColors.InfoHover,
+                Foreground = MessageColors.OnWarningContainer,
+                IconBrush = MessageColors.OnWarningContainer,
+                Background = MessageColors.WarningContainer,
+                MouseOverBackground = MessageColors.WarningHover,
                 IsInteractive = true,
                 ConfirmCallBack = ConfirmCallBack,
                 ConfirmMessage = confirmMsg,

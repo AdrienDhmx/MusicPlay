@@ -380,8 +380,8 @@ namespace MusicPlayUI.Core.Services
         public void UpdateRating(int rating)
         {
             PlayingTrack.Rating = rating;
-            OnPlayingTrackInteractionChanged();
             DataAccess.Connection.UpdateTrackRating(PlayingTrack);
+            OnPlayingTrackInteractionChanged();
         }
 
         public async Task UpdateFavorite(bool isFavorite)

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Clipboard = System.Windows.Clipboard;
 
@@ -26,6 +27,13 @@ namespace MusicPlayUI.MVVM.ViewModels
         private readonly IQueueService _queueService;
         private readonly IAudioTimeService _audioService;
         private readonly LyricsProcessor _lyricsProcessor;
+
+        private IVisualizerParameterStore _visualizerParameterService;
+        public IVisualizerParameterStore VisualizerParameterService
+        {
+            get => _visualizerParameterService;
+            set { SetField(ref _visualizerParameterService, value); }
+        }
 
         private string SavedLyrics { get; set; }
 
@@ -104,6 +112,16 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 _playingTimedLyrics = value;
                 OnPropertyChanged(nameof(PlayingTimedLyrics));
+            }
+        }
+
+        private bool _settingsVisibility = false;
+        public bool SettingsVisibility
+        {
+            get => _settingsVisibility;
+            set
+            {
+                SetField(ref _settingsVisibility, value);
             }
         }
 
@@ -242,6 +260,17 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
+        private bool _autoForeground = ConfigurationService.GetPreference(SettingsEnum.AutoForeground) == 1;
+        public bool IsAutoForeground
+        {
+            get => _autoForeground;
+            set
+            {
+                SetField(ref _autoForeground, value);
+                ConfigurationService.SetPreference(SettingsEnum.AutoForeground, value ? "1" : "0");
+            }
+        }
+        
         public int CurrentPosition
         {
             get => _audioService.CurrentPositionMs;
@@ -257,10 +286,13 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PasteLyricsCommand { get; }
         public ICommand CopyLyricsCommand { get; }
         public ICommand OpenLyricsWebPageCommand { get; }
-        public LyricsViewModel(IQueueService queueService, IAudioTimeService audioService)
+        public ICommand ToggleAutoForegroundCommand { get; }
+        public ICommand ToggleSettingsVisibilityCommand { get; }
+        public LyricsViewModel(IQueueService queueService, IAudioTimeService audioService, IVisualizerParameterStore visualizerParameterStore)
         {
             _queueService = queueService;
             _audioService = audioService;
+            VisualizerParameterService = visualizerParameterStore;
 
             _queueService.PlayingTrackChanged += OnPlayingTrackChanged;
             _audioService.CurrentPositionChanged += OnCurrentAudioPositionChanged;
@@ -380,6 +412,16 @@ namespace MusicPlayUI.MVVM.ViewModels
                 LyricsModel.IsFromUser = true;
                 LyricsModel.IsSaved = false;
                 IsSaved = false;
+            });
+
+            ToggleAutoForegroundCommand = new RelayCommand(() =>
+            {
+                IsAutoForeground = !IsAutoForeground;
+            });
+            
+            ToggleSettingsVisibilityCommand = new RelayCommand(() =>
+            {
+                SettingsVisibility = !SettingsVisibility;
             });
 
             OnPlayingTrackChanged();

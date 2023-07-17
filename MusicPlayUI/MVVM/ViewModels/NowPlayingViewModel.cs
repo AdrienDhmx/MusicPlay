@@ -354,7 +354,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 IsLyricsOpen = false;
                 IsTrackInfoOpen = false;
 
-                if (IsQueueOpen) 
+                if (IsQueueOpen)
                     selectedView = ViewNameEnum.Queue;
             }
             else if (view == 42) // lyrics
@@ -363,8 +363,10 @@ namespace MusicPlayUI.MVVM.ViewModels
                 IsLyricsOpen = !IsLyricsOpen;
                 IsTrackInfoOpen = false;
 
-                if (IsLyricsOpen) 
+                if (IsLyricsOpen)
+                {
                     selectedView = ViewNameEnum.Lyrics;
+                }
             }
             else if (view == 43) // track info
             {
@@ -398,6 +400,11 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if(IsSubViewOpen)
                 {
                     WidthValue = 30;
+
+                    if(IsLyricsOpen)
+                    {
+                        VisualizerParameterService.TextAlignment = TextAlignment.Left;
+                    }
                 }
                 else
                 {
@@ -428,6 +435,11 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 SpectrumColumn = 0; // cover not open
                 WidthValue = 0;
+
+                if(IsLyricsOpen)
+                {
+                    VisualizerParameterService.TextAlignment = TextAlignment.Center;
+                }
             }
             else
             {
@@ -435,8 +447,9 @@ namespace MusicPlayUI.MVVM.ViewModels
                 {
                     SpectrumColumn = 0;
                 }
+
                 WidthValue = 100;
-            }
+            }            
         }
 
         private void LoadData()

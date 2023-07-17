@@ -110,7 +110,7 @@
                      Color="#20ffffff"/>
 
     <SolidColorBrush x:Key="BlackTransparent"
-                     Color="#65000000"/>
+                     Color="#75000000"/>
 
     <SolidColorBrush x:Key="BlackGradient"
                      Color="#DD202020"/>

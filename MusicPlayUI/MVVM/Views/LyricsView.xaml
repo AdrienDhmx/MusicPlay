@@ -18,7 +18,7 @@
     <UserControl.InputBindings>
         <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveCommand}"/>
     </UserControl.InputBindings>
-    <Border Margin="0,0,0,0">
+    <Border>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
@@ -26,15 +26,14 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Border Visibility="Visible"
-                    x:Name="SettingsBorder"
-                    Background="Transparent"
-                    Margin="20,5"
-                    BorderBrush="{DynamicResource WhiteTransparent}"
-                    HorizontalAlignment="Stretch"
-                    CornerRadius="5">
-
+            <Border Background="{DynamicResource ScdWhiteTransparent}"
+                        Height="50"
+                         Margin="0,0,10,0"
+                        HorizontalAlignment="Stretch"
+                        CornerRadius="0,0,12,12">
                 <StackPanel Margin="5,0"
+                            Grid.Row="1"
+                            Panel.ZIndex="3"
                             Orientation="Horizontal"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center">
@@ -49,12 +48,13 @@
                                      BtnBackgroundColor="Transparent"
                                      CornerRadius="4"
                                      BorderThickness="0.5"
+                                     Panel.ZIndex="10"
                                      Padding="2,0"
                                      BorderBrush="{DynamicResource WhiteForeground}"
                                      Foreground="{DynamicResource WhiteForeground}"
                                      CaretBrush="{DynamicResource WhiteForeground}"
                                      MouseOverBtnColor="{DynamicResource ScdWhiteTransparent}"
-                                     IsReadOnly="True"
+                                     IsReadOnly="False"
                                      IsReadOnlyCaretVisible="False"
                                      FontSize="18"
                                      Placeholder="10 - 50"
@@ -65,8 +65,27 @@
                                      StepValue="1"
                                      Value="{Binding FontSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      Unit="px"
-                                     Margin="0,0,10,0">
+                                     Margin="0,0,5,0">
                     </stepper:Stepper>
+
+                    <!-- auto foreground Button -->
+                    <customButton:IconButton Icon="{DynamicResource PaletteIcon}"
+                                             Margin="0,0,10,0"
+                                             FillColor="{DynamicResource WhiteForeground}"
+                                             Command="{Binding ToggleAutoForegroundCommand}">
+                        <customButton:IconButton.Style>
+                            <Style TargetType="customButton:IconButton"
+                                   BasedOn="{StaticResource NowPlayingIconButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.IsAutoForeground, ElementName=RootLyricsView}"
+                                                 Value="true">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
+                                        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </customButton:IconButton.Style>
+                    </customButton:IconButton>
 
                     <!-- Save Button -->
                     <customButton:IconButton IsEnabled="{Binding CanSave}"
@@ -102,13 +121,13 @@
                                     <DataTrigger Binding="{Binding DataContext.IsEditMode, ElementName=RootLyricsView}"
                                                  Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                                        <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </customButton:IconButton.Style>
                     </customButton:IconButton>
-                    
+
                     <!-- Timed Lyrics Button -->
                     <customButton:IconButton Icon="{DynamicResource TimedLyrics}"
                                              FillColor="{DynamicResource WhiteForeground}"
@@ -129,20 +148,22 @@
 
                     <!-- Copy -->
                     <customButton:IconButton Style="{DynamicResource NowPlayingIconButton}"
+                                              Margin="10,0,0,0"
                                              Icon="{DynamicResource Copy}"
                                              IsEnabled="{Binding CanCopy}"
                                               FillColor="{DynamicResource WhiteForeground}"
                                              Command="{Binding CopyLyricsCommand}"/>
                     <!-- Paste -->
                     <customButton:IconButton Style="{DynamicResource NowPlayingIconButton}"
+                                              Margin="0,0,5,0"
                                              Icon="{DynamicResource Paste}"
                                               FillColor="{DynamicResource WhiteForeground}"
                                              Command="{Binding PasteLyricsCommand}"/>
-                    
+
                     <!-- URL link Button -->
                     <card:CustomCardControl Icon="{DynamicResource LinkIcon}"
                                             FillColor="{DynamicResource WhiteForeground}"
-                                            Margin="10,0"
+                                            Margin="5,0, 0, 0"
                                             Width="auto"
                                             Height="34"
                                             IconHeight="12"
@@ -174,7 +195,7 @@
                             </Style>
                         </card:CustomCardControl.Style>
                     </card:CustomCardControl>
-                    
+
                     <!-- Retry Button -->
                     <customButton:IconButton Style="{DynamicResource NowPlayingIconButton}"
                                              Icon="{DynamicResource Refresh}"
@@ -184,12 +205,32 @@
             </Border>
 
             <!-- Lyrics -->
-            <ds:DynamicScrollViewer Margin="5,5,5,0"
-                                    IsInertiaEnabled="True"
-                          Grid.Row="1"
+            <ds:DynamicScrollViewer IsInertiaEnabled="True"
                           x:Name="LyricsScroll"
                           VerticalScrollBarVisibility="Hidden"
                           PreviewMouseWheel="LyricsScroll_PreviewMouseWheel">
+                <ds:DynamicScrollViewer.Style>
+                    <Style TargetType="ds:DynamicScrollViewer">
+                        <Setter Property="Grid.Row" Value="1"/>
+                        <Setter Property="Margin" Value="10,0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DataContext.VisualizerParameterService.TextAlignment, Mode=OneWay, ElementName=RootLyricsView}" Value="left">
+                                <Setter Property="Margin" Value="40,0, 10, 0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ds:DynamicScrollViewer.Style>
+                <ds:DynamicScrollViewer.OpacityMask>
+                    <RadialGradientBrush Center="0.5, 0.5"
+                                              RadiusX="2">
+                        <GradientStop Offset="0" Color="#000000"/>
+                        <GradientStop Offset="0.65" Color="#000000"/>
+                        <GradientStop Offset="0.8" Color="#aa000000"/>
+                        <GradientStop Offset="0.9" Color="#60000000"/>
+                        <GradientStop Offset="1" Color="#20000000"/>
+                    </RadialGradientBrush>
+                </ds:DynamicScrollViewer.OpacityMask>
+
                 <Grid x:Name="LyricsGrid">
                     <Grid.RowDefinitions >
                         <RowDefinition Height="auto"/>
@@ -206,18 +247,28 @@
                           AcceptsReturn="True"
                          AcceptsTab="True"
                          TextWrapping="Wrap"
-                         TextAlignment="Center"
-                             Style="{DynamicResource Basestyle}"
+                         TextAlignment="{Binding VisualizerParameterService.TextAlignment, Mode=OneWay}"
                              Background="Transparent"
                              BorderThickness="0"
                              IsReadOnlyCaretVisible="False"
                          IsReadOnly="{Binding IsEditMode, Converter={StaticResource InverseBoolConverter}}"
                          IsHitTestVisible="{Binding IsEditMode}"
                          CaretBrush="{DynamicResource WhiteForeground}"
-                             Foreground="{DynamicResource WhiteForeground}"
                          Text="{Binding Lyrics, UpdateSourceTrigger=PropertyChanged}"
                          FontSize="{Binding FontSize}"
+                             FontWeight="Normal"
                           PreviewMouseWheel="LyricsScroll_PreviewMouseWheel">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource Basestyle}">
+                                <Setter Property="Foreground" Value="{Binding DataContext.VisualizerParameterService.EmphasizedObjectColor, ElementName=RootLyricsView}"/>
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.IsAutoForeground, ElementName=RootLyricsView}" Value="false">
+                                        <Setter Property="Foreground" Value="{DynamicResource WhiteForeground}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
                     </TextBox>
 
                     <!-- Timed Lyrics -->
@@ -262,7 +313,7 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Height="auto"
-                                            Margin="2,10">
+                                            Margin="2,15">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -304,23 +355,26 @@
                                                 HorizontalAlignment="Stretch"
                                                     Background="Transparent"
                                                     BorderThickness="0"
-                                                    Foreground="{DynamicResource WhiteForeground}"
                                                     TextWrapping="Wrap"
                                                 HorizontalContentAlignment="Stretch"
-                                                TextAlignment="Center"
+                                                TextAlignment="{Binding DataContext.VisualizerParameterService.TextAlignment, ElementName=RootLyricsView, Mode=OneWay}"
                                                     Padding="5,0">
                                             <TextBox.Style>
                                                 <Style TargetType="TextBox">
                                                     <Setter Property="FontSize" Value="{Binding DataContext.FontSize, ElementName=RootLyricsView}"/>
                                                     <Setter Property="FontWeight" Value="Normal"/>
-                                                    <Setter Property="Opacity" Value="0.8"/>
+                                                    <Setter Property="Foreground" Value="{Binding DataContext.VisualizerParameterService.EmphasizedObjectColor, ElementName=RootLyricsView}"/>
+                                                    <Setter Property="Opacity" Value="0.75"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsPlaying}" Value="true">
                                                             <Setter Property="FontSize" Value="{Binding DataContext.FontSize, ElementName=RootLyricsView, 
-                                                                Converter={StaticResource AdditionConverter}, ConverterParameter=10, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                                Converter={StaticResource AdditionConverter}, ConverterParameter=2, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                                                         />
                                                             <Setter Property="FontWeight" Value="Bold"/>
                                                             <Setter Property="Opacity" Value="1"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding DataContext.IsAutoForeground, ElementName=RootLyricsView}" Value="false">
+                                                            <Setter Property="Foreground" Value="{DynamicResource WhiteForeground}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>

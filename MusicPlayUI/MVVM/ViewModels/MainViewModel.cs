@@ -73,8 +73,6 @@ namespace MusicPlayUI.MVVM.ViewModels
         }
 
         private ViewModel _queueDrawer;
-        private object _audioTimeService;
-
         public ViewModel QueueDrawer
         {
             get => _queueDrawer;

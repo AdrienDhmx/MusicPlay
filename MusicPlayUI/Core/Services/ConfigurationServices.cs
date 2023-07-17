@@ -54,6 +54,7 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.VRefreshRate => Settings.Default.VRefreshRate,
                 SettingsEnum.VAutoColor => Settings.Default.VAutoColor,
                 SettingsEnum.VCenterFreq => Settings.Default.VCenterFreq,
+                SettingsEnum.AutoForeground => Settings.Default.AutoForeground,
                 _ => "",
             };
             return int.TryParse(storedInt, out int id) ? id : -2;
@@ -217,6 +218,9 @@ namespace MusicPlayUI.Core.Services
                     break;
                 case SettingsEnum.VCenterFreq:
                     Settings.Default.VCenterFreq = value;
+                    break;
+                case SettingsEnum.AutoForeground:
+                    Settings.Default.AutoForeground = value;
                     break;
                 case SettingsEnum.UNKNOWN:
                     return false;

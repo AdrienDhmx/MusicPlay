@@ -742,5 +742,17 @@ namespace MusicPlayUI {
                 this["ToggleLightThemeShortcut"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public string AutoForeground {
+            get {
+                return ((string)(this["AutoForeground"]));
+            }
+            set {
+                this["AutoForeground"] = value;
+            }
+        }
     }
 }
