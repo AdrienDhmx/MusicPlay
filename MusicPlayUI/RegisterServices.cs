@@ -46,7 +46,7 @@ namespace MusicPlayUI
                 services.AddSingleton<IPlaylistService, PlaylistService>();
                 services.AddSingleton<ICommandsManager, CommandsManager>();
 
-                // Views with their ViewModel
+                // Views
                 services.AddSingleton<MainMenuView>();
                 services.AddSingleton<MainMenuViewModel>();
 
@@ -62,6 +62,9 @@ namespace MusicPlayUI
                 services.AddTransient<ArtistLibraryView>();
                 services.AddTransient<ArtistLibraryViewModel>();
 
+                services.AddTransient<GenreLibraryView>();
+                services.AddTransient<GenreLibraryViewModel>();
+
                 services.AddTransient<HomeView>();
                 services.AddTransient<HomeViewModel>();
 
@@ -73,7 +76,6 @@ namespace MusicPlayUI
 
                 services.AddTransient<AlbumView>();
                 services.AddTransient<AlbumViewModel>();
-
 
                 services.AddTransient<ArtistView>();
                 services.AddTransient<ArtistViewModel>();
@@ -99,19 +101,21 @@ namespace MusicPlayUI
                 services.AddTransient<PlaylistView>();
                 services.AddTransient<PlaylistViewModel>();
 
+                // Popups
                 services.AddTransient<TrackPopupView>();
                 services.AddTransient<TrackPopupViewModel>();
 
-
                 services.AddTransient<AlbumPopupView>();
                 services.AddTransient<AlbumPopupViewModel>();
-
 
                 services.AddTransient<ArtistPopupView>();
                 services.AddTransient<ArtistPopupViewModel>();
 
                 services.AddTransient<PlaylistPopupView>();
                 services.AddTransient<PlaylistPopupViewModel>();
+
+                services.AddTransient<TagPopupView>();
+                services.AddTransient<TagPopupViewModel>();
 
                 services.AddSingleton<QueueDrawerView>();
                 services.AddSingleton<QueueDrawerViewModel>();
@@ -139,6 +143,9 @@ namespace MusicPlayUI
                 // Modals
                 services.AddTransient<CreatePlaylistView>();
                 services.AddTransient<CreatePlaylistViewModel>();
+
+                services.AddTransient<CreateTagModal>();
+                services.AddTransient<CreateTagViewModel>();
 
                 services.AddTransient<ValidationModalView>();
                 services.AddTransient<ValidationModalViewModel>();

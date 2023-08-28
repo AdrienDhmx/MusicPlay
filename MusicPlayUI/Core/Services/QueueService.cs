@@ -499,7 +499,11 @@ namespace MusicPlayUI.Core.Services
                     }
                     UpdateTracksIndexes();
                 }
-                MessageHelper.PublishMessage(name.QueueChanged(true, album, !album));
+
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    MessageHelper.PublishMessage(name.QueueChanged(true, album, !album));
+                }
             }
         }
 
@@ -617,7 +621,7 @@ namespace MusicPlayUI.Core.Services
                         break;
                     case ModelTypeEnum.Genre:
                         viewName = ViewNameEnum.SpecificGenre;
-                        parameter = await DataAccess.Connection.GetGenre(id);
+                        parameter = await DataAccess.Connection.GetTag(id);
                         break;
                     default:
                         viewName = ViewNameEnum.Empty;

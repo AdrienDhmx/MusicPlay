@@ -5,13 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
-             xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
-             xmlns:model="clr-namespace:MusicPlayModels.MusicModels;assembly=MusicPlayModels"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
-             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
-             xmlns:dropdown="clr-namespace:CardDropDown;assembly=CardDropDown"
              d:DataContext="{d:DesignInstance Type=viewmodel:AlbumViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
@@ -32,9 +28,9 @@
 
             <Grid x:Name="StickyPart"
                     MinHeight="180"
-                  Height="350"
+                  Height="300"
                   HorizontalAlignment="Stretch"
-                  MaxHeight="350">
+                  MaxHeight="300">
                 <Grid Grid.Column="1"
                     Margin="10"
                     HorizontalAlignment="Center">
@@ -47,7 +43,7 @@
                     <!-- Album Cover -->
                     <Border Grid.RowSpan="2"
                             Margin="0,0,10,0"
-                            MaxHeight="300"
+                            MaxHeight="280"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
                         <Border.Background>
@@ -59,7 +55,7 @@
                     <!-- Album & Artist Name + Duration + More Opt Btn -->
                     <Grid VerticalAlignment="Stretch"
                           HorizontalAlignment="Stretch"
-                          MaxHeight="300"
+                          MaxHeight="280"
                           Margin="0,4, 0, 0"
                             Grid.Column="1">
                         <Grid.RowDefinitions>

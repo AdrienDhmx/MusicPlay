@@ -45,11 +45,14 @@ namespace MusicPlayUI.Core.Commands
         public ICommand NavigateToGenreCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
+        public ICommand NavigateToPlaylistCommand { get; }
 
         // popup
-        public ICommand OpenAlbumPopupCommand { get;}
+        public ICommand OpenAlbumPopupCommand { get; }
         public ICommand OpenArtistPopupCommand { get; }
         public ICommand OpenTrackPopupCommand { get; }
+        public ICommand OpenPlaylistPopupCommand { get; }
+        public ICommand OpenTagPopupCommand { get; }
         public ICommand ClosePopupCommand { get; }
 
         // settings
@@ -141,7 +144,7 @@ namespace MusicPlayUI.Core.Commands
                 _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id));
             });
 
-            NavigateToGenreCommand = new RelayCommand<GenreModel>((genre) =>
+            NavigateToGenreCommand = new RelayCommand<TagModel>((genre) =>
             {
                 _navigationService.NavigateTo(ViewNameEnum.SpecificGenre, genre);
             });
@@ -156,9 +159,17 @@ namespace MusicPlayUI.Core.Commands
                 _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, artist);
             });
 
+            NavigateToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) =>
+            {
+                _navigationService.NavigateTo(ViewNameEnum.SpecificPlaylist, playlist);
+            });
+
             OpenAlbumPopupCommand = new RelayCommand<AlbumModel>((album) => _navigationService.OpenPopup(ViewNameEnum.AlbumPopup, album));
             OpenTrackPopupCommand = new RelayCommand<UIOrderedTrackModel>((track) => _navigationService.OpenPopup(ViewNameEnum.TrackPopup, track));
             OpenArtistPopupCommand = new RelayCommand<ArtistModel>((artist) => _navigationService.OpenPopup(ViewNameEnum.ArtistPopup, artist));
+            OpenPlaylistPopupCommand = new RelayCommand<PlaylistModel>((playlist) => _navigationService.OpenPopup(ViewNameEnum.PlaylistPopup, playlist));
+            OpenTagPopupCommand = new RelayCommand<UITagModel>((tag) => _navigationService.OpenPopup(ViewNameEnum.TagPopup, tag));
+
 
             ToggleQueueDrawerCommand = new RelayCommand(_navigationService.ToggleQueueDrawer);
 

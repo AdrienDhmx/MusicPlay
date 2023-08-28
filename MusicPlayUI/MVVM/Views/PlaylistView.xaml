@@ -30,10 +30,10 @@
               Background="{DynamicResource PrimaryContainer}">
 
             <Grid x:Name="StickyPart"
-                    MinHeight="180"
-                  Height="270"
+                    MinHeight="120"
+                  Height="230"
                   Margin="10"
-                  MaxHeight="270">
+                  MaxHeight="230">
                 <Grid  Margin="0,5,5,5"
                     HorizontalAlignment="Center">
                     <Grid.ColumnDefinitions>
@@ -45,7 +45,7 @@
                     <!-- Playlist Cover -->
                     <Border Grid.RowSpan="2"
                             Margin="0,0,10,0"
-                            MaxHeight="310"
+                            MaxHeight="210"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
@@ -58,7 +58,7 @@
                     <Border Grid.RowSpan="2"
                                 CornerRadius="{DynamicResource SecondaryCornerRadius}"
                                 Margin="0,0,10,0"
-                            MaxHeight="310"
+                            MaxHeight="210"
                              Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"
                                 Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Path Data="{Binding PathCover}"
@@ -89,13 +89,43 @@
                                        MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
                                        TextWrapping="NoWrap"
                                        Margin="0,0,0,4"/>
-                            
-                            <TextBlock Text="{Binding Playlist.Description}"
-                                       Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
-                                   Style="{DynamicResource SSubDataStyle}"
-                                       MaxWidth="650"
-                                       TextTrimming="CharacterEllipsis"
-                                   MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2.6}"/>
+
+                            <Border HorizontalAlignment="Left">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=230}" Value="true">
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Duration="0:0:0:0.2"  From="1" To="0"
+                                                                              Storyboard.TargetProperty="Opacity"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.EnterActions>
+                                                <DataTrigger.ExitActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Duration="0:0:0:0.2"  From="0" To="1"
+                                                                              Storyboard.TargetProperty="Opacity"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.ExitActions>
+                                            </DataTrigger>
+                                            <Trigger Property="Opacity" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding Playlist.Description}"
+                                           Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
+                                       Style="{DynamicResource SSubDataStyle}"
+                                           HorizontalAlignment="Left"
+                                           MaxWidth="650"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </Border>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal"
@@ -309,6 +339,7 @@
                                   dd:DragDrop.DropTargetAdornerBrush="{DynamicResource Primary}"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
+                                  MinHeight="200"
                                   Margin="10, 10, 10,20">
                         <dd:DragDrop.EffectMoveAdornerTemplate>
                             <DataTemplate DataType="{x:Type model:OrderedTrackModel}">

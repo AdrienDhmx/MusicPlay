@@ -204,8 +204,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<GenreModel> _genres;
-        public List<GenreModel> Genres
+        private List<TagModel> _genres;
+        public List<TagModel> Genres
         {
             get { return _genres; }
             set
@@ -399,8 +399,8 @@ namespace MusicPlayUI.MVVM.ViewModels
                 Artist = (ArtistModel)baseModel;
             }
 
-            Genres = await DataAccess.Connection.GetArtistGenre(Artist.Id);
-            Artist.Genres = Genres;
+            Genres = await DataAccess.Connection.GetArtistTag(Artist.Id);
+            Artist.Tags = Genres;
 
             Tracks = (await (await ArtistServices.GetArtistTracks(Artist.Id))
                             .GetAlbumTrackProperties())

@@ -67,7 +67,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 
         public ICommand ChangeModifierCommand { get; }
         public ICommand ChangeShortcutCommand { get; }
-        public UpdateShortcutViewModel(IModalService modalService) : base(modalService)
+        public UpdateShortcutViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
         {
             ChangeModifierCommand = new RelayCommand<string>((string modifier) =>
             {

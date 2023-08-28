@@ -33,7 +33,7 @@ namespace MusicPlayUI.Core.Services
         public int ArtistInfluence { get; set; } = 40;
 
         /// <summary>
-        /// The min percentage of tracks included the radio having the same Genre as the track the radio is based on.
+        /// The min percentage of tracks included the radio having the same CurrentTagView as the track the radio is based on.
         /// </summary>
         public int GenreInfluence { get; set; } = 60;
 
@@ -91,7 +91,7 @@ namespace MusicPlayUI.Core.Services
 
             ArtistModel artist = await DataAccess.Connection.GetArtist(ArtistDataRelation.ArtistId);
 
-            List<GenreModel> genres = await DataAccess.Connection.GetAlbumGenre(album.Id);
+            List<TagModel> genres = await DataAccess.Connection.GetAlbumTag(album.Id);
             List<TrackModel> RadioTracks = new();
             List<TrackModel> Tracks = new();
             List<AlbumModel> albums = new();
@@ -103,11 +103,11 @@ namespace MusicPlayUI.Core.Services
             radio.Cover = string.IsNullOrWhiteSpace(track.Artwork) ? track.AlbumCover : track.Artwork;
 
             // add all tracks with the same genre
-            foreach (GenreModel genreModel in genres)
+            foreach (TagModel genreModel in genres)
             {
                 if (genreModel is null) continue;
 
-                albums = await DataAccess.Connection.GetAlbumFromGenre(genreModel.Id);
+                albums = await DataAccess.Connection.GetAlbumFromTag(genreModel.Id);
 
                 Tracks.AddRange(await GetTracksFromAlbums(albums));
             }

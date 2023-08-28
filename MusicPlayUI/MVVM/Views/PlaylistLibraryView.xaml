@@ -95,7 +95,7 @@
               Background="Transparent"
                   Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="210"/>
+                <RowDefinition Height="180"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -114,10 +114,10 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Width="180"
-                                    Height="200"
-                                    Margin="2,10,2,2"
-                                    x:Name="itemgrid">
+                        <Grid Width="140"
+                            Height="160"
+                            Margin="2,20,2,2"
+                            x:Name="itemgrid">
                             <Grid.InputBindings>
                                 <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToPlaylistCommand, Source={x:Reference RootView}}"
                                               CommandParameter="{Binding .}"/>
@@ -125,7 +125,7 @@
                                               CommandParameter="{Binding .}"/>
                             </Grid.InputBindings>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="150"/>
+                                <RowDefinition Height="120"/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
@@ -133,26 +133,26 @@
                                         Grid.Row="0"
                                         Panel.ZIndex="2"
                                         Opacity="0"
-                                        CornerRadius="10"
-                                         Width="150"
-                                        Height="150"
+                                        CornerRadius="8"
+                                         Width="120"
+                                        Height="120"
                                         Background="{DynamicResource TransparentGradient}"/>
 
                             <iconbtn:IconButton Icon="{Binding Cover}"
                                                     Background="{DynamicResource SecondaryContainer}"
                                                     FillColor="{DynamicResource OnSecondaryContainer}"
                                                     Style="{DynamicResource BaseIconButton}"
-                                                    Width="150"
-                                                    Height="150"
+                                                    Width="120"
+                                                    Height="120"
                                                     CornerRadius="{DynamicResource SecondaryCornerRadius}"
-                                                    IconHeight="100"
-                                                    IconWidth="100">
+                                                    IconHeight="70"
+                                                    IconWidth="70">
                             </iconbtn:IconButton>
 
                             <Grid Opacity="0"
                                       VerticalAlignment="Bottom"
                                       Panel.ZIndex="3"
-                                      Margin="25,5"
+                                      Margin="15,5"
                                       x:Name="BtnGrid">
                                 <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
                                                         Command="{Binding DataContext.PlayPlaylistCommand, ElementName=RootView}"

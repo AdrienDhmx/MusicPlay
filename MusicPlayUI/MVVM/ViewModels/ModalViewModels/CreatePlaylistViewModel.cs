@@ -15,8 +15,6 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 {
     public class CreatePlaylistViewModel : ModalViewModel
     {
-        private readonly INavigationService _navigationService;
-
         private PlaylistModel Playlist { get; set; }
 
         private string _playlistName = "";
@@ -91,17 +89,10 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 
         public ICommand CreatePlaylistCommand { get; }
         public ICommand SelectCoverCommand { get; }
-        public CreatePlaylistViewModel(IModalService modalService, INavigationService navigationService) : base(modalService)
+        public CreatePlaylistViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
         {            
-            _navigationService = navigationService;
-
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
             SelectCoverCommand = new RelayCommand(SelectCover);
-
-            if (_navigationService.IsPopupOpen)
-            {
-                _navigationService.ClosePopup();
-            }
 
             if(_modalService.ModalParameter is PlaylistModel playlist)
             {

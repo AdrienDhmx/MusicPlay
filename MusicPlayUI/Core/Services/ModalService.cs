@@ -71,6 +71,9 @@ namespace MusicPlayUI.Core.Services
                 case ViewNameEnum.CreatePlaylist:
                     Modal = _viewFactory.Invoke(typeof(CreatePlaylistViewModel));
                     break;
+                case ViewNameEnum.CreateTag:
+                    Modal = _viewFactory.Invoke(typeof(CreateTagViewModel));
+                    break;
                 case ViewNameEnum.ConfirmAction:
                     Modal = _viewFactory.Invoke(typeof(ValidationModalViewModel));
                     break;

@@ -41,6 +41,9 @@
             <DataTemplate DataType="{x:Type modalviewmodel:CreatePlaylistViewModel}">
                 <modalview:CreatePlaylistView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type modalviewmodel:CreateTagViewModel}">
+                <modalview:CreateTagModal/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type modalviewmodel:ValidationModalViewModel}">
                 <modalview:ValidationModalView/>
             </DataTemplate>
@@ -59,6 +62,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewmodels:PlaylistLibraryViewModel}">
                 <views:PlaylistLibraryView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:GenreLibraryViewModel}">
+                <views:GenreLibraryView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewmodels:ImportLibraryViewModel}">
                 <views:ImportLibraryView/>
@@ -107,6 +113,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type popupviewmodels:PlaylistPopupViewModel}">
                 <popupviews:PlaylistPopupView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type popupviewmodels:TagPopupViewModel}">
+                <popupviews:TagPopupView/>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type settingsviewmodels:GeneralSettingsViewModel}">

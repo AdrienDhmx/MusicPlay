@@ -147,7 +147,7 @@
     <!-- For sub data like the artist of the album -->
     <Style x:Key="SSubDataStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
-        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontSize" Value="18"/>
     </Style>
 
     <!-- For lists name (recent artist, recent albums...) -->

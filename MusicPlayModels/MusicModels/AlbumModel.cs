@@ -12,8 +12,6 @@ namespace MusicPlayModels.MusicModels
 
         private string _duration = "";
 
-        public int Id { get; set; }
-
         public string Name { get; set; } = "";
 
         public string Copyright { get; set; } = "";
@@ -36,7 +34,7 @@ namespace MusicPlayModels.MusicModels
 
         public bool IsEP { get; set; } = false;
 
-        public List<GenreModel> Genres { get; set; } = new();
+        public List<TagModel> Tags { get; set; } = new();
 
         public string Duration 
         {

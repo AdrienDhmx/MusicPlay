@@ -43,7 +43,7 @@ namespace MusicFilesProcessor
 
         private List<TrackModel> AllTracksModel { get; set; } = new();
         private List<AlbumModel> AllAlbumsModel { get; set; } = new();
-        private List<GenreModel> AllGenres { get; set; } = new();
+        private List<TagModel> AllGenres { get; set; } = new();
         private Dictionary<int, Dictionary<string, List<bool>>> FileArtists = new();
         private Dictionary<string, string> CoverDictionary = new();
 
@@ -183,10 +183,6 @@ namespace MusicFilesProcessor
                 importedFiles.Add(track.Path);
             }
             importedArtists = await DataAccess.Connection.GetAllArtists();
-            foreach (ArtistModel artist in importedArtists)
-            {
-                artist.Genres = await DataAccess.Connection.GetArtistGenre(artist.Id);
-            }
         } 
 
         private int GetFiles()
@@ -202,9 +198,6 @@ namespace MusicFilesProcessor
         /// <returns></returns>
         private async void ImportArtists()
         {
-            // get already imported genres
-            AllGenres = await DataAccess.Connection.GetAllGenres();
-
             int i = 0;
             foreach (string file in files)
             {
@@ -218,32 +211,6 @@ namespace MusicFilesProcessor
                 if(artists.Count > 0)
                     CurrentFile = artists.Keys.ToList()[0];
                 Progress++;
-
-                string[] genres = fileInfo.Tag.Genres;
-                List<GenreModel> artistGenre = new();
-
-                // insert genres if not in database
-                if (genres != null && genres.Length > 0)
-                {
-                    foreach (string g in genres)
-                    {
-                        if (!string.IsNullOrWhiteSpace(g))
-                        {
-                            string curGenre = g.ToLower();
-                            if (!AllGenres.Any(g => g.Name.ToLower() == curGenre)) // not in the database
-                            {
-                                GenreModel genreModel = new() { Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(curGenre) };
-                                genreModel.Id = await DataAccess.Connection.InsertGenre(genreModel);
-                                artistGenre.Add(genreModel);
-                                AllGenres.Add(genreModel);
-                            }
-                            else if(!artistGenre.Any(g => g.Name.ToLower() == curGenre.ToLower()))
-                            {
-                                artistGenre.Add(AllGenres.Find(g => g.Name.ToLower() == curGenre));
-                            }
-                        }
-                    }
-                }
 
                 foreach (var kvp in artists)
                 {
@@ -282,7 +249,7 @@ namespace MusicFilesProcessor
                             artistModel.IsLyricist = true;
                         }
 
-                        artistModel.Genres = artistGenre ?? new();
+                        artistModel.Tags = new();
                         artistModel.Id = await DataAccess.Connection.InsertArtist(artistModel);
 
                         importedArtists.Add(artistModel);
@@ -291,19 +258,6 @@ namespace MusicFilesProcessor
                     {
                         int index = importedArtists.IndexOf(importedArtist);
                         bool updated = await CheckArtistBool(importedArtist, kvp.Value);
-
-                        foreach (GenreModel genre in artistGenre)
-                        {
-                            if (genre is null)
-                                continue;
-
-                            if (!importedArtist.Genres.Any(g => g.Id == genre.Id))
-                            {
-                                await DataAccess.Connection.InsertArtistGenre(importedArtist.Id, genre.Id);
-                                importedArtist.Genres.Add(genre);
-                                updated = true;
-                            }
-                        }
 
                         if (updated)
                         {
@@ -318,7 +272,7 @@ namespace MusicFilesProcessor
         private async void ImportAlbumsAndTracks()
         {
             // get already imported genres
-            AllGenres = await DataAccess.Connection.GetAllGenres();
+            AllGenres = await DataAccess.Connection.GetAllTags();
 
             List<TrackModel> AlbumTracks = new(); // store tracks of each albums
             AlbumModel album = new(); // album
@@ -610,18 +564,18 @@ namespace MusicFilesProcessor
                             string curGenre = g.ToLower();
                             if (!AllGenres.Any(ag => ag.Name.ToLower() == curGenre)) // not in the database
                             {
-                                GenreModel genreModel = new() { Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(curGenre) };
-                                genreModel.Id = await DataAccess.Connection.InsertGenre(genreModel);
+                                TagModel genreModel = new() { Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(curGenre) };
+                                genreModel.Id = await DataAccess.Connection.InserTag(genreModel);
                                 AllGenres.Add(genreModel);
 
                                 // insert the album genres
-                                await DataAccess.Connection.InsertAlbumGenre(album.Id, genreModel.Id);
+                                await DataAccess.Connection.InsertAlbumTag(album.Id, genreModel.Id);
 
                             }
                             else
                             {
                                 // Find and insert the album genres
-                                await DataAccess.Connection.InsertAlbumGenre(album.Id, AllGenres.Find(ag => ag.Name.ToLower() == curGenre).Id);
+                                await DataAccess.Connection.InsertAlbumTag(album.Id, AllGenres.Find(ag => ag.Name.ToLower() == curGenre).Id);
                             }
                         }
                     }

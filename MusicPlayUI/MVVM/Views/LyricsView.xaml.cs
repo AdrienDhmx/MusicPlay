@@ -37,8 +37,9 @@ namespace MusicPlayUI.MVVM.Views
             double spaceAbove = 0.25;
             if(LyricsTextBox.FontSize > 40)
             {
-                spaceAbove = 0.2;
-            } else if(LyricsTextBox.FontSize < 30)
+                spaceAbove = 0.3;
+            } 
+            else if(LyricsTextBox.FontSize < 30)
             {
                 spaceAbove = 0.3;
             }

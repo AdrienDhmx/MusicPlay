@@ -4,27 +4,19 @@ using MusicPlayModels.MusicModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Enums;
-using MusicPlayUI.Core.Factories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Helpers;
 using System.Collections.ObjectModel;
-using MessageControl;
-using TagLib;
-using MusicPlayUI.MVVM.Models;
-using Humanizer.Localisation;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
-    public class AlbumPopupViewModel : ViewModel
+    public class AlbumPopupViewModel : TagTargetPopupViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
-        private readonly IModalService _modalService;
         private readonly IPlaylistService _playlistService;
         private readonly ICommandsManager _commandsManager;
         private AlbumModel _album;
@@ -49,41 +41,18 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private bool _canRemoveFromGenre = false;
-        public bool CanRemoveFromGenre
-        {
-            get => _canRemoveFromGenre;
-            set
-            {
-                SetField(ref _canRemoveFromGenre, value);
-            }
-        }
-
-        private GenreModel _genre;
-        public GenreModel Genre
-        {
-            get => _genre;
-            set
-            {
-                SetField(ref _genre, value);
-            }
-        }
-
-        private MessageCancelClosedModel<GenreModel> _genreMessageCancelClosedModel { get; set; }
-        private int RemovedAlbumGenreIndex { get; set; }
-
         public ICommand PlayNextCommand { get; }
         public ICommand AddToQueueCommand { get; }
         public ICommand AddToPlaylistCommand { get; }
-        public ICommand RemoveAlbumGenreCommand { get; }
+        public ICommand AddToTagCommand { get; }
+        public ICommand RemoveAlbumTagCommand { get; }
         public ICommand ChangeCoverCommand { get; }
         public ICommand CreatePlaylistCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
-        public AlbumPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager)
+        public ICommand CreateTagCommand { get; }
+        public AlbumPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager) : base(navigationService, modalService)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
-            _modalService = modalService;
             _playlistService = playlistService;
             _commandsManager = commandsManager;
             LoadData();
@@ -94,40 +63,15 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
             ChangeCoverCommand = new RelayCommand(ChangeCover);
             NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
-            RemoveAlbumGenreCommand = new RelayCommand(() =>
-            {
-                if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
-                {
-                    RemovedAlbumGenreIndex = genreViewModel.RemoveAlbum(Album.Id);
-                }
 
-                _genreMessageCancelClosedModel = new(Genre, RestoreGenre);
-                MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre(Album.Name, Genre.Name, _genreMessageCancelClosedModel.Cancel, RemoveFromGenreCloseCallBack));
-            });
-        }
-
-        private bool RestoreGenre()
-        {
-            if(_navigationService.CurrentViewModel is GenreViewModel genreViewModel &&
-                RemovedAlbumGenreIndex != -1)
-            {
-                genreViewModel.Albums.Insert(RemovedAlbumGenreIndex, Album);
-            }
-            return true;
-        }
-
-        private async void RemoveFromGenreCloseCallBack()
-        {
-            if (!_genreMessageCancelClosedModel.IsCanceled)
-            { 
-                // real deletion
-                await DataAccess.Connection.RemoveAlbumGenre(Album.Id, _genreMessageCancelClosedModel.Data.Id);
-            }
+            CreateTagCommand = new RelayCommand(() => CreateTag(Album));
+            AddToTagCommand = new RelayCommand<TagModel>((tag) => AddToTag(tag, Album));
         }
 
         private async void PlayNext(bool end = false)
         {
             _queueService.AddTracks(await (await DataAccess.Connection.GetTracksFromAlbum(Album.Id)).GetAlbumTrackProperties(), end, true, Album.Name);
+            _navigationService.ClosePopup();
         }
 
         private async void AddToPlaylist(PlaylistModel playlist)
@@ -153,7 +97,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             {
                 await Task.Delay(500);
                 var playlists = await DataAccess.Connection.GetAllPlaylists();
-                playlists.ToList().Sort((x, y) => x.CreationDate.CompareTo(y.CreationDate));
+                playlists.ToList().OrderBy(p => p.Id);
                 PlaylistModel createdPlaylist = playlists.LastOrDefault();
                 AddToPlaylist(createdPlaylist);
             }
@@ -161,6 +105,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private void ChangeCover()
         {
+            _navigationService.ClosePopup();
             bool result = Album.ChangeCover();
             if (result)
             {
@@ -188,10 +133,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
             {
                 CanRemoveFromGenre = true;
-                Genre = genreViewModel.Genre;
+                CurrentTagView = genreViewModel.Genre;
             }
 
+            Album.Tags = await DataAccess.Connection.GetAlbumTag(Album.Id);
+
             await GetUserPlaylists();
+            await GetTags(Album.Tags.Select(g => g.Id));
         }
     }
 }

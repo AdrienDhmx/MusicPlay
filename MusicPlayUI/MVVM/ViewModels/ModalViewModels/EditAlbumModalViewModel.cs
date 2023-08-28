@@ -13,10 +13,8 @@ using MusicPlayUI.Core.Services.Interfaces;
 
 namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 {
-    public class EditAlbumModalViewModel : ViewModel
+    public class EditAlbumModalViewModel : ModalViewModel
     {
-        private readonly INavigationService _navigationService;
-        private readonly IModalService _modalService;
         private readonly ICommandsManager _commandsManager;
         private AlbumModel _album;
         public AlbumModel Album
@@ -52,18 +50,16 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             set { SetField(ref _year, value);}
         }
 
-        private ObservableCollection<GenreModel> _genres;
-        public ObservableCollection<GenreModel> Genre
+        private ObservableCollection<TagModel> _genres;
+        public ObservableCollection<TagModel> Genre
         {
             get => _genres;
             set { SetField(ref _genres, value); }
         }
 
         public ICommand UpdateAlbumCover { get; }
-        public EditAlbumModalViewModel(INavigationService navigationService, IModalService modalService, ICommandsManager commandsManager)
+        public EditAlbumModalViewModel(INavigationService navigationService, IModalService modalService, ICommandsManager commandsManager) : base(modalService,navigationService)
         {
-            _navigationService = navigationService;
-            _modalService = modalService;
             _commandsManager = commandsManager;
 
             UpdateAlbumCover = _commandsManager.UpdateAlbumCover;

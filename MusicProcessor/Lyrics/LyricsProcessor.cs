@@ -106,7 +106,7 @@ namespace MusicFilesProcessor.Lyrics
                         }
                         catch (Exception)
                         {
-                            return CreateLyricsModel(Resources.No_Lyrics_Found, "", "", GetFileName(title, artist), true, false);
+                            return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
                         }
                     }
                     else
@@ -138,13 +138,13 @@ namespace MusicFilesProcessor.Lyrics
                     if(response.StatusCode != System.Net.HttpStatusCode.NotFound)
                         _connectivityHelper.HandleHttpError(response.StatusCode);
 
-                    return CreateLyricsModel(Resources.No_Lyrics_Found, "", "", GetFileName(title, artist), true, false);
+                    return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
                 }
             }
             else
             {
                 ConnectivityHelper.PublishNoConnectionMsg();
-                return CreateLyricsModel(Resources.No_Lyrics_Found, "", "", GetFileName(title, artist), true, false);
+                return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
             }
         }
 

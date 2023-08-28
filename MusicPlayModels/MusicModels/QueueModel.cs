@@ -17,7 +17,6 @@ namespace MusicPlayModels.MusicModels
         private string _cover = "";
         private int _playingFromId = -1;
 
-        public int Id { get; set; }
         public bool IsShuffled
         {
             get { return _isShuffled; }

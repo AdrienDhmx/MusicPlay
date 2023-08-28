@@ -18,6 +18,7 @@ using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Clipboard = System.Windows.Clipboard;
 
 namespace MusicPlayUI.MVVM.ViewModels
@@ -454,6 +455,12 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 IsEditMode = !IsEditMode;
                 IsTimedEditMode = false;
+
+            }
+
+            if (IsEditMode)
+            {
+                RemoveEmptyLineToLyrics();
             }
         }
 
@@ -461,13 +468,21 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             if (IsTimedEditMode) // don't save unfinished timed lyrics
             {
-                MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("You need to save manually the timed lyrics."));
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("You need to save manually the timed lyrics."));
+                }));
                 return;
             }
 
             LyricsModel.Lyrics = Lyrics;
             _lyricsProcessor.SaveLyrics(LyricsModel, IsTimed);
             SavedLyrics = Lyrics;
+
+            if (IsEditMode)
+            {
+                AddEmptyLineToLyrics();
+            }
 
             IsSaved = true;
             IsEditMode = false; // Escape edit mode
@@ -489,30 +504,104 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             _lyrics = LyricsModel.Lyrics;
             SavedLyrics = Lyrics;
-            OnPropertyChanged(nameof(Lyrics));
             TimedLyrics = new(LyricsModel.TimedLyrics);
             AddEmptyLineToLyrics();
+            OnPropertyChanged(nameof(Lyrics));
 
             LyricsFound = IsSaved || IsURLValid;
             CanSave = LyricsFound;
-            CanCopy = !string.IsNullOrWhiteSpace(Lyrics) || Lyrics != Resources.No_Lyrics_Found;
+            CanCopy = !string.IsNullOrWhiteSpace(Lyrics);
+
+            if (!LyricsFound)
+            {
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage(Resources.No_Lyrics_Found));
+                }));
+            }
         }
 
         private void AddEmptyLineToLyrics()
         {
-            if(TimedLyrics == null || TimedLyrics.Count == 0) return;
+            if (IsTimed && (TimedLyrics == null || TimedLyrics.Count == 0)) return;
+            if (!IsTimed && string.IsNullOrWhiteSpace(Lyrics)) return;
 
-            for (int i = 0; i < 4; i++)
+            int nbLineToAdd = 3;
+            if (IsTimed)
             {
-                int index = TimedLyrics.Last().index + i + 1;
-                TimedLyrics.Add(new()
+                nbLineToAdd = 4;
+
+                TimedLyrics.Insert(0, new()
                 {
                     Lyrics = "  ",
-                    index = index,
-                    LengthInMilliseconds = TimedLyrics.Last().LengthInMilliseconds + index * 2000,
+                    index = 0,
+                    LengthInMilliseconds = 0,
                     IsPlaying = false,
                 });
             }
+
+            for (int i = 0; i < nbLineToAdd; i++)
+            {
+                if (IsTimed)
+                {
+                    int index = TimedLyrics.Last().index + i + 1;
+                    TimedLyrics.Add(new()
+                    {
+                        Lyrics = "  ",
+                        index = index,
+                        LengthInMilliseconds = TimedLyrics.Last().LengthInMilliseconds + index * 2000,
+                        IsPlaying = false,
+                    });
+                } 
+                else
+                {
+                    _lyrics += "\n";
+                    _lyrics = _lyrics.Insert(0, "\n");
+                }
+            }
+            OnPropertyChanged(nameof(Lyrics));
+        }
+
+        private void RemoveEmptyLineToLyrics()
+        {
+            if (TimedLyrics == null || TimedLyrics.Count == 0) return;
+            if (!IsTimed && !string.IsNullOrWhiteSpace(Lyrics)) return;
+
+            int nbLineToAdd = 3;
+            if(IsTimed)
+            {
+                nbLineToAdd = 4;
+
+                if (TimedLyrics.First().Lyrics == "  ")
+                {
+                    TimedLyrics.RemoveAt(0);
+                }
+            }
+
+            for (int i = 0; i < nbLineToAdd; i++)
+            {
+                if(IsTimed)
+                {
+                    int index = TimedLyrics.Last().index;
+                    if(TimedLyrics.Last().Lyrics == "  ")
+                    {
+                        TimedLyrics.RemoveAt(index);
+                    }
+                } 
+                else
+                {
+                    if (_lyrics.StartsWith("\n"))
+                    {
+                        _lyrics = _lyrics.Remove(0, 1);
+                    }
+
+                    if (_lyrics.EndsWith("\n"))
+                    {
+                        _lyrics = _lyrics.Remove(_lyrics.Length - 1);
+                    }
+                }
+            }
+            OnPropertyChanged(nameof(Lyrics));
         }
 
 

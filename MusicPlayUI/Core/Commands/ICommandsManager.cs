@@ -21,9 +21,12 @@ namespace MusicPlayUI.Core.Commands
         ICommand NavigateToGenreCommand { get; }
         ICommand NavigateToAlbumCommand { get; }
         ICommand NavigateToArtistCommand { get; }
+        ICommand NavigateToPlaylistCommand { get; }
         ICommand OpenAlbumPopupCommand { get; }
         ICommand OpenArtistPopupCommand { get; }
         ICommand OpenTrackPopupCommand { get; }
+        ICommand OpenTagPopupCommand { get; }
+        ICommand OpenPlaylistPopupCommand { get; }
         ICommand NextTrackCommand { get; }
         ICommand ToggleQueueDrawerCommand { get; }
 

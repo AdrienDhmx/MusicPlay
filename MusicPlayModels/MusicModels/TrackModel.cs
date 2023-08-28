@@ -9,7 +9,6 @@ namespace MusicPlayModels.MusicModels
     public class TrackModel : ArtistsRelation
     {
         private string _artwork = "";
-        public int Id { get; set; }
         public string Path { get; set; } = "";
         public string Title { get; set; } = "";
         public int AlbumId { get; set; }
@@ -23,6 +22,8 @@ namespace MusicPlayModels.MusicModels
                 OnPropertyChanged(nameof(Artwork));
             }
         }
+
+        public List<TagModel> Tags { get; set; } = new();
 
         public int Tracknumber { get; set; } = 0;
 

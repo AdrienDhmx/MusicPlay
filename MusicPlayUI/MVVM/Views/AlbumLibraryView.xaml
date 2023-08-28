@@ -103,7 +103,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Text="{x:Static lang:Resources.Genre}"
+                            <TextBlock Text="Tags"
                                            Style="{DynamicResource SFilterHeaderStyle}"/>
 
                             <Border VerticalAlignment="Bottom"

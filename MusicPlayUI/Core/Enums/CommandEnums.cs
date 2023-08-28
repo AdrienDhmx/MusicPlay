@@ -52,7 +52,7 @@ namespace MusicPlayUI.Core.Enums
             {
                 CommandEnums.PlayPause => "Play / Pause",
                 CommandEnums.NexTrack => "Next Track",
-                CommandEnums.PreviousTrack => "Previous Tracks",
+                CommandEnums.PreviousTrack => "Previous AllTracks",
                 CommandEnums.Shuffle => "Shuffle",
                 CommandEnums.Repeat => "Repeat",
                 CommandEnums.DecreaseVolume => "Decrease Volume",

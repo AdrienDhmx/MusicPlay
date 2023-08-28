@@ -66,6 +66,8 @@
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
@@ -84,8 +86,22 @@
                                     x:Name="AddToPlaylistBorder"
                                     Style="{DynamicResource PopupBtn}"/>
 
-                <textbtn:TextButton Text="{x:Static lang:Resources.Remove_From_Playlist}"
+                <textbtn:TextButton Text="Add to Tag"
                                     Grid.Row="3"
+                                    x:Name="AddToTagBorder"
+                                    Style="{DynamicResource PopupBtn}"/>
+
+                <textbtn:TextButton Text="Remove from Tag"
+                                    Grid.Row="4"
+                                        Height="40"
+                                        Visibility="{Binding CanRemoveFromGenre, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2}"
+                                    Command="{Binding RemoveTagCommand}"
+                                    CommandParameter="{Binding SelectedTrack}"
+                                    x:Name="RemomveFromGenreBorder"
+                                    Style="{DynamicResource PopupBtn}"/>
+
+                <textbtn:TextButton Text="{x:Static lang:Resources.Remove_From_Playlist}"
+                                    Grid.Row="5"
                                    Style="{DynamicResource PopupBtn}"
                                     Height="40"
                                     x:Name="RemoveFromPlaylistBorder"
@@ -93,7 +109,7 @@
                                     Command="{Binding RemoveFromPlaylistCommand}"/>
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Edit}"
-                                    Grid.Row="4"
+                                    Grid.Row="6"
                                     CornerRadius="0,0,4,4"
                                    Style="{DynamicResource PopupBtn}"
                                     Command="{Binding OpenTagWindowCommand}"/>
@@ -121,6 +137,34 @@
                                 <Setter Property="IsOpen" Value="True"/>
                             </Trigger>
                             <DataTrigger Binding="{Binding IsMouseOver, ElementName=AddToPlaylistBorder}" Value="true">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Popup.Style>
+            </Popup>
+
+            <!-- Tag Popup -->
+            <Popup AllowsTransparency="True"
+                   x:Name="tagsPopup"
+                   PopupAnimation="None"
+                   StaysOpen="True">
+                <Popup.Style>
+                    <Style TargetType="Popup">
+                        <Setter Property="PlacementTarget" Value="{Binding ElementName=AddToTagBorder}"/>
+                        <Setter Property="Placement" Value="Right"/>
+                        <Setter Property="VerticalOffset" Value="0"/>
+                        <Setter Property="IsOpen" Value="False"/>
+                        <Setter Property="Child">
+                            <Setter.Value>
+                                <popup:AddToTagPopup DataContext="{Binding DataContext, ElementName=RootView}"/>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsMouseOver, ElementName=AddToTagBorder}" Value="true">
                                 <Setter Property="IsOpen" Value="True"/>
                             </DataTrigger>
                         </Style.Triggers>

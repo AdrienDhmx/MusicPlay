@@ -12,11 +12,18 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
     public class ModalViewModel : ViewModel
     {
         internal readonly IModalService _modalService;
+        internal readonly INavigationService _navigationService;
 
         public ICommand CloseModalCommand { get; }
-        public ModalViewModel(IModalService modalService)
+        public ModalViewModel(IModalService modalService, INavigationService navigationService)
         {
             _modalService = modalService;
+            _navigationService = navigationService;
+
+            if (_navigationService.IsPopupOpen)
+            {
+                _navigationService.ClosePopup();
+            }
 
             CloseModalCommand = new RelayCommand(() => CloseModal(true));
 

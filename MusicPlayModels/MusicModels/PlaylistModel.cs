@@ -13,7 +13,6 @@ namespace MusicPlayModels.MusicModels
         private string _description = "";
         private string _cover = "";
 
-        public int Id { get; set; }
         public string Name
         {
             get { return _name; }
@@ -47,6 +46,8 @@ namespace MusicPlayModels.MusicModels
         public PlaylistTypeEnum PlaylistType { get; set; } = PlaylistTypeEnum.UserPlaylist;
 
         public List<OrderedTrackModel> Tracks { get; set; } = new();
+
+        public List<TagModel> Tags { get; set; } = new();
 
         public PlaylistModel(int id, string name, string description, string cover, string duration)
         {
