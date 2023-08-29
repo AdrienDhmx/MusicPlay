@@ -95,7 +95,53 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Grid>
+                        <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Tags"
+                                       Style="{DynamicResource SFilterHeaderStyle}"
+                                       Margin="10,0"/>
+
+                            <Border VerticalAlignment="Bottom"
+                                    Height="2"
+                                    Margin="0,0,0,2"
+                                    Background="{DynamicResource OnSecondaryContainer}"
+                                    Opacity="0.5"/>
+
+                            <ItemsControl Grid.Row="1"
+                                          HorizontalAlignment="Center"
+                                      ItemsSource="{Binding TagFilters}"
+                                      Background="Transparent">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="ItemRootBorder"
+                                                Cursor="Hand"
+                                                     Style="{DynamicResource FilterItemRootBorder}">
+                                            <Border.InputBindings>
+                                                <MouseBinding Gesture="LeftClick"
+                                                        Command="{Binding DataContext.AddFilterCommand, ElementName=RootView}"
+                                                        CommandParameter="{Binding .}"/>
+                                            </Border.InputBindings>
+                                            <TextBlock Text="{Binding Name}"
+                                                       Style="{DynamicResource SFilterStyle}"
+                                                       x:Name="FilterName">
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                        
+                        <Grid Grid.Column="1"
+                              Margin="20,0,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="40"/>
                                 <RowDefinition/>
@@ -123,6 +169,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border x:Name="ItemRootBorder"
+                                                Cursor="Hand"
                                                      Style="{DynamicResource FilterItemRootBorder}">
                                             <Border.InputBindings>
                                                 <MouseBinding Gesture="LeftClick"

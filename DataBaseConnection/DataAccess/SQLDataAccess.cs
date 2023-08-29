@@ -957,7 +957,7 @@ namespace DataBaseConnection.DataAccess
             return await GetAlbumArtists(albums);
         }
 
-        public async Task<List<ArtistModel>> SearchArtists(List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false)
+        public async Task<List<ArtistModel>> SearchArtists(List<int> genresId, List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false)
         {
             Query query = new Query(Tables.TArtist);
 
@@ -994,7 +994,15 @@ namespace DataBaseConnection.DataAccess
             // need to group the filters in one query dif from the main
             // otherwise the search query only apply to the last filter
             Query filterQuery = new Query(Tables.TArtist).Select(Columns.Id);
-            if(isAlbumArtist)
+
+            if (genresId.Count > 0)
+            {
+                // selected genres query
+                Query selectedGenre = new Query(Tables.TArtistGenres).Select(Columns.ArtistId).OrWhereIn(Columns.GenreId, genresId);
+                filterQuery.OrWhereIn(Columns.Id, selectedGenre);
+            }
+
+            if (isAlbumArtist)
             {
                 or = true;
                 filterQuery.Where(Columns.IsAlbumArtist, 1);

@@ -100,40 +100,45 @@ namespace MusicPlayUI.MVVM.Models
 
     public static class UIGEnreModelExt
     {
+        public static async Task<UITagModel> ToUITagModel(this TagModel tag)
+        {
+            List<AlbumModel> albums = await DataAccess.Connection.GetAlbumFromTag(tag.Id);
+            List<ArtistModel> artists = await DataAccess.Connection.GetArtistFromTag(tag.Id);
+            List<PlaylistModel> playlists = await DataAccess.Connection.GetPlaylistFromTag(tag.Id);
+            List<TrackModel> tracks = await DataAccess.Connection.GetTrackFromTag(tag.Id);
+            tracks = await tracks.GetAlbumTrackProperties();
+
+            string cover = "";
+            if (albums.Count > 0)
+            {
+                cover = albums.Last().AlbumCover;
+            }
+            else if (artists.Count > 0)
+            {
+                cover = artists.Last().Cover;
+            }
+            else if (playlists.Count > 0)
+            {
+                cover = playlists.Last().Cover;
+            }
+            else if (tracks.Count > 0)
+            {
+                if (string.IsNullOrWhiteSpace(tracks.Last().Artwork))
+                    cover = tracks.Last().AlbumCover;
+                else
+                    cover = tracks.Last().Artwork;
+            }
+
+            return new(tag, albums, artists, playlists, tracks, cover);
+        }
+
         public static async Task<List<UITagModel>> ToUIGenreModel(this List<TagModel> tags)
         {
             List<UITagModel> uiGenres = new();
 
             foreach (TagModel tag in tags)
             {
-                List<AlbumModel> albums = await DataAccess.Connection.GetAlbumFromTag(tag.Id);
-                List<ArtistModel> artists = await DataAccess.Connection.GetArtistFromTag(tag.Id);
-                List<PlaylistModel> playlists = await DataAccess.Connection.GetPlaylistFromTag(tag.Id);
-                List<TrackModel> tracks = await DataAccess.Connection.GetTrackFromTag(tag.Id);
-                tracks = await tracks.GetAlbumTrackProperties();
-
-                string cover = "";
-                if(albums.Count > 0)
-                {
-                    cover = albums.Last().AlbumCover;
-                }
-                else if (artists.Count > 0)
-                {
-                    cover = artists.Last().Cover;
-                }
-                else if (playlists.Count > 0)
-                {
-                    cover = playlists.Last().Cover;
-                }
-                else if (tracks.Count > 0)
-                {
-                    if(string.IsNullOrWhiteSpace(tracks.Last().Artwork))
-                        cover = tracks.Last().AlbumCover;
-                    else 
-                        cover = tracks.Last().Artwork;
-                }
-
-                uiGenres.Add(new(tag, albums, artists, playlists, tracks, cover));
+                uiGenres.Add(await tag.ToUITagModel());
             }
 
             return uiGenres;

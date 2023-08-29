@@ -255,6 +255,7 @@ namespace MusicPlayUI.Core.Services
                 bool open = true;
 
                 PopupViewParameter = parameter;
+                PopupViewName = viewName;
                 switch (viewName)
                 {
                     case ViewNameEnum.TrackPopup:
@@ -276,6 +277,7 @@ namespace MusicPlayUI.Core.Services
                         open = false;
                         break;
                 }
+
                 if (open)
                 {
                     if (IsPopupOpen)

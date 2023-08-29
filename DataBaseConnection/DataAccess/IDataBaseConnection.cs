@@ -124,7 +124,7 @@ namespace DataBaseConnection.DataAccess
         /// <param name="sortEnum"></param>
         /// <param name="ascending"></param>
         /// <returns></returns>
-        public Task<List<ArtistModel>> SearchArtists(List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false);
+        public Task<List<ArtistModel>> SearchArtists(List<int> tagsId, List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false);
 
         /// <summary>
         /// Update the artistId

@@ -8,6 +8,7 @@
              d:DataContext="{d:DesignInstance Type=viewmodels:PlaylistViewModel}"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
              xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
@@ -160,6 +161,7 @@
                                                 IconWidth="28"
                                                     Icon="{DynamicResource MoreOptionIcon}"
                                                     Margin="6,0"
+                                                CommandParameter="{Binding Playlist}"
                                                     Command="{Binding OpenPlaylistPopupCommand}"/>
 
                             <iconbtn:IconButton Icon="{DynamicResource Edit}"
@@ -195,6 +197,7 @@
                                                 IconWidth="28"
                                                     Icon="{DynamicResource MoreOptionIcon}"
                                                     Margin="6,0"
+                                            CommandParameter="{Binding Playlist}"
                                                     Command="{Binding OpenPlaylistPopupCommand}"/>
 
                         <iconbtn:IconButton Icon="{DynamicResource Edit}"
@@ -220,12 +223,21 @@
                 <Grid MaxWidth="1250">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+
+                    <listview:ChipListView Genres="{Binding Tags}"
+                                       NavigateToGenreCommand="{Binding NavigateToTagCommand}"
+                                        Margin="0,5,0,0"
+                                        VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
                     <!-- Track header -->
                     <Grid HorizontalAlignment="Stretch"
                           VerticalAlignment="Center"
                           Height="30"
+                          Grid.Row="1"
                           Margin="30,20, 30, 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
@@ -329,7 +341,7 @@
                         </Border>
                     </Grid>
 
-                    <ItemsControl Grid.Row="1"
+                    <ItemsControl Grid.Row="2"
                                     ItemsSource="{Binding PlaylistTracks}"
                                 dd:DragDrop.IsDropTarget="True"
                                     dd:DragDrop.IsDragSource="True"

@@ -289,13 +289,17 @@ namespace MusicPlayUI.MVVM.ViewModels
             else
             {
                 Genre = _navigationService.CurrentViewParameter as UITagModel;
+
+                Genre ??= await (_navigationService.CurrentViewParameter as TagModel).ToUITagModel();
             }
+
+
 
             Artists = new(Genre.Artists);
             Albums = new(Genre.Albums);
             BindedPlaylists = new(Genre.Playlists);
-            Tracks = new(Genre.Tracks.ToUIOrderedTrackModel(_queueService.AlbumCoverOnly, _queueService.AutoCover));
 
+            Tracks = new(Genre.Tracks.ToUIOrderedTrackModel(_queueService.AlbumCoverOnly, _queueService.AutoCover));
             List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbums(Albums.Select(a => a.Id));
             tracks.AddRange(await DataAccess.Connection.GetTracksFromArtists(Artists.Select(a => a.Id)));
             tracks.AddRange(await GetPlaylistsTracks());

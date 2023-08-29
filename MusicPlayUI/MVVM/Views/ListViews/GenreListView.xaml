@@ -83,7 +83,7 @@
                                                     Command="{Binding DataContext.PlayGenreCommand, ElementName=RootListView}"
                                                     CommandParameter="{Binding .}"/>
 
-                                <iconbtn:IconButton Style="{DynamicResource MoreOptionIconButton}"
+                                <iconbtn:IconButton Style="{DynamicResource CircledMoreOptionButton}"
                                                     Grid.Column="2"
                                                     Command="{Binding DataContext.OpenTagPopupCommand, ElementName=RootListView}"
                                                     CommandParameter="{Binding .}"

@@ -115,6 +115,16 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
+        private ObservableCollection<FilterModel> _tagFilters;
+        public ObservableCollection<FilterModel> TagFilters
+        {
+            get => _tagFilters;
+            set
+            {
+                SetField(ref _tagFilters, value);
+            }
+        }
+
         private SortModel _selectedSorting;
         public SortModel SelectedSorting
         {
@@ -197,6 +207,10 @@ namespace MusicPlayUI.MVVM.ViewModels
                     if (filter.FilterType == FilterEnum.ArtistType)
                     {
                         ArtistTypeFilters.Remove(filter);
+                    } 
+                    else if(filter.FilterType == FilterEnum.Genre)
+                    {
+                        TagFilters.Remove(filter);
                     }
                     FilterSearch();
                 }
@@ -210,6 +224,12 @@ namespace MusicPlayUI.MVVM.ViewModels
                     if (filter.FilterType == FilterEnum.ArtistType)
                     {
                         ArtistTypeFilters.Add(filter);
+                        ArtistTypeFilters = new(ArtistTypeFilters.OrderBy(f => f.Name));
+                    } 
+                    else if(filter.FilterType == FilterEnum.Genre)
+                    {
+                        TagFilters.Add(filter);
+                        TagFilters = new(TagFilters.OrderBy(f => f.Name));
                     }
                 }
                 FilterSearch();
@@ -274,12 +294,21 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             (TotalArtistCount, int _, int _) = await DataAccess.Connection.GetNumberOfEntries();
 
+            List<FilterModel> tagFilters = await FilterFactory.GetGenreFilter();
             List<FilterModel> artistsFilter = FilterFactory.GetArtistTypeFilter();
 
             List<FilterModel> temp = SearchHelper.GetSelectedFilters(false).ToList();
 
             foreach (FilterModel filter in temp)
             {
+                for (int i = 0; i < tagFilters.Count; i++)
+                {
+                    if (filter.Equals(tagFilters[i]))
+                    {
+                        filter.Name = tagFilters[i].Name;
+                        tagFilters.RemoveAt(i);
+                    }
+                }
                 for (int i = 0; i < artistsFilter.Count; i++)
                 {
                     if (filter.Equals(artistsFilter[i]))
@@ -290,7 +319,8 @@ namespace MusicPlayUI.MVVM.ViewModels
                 }
             }
 
-            ArtistTypeFilters = new(artistsFilter);
+            TagFilters = new(tagFilters.OrderBy(f => f.Name));
+            ArtistTypeFilters = new(artistsFilter.OrderBy(f => f.Name));
             SelectedFilters = new(temp);
 
             SortBy = SortFactory.GetSortMenu<ArtistModel>();

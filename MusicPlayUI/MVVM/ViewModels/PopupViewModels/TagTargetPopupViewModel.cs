@@ -106,8 +106,15 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
             if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
             {
-                CanRemoveFromGenre = true;
                 CurrentTagView = genreViewModel.Genre;
+                CanRemoveFromGenre = _navigationService.PopupViewName switch
+                {
+                    ViewNameEnum.AlbumPopup => genreViewModel.Albums.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
+                    ViewNameEnum.ArtistPopup => genreViewModel.Artists.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
+                    ViewNameEnum.PlaylistPopup => genreViewModel.BindedPlaylists.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
+                    ViewNameEnum.TrackPopup => genreViewModel.Tracks.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
+                    _ => false,
+                };
             }
         }
 
@@ -220,6 +227,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
                         break;
                 }
 
+                CanRemoveFromGenre = false;
                 AllTags.Remove(CurrentTagView);
             }
         }

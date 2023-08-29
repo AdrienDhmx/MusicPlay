@@ -92,7 +92,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-
         public ICommand PlayNextCommand { get; }
         public ICommand AddToQueueCommand { get; }
         public ICommand AddToPlaylistCommand { get; }
