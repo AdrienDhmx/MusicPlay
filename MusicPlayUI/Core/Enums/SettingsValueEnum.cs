@@ -16,6 +16,8 @@ namespace MusicPlayUI.Core.Enums
         WaterTheme = 1,
         ForestTheme = 2,
         FallenLeavesTheme = 3,
+        TurquoiseTheme = 4,
+        RedWineTheme = 5,
 
         // Languages (10 - 29)
         English = 10,
@@ -36,7 +38,6 @@ namespace MusicPlayUI.Core.Enums
         // IDEAS:
         // - File directories = Cover and Lyrics directories
         // - Lyrics Settings = default fontsize, default website (only AZLyrics for now though), AutoSave
-        // - default blur radius or no blur at all
 
     }
 

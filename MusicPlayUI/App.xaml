@@ -142,6 +142,7 @@
             <converter:PercentageConverter x:Key="InvertPercentageConverter" Invert="True"/>
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" TrueValue="Visible"/>
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverterInverted" FalseValue="Visible" TrueValue="Collapsed"/>
+            <converter:BoolToVisibilityConverter x:Key="BoolToHVisibilityConverter" FalseValue="Hidden" TrueValue="Visible"/>
             <converter:SizeConverter x:Key="SizeConverter"/>
             <converter:NullImageConverter x:Key="ONullImageConverter" />
             <converter:NullImageConverter x:Key="MNullImageConverter" CoverSize="1"/>

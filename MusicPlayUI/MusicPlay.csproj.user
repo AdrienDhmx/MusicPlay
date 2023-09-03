@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_LastSelectedProfileId>C:\dev\C#\MusicPlay-private\MusicPlayUI\Properties\PublishProfiles\_myrepo_.azurecr.io.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>C:\dev\C#\MusicPlay-private\MusicPlayUI\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
@@ -245,10 +245,22 @@
     <Page Update="Resources\ThemeColors\DarkFallenLeavesThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Resources\ThemeColors\DarkRedWineThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\DarkTurquoiseThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Resources\ThemeColors\DarkWaterThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\ThemeColors\LightFallenLeavesThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\LightRedWineThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\LightTurquoiseThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\ThemeColors\LightWaterThemeColors.xaml">

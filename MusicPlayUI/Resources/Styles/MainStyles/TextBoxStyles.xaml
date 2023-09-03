@@ -167,10 +167,11 @@
     <!-- For filters texts -->
     <Style x:Key="SFilterStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
+        <Setter Property="MinWidth" Value="100"/>
         <Setter Property="FontSize" Value="14"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Left"/>
         <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainer}"/>
         <Setter Property="Margin" Value="4,0"/>
     </Style>
