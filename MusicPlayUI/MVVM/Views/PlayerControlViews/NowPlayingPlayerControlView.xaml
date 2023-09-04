@@ -36,7 +36,7 @@
                         <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding DataContext.QueueService.IsShuffled, ElementName=RootView}" Value="true">
-                                <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+                                <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -45,12 +45,14 @@
 
             <!-- Previous Track -->
             <iconbtn:IconButton  Style="{DynamicResource ScdPlayBackButton}"
+                                 FillColor="{DynamicResource WhiteForeground}"
                                          Icon="{DynamicResource PreviousIcon}"
                                          Command="{Binding PreviousTrackCommand}">
             </iconbtn:IconButton>
 
             <!-- Play/Pause -->
-            <iconbtn:IconButton Command="{Binding PlayPauseCommand}">
+            <iconbtn:IconButton Command="{Binding PlayPauseCommand}"
+                                FillColor="{DynamicResource WhiteForeground}">
                 <iconbtn:IconButton.Style>
                     <Style BasedOn="{StaticResource PlayBackButton}" 
                                    TargetType="iconbtn:IconButton">
@@ -67,6 +69,7 @@
 
             <!-- Next Track -->
             <iconbtn:IconButton  Style="{DynamicResource ScdPlayBackButton}"
+                                 FillColor="{DynamicResource WhiteForeground}"
                                          Icon="{DynamicResource NextIcon}"
                                          Command="{Binding NextTrackCommand}">
             </iconbtn:IconButton>
@@ -76,15 +79,15 @@
                 <iconbtn:IconButton.Style>
                     <Style TargetType="iconbtn:IconButton"
                                    BasedOn="{StaticResource ThirdPlayBackButton}">
-                        <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+                        <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
                         <Setter Property="Icon" Value="{DynamicResource RepeatIcon}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.QueueService.IsOnRepeat, ElementName=RootView}" Value="false">
-                                <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
+                            <DataTrigger Binding="{Binding DataContext.QueueService.IsOnRepeat, ElementName=RootView}" Value="true">
+                                <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootView}" Value="true">
                                 <Setter Property="Icon" Value="{DynamicResource RepeatOneIcon}"/>
-                                <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+                                <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -109,8 +112,11 @@
 
             <!-- Audio Slider -->
             <Slider Grid.Column="1"
+                    Style="{DynamicResource NPSlider}"
                             HorizontalAlignment="Stretch"
                              VerticalAlignment="Center"
+                    Foreground="{DynamicResource ScdWhiteTransparent}"
+                    Background="{DynamicResource ScdWhiteTransparent}"
                             Value="{Binding AudioService.CurrentPositionMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="0"
                             Maximum="{Binding AudioService.MaxPositionMs}"

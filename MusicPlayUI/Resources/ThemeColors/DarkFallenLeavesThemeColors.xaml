@@ -87,7 +87,7 @@
                      Color="#4054643d"/>
 
     <SolidColorBrush x:Key="ErrorHover"
-                     Color="#60B3261E"/>
+                     Color="#40B3261E"/>
 
     <SolidColorBrush x:Key="TransparentHover"
                      Color="#901C1B1F"/>
@@ -107,10 +107,10 @@
                      Color="#80ffffff"/>
 
     <SolidColorBrush x:Key="ScdWhiteTransparent"
-                     Color="#40ffffff"/>
+                     Color="#20ffffff"/>
 
     <SolidColorBrush x:Key="BlackTransparent"
-                     Color="#65000000"/>
+                     Color="#75000000"/>
 
     <SolidColorBrush x:Key="BlackGradient"
                      Color="#EE202020"/>

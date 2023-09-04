@@ -27,12 +27,12 @@ namespace DataBaseConnection.DataAccess
         /// <returns></returns>
         public Task<List<PlaylistModel>> GetAllPlaylists();
         /// <summary>
-        /// Get all the genres in the database
+        /// Get all the tags in the database
         /// </summary>
         /// <returns></returns>
-        public Task<List<GenreModel>> GetAllGenres();
+        public Task<List<TagModel>> GetAllTags();
 
-        public Task<GenreModel> GetGenre(int id);
+        public Task<TagModel> GetTag(int id);
 
         /// <summary>
         /// Get the last queue playing stored in the database
@@ -61,26 +61,42 @@ namespace DataBaseConnection.DataAccess
         /// <returns></returns>
         public Task<int> InsertArtist(ArtistModel artist);
         /// <summary>
-        /// Insert a genre in the database
+        /// Insert a tag in the database
         /// </summary>
-        /// <param name="genre"></param>
+        /// <param name="tag"></param>
         /// <returns></returns>
-        public Task<int> InsertGenre(GenreModel genre);
+        public Task<int> InserTag(TagModel tag);
         /// <summary>
-        /// Insert a relation between an album and a genre in the database
+        /// Insert a relation between an album and a tag in the database
         /// </summary>
         /// <param name="albumId"></param>
-        /// <param name="genreId"></param>
+        /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task InsertAlbumGenre(int albumId, int genreId);
+        public Task InsertAlbumTag(int albumId, int tagId);
 
         /// <summary>
-        /// Insert a relation between an artist and a genre in the database
+        /// Insert a relation between an artist and a tag in the database
         /// </summary>
-        /// <param name="albumId"></param>
-        /// <param name="genreId"></param>
+        /// <param name="artistId"></param>
+        /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task InsertArtistGenre(int artistId, int genreId);
+        public Task InsertArtistTag(int artistId, int tagId);
+
+        /// <summary>
+        /// Insert a relation between a playlist and a tag in the database
+        /// </summary>
+        /// <param name="playlistId"></param>
+        /// <param name="tagId"></param>
+        /// <returns></returns>
+        public Task<int> InsertPlaylistTag(int playlistId, int tagId);
+
+        /// <summary>
+        /// Insert a relation between a track and a tag in the database
+        /// </summary>
+        /// <param name="trackId"></param>
+        /// <param name="tagId"></param>
+        /// <returns></returns>
+        public Task InsertTrackTag(int trackId, int tagId);
 
         /// <summary>
         /// Insert a queue in the database
@@ -92,13 +108,13 @@ namespace DataBaseConnection.DataAccess
         /// <summary>
         /// Query the database to find the albums corresping to the criterias and sort the result
         /// </summary>
-        /// <param name="genresId"></param>
+        /// <param name="tagsId"></param>
         /// <param name="artistsId"></param>
         /// <param name="searchString"></param>
         /// <param name="sortEnum"></param>
         /// <param name="ascending"></param>
         /// <returns></returns>
-        public Task<List<AlbumModel>> SearchAlbums(List<int> genresId, List<int> artistsId, List<AlbumTypeEnum> albumTypes, string searchString, SortEnum sortEnum, bool ascending = false);
+        public Task<List<AlbumModel>> SearchAlbums(List<int> tagsId, List<int> artistsId, List<AlbumTypeEnum> albumTypes, string searchString, SortEnum sortEnum, bool ascending = false);
 
         /// <summary>
         ///  Query the database to find the artists corresping to the criterias and sort the result
@@ -108,7 +124,7 @@ namespace DataBaseConnection.DataAccess
         /// <param name="sortEnum"></param>
         /// <param name="ascending"></param>
         /// <returns></returns>
-        public Task<List<ArtistModel>> SearchArtists(List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false);
+        public Task<List<ArtistModel>> SearchArtists(List<int> tagsId, List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false);
 
         /// <summary>
         /// Update the artistId
@@ -171,6 +187,14 @@ namespace DataBaseConnection.DataAccess
         /// <returns></returns>
         public Task UpdatePlaylist(PlaylistModel playlist);
 
+
+        /// <summary>
+        /// Update the name of the tag
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public Task UpdateTag(TagModel tag);
+
         /// <summary>
         /// Insert a playlist in the database
         /// </summary>
@@ -227,6 +251,13 @@ namespace DataBaseConnection.DataAccess
         /// <param name="albumId"></param>
         /// <returns></returns>
         public Task DeleteAlbum(int albumId);
+
+        /// <summary>
+        /// Delete the tag and all its relation from the database
+        /// </summary>
+        /// <param name="tagId"></param>
+        /// <returns></returns>
+        public Task DeleteTag(int tagId);
 
         /// <summary>
         /// Get all the tracks belonging to the album
@@ -292,26 +323,34 @@ namespace DataBaseConnection.DataAccess
         public Task<List<ArtistModel>> GetMostPlayedArtists(int top);
 
         /// <summary>
-        /// Get all the genres the album is labeled as
+        /// Get all the tags the album is labeled as
         /// </summary>
         /// <param name="albumId"></param>
         /// <returns></returns>
-        public Task<List<GenreModel>> GetAlbumGenre(int albumId);
+        public Task<List<TagModel>> GetAlbumTag(int albumId);
+
         /// <summary>
-        /// Get all the albums labeled with the specified genre
+        /// Get all the albums labeled with the specified tag
         /// </summary>
-        /// <param name="genreId"></param>
+        /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task<List<AlbumModel>> GetAlbumFromGenre(int genreId);
+        public Task<List<AlbumModel>> GetAlbumFromTag(int tagId);
 
-        public Task<List<GenreModel>> GetArtistGenre(int artistId);
+        public Task<List<TagModel>> GetArtistTag(int artistId);
 
-        public Task<List<ArtistModel>> GetArtistFromGenre(int genreId);
+        public Task<List<ArtistModel>> GetArtistFromTag(int tagId);
 
         public Task<List<TrackModel>> GetTracksFromAlbums(IEnumerable<int> albumsId);
 
         public Task<List<TrackModel>> GetTracksFromArtists(IEnumerable<int> artistsId);
 
+        public Task<List<TagModel>> GetTrackTag(int trackId);
+
+        public Task<List<TagModel>> GetPlaylistTag(int playlistId);
+
+        public Task<List<PlaylistModel>> GetPlaylistFromTag(int tagId);
+
+        public Task<List<TrackModel>> GetTrackFromTag(int tagId);
 
         /// <summary>
         /// Get the album corresponding to the Id
@@ -377,20 +416,36 @@ namespace DataBaseConnection.DataAccess
         public Task DeleteArtist(int artistId);
 
         /// <summary>
-        /// Remove the relation btw the album and the genre specified
+        /// Remove the relation btw the album and the tag
         /// </summary>
         /// <param name="albumId"></param>
-        /// <param name="genreId"></param>
+        /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task RemoveAlbumGenre(int albumId, int genreId);
+        public Task RemoveAlbumTag(int albumId, int tagId);
 
         /// <summary>
-        /// Remove the relation btw the artist and the genre specified as well as all the albums from that artist
+        /// Remove the relation btw the artist and the tag
         /// </summary>
         /// <param name="albumId"></param>
-        /// <param name="genreId"></param>
+        /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task RemoveArtistGenre(int artistId, int genreId);
+        public Task RemoveArtistTag(int artistId, int tagId);
+
+        /// <summary>
+        /// Remove the relation btw the playlist and the tag
+        /// </summary>
+        /// <param name="playlistId"></param>
+        /// <param name="tagId"></param>
+        /// <returns></returns>
+        public Task RemovePlaylistTag(int playlistId, int tagId);
+
+        /// <summary>
+        /// Remove the relation btw the track and the tag
+        /// </summary>
+        /// <param name="trackId"></param>
+        /// <param name="tagId"></param>
+        /// <returns></returns>
+        public Task RemoveTrackTag(int trackId, int tagId);
 
         /// <summary>
         /// Delete all the data in the database (no undo)

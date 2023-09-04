@@ -99,12 +99,14 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 SetNewTheme(theme);
             });
 
+            AppThemeService.ThemeChanged += Load;
             Load();
         }
 
         public override void Dispose()
         {
             Themes.Clear();
+            AppThemeService.ThemeChanged -= Load;
         }
 
         private void Load()

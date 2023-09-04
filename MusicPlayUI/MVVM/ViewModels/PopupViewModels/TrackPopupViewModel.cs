@@ -15,15 +15,14 @@ using MusicPlayUI.Core.Services.Interfaces;
 using MessageControl;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Helpers;
+using Windows.Media.Playlists;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
-    public class TrackPopupViewModel : ViewModel
+    public class TrackPopupViewModel : TagTargetPopupViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
         public IQueueService QueueService { get { return _queueService; } }
-        private readonly IModalService _modalService;
         
         private readonly IWindowService _windowService;
 
@@ -93,7 +92,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-
         public ICommand PlayNextCommand { get; }
         public ICommand AddToQueueCommand { get; }
         public ICommand AddToPlaylistCommand { get; }
@@ -102,13 +100,12 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand ChangeArtworkCommand { get; }
         public ICommand OpenTagWindowCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
+        public ICommand AddToTagCommand { get; }
+        public ICommand CreateTagCommand { get; }
         public TrackPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, 
-             IWindowService windowService)
+             IWindowService windowService) : base(navigationService, modalService)
         {
-            _navigationService = navigationService;
-            _queueService = queueService;
-            _modalService = modalService;
-            
+            _queueService = queueService;            
             _windowService = windowService;
 
             PlayNextCommand = new RelayCommand(PlayNext);
@@ -117,6 +114,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
             RemoveFromPlaylistCommand = new RelayCommand(RemoveFromPlaylist);
             ChangeArtworkCommand = new RelayCommand(ChangeArtwork);
+            AddToTagCommand = new RelayCommand<TagModel>((tag) => AddToTag(tag, SelectedTrack));
+            CreateTagCommand = new RelayCommand(() => CreateTag(SelectedTrack));
             OpenTagWindowCommand = new RelayCommand(() =>
             {
                 _windowService.OpenWindow(ViewNameEnum.TrackProperties, SelectedTrack);
@@ -143,7 +142,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private async void AddToPlaylist(PlaylistModel playlist)
         {
-            await DataAccess.Connection.AddTrackToPlaylist(playlist, SelectedTrack, -1);
+            int index = (await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id)).Count + 1;
+            await DataAccess.Connection.AddTrackToPlaylist(playlist, SelectedTrack, index);
             MessageHelper.PublishMessage(SelectedTrack.Title.TrackAddedToPlaylist(playlist.Name));
 
             UserPlaylists.Remove(playlist);
@@ -201,7 +201,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private async Task GetUserPlaylists()
         {
-            var playlists = await DataAccess.Connection.GetAllPlaylists();
+            var playlists = (await DataAccess.Connection.GetAllPlaylists()).OrderBy(p => p.Name);
             var trackPlaylists = await DataAccess.Connection.GetTrackPlaylistsIds(SelectedTrack.Id);
 
             UserPlaylists = new(playlists.ToList().ExceptBy(trackPlaylists, p => p.Id));
@@ -214,7 +214,10 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             {
                 track = await track.GetAlbumTrackProperties();
                 SelectedTrack = new(track, _queueService.AlbumCoverOnly, _queueService.AutoCover);
+                SelectedTrack.Tags = await DataAccess.Connection.GetTrackTag(SelectedTrack.Id);
+
                 await GetUserPlaylists();
+                await GetTags(SelectedTrack.Tags.Select(t => t.Id));
 
                 // visible if the view is a playlist and the playlist type is a user one
                 if (_navigationService.CurrentViewParameter is PlaylistModel playlist

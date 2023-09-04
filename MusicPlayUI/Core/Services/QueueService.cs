@@ -180,8 +180,8 @@ namespace MusicPlayUI.Core.Services
             }
         }
 
-        private UIOrderedTrackModel LastRemovedTrack { get; set; }
-        private int LastRemovedTrackIndex { get; set; }
+        private List<UIOrderedTrackModel> LastRemovedTrack { get; set; } = new();
+        private List<int> LastRemovedTrackIndex { get; set; } = new();
 
         private void InitCoversSettings()
         {
@@ -318,8 +318,8 @@ namespace MusicPlayUI.Core.Services
                 // bug with the drag drop library when removing an item from the list while the 'drag' (click in reality) is processed
                 await Task.Delay(200);
 
-                LastRemovedTrack = QueueTracks[index];
-                LastRemovedTrackIndex = index; // keeping the index and not using the TrackIndex property of the track is needed in case the queue is shuffled
+                LastRemovedTrack.Insert(0, QueueTracks[index]);
+                LastRemovedTrackIndex.Insert(0, index); // keeping the index and not using the TrackIndex property of the track is needed in case the queue is shuffled
                 QueueTracks.RemoveAt(index);
 
                 QueueLength -= track.Length;
@@ -330,11 +330,13 @@ namespace MusicPlayUI.Core.Services
 
         private bool RestoreLastRemovedTrack()
         {
-            if(LastRemovedTrack == null)
+            if(LastRemovedTrack == null || LastRemovedTrack.Count == 0)
                 return false;
 
-            InsertTrack(LastRemovedTrackIndex, LastRemovedTrack, false);
+            InsertTrack(LastRemovedTrackIndex.First(), LastRemovedTrack.First(), false);
 
+            LastRemovedTrack.RemoveAt(0);
+            LastRemovedTrackIndex.RemoveAt(0);
             return true;
         }
 
@@ -378,8 +380,8 @@ namespace MusicPlayUI.Core.Services
         public void UpdateRating(int rating)
         {
             PlayingTrack.Rating = rating;
-            OnPlayingTrackInteractionChanged();
             DataAccess.Connection.UpdateTrackRating(PlayingTrack);
+            OnPlayingTrackInteractionChanged();
         }
 
         public async Task UpdateFavorite(bool isFavorite)
@@ -497,10 +499,21 @@ namespace MusicPlayUI.Core.Services
                     }
                     UpdateTracksIndexes();
                 }
-                MessageHelper.PublishMessage(name.QueueChanged(true, album, !album));
+
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    MessageHelper.PublishMessage(name.QueueChanged(true, album, !album));
+                }
             }
         }
 
+        /// <summary>
+        /// Insert a track in the queue and update all the properties of the queue (duration and length)
+        /// Publich a message to notify the user if <paramref name="msg"/> is true.
+        /// </summary>
+        /// <param name="index">The index to insert to</param>
+        /// <param name="track">The track to insert</param>
+        /// <param name="msg">Wether to publish a message to notify the user or not</param>
         private void InsertTrack(int index, TrackModel track, bool msg = true)
         {
             if(track is not null)
@@ -568,7 +581,7 @@ namespace MusicPlayUI.Core.Services
 
         public async void NavigateToPlayingFrom()
         {
-            if (QueueTracks is not null || PlayingFrom is not null)
+            if (QueueTracks is not null && PlayingFrom is not null && PlayingFrom.DataId != -1)
             {
                 ViewNameEnum viewName;
                 BaseModel parameter;
@@ -608,7 +621,7 @@ namespace MusicPlayUI.Core.Services
                         break;
                     case ModelTypeEnum.Genre:
                         viewName = ViewNameEnum.SpecificGenre;
-                        parameter = await DataAccess.Connection.GetGenre(id);
+                        parameter = await DataAccess.Connection.GetTag(id);
                         break;
                     default:
                         viewName = ViewNameEnum.Empty;

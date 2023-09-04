@@ -34,13 +34,23 @@ namespace MusicPlayUI.MVVM.Views
 
         private void TimedLyricsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            double spaceAbove = 0.25;
+            if(LyricsTextBox.FontSize > 40)
+            {
+                spaceAbove = 0.3;
+            } 
+            else if(LyricsTextBox.FontSize < 30)
+            {
+                spaceAbove = 0.3;
+            }
+
             double height = TimedLyricsListView.ActualHeight;
-            int totalLine = TimedLyricsListView.Items.Count;
+            int totalItem = TimedLyricsListView.Items.Count;
             double viewPort = LyricsScroll.ViewportHeight;
-            double lineheight = height / totalLine;
-            double itemInViewPort = (viewPort / lineheight) / 2;
-            double verticalOffset = lineheight * ((double)TimedLyricsListView.SelectedIndex - itemInViewPort + 1);
-            LyricsScroll.ScrollToVerticalOffsetWithAnimation(verticalOffset);
+            double itemheight = height / totalItem;
+            double halvedItemInViewPort = (viewPort / itemheight) * spaceAbove;
+            double verticalOffset = itemheight * ((double)TimedLyricsListView.SelectedIndex - halvedItemInViewPort);
+            LyricsScroll.ScrollToVerticalOffsetWithAnimation(verticalOffset, 500);
         }
     }
 }

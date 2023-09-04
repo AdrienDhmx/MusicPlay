@@ -56,21 +56,28 @@ namespace MusicPlayUI
 
             try
             {
+                // init language
                 LanguageService.SetLanguage(((SettingsValueEnum)ConfigurationService.GetPreference(SettingsEnum.Language)).GetLanguageCulture());
-                AppThemeService.InitializeAppTheme();
-                MessageFactory.RegisterErrorMessagesStyle();
 
+                // init app theme
+                AppThemeService.InitializeAppTheme();
+                MessageFactory.RegisterMessagesStyles();
+
+                // create and show main window
                 MainWindow window = _services.GetRequiredService<MainWindow>();
                 window.Show();
 
+                // init shortcuts services and apply 
                 ShortcutsManager = new(_services.GetRequiredService<ICommandsManager>(), window);
 
+                // check for missing tracks
                 int deletedTracks = await ImportMusicLibrary.CheckTrackPaths();
                 if (deletedTracks > 0)
                 {
                     MessageHelper.PublishMessage(MessageFactory.TrackDeleted(deletedTracks));
                 }
 
+                // init queue services
                 _queueService = _services.GetRequiredService<IQueueService>();
             }
             catch (Exception ex)

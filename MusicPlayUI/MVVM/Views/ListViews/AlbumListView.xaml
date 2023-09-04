@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:templates="clr-namespace:MusicPlayUI.MVVM.Views.Templates"
              xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls"
              mc:Ignorable="d" 
              x:Name="RootListView"
@@ -47,7 +48,7 @@
                     <Grid Opacity="0"
                           VerticalAlignment="Bottom"
                           Panel.ZIndex="3"
-                          Margin="15,5, 20, 5"
+                          Margin="12,5, 12, 5"
                           IsHitTestVisible="True"
                           x:Name="BtnGrid">
                         

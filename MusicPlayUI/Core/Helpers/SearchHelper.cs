@@ -65,6 +65,8 @@ namespace MusicPlayUI.Core.Helpers
             SaveOrder(SettingsEnum.ArtistOrder, sortEnum, ascending);
 
             List<int> artistTypes = new();
+            List<int> tagTypes = new();
+
 
             foreach (FilterModel filter in filters)
             {
@@ -73,12 +75,15 @@ namespace MusicPlayUI.Core.Helpers
                     case FilterEnum.ArtistType:
                         artistTypes.Add(filter.ValueId);
                         break;
+                    case FilterEnum.Genre:
+                        tagTypes.Add(filter.ValueId);
+                        break;
                     default:
                         break;
                 }
             }
 
-            return await DataAccess.Connection.SearchArtists(artistTypes, searchString, sortEnum, ascending);
+            return await DataAccess.Connection.SearchArtists(tagTypes, artistTypes, searchString, sortEnum, ascending);
         }
 
         public static async Task<List<AlbumModel>> FilterAlbum(List<FilterModel> filters, string searchString, SortEnum sortEnum, bool ascending = false)

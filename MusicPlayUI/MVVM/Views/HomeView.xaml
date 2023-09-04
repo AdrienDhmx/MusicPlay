@@ -72,7 +72,7 @@
                         Background="{DynamicResource SurfaceVariant}"
                         CornerRadius="{DynamicResource PrimaryCornerRadius}"
                         Margin="40, 20">
-                    <Grid>
+                    <Grid Margin="0, 20, 0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
@@ -83,7 +83,7 @@
                                         FontSize="25"
                                         FontWeight="SemiBold"
                                         HorizontalAlignment="Center"
-                                        Margin="40, 20"
+                                        Margin="40, 0, 40, 20"
                                    Visibility="{Binding TodayStats.Length, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <chart:HistoryChart Foreground="{DynamicResource OnSurfaceVariant}"
@@ -92,7 +92,6 @@
                                             Background="Transparent"
                                             MouseOverBtnColor="{DynamicResource TertiaryHover}"
                                             Grid.Row="2"
-                                            Margin="0,5"
                                             x:Name="Chart"/>
                     </Grid>
                 </Border>
@@ -108,13 +107,14 @@
                             BorderBrush="{DynamicResource Primary}"
                             Margin="10,0,20,0">
                         <TextBlock Text="{x:Static lang:Resources.Recently_Played_Artists}"
+                                   Margin="10,0"
                                    Style="{DynamicResource SlistInfoStyle}"/>
                     </Border>
 
                     <listviews:HorizontalArtistListView Artists="{Binding BindedArtists}"
                                                             VerticalAlignment="Stretch"
                                                             Grid.Row="1"
-                                                           Margin="20,4"
+                                                           Margin="20,6"
                                                             ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
                 </Grid>
 
@@ -135,10 +135,10 @@
                                              HorizontalAlignment="Stretch"
                                              HorizontalContentAlignment="Stretch"
                                                  Grid.Row="1"
-                                                 Margin="20,4"/>
+                                                 Margin="20,6"/>
                 </Grid>
 
-                <!-- Records -->
+                <!-- Playlists -->
                 <Grid Grid.Row="3"
                           Visibility="{Binding BindedPlaylists.Count, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.RowDefinitions>
@@ -154,7 +154,7 @@
 
                     <listviews:PlaylistListView DataContext="{Binding DataContext, ElementName=RootView}"
                                                 Grid.Row="1"
-                                                    Margin="4"/>
+                                                    Margin="4, 6"/>
                 </Grid>
             </Grid>
 

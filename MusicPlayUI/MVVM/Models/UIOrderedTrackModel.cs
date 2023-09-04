@@ -91,7 +91,40 @@ namespace MusicPlayUI.MVVM.Models
             return output;
         }
 
-        public static List<UIOrderedTrackModel> ToUIOrderedTrackModel<T>(this List<T> tracks, bool albumCover, bool autoCover) where T : TrackModel
+        public static List<UIOrderedTrackModel> ToUIOrderedTrackModel(this IEnumerable<OrderedTrackModel> tracks, bool albumCover, bool autoCover)
+        {
+            List<UIOrderedTrackModel> output = new();
+
+            foreach (OrderedTrackModel t in tracks)
+            {
+                if(output.Count > 1 && output.Last().TrackIndex > t.TrackIndex) // need to insert before the higher indexes
+                {
+                    // find the index to insert the track to
+                    int index = 0;
+                    while (index<output.Count && output[index].TrackIndex < t.TrackIndex)
+                    {
+                        index++;
+                    }
+
+                    if (index >= output.Count)
+                    {
+                        output.Add(new(t, albumCover, autoCover));
+                    }
+                    else
+                    {
+                        output.Insert(index, new(t, albumCover, autoCover));
+                    }
+                }
+                else
+                {
+                    output.Add(new(t, albumCover, autoCover));
+                }
+            }
+
+            return output;
+        }
+
+        public static List<UIOrderedTrackModel> ToUIOrderedTrackModel(this IEnumerable<TrackModel> tracks, bool albumCover, bool autoCover)
         {
             List<UIOrderedTrackModel> output = new();
 

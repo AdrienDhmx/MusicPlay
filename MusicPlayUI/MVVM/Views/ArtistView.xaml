@@ -32,7 +32,7 @@
               Background="{DynamicResource PrimaryContainer}">
 
             <Grid x:Name="StickyPart"
-                    MinHeight="120"
+                    MinHeight="130"
                   Height="220"
                   MaxHeight="220">
                 <Grid HorizontalAlignment="Center"

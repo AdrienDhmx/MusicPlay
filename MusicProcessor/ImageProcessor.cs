@@ -172,36 +172,36 @@ namespace MusicFilesProcessor
             return new(System.Windows.Media.Color.FromRgb((byte)avgR, (byte)avgG, (byte)avgB));
         }
 
-        public static SolidColorBrush GetEmphasizedColor(this SolidColorBrush color)
+        public static SolidColorBrush GetEmphasizedColor(this SolidColorBrush color, double emphasizeBy = 1.05d, int maxChannelValue = 230)
         {
-            const int max = 230; // base max value for each color channel
             int red;
             int green;
             int blue;
 
             // color dif with the highest value increased
-            (double rRatio, double gRatio, double bRatio) = CalculateRatio(color.Color.R, color.Color.G, color.Color.B);
+            (double rRatio, double gRatio, double bRatio) = CalculateRatio(color.Color.R, color.Color.G, color.Color.B, emphasizeBy);
 
             double brightness = (color.Color.R + color.Color.G + color.Color.B) / 765d;
 
             // change brightness to have a color that's eiter brighter or darker than the original (it needs to be visible)
-            red = (int)(rRatio * color.Color.R + (0.7 - brightness) * max * (1.05 - brightness));
-            green = (int)(gRatio * color.Color.G + (0.7 - brightness) * max * (1.05 - brightness));
-            blue = (int)(bRatio * color.Color.B + (0.7 - brightness) * max * (1.05 - brightness));
+            red = (int)(rRatio * color.Color.R + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
+            green = (int)(gRatio * color.Color.G + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
+            blue = (int)(bRatio * color.Color.B + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
 
-            if(brightness <= 0.8)
+            if (brightness <= 0.8)
             {
                 // increase the brightness
                 brightness += 0.85 - brightness;
             }
 
             // accentuate or minimize rbg values while making sure they stay between valid values (0 - 255)
-            red = FormatRGB(red, 1.1, (int)(max * brightness * rRatio));
-            green = FormatRGB(green, 1.1, (int)(max * brightness * gRatio));
-            blue = FormatRGB(blue, 1.1, (int)(max * brightness * bRatio));
+            red = FormatRGB(red, 1.1, (int)(maxChannelValue * brightness * rRatio));
+            green = FormatRGB(green, 1.1, (int)(maxChannelValue * brightness * gRatio));
+            blue = FormatRGB(blue, 1.1, (int)(maxChannelValue * brightness * bRatio));
 
             return new(System.Windows.Media.Color.FromRgb((byte)red, (byte)green, (byte)blue));
         }
+
 
         private static int FormatRGB(int value, double ratio, int maxvalue = 210, int minvalue = 20)
         {
@@ -214,10 +214,8 @@ namespace MusicFilesProcessor
             return output < min ? min : output;
         }
 
-        private static (double, double, double) CalculateRatio(double red, double green, double blue)
+        private static (double, double, double) CalculateRatio(double red, double green, double blue,double maxRatio = 1.05d)
         {
-            double maxRatio = 1.05d;
-
             double rRatio = maxRatio;
             double gRatio = maxRatio;
             double bRatio = maxRatio;

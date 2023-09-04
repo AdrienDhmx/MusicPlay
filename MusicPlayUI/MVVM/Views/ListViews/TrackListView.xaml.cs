@@ -34,7 +34,7 @@ namespace MusicPlayUI.MVVM.Views.ListViews
             set { SetValue(TrackModelsProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Tracks.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for AllTracks.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TrackModelsProperty =
             DependencyProperty.Register("TrackModels", typeof(ObservableCollection<UIOrderedTrackModel>), typeof(TrackListView), new PropertyMetadata(new ObservableCollection<UIOrderedTrackModel>()));
 

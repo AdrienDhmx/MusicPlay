@@ -28,7 +28,7 @@
                                            Margin="5, 2"
                                             Background="{DynamicResource ScdWhiteTransparent}"
                                            BorderThickness="1.5"
-                                            BorderBrush="{DynamicResource Primary}"
+                                            BorderBrush="{DynamicResource WhiteTransparent}"
                                            FontSize="18"
                                            FontWeight="DemiBold"
                                            HeaderHeight="80"
@@ -76,7 +76,7 @@
                                            Margin="5, 2"
                                             Background="{DynamicResource ScdWhiteTransparent}"
                                            BorderThickness="1.5"
-                                            BorderBrush="{DynamicResource Primary}"
+                                            BorderBrush="{DynamicResource WhiteTransparent}"
                                            FontSize="18"
                                            FontWeight="DemiBold"
                                            Header="{x:Static lang:Resources.File_Properties}"
@@ -125,7 +125,7 @@
                                            Margin="5, 2"
                                             Background="{DynamicResource ScdWhiteTransparent}"
                                            BorderThickness="1.5"
-                                            BorderBrush="{DynamicResource Primary}"
+                                            BorderBrush="{DynamicResource WhiteTransparent}"
                                            FontSize="18"
                                            FontWeight="DemiBold"
                                            Header="{x:Static lang:Resources.Your_Interactions}"
@@ -143,8 +143,9 @@
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Center">
                             <!-- Rating -->
-                            <rating:RatingControl Fill="{DynamicResource Primary}"
-                                      MouseOverColor="{DynamicResource PrimaryHover}"
+                            <rating:RatingControl Fill="{DynamicResource WhiteTransparent}"
+                                      MouseOverColor="{DynamicResource ScdWhiteTransparent}"
+                                                  Width="140"
                                                   HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Shape="{DynamicResource StarIcon}"
@@ -163,10 +164,10 @@
                                     Margin="10,0"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
-                                    StrokeColor="{DynamicResource Primary}"
+                                    StrokeColor="{DynamicResource WhiteTransparent}"
                                     Command="{Binding IsFavoriteCommand}"
                                     MouseOverBackground="Transparent"
-                                    FillColor="{DynamicResource Primary}">
+                                    FillColor="{DynamicResource WhiteTransparent}">
                                 <iconbtn:IconButton.Style>
                                     <Style TargetType="iconbtn:IconButton">
                                         <Setter Property="Icon" Value="{DynamicResource HeartIcon}"/>
@@ -193,13 +194,13 @@
                                     IconStretch="Fill"
                                     MouseOverBackground="Transparent"
                                     Command="{Binding IsFavoriteCommand}"
-                                    StrokeColor="{DynamicResource Primary}">
+                                    StrokeColor="{DynamicResource WhiteTransparent}">
                                 <iconbtn:IconButton.Style>
                                     <Style TargetType="iconbtn:IconButton">
                                         <Setter Property="FillColor" Value="Transparent"/>
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="true">
-                                                <Setter Property="FillColor" Value="{DynamicResource PrimaryHover}"/>
+                                                <Setter Property="FillColor" Value="{DynamicResource ScdWhiteTransparent}"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>

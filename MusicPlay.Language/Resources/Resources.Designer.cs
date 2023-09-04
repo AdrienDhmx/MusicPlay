@@ -1528,7 +1528,7 @@ namespace MusicPlay.Language {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Radio Stations for You.
+        ///   Looks up a localized string similar to Radios for You.
         /// </summary>
         public static string Radio_Station_For_You {
             get {

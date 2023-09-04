@@ -1,0 +1,117 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Primary -->
+    <SolidColorBrush x:Key="Primary"
+                     Color="#006b5f"/>
+
+    <SolidColorBrush x:Key="OnPrimary"
+                     Color="#ffffff"/>
+
+    <SolidColorBrush x:Key="PrimaryContainer"
+                     Color="#77e6d4"/>
+
+    <SolidColorBrush x:Key="OnPrimaryContainer"
+                     Color="#00201c"/>
+
+    <!-- Secondary -->
+    <SolidColorBrush x:Key="Secondary"
+                     Color="#4a635e"/>
+
+    <SolidColorBrush x:Key="OnSecondary"
+                     Color="#ffffff"/>
+
+    <SolidColorBrush x:Key="SecondaryContainer"
+                     Color="#cce8e2"/>
+
+    <SolidColorBrush x:Key="OnSecondaryContainer"
+                     Color="#06201c"/>
+
+
+    <!-- Tertiary -->
+    <SolidColorBrush x:Key="Tertiary"
+                     Color="#456179"/>
+
+    <SolidColorBrush x:Key="OnTertiary"
+                     Color="#ffffff"/>
+
+    <SolidColorBrush x:Key="TertiaryContainer"
+                     Color="#cbe6ff"/>
+
+    <SolidColorBrush x:Key="OnTertiaryContainer"
+                     Color="#001e30"/>
+
+    <!-- Error -->
+    <SolidColorBrush x:Key="Error"
+                     Color="#ba1a1a"/>
+
+    <SolidColorBrush x:Key="OnError"
+                     Color="#ffffff"/>
+
+    <SolidColorBrush x:Key="ErrorContainer"
+                     Color="#ffdad6"/>
+
+    <SolidColorBrush x:Key="OnErrorContainer"
+                     Color="#410002"/>
+
+    <!-- Backgrounds -->
+    <SolidColorBrush x:Key="Background"
+                     Color="#fafdfb"/>
+
+    <SolidColorBrush x:Key="OnBackground"
+                     Color="#191c1b"/>
+
+    <SolidColorBrush x:Key="SurfaceVariant"
+                     Color="#dae5e1"/>
+
+    <SolidColorBrush x:Key="OnSurfaceVariant"
+                     Color="#3f4946"/>
+
+    <SolidColorBrush x:Key="Outline"
+                     Color="#6f7976"/>
+
+    <!-- Foregrounds -->
+    <SolidColorBrush x:Key="BlackForeground"
+                     Color="#19191A"/>
+
+    <SolidColorBrush x:Key="WhiteForeground"
+                     Color="#EFEFEF"/>
+
+    <!-- Hover / Transparent -->
+    <SolidColorBrush x:Key="PrimaryHover"
+                     Color="#4077e6d4"/>
+
+    <SolidColorBrush x:Key="SecondaryHover"
+                     Color="#40acc8c2"/>
+
+    <SolidColorBrush x:Key="TertiaryHover"
+                     Color="#40abc6df"/>
+
+    <SolidColorBrush x:Key="ErrorHover"
+                     Color="#40ba1a1a"/>
+
+    <SolidColorBrush x:Key="TransparentHover"
+                     Color="#80fcfdf6"/>
+
+    <LinearGradientBrush x:Key="TransparentGradient"
+                          StartPoint="0.5,1"
+                         EndPoint="0.5, 0.3">
+        <GradientStop Color="#cf000000" Offset="0"/>
+        <GradientStop Color="#ae000000" Offset="0.2"/>
+        <GradientStop Color="#80101010" Offset="0.4"/>
+        <GradientStop Color="#40101010" Offset="0.6"/>
+        <GradientStop Color="#20101010" Offset="0.8"/>
+        <GradientStop Color="#00101010" Offset="1"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="WhiteTransparent"
+                     Color="#80ffffff"/>
+
+    <SolidColorBrush x:Key="ScdWhiteTransparent"
+                     Color="#20ffffff"/>
+
+    <SolidColorBrush x:Key="BlackTransparent"
+                     Color="#75000000"/>
+
+    <SolidColorBrush x:Key="BlackGradient"
+                     Color="#DD202020"/>
+</ResourceDictionary>

@@ -64,7 +64,8 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <iconbtn:IconButton Command="{Binding OpenCloseFiltersCommand}"
-                                        Style="{DynamicResource FilterButton}"/>
+                                    Style="{DynamicResource NormalIconBtn}"
+                                    Icon="{DynamicResource Filter.Filled}"/>
 
                 <listviews:SelectedFilterListView HorizontalAlignment="Left"
                                                     Grid.Column="1"
@@ -102,7 +103,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Text="{x:Static lang:Resources.Genre}"
+                            <TextBlock Text="Tags"
                                            Style="{DynamicResource SFilterHeaderStyle}"/>
 
                             <Border VerticalAlignment="Bottom"
@@ -122,6 +123,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border x:Name="ItemRootBorder"
+                                                Cursor="Hand"
                                                          Style="{DynamicResource FilterItemRootBorder}">
                                             <Border.InputBindings>
                                                 <MouseBinding Gesture="LeftClick"
@@ -164,6 +166,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border x:Name="ItemRootBorder"
+                                                Cursor="Hand"
                                                          Style="{DynamicResource FilterItemRootBorder}">
                                             <Border.InputBindings>
                                                 <MouseBinding Gesture="LeftClick"
@@ -207,6 +210,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border x:Name="ItemRootBorder"
+                                                Cursor="Hand"
                                                          Style="{DynamicResource FilterItemRootBorder}">
                                             <Border.InputBindings>
                                                 <MouseBinding Gesture="LeftClick"

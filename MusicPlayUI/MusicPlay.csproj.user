@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_LastSelectedProfileId>C:\dev\C#\MusicPlay\MusicPlayUI\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>C:\dev\C#\MusicPlay-private\MusicPlayUI\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
@@ -13,6 +13,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\EmptyView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\GenreLibraryView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\GenreView.xaml.cs">
@@ -31,6 +34,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\ListViews\ChipListView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\ListViews\GenreListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\ListViews\HorizontalAlbumListView.xaml.cs">
@@ -54,6 +60,12 @@
     <Compile Update="MVVM\Views\MainMenuView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\ModalViews\CreateTagModal.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\ModalViews\ValidationModalView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -61,6 +73,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\PopupViews\AddToPlaylistPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\PopupViews\AddToTagPopup.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\PopupViews\AlbumPopupView.xaml.cs">
@@ -114,6 +129,9 @@
     <Compile Update="MVVM\Views\PopupViews\SortByPopupView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\PopupViews\TagPopupView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\QueueView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -152,6 +170,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="MVVM\Views\GenreLibraryView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\GenreView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -162,6 +183,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\ListViews\ChipListView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\ListViews\GenreListView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\ListViews\HorizontalAlbumListView.xaml">
@@ -179,16 +203,28 @@
     <Page Update="MVVM\Views\ListViews\TrackListView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="MVVM\Views\ModalViews\CreateTagModal.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\ModalViews\ValidationModalView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\PlayerControlViews\NowPlayingPlayerControlView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="MVVM\Views\PopupViews\AddToTagPopup.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\PopupViews\GenreListPopupView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\PopupViews\SortByPopupView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\PopupViews\TagPopupView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\SettingsViews\ShortcutSettingView.xaml">
@@ -209,10 +245,22 @@
     <Page Update="Resources\ThemeColors\DarkFallenLeavesThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Resources\ThemeColors\DarkRedWineThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\DarkTurquoiseThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Resources\ThemeColors\DarkWaterThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\ThemeColors\LightFallenLeavesThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\LightRedWineThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\LightTurquoiseThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\ThemeColors\LightWaterThemeColors.xaml">

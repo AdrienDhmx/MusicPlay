@@ -15,9 +15,8 @@ namespace MusicPlayModels.MusicModels
         private bool _isOnRepeat = false;
         private string _playingFrom = "";
         private string _cover = "";
-        private int _playingFromId;
+        private int _playingFromId = -1;
 
-        public int Id { get; set; }
         public bool IsShuffled
         {
             get { return _isShuffled; }

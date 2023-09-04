@@ -12,11 +12,6 @@ namespace MusicPlayModels.MusicModels
         private string _duration = "";
 
         /// <summary>
-        /// The unique identifier
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
         /// Thge artist name
         /// </summary>
         public string Name { get; set; } = "";
@@ -47,7 +42,7 @@ namespace MusicPlayModels.MusicModels
         }
         public string Biography { get; set; } = "";
 
-        public List<GenreModel> Genres { get; set; }
+        public List<TagModel> Tags { get; set; }
 
         public int PlayCount { get; set; } = 0;
         public DateTime LastPlayed { get; set; } = DateTime.MinValue;

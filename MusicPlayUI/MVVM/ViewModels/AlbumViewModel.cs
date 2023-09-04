@@ -47,8 +47,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<GenreModel> _genres;
-        public List<GenreModel> Genres
+        private List<TagModel> _genres;
+        public List<TagModel> Genres
         {
             get => _genres;
             set
@@ -147,7 +147,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
             MainArtist = Album.GetAlbumArtist();
 
-            Genres = await DataAccess.Connection.GetAlbumGenre(Album.Id);
+            Genres = await DataAccess.Connection.GetAlbumTag(Album.Id);
 
             List<TrackModel> tracks = new(await DataAccess.Connection.GetTracksFromAlbum(Album.Id));
             tracks = tracks.OrderTracks();

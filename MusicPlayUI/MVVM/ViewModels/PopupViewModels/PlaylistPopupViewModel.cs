@@ -12,15 +12,14 @@ using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Services;
 using MessageControl;
+using System.Linq;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
-    public class PlaylistPopupViewModel : ViewModel
+    public class PlaylistPopupViewModel : TagTargetPopupViewModel
     {
         private readonly IQueueService _queueService;
-        private readonly IModalService _modalService;
         private readonly IPlaylistService _playlistService;
-        private INavigationService _navigationService;
 
         private PlaylistModel _playlist;
         public PlaylistModel Playlist
@@ -82,20 +81,21 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand AddToQueueCommand { get; }
         public ICommand DeletePlaylistCommand { get; }
         public ICommand EditPlaylistCommand { get; }
-
+        public ICommand AddToTagCommand { get; }
+        public ICommand CreateTagCommand { get; }
         public PlaylistPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, 
-            IPlaylistService playlistService)
+            IPlaylistService playlistService) : base(navigationService, modalService)
         {
 
             _queueService = queueService;
-            _modalService = modalService;
             _playlistService = playlistService;
-            _navigationService = navigationService;
 
             PlayNextCommand = new RelayCommand(() => PlayNext());
             AddToQueueCommand = new RelayCommand(() => PlayNext(true));
             DeletePlaylistCommand = new RelayCommand(()=> _modalService.OpenModal(ViewNameEnum.ConfirmAction, DeletePlaylist, ConfirmActionModelFactory.CreateConfirmDeleteModel(Playlist.Name, ModelTypeEnum.Playlist)));
             EditPlaylistCommand = new RelayCommand(EditPlaylist);
+            AddToTagCommand = new RelayCommand<TagModel>((tag) => AddToTag(tag, Playlist));
+            CreateTagCommand = new RelayCommand(() => CreateTag(Playlist));
 
             LoadData();
         }
@@ -142,7 +142,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private void LoadData()
+        private async void LoadData()
         {
             Playlist = (PlaylistModel)_navigationService.PopupViewParameter;
             if(Playlist is not null)
@@ -162,7 +162,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
                     {
                         IsAutoPlaylist = true;
                     }
+                    else
+                    {
+                        Playlist.Tags = await DataAccess.Connection.GetPlaylistTag(Playlist.Id);
+                        await GetTags(Playlist.Tags.Select(t => t.Id));
+                    }
                 }
+
             }
             else
             {

@@ -54,6 +54,7 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.VRefreshRate => Settings.Default.VRefreshRate,
                 SettingsEnum.VAutoColor => Settings.Default.VAutoColor,
                 SettingsEnum.VCenterFreq => Settings.Default.VCenterFreq,
+                SettingsEnum.AutoForeground => Settings.Default.AutoForeground,
                 _ => "",
             };
             return int.TryParse(storedInt, out int id) ? id : -2;
@@ -68,6 +69,30 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.AlbumOrder => Settings.Default.AlbumOrder,
                 SettingsEnum.ArtistOrder => Settings.Default.ArtistOrder,
                 SettingsEnum.UserName => Settings.Default.UserName,
+                SettingsEnum.PlayPause => Settings.Default.PlayPauseShortcut,
+                SettingsEnum.NexTrack => Settings.Default.NextTrackShortcut,
+                SettingsEnum.PreviousTrack => Settings.Default.PreviousTrackShortcut,
+                SettingsEnum.Repeat => Settings.Default.RepeatShortcut,
+                SettingsEnum.Shuffle => Settings.Default.ShuffleShortcut,
+                SettingsEnum.ToggleFavorite => Settings.Default.ToggleFavShortcut,
+                SettingsEnum.Rating0 => Settings.Default.Rating0Shortcut,
+                SettingsEnum.Rating1 => Settings.Default.Rating1Shortcut,
+                SettingsEnum.Rating2 => Settings.Default.Rating2Shortcut,
+                SettingsEnum.Rating3 => Settings.Default.Rating3Shortcut,
+                SettingsEnum.Rating4 => Settings.Default.Rating4Shortcut,
+                SettingsEnum.Rating5 => Settings.Default.Rating5Shortcut,
+                SettingsEnum.Home => Settings.Default.NavHomeShortcut,
+                SettingsEnum.Albums => Settings.Default.NavAlbumsShortcut,
+                SettingsEnum.Artists => Settings.Default.NavArtistsShortcut,
+                SettingsEnum.Playlists => Settings.Default.NavPlaylistsShortcut,
+                SettingsEnum.NowPlaying => Settings.Default.NavNowPlayingShortcut,
+                SettingsEnum.Import => Settings.Default.NavImportShortcut,
+                SettingsEnum.Settings => Settings.Default.NavSettingsShortcut,
+                SettingsEnum.Back => Settings.Default.NavBackShortcut,
+                SettingsEnum.ToggleFullScreen => Settings.Default.ToggleFullScreenShortcut,
+                SettingsEnum.EscapeFullScreen => Settings.Default.EscapeFullScreenShortcut,
+                SettingsEnum.ToggleTheme => Settings.Default.ToggleLightThemeShortcut,
+                SettingsEnum.ToggleQueueDrawer => Settings.Default.ToggleQueueShortcut,
                 _ => "",
             };
         }
@@ -194,8 +219,92 @@ namespace MusicPlayUI.Core.Services
                 case SettingsEnum.VCenterFreq:
                     Settings.Default.VCenterFreq = value;
                     break;
+                case SettingsEnum.AutoForeground:
+                    Settings.Default.AutoForeground = value;
+                    break;
                 case SettingsEnum.UNKNOWN:
                     return false;
+                case SettingsEnum.PlayPause:
+                    Settings.Default.PlayPauseShortcut = value;
+                    break;
+                case SettingsEnum.NexTrack:
+                    Settings.Default.NextTrackShortcut = value;
+                    break;
+                case SettingsEnum.PreviousTrack:
+                    Settings.Default.PreviousTrackShortcut = value;
+                    break;
+                case SettingsEnum.Shuffle:
+                    Settings.Default.ShuffleShortcut = value;
+                    break;
+                case SettingsEnum.Repeat:
+                    Settings.Default.RepeatShortcut = value;
+                    break;
+                case SettingsEnum.DecreaseVolume:
+                    Settings.Default.DecreaseVolShortcut = value;
+                    break;
+                case SettingsEnum.IncreaseVolume:
+                    Settings.Default.IncreaseVolShortcut = value;
+                    break;
+                case SettingsEnum.MuteVolume:
+                    Settings.Default.MuteVolShortcut = value;
+                    break;
+                case SettingsEnum.ToggleFavorite:
+                    Settings.Default.ToggleFavShortcut = value;
+                    break;
+                case SettingsEnum.Rating0:
+                    Settings.Default.Rating0Shortcut = value;
+                    break;
+                case SettingsEnum.Rating1:
+                    Settings.Default.Rating1Shortcut = value;
+                    break;
+                case SettingsEnum.Rating2:
+                    Settings.Default.Rating2Shortcut = value;
+                    break;
+                case SettingsEnum.Rating3:
+                    Settings.Default.Rating3Shortcut = value;
+                    break;
+                case SettingsEnum.Rating4:
+                    Settings.Default.Rating4Shortcut = value;
+                    break;
+                case SettingsEnum.Rating5:
+                    Settings.Default.Rating5Shortcut = value;
+                    break;
+                case SettingsEnum.Home:
+                    Settings.Default.NavHomeShortcut = value;
+                    break;
+                case SettingsEnum.Albums:
+                    Settings.Default.NavAlbumsShortcut = value;
+                    break;
+                case SettingsEnum.Artists:
+                    Settings.Default.NavArtistsShortcut = value;
+                    break;
+                case SettingsEnum.Playlists:
+                    Settings.Default.NavPlaylistsShortcut = value;
+                    break;
+                case SettingsEnum.NowPlaying:
+                    Settings.Default.NavNowPlayingShortcut = value;
+                    break;
+                case SettingsEnum.Import:
+                    Settings.Default.NavImportShortcut = value;
+                    break;
+                case SettingsEnum.Settings:
+                    Settings.Default.NavSettingsShortcut = value;
+                    break;
+                case SettingsEnum.Back:
+                    Settings.Default.NavBackShortcut = value;
+                    break;
+                case SettingsEnum.ToggleQueueDrawer:
+                    Settings.Default.ToggleQueueShortcut = value;
+                    break;
+                case SettingsEnum.EscapeFullScreen:
+                    Settings.Default.EscapeFullScreenShortcut = value;
+                    break;
+                case SettingsEnum.ToggleFullScreen:
+                    Settings.Default.ToggleFullScreenShortcut = value;
+                    break;
+                case SettingsEnum.ToggleTheme:
+                    Settings.Default.ToggleLightThemeShortcut = value;
+                    break;
                 default:
                     return false;
             }

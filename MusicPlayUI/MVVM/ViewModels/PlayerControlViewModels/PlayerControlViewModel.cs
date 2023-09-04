@@ -290,8 +290,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             if (QueueService.PlayingTrack is not null) 
             {
                 IsFavorite = QueueService.PlayingTrack.IsFavorite;
+                OnPropertyChanged(nameof(Rating));
             }
-            OnPropertyChanged(nameof(Rating));
         }
 
         private void OnDeviceChanged()

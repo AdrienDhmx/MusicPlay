@@ -21,11 +21,16 @@ namespace MusicPlayUI.Core.Commands
         ICommand NavigateToGenreCommand { get; }
         ICommand NavigateToAlbumCommand { get; }
         ICommand NavigateToArtistCommand { get; }
+        ICommand NavigateToPlaylistCommand { get; }
         ICommand OpenAlbumPopupCommand { get; }
         ICommand OpenArtistPopupCommand { get; }
         ICommand OpenTrackPopupCommand { get; }
+        ICommand OpenTagPopupCommand { get; }
+        ICommand OpenPlaylistPopupCommand { get; }
         ICommand NextTrackCommand { get; }
         ICommand ToggleQueueDrawerCommand { get; }
+
+        ICommand UpdateAlbumCover { get; }
 
         ICommand PlayPauseCommand { get; }
         ICommand PreviousTrackCommand { get; }
@@ -33,6 +38,8 @@ namespace MusicPlayUI.Core.Commands
         ICommand RepeatCommand { get; }
         ICommand ShuffleCommand { get; }
         ICommand ToggleFullScreenCommand { get; }
+
+        ICommand ToggleThemeCommand { get; }
 
         ICommand GetCommand(CommandEnums commandEnums);
     }

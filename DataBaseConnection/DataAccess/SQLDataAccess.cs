@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Data;
+using System.Diagnostics;
+using System.Windows.Controls.Primitives;
 using DataBaseConnection.Model;
 using MusicPlayModels.Enums;
 using MusicPlayModels.MusicModels;
@@ -19,10 +21,12 @@ namespace DataBaseConnection.DataAccess
         {
             public const string TAlbum = "Album";
             public const string TAlbumArtists = "AlbumArtists";
-            public const string TAlbumGenres = "AlbumGenres";
             public const string TArtist = "Artist";
-            public const string TArtistGenres = "ArtistGenres";
             public const string TGenre = "Genre";
+            public const string TAlbumGenres = "AlbumGenres";
+            public const string TArtistGenres = "ArtistGenres";
+            public const string TPlaylistGenres = "PlaylistGenres";
+            public const string TTrackGenres = "TrackGenres";
             public const string THistory = "History";
             public const string TPlaylist = "Playlist";
             public const string TPlaylistTracks = "PlaylistTracks";
@@ -95,7 +99,7 @@ namespace DataBaseConnection.DataAccess
                 return keyValues;
             }
 
-            public static Dictionary<string, object> CreateTable(GenreModel genre)
+            public static Dictionary<string, object> CreateTable(TagModel genre)
             {
                 Dictionary<string, object> keyValues = new Dictionary<string, object>
                 {
@@ -213,6 +217,29 @@ namespace DataBaseConnection.DataAccess
 
                 return keyValues;
             }
+
+            public static Dictionary<string, object> CreatePlaylistGenresTable(int albumId, int genreId)
+            {
+                Dictionary<string, object> keyValues = new Dictionary<string, object>
+                {
+                    { Columns.PlaylistId, albumId },
+                    { Columns.GenreId, genreId },
+                };
+
+                return keyValues;
+            }
+
+            public static Dictionary<string, object> CreateTrackGenresTable(int albumId, int genreId)
+            {
+                Dictionary<string, object> keyValues = new Dictionary<string, object>
+                {
+                    { Columns.TrackId, albumId },
+                    { Columns.GenreId, genreId },
+                };
+
+                return keyValues;
+            }
+
 
             public static Dictionary<string, object> CreateQueueTracksTable(int queueId, int trackId, int trackIndex)
             {
@@ -379,7 +406,7 @@ namespace DataBaseConnection.DataAccess
             return id;
         }
 
-        public Task InsertAlbumGenre(int albumId, int genreId)
+        public Task InsertAlbumTag(int albumId, int genreId)
         {
             Query query = new Query(Tables.TAlbumGenres).AsInsert(Tables.CreateAlbumGenresTable(albumId, genreId));
             return query.InsertAsync(false);
@@ -390,7 +417,7 @@ namespace DataBaseConnection.DataAccess
             Query query =  new Query(Tables.TArtist).AsInsert(Tables.CreateTable(artist));
             int id = await query.InsertAsync();
 
-            foreach (GenreModel genre in artist.Genres)
+            foreach (TagModel genre in artist.Tags)
             {
                 query = new Query(Tables.TArtistGenres).AsInsert(Tables.CreateArtistGenresTable(id, genre.Id));
                 query.Insert(false);
@@ -399,13 +426,13 @@ namespace DataBaseConnection.DataAccess
             return id;
         }
 
-        public Task InsertArtistGenre(int artistId, int genreId)
+        public Task InsertArtistTag(int artistId, int genreId)
         {
             Query query = new Query(Tables.TArtistGenres).AsInsert(Tables.CreateArtistGenresTable(artistId, genreId));
             return query.InsertAsync(false);
         }
 
-        public Task<int> InsertGenre(GenreModel genre)
+        public Task<int> InserTag(TagModel genre)
         {
             Query query =  new Query(Tables.TGenre).AsInsert(Tables.CreateTable(genre));
             return query.InsertAsync();
@@ -459,15 +486,18 @@ namespace DataBaseConnection.DataAccess
             return new Query(Tables.TPlaylistTracks).AsInsert(Tables.CreateTable(playlist.Id, track.Id, trackIndex)).InsertAsync(false);
         }
 
-        public Task AddTrackToPlaylist(PlaylistModel playlist, List<OrderedTrackModel> tracks)
+        public async Task AddTrackToPlaylist(PlaylistModel playlist, List<OrderedTrackModel> tracks)
         {
             List<Query> queries = new List<Query>();
+            int index = (await GetTracksFromPlaylist(playlist.Id)).Count + 1;
+
             foreach (OrderedTrackModel track in tracks)
             {
-                queries.Add(new Query(Tables.TPlaylistTracks).AsInsert(Tables.CreateTable(playlist.Id, track.Id, track.TrackIndex)));
+                queries.Add(new Query(Tables.TPlaylistTracks).AsInsert(Tables.CreateTable(playlist.Id, track.Id, index)));
+                index++;
             }
 
-            return queries.ExecuteAsync();
+            await queries.ExecuteAsync();
         }
 
         public async Task AddTrackToPlaylist(PlaylistModel playlist, List<TrackModel> tracks)
@@ -534,17 +564,17 @@ namespace DataBaseConnection.DataAccess
             return new Query(Tables.TTrack).Where(Columns.Id, trackId).AsDelete().DeleteAsync();
         }
 
-        public async Task<List<AlbumModel>> GetAlbumFromGenre(int genreId)
+        public async Task<List<AlbumModel>> GetAlbumFromTag(int genreId)
         {
             Query query = new Query(Tables.TAlbumGenres).Select(Columns.AlbumId).Where(Columns.GenreId, genreId);
             List<AlbumModel> albums = await new Query(Tables.TAlbum).WhereIn(Columns.Id, query).GetAsync<AlbumModel>();
             return await GetAlbumArtists(albums);
         }
 
-        public async Task<List<GenreModel>> GetAlbumGenre(int albumId)
+        public async Task<List<TagModel>> GetAlbumTag(int albumId)
         {
             Query query = new Query(Tables.TAlbumGenres).Select(Columns.GenreId).Where(Columns.AlbumId, albumId);
-            return await new Query(Tables.TGenre).WhereIn(Columns.Id, query).GetAsync<GenreModel>();
+            return await new Query(Tables.TGenre).WhereIn(Columns.Id, query).GetAsync<TagModel>();
         }
 
         public Task<int> GetAlbumId(string albumName)
@@ -575,9 +605,9 @@ namespace DataBaseConnection.DataAccess
             return new Query(Tables.TArtist).GetAsync<ArtistModel>();
         }
 
-        public Task<List<GenreModel>> GetAllGenres()
+        public Task<List<TagModel>> GetAllTags()
         {
-            return new Query(Tables.TGenre).GetAsync<GenreModel>();
+            return new Query(Tables.TGenre).GetAsync<TagModel>();
         }
 
         public Task<List<PlaylistModel>> GetAllPlaylists()
@@ -597,9 +627,9 @@ namespace DataBaseConnection.DataAccess
         }
 
 
-        public Task<GenreModel> GetGenre(int id)
+        public Task<TagModel> GetTag(int id)
         {
-            return new Query(Tables.TGenre).Where(Columns.Id, id).FirstAsync<GenreModel>();
+            return new Query(Tables.TGenre).Where(Columns.Id, id).FirstAsync<TagModel>();
         }
             
         public Task<List<ArtistModel>> GetArtists(IEnumerable<int> ids)
@@ -607,16 +637,16 @@ namespace DataBaseConnection.DataAccess
             return new Query(Tables.TArtist).WhereIn(Columns.Id, ids).GetAsync<ArtistModel>();
         }
 
-        public Task<List<ArtistModel>> GetArtistFromGenre(int genreId)
+        public Task<List<ArtistModel>> GetArtistFromTag(int genreId)
         {
             Query query = new Query(Tables.TArtistGenres).Select(Columns.ArtistId).Where(Columns.GenreId, genreId);
             return new Query(Tables.TArtist).WhereIn(Columns.Id, query).GetAsync<ArtistModel>();
         }
 
-        public Task<List<GenreModel>> GetArtistGenre(int artistId)
+        public Task<List<TagModel>> GetArtistTag(int artistId)
         {
             Query query = new Query(Tables.TArtistGenres).Select(Columns.GenreId).Where(Columns.ArtistId, artistId);
-            return new Query(Tables.TGenre).WhereIn(Columns.Id, query).GetAsync<GenreModel>();
+            return new Query(Tables.TGenre).WhereIn(Columns.Id, query).GetAsync<TagModel>();
         }
 
         public Task<int> GetArtistId(string artistName)
@@ -828,12 +858,12 @@ namespace DataBaseConnection.DataAccess
             return await GetTracksArtists(tracks);
         }
 
-        public Task RemoveAlbumGenre(int albumId, int genreId)
+        public Task RemoveAlbumTag(int albumId, int genreId)
         {
             return new Query(Tables.TAlbumGenres).Where(Tables.CreateAlbumGenresTable(albumId, genreId)).AsDelete().DeleteAsync();
         }
 
-        public async Task RemoveArtistGenre(int artistId, int genreId)
+        public async Task RemoveArtistTag(int artistId, int genreId)
         {
             await new Query(Tables.TArtistGenres).Where(Tables.CreateArtistGenresTable(artistId, genreId)).AsDelete().DeleteAsync();
         }
@@ -927,7 +957,7 @@ namespace DataBaseConnection.DataAccess
             return await GetAlbumArtists(albums);
         }
 
-        public async Task<List<ArtistModel>> SearchArtists(List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false)
+        public async Task<List<ArtistModel>> SearchArtists(List<int> genresId, List<int> artistTypes, string searchString, SortEnum sortEnum, bool ascending = false)
         {
             Query query = new Query(Tables.TArtist);
 
@@ -964,7 +994,15 @@ namespace DataBaseConnection.DataAccess
             // need to group the filters in one query dif from the main
             // otherwise the search query only apply to the last filter
             Query filterQuery = new Query(Tables.TArtist).Select(Columns.Id);
-            if(isAlbumArtist)
+
+            if (genresId.Count > 0)
+            {
+                // selected genres query
+                Query selectedGenre = new Query(Tables.TArtistGenres).Select(Columns.ArtistId).OrWhereIn(Columns.GenreId, genresId);
+                filterQuery.OrWhereIn(Columns.Id, selectedGenre);
+            }
+
+            if (isAlbumArtist)
             {
                 or = true;
                 filterQuery.Where(Columns.IsAlbumArtist, 1);
@@ -1094,7 +1132,7 @@ namespace DataBaseConnection.DataAccess
             List<Query> queries = new List<Query>();
             foreach (OrderedTrackModel track in tracks)
             {
-                queries.Add(new Query(Tables.TPlaylistTracks).Where(Columns.TrackId, track.Id).WhereNot(Columns.Index, track.TrackIndex).AsUpdate(new Dictionary<string, object>()
+                queries.Add(new Query(Tables.TPlaylistTracks).Where(Columns.PlaylistId, playlistId).Where(Columns.TrackId, track.Id).AsUpdate(new Dictionary<string, object>()
                 {
                     { Columns.Index, track.TrackIndex },
                 }));
@@ -1136,6 +1174,71 @@ namespace DataBaseConnection.DataAccess
             {
                 { Columns.Rating, track.Rating },
             }).Execute();
+        }
+
+        public Task<int> InsertPlaylistTag(int playlistId, int tagId)
+        {
+            Query query = new Query(Tables.TPlaylistGenres).AsInsert(Tables.CreatePlaylistGenresTable(playlistId, tagId));
+            return query.InsertAsync(false);
+        }
+
+        public Task InsertTrackTag(int trackId, int tagId)
+        {
+            Query query = new Query(Tables.TTrackGenres).AsInsert(Tables.CreateTrackGenresTable(trackId, tagId));
+            return query.InsertAsync(false);
+        }
+
+        public Task UpdateTag(TagModel tag)
+        {
+            return new Query(Tables.TGenre).Where(Columns.Id, tag.Id).AsUpdate(new Dictionary<string, object>()
+            {
+                { Columns.Name, tag.Name },
+            }).ExecuteAsync();
+        }
+
+        public Task RemovePlaylistTag(int playlistId, int tagId)
+        {
+            return new Query(Tables.TPlaylistGenres).Where(Tables.CreatePlaylistGenresTable(playlistId, tagId)).AsDelete().DeleteAsync();
+        }
+
+        public Task RemoveTrackTag(int trackId, int tagId)
+        {
+            return new Query(Tables.TTrackGenres).Where(Tables.CreateTrackGenresTable(trackId, tagId)).AsDelete().DeleteAsync();
+        }
+
+        public Task<List<TagModel>> GetTrackTag(int trackId)
+        {
+            Query query = new Query(Tables.TTrackGenres).Select(Columns.GenreId).Where(Columns.TrackId, trackId);
+            return new Query(Tables.TGenre).WhereIn(Columns.Id, query).GetAsync<TagModel>();
+        }
+
+        public Task<List<TagModel>> GetPlaylistTag(int playlistId)
+        {
+            Query query = new Query(Tables.TPlaylistGenres).Select(Columns.GenreId).Where(Columns.PlaylistId, playlistId);
+            return new Query(Tables.TGenre).WhereIn(Columns.Id, query).GetAsync<TagModel>();
+        }
+
+        public Task<List<PlaylistModel>> GetPlaylistFromTag(int tagId)
+        {
+            Query query = new Query(Tables.TPlaylistGenres).Select(Columns.PlaylistId).Where(Columns.GenreId, tagId);
+            return new Query(Tables.TPlaylist).WhereIn(Columns.Id, query).GetAsync<PlaylistModel>();
+        }
+
+        public async Task<List<TrackModel>> GetTrackFromTag(int tagId)
+        {
+            Query query = new Query(Tables.TTrackGenres).Select(Columns.TrackId).Where(Columns.GenreId, tagId);
+            List<TrackModel> tracks = await new Query(Tables.TTrack).WhereIn(Columns.Id, query).GetAsync<TrackModel>();
+            return await GetTracksArtists(tracks);
+        }
+
+        public Task DeleteTag(int tagId)
+        {
+            new Query(Tables.TAlbumGenres).Where(Columns.GenreId, tagId).AsDelete().Delete();
+            new Query(Tables.TArtistGenres).Where(Columns.GenreId, tagId).AsDelete().Delete();
+            new Query(Tables.TPlaylistGenres).Where(Columns.GenreId, tagId).AsDelete().Delete();
+            new Query(Tables.TTrackGenres).Where(Columns.GenreId, tagId).AsDelete().Delete();
+
+            return new Query(Tables.TGenre).Where(Columns.Id, tagId).AsDelete().DeleteAsync();
         }
     }
 }

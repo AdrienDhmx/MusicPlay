@@ -73,7 +73,9 @@
                 <ControlTemplate.Triggers>
                     <Trigger Property="IsSelected" Value="True">
                         <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
-                    </Trigger>
+                        <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
+                        <Setter Property="BorderThickness" Value="1"/>
+                        </Trigger>
                 </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -102,6 +104,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" TargetName="Border"  Value="{DynamicResource PrimaryHover}"/>
                             <Setter Property="BorderThickness" TargetName="Border"  Value="1"/>
                         </Trigger>
                     </ControlTemplate.Triggers>

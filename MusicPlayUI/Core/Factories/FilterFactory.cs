@@ -31,9 +31,9 @@ namespace MusicPlayUI.Core.Factories
         public static async Task<List<FilterModel>> GetGenreFilter()
         {
             List<FilterModel> filters = new();
-            List<GenreModel> allGenre = await DataAccess.Connection.GetAllGenres();
+            List<TagModel> allGenre = await DataAccess.Connection.GetAllTags();
 
-            foreach (GenreModel genre in allGenre.OrderBy(g => g.Name))
+            foreach (TagModel genre in allGenre.OrderBy(g => g.Name))
             {
                 FilterModel filter = new(genre.Name, genre.Id, FilterEnum.Genre);
                 filters.Add(filter);

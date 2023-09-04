@@ -33,7 +33,7 @@ namespace MusicPlayUI.Core.Services
         public int ArtistInfluence { get; set; } = 40;
 
         /// <summary>
-        /// The min percentage of tracks included the radio having the same Genre as the track the radio is based on.
+        /// The min percentage of tracks included the radio having the same CurrentTagView as the track the radio is based on.
         /// </summary>
         public int GenreInfluence { get; set; } = 60;
 
@@ -87,28 +87,27 @@ namespace MusicPlayUI.Core.Services
             track.AlbumCover = album.AlbumCover;
 
             ArtistDataRelation ArtistDataRelation = album.GetAlbumArtist();
-            if(ArtistDataRelation == null)
-            {
-                ArtistDataRelation = album.Artists[0];
-            }
+            ArtistDataRelation ??= album.Artists[0];
+
             ArtistModel artist = await DataAccess.Connection.GetArtist(ArtistDataRelation.ArtistId);
 
-            List<GenreModel> genres = await DataAccess.Connection.GetAlbumGenre(album.Id);
+            List<TagModel> genres = await DataAccess.Connection.GetAlbumTag(album.Id);
             List<TrackModel> RadioTracks = new();
             List<TrackModel> Tracks = new();
             List<AlbumModel> albums = new();
 
             PlaylistModel radio = new();
-            radio.Name = $"{track.Title} Radio";
+            radio.Name = $"{track.Title} - Radio";
+            radio.Description = $"A radio based on the track '{track.Title}' by {album.GetAlbumArtist()?.Name}.";
             radio.PlaylistType = MusicPlayModels.Enums.PlaylistTypeEnum.Radio;
             radio.Cover = string.IsNullOrWhiteSpace(track.Artwork) ? track.AlbumCover : track.Artwork;
 
             // add all tracks with the same genre
-            foreach (GenreModel genreModel in genres)
+            foreach (TagModel genreModel in genres)
             {
                 if (genreModel is null) continue;
 
-                albums = await DataAccess.Connection.GetAlbumFromGenre(genreModel.Id);
+                albums = await DataAccess.Connection.GetAlbumFromTag(genreModel.Id);
 
                 Tracks.AddRange(await GetTracksFromAlbums(albums));
             }
@@ -131,6 +130,7 @@ namespace MusicPlayUI.Core.Services
 
             Tracks = TrackListHelper.Shuffle(Tracks).ToList();
 
+            RadioTracks = RadioTracks.DistinctBy(t => t?.Id).ToList();
             if(Tracks.Count >= RadioStationTrackNumber)
             {
                 RadioTracks = Tracks.GetRange(0, RadioStationTrackNumber);

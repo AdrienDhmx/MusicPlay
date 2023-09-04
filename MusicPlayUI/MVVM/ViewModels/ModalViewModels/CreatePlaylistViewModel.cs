@@ -13,11 +13,8 @@ using Windows.Media.Playlists;
 
 namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 {
-    public class CreatePlaylistViewModel : ViewModel
+    public class CreatePlaylistViewModel : ModalViewModel
     {
-        private readonly IModalService _modalService;
-        private readonly INavigationService _navigationService;
-
         private PlaylistModel Playlist { get; set; }
 
         private string _playlistName = "";
@@ -90,23 +87,12 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             }
         }
 
-        public ICommand CloseModalCommand { get; }
         public ICommand CreatePlaylistCommand { get; }
         public ICommand SelectCoverCommand { get; }
-        public CreatePlaylistViewModel(IModalService modalService, INavigationService navigationService)
-        {
-            _modalService = modalService;
-            
-            _navigationService = navigationService;
-
-            CloseModalCommand = new RelayCommand(() => CloseModal(true));
+        public CreatePlaylistViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
+        {            
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
             SelectCoverCommand = new RelayCommand(SelectCover);
-
-            if (_navigationService.IsPopupOpen)
-            {
-                _navigationService.ClosePopup();
-            }
 
             if(_modalService.ModalParameter is PlaylistModel playlist)
             {
@@ -121,11 +107,6 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             {
                 Playlist = new();
             }
-        }
-
-        private void CloseModal(bool canceled = false)
-        {   
-            _modalService.CloseModal(canceled);
         }
 
         private void SelectCover()

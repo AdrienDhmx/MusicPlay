@@ -85,7 +85,7 @@
                                                    HorizontalAlignment="Stretch"/>
 
                                     <ListView:TrackArtistsListView Artists="{Binding Artists}"
-                                                                   Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootQueuePopupView}"/>
+                                                                   Foreground="{DynamicResource OnBackground}"/>
                                 </StackPanel>
                             </Grid>
                             </Border>

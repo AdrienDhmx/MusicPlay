@@ -45,7 +45,7 @@
                     <Grid Opacity="0"
                           VerticalAlignment="Bottom"
                           Panel.ZIndex="3"
-                          Margin="34,17"
+                          Margin="28,17"
                           x:Name="BtnGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>

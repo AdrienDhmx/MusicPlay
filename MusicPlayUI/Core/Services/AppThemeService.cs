@@ -21,13 +21,21 @@ namespace MusicPlayUI.Core.Services
         private const int _sunset = 20;
 
         public static bool IsLightTheme { get; private set; }
+        public static bool IsSunsetSunrise { get; private set; }
+        public static bool IsSystemSync { get; private set; }
+
+        public static event Action ThemeChanged;
+        public static void OnThemeChanged()
+        {
+            ThemeChanged?.Invoke();
+        }
 
         public static void InitializeAppTheme()
         {
             SettingsValueEnum theme = (SettingsValueEnum)ConfigurationService.GetPreference(SettingsEnum.AppTheme);
             bool light = ConfigurationService.GetPreference(SettingsEnum.LightTheme) == 1;
             bool sunsetSunrise = ConfigurationService.GetPreference(SettingsEnum.SunsetSunrise) == 1;
-            bool SystemSync = ConfigurationService.GetPreference(SettingsEnum.SystemSyncTheme) == 1; ;
+            bool SystemSync = ConfigurationService.GetPreference(SettingsEnum.SystemSyncTheme) == 1;
 
             if (sunsetSunrise)
             {
@@ -63,6 +71,8 @@ namespace MusicPlayUI.Core.Services
             }
 
             IsLightTheme = light;
+            IsSunsetSunrise = sunsetSunrise;
+            IsSystemSync = SystemSync;
             LoadAppTheme(theme, light);
         }
 
@@ -83,6 +93,8 @@ namespace MusicPlayUI.Core.Services
                     SettingsValueEnum.ForestTheme => new Uri(@"\Resources\ThemeColors\LightForestThemeColors.xaml", UriKind.Relative),
                     SettingsValueEnum.WaterTheme => new Uri(@"\Resources\ThemeColors\LightWaterThemeColors.xaml", UriKind.Relative),
                     SettingsValueEnum.FallenLeavesTheme => new Uri(@"\Resources\ThemeColors\LightFallenLeavesThemeColors.xaml", UriKind.Relative),
+                    SettingsValueEnum.TurquoiseTheme => new Uri(@"\Resources\ThemeColors\LightTurquoiseThemeColors.xaml", UriKind.Relative),
+                    SettingsValueEnum.RedWineTheme => new Uri(@"\Resources\ThemeColors\LightRedWineThemeColors.xaml", UriKind.Relative),
                     _ => new Uri(@"\Resources\ThemeColors\MainLightThemeColors.xaml", UriKind.Relative),
                 };
             }
@@ -94,6 +106,8 @@ namespace MusicPlayUI.Core.Services
                     SettingsValueEnum.ForestTheme => new Uri(@"\Resources\ThemeColors\DarkForestThemeColors.xaml", UriKind.Relative),
                     SettingsValueEnum.WaterTheme => new Uri(@"\Resources\ThemeColors\DarkWaterThemeColors.xaml", UriKind.Relative),
                     SettingsValueEnum.FallenLeavesTheme => new Uri(@"\Resources\ThemeColors\DarkFallenLeavesThemeColors.xaml", UriKind.Relative),
+                    SettingsValueEnum.TurquoiseTheme => new Uri(@"\Resources\ThemeColors\DarkTurquoiseThemeColors.xaml", UriKind.Relative),
+                    SettingsValueEnum.RedWineTheme => new Uri(@"\Resources\ThemeColors\DarkRedWineThemeColors.xaml", UriKind.Relative),
                     _ => new Uri(@"\Resources\ThemeColors\MainDarkThemeColors.xaml", UriKind.Relative),
                 };
             }

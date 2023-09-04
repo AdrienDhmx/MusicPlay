@@ -6,10 +6,13 @@
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.SettingsViews"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" 
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:cardbtn="clr-namespace:CustomCardControl;assembly=CustomCardControl"
              xmlns:settingsviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
              d:DataContext="{d:DesignInstance Type=settingsviewmodels:ShortcutSettingViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="RootModal">
     <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
           helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
           helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
@@ -35,16 +38,31 @@
             <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
+                <Grid HorizontalAlignment="Center"
+                      Margin="10">
+
+                    <cardbtn:CustomCardControl Icon="{DynamicResource Refresh}"
+                                               Style="{DynamicResource SimpleCardStyle}"
+                                               Command="{Binding ResetAllShortcutsCommand}"
+                                               CardDescriptionVisibility="Collapsed"
+                                               HorizontalContentAlignment="Center"
+                                               IconMargin="10"
+                                               CardHeader="Reset All  "/>
+                </Grid>
+                
                 <Grid MaxWidth="900"
-                      HorizontalAlignment="Center"
+                      Grid.Row="1"
+                      HorizontalAlignment="Stretch"
                       Margin="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="110"/>
                         <ColumnDefinition Width="115"/>
+                        <ColumnDefinition Width="110"/>
                     </Grid.ColumnDefinitions>
 
                     <Border BorderBrush="{DynamicResource SurfaceVariant}"
@@ -67,7 +85,15 @@
                             Grid.Column="2"
                             Padding="10,0"
                             BorderThickness="0,0,1,0">
-                        <TextBlock Text="key"
+                        <TextBlock Text="Key"
+                                   Style="{DynamicResource NTrackDataStyle}"/>
+                    </Border>
+
+                    <Border BorderBrush="{DynamicResource SurfaceVariant}"
+                            Grid.Column="3"
+                            Padding="10,0"
+                            BorderThickness="0,0,1,0">
+                        <TextBlock Text="Edit"
                                    Style="{DynamicResource NTrackDataStyle}"/>
                     </Border>
                 </Grid>
@@ -75,8 +101,8 @@
                 <ItemsControl x:Name="Shortcuts"
                               ItemsSource="{Binding Shortcuts}"
                               MaxWidth="900"
-                              Grid.Row="1"
-                              HorizontalAlignment="Center"
+                              Grid.Row="2"
+                              HorizontalAlignment="Stretch"
                               Margin="10">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -85,13 +111,14 @@
                                     Padding="6, 4">
                                 <Grid Height="45">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="300"/>
+                                        <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="10"/>
                                         <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="100"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding CommandName}"
+                                    <TextBlock Text="{Binding Name}"
                                                Margin="10,0"
                                                FontSize="18"
                                                Style="{DynamicResource SlistInfoStyle}"/>
@@ -120,6 +147,32 @@
                                                    Style="{DynamicResource BStyle}"
                                                    />
                                     </Border>
+
+                                    <Grid Grid.Column="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <iconbtn:IconButton Icon="{DynamicResource Edit}"
+                                                            Width="36"
+                                                            IconWidth="22"
+                                                            Height="36"
+                                                            IconHeight="22"
+                                                            Style="{DynamicResource NormalIconBtn}"
+                                                            Command="{Binding DataContext.ChangeShortcutCommand, ElementName=RootModal}"
+                                                            CommandParameter="{Binding .}"/>
+
+                                        <iconbtn:IconButton Icon="{DynamicResource Refresh}"
+                                                            Grid.Column="1"
+                                                            Width="36"
+                                                            IconWidth="22"
+                                                            Height="36"
+                                                            IconHeight="22"
+                                                            Style="{DynamicResource NormalIconBtn}"
+                                                            Command="{Binding DataContext.ResetShortcutCommand, ElementName=RootModal}"
+                                                            CommandParameter="{Binding .}"/>
+                                   </Grid>
 
                                 </Grid>
                             </Border>

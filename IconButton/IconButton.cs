@@ -56,6 +56,13 @@ namespace IconButton
             set { SetValue(IconHeightProperty, value); }
         }
 
+        public double StrokeWidth
+        {
+            get { return (double)GetValue(StrokeWidthProperty); }
+            set { SetValue(StrokeWidthProperty, value); }
+
+        }
+
         public Brush MouseOverBackground
         {
             get { return (Brush)GetValue(MouseOverBackgroundProperty); }
@@ -106,6 +113,9 @@ namespace IconButton
 
         public static readonly DependencyProperty IconMarginProperty =
             DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(IconButton), new PropertyMetadata(new Thickness(4)));
+
+        public static readonly DependencyProperty StrokeWidthProperty =
+            DependencyProperty.Register("StrokeWidth", typeof(double), typeof(IconButton), new PropertyMetadata(1d));
 
         static IconButton()
         {

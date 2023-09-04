@@ -14,7 +14,7 @@
                   BottomRight="12" BottomLeft="12"/>
 
     <Style x:Key="Basestyle" TargetType="{x:Type Control}">
-        <Setter  Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
     
     <Style x:Key="BaseBtn" TargetType="{x:Type Button}">
@@ -30,14 +30,15 @@
         <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontFamily" Value="Times New Roman"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryContainer}"/>
         <Setter Property="IconMargin" Value="20,0,0,0"/>
         <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
         <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+        <Setter Property="BackgroundOpacity" Value="0.6"/>
+        <Setter Property="MouseOverBackgroundColor" Value="{DynamicResource PrimaryContainer}"/>
         <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
         <Setter Property="FontSize" Value="28"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="BackgroundOpacity" Value="0.8"/>
         <Setter Property="IconHeight" Value="40"/>
         <Setter Property="IconWidth" Value="40"/>
         <Setter Property="IconStretch" Value="Uniform"/>
@@ -45,28 +46,6 @@
         <Setter Property="CardDescriptionVisibility" Value="Collapsed"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Trigger.EnterActions>
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Duration="0:00:0.2"
-                                             To="1"
-                                             Storyboard.TargetProperty="BackgroundOpacity"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </Trigger.EnterActions>
-                <Trigger.ExitActions>
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Duration="0:00:0.2"
-                                             To="0.8"
-                                             Storyboard.TargetProperty="BackgroundOpacity"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </Trigger.ExitActions>
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <Style x:Key="SimpleCardStyle" TargetType="{x:Type cardcontrol:CustomCardControl}">
@@ -112,6 +91,7 @@
         </Style.Triggers>
     </Style>
 
+
     <Style x:Key="BaseIconButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource Basestyle}">
         <Setter Property="BorderThickness" Value="0"/>
@@ -128,6 +108,18 @@
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
+    <Style TargetType="{x:Type IconButton:IconButton}" x:Key="NormalIconBtn"
+           BasedOn="{StaticResource BaseIconButton}">
+        <Setter Property="Width" Value="42"/>
+        <Setter Property="Height" Value="42"/>
+        <Setter Property="IconWidth" Value="28"/>
+        <Setter Property="IconHeight" Value="28"/>
+        <Setter Property="IconStretch" Value="Uniform"/>
+        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
+        <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
+        <Setter Property="StrokeColor" Value="{DynamicResource PrimaryHover}"/>
+    </Style>
+    
     <Style TargetType="IconButton:IconButton" x:Key="QuickPlayButton"
            BasedOn="{StaticResource BaseIconButton}">
         <Setter Property="Width" Value="40"/>
@@ -269,14 +261,14 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="IconWidth" Value="25"/>
-        <Setter Property="IconHeight" Value="25"/>
-        <Setter Property="Width" Value="40"/>
-        <Setter Property="Height" Value="40"/>
+        <Setter Property="IconWidth" Value="22"/>
+        <Setter Property="IconHeight" Value="22"/>
+        <Setter Property="Width" Value="36"/>
+        <Setter Property="Height" Value="36"/>
         <Setter Property="Margin" Value="2,0"/>
         <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
         <Setter Property="IconStretch" Value="Uniform"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
+        <Setter Property="MouseOverBackground" Value="{DynamicResource ScdWhiteTransparent}"/>
     </Style>
 
     <Style x:Key="LargeBtn" TargetType="IconButton:IconButton"
@@ -503,6 +495,14 @@
         <Setter Property="Width" Value="150"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="Text" Value="{x:Static lang:Resources.Delete}"/>
+        <Setter Property="MouseOverBtnColor" Value="{DynamicResource ErrorHover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+    </Style>
+
+    <Style x:Key="Normalbtn" TargetType="{x:Type textbtn:TextButton}"
+           BasedOn="{StaticResource BaseTextBtn}">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Height" Value="40"/>
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
     </Style>
 
@@ -512,6 +512,12 @@
         <Setter Property="Height" Value="40"/>
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
         <Setter Property="Text" Value="{x:Static lang:Resources.Edit}"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="BorderBrush" Value="{DynamicResource Error}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Error}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="ConfirmActionTextBtn" TargetType="textbtn:TextButton"
@@ -527,8 +533,9 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Left"/>
         <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="10, 0"/>
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="CornerRadius" Value="0"/>
         <Setter Property="FontWeight" Value="Normal"/>

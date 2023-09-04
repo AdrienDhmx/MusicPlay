@@ -166,6 +166,10 @@ namespace MusicPlayUI.Core.Services
                     CurrentViewName = viewName;
                     NavigateTo<PlaylistLibraryViewModel>(saveView: saveView);
                     break;
+                case ViewNameEnum.Genres:
+                    CurrentViewName = viewName;
+                    NavigateTo<GenreLibraryViewModel>(saveView: saveView);
+                    break;
                 case ViewNameEnum.Import:
                     CurrentViewName = viewName;
                     NavigateTo<ImportLibraryViewModel>(saveView: saveView);
@@ -251,6 +255,7 @@ namespace MusicPlayUI.Core.Services
                 bool open = true;
 
                 PopupViewParameter = parameter;
+                PopupViewName = viewName;
                 switch (viewName)
                 {
                     case ViewNameEnum.TrackPopup:
@@ -265,10 +270,14 @@ namespace MusicPlayUI.Core.Services
                     case ViewNameEnum.PlaylistPopup:
                         PopupViewModel = _viewModelFactory?.Invoke(typeof(PlaylistPopupViewModel));
                         break;
+                    case ViewNameEnum.TagPopup:
+                        PopupViewModel = _viewModelFactory?.Invoke(typeof(TagPopupViewModel));
+                        break;
                     default:
                         open = false;
                         break;
                 }
+
                 if (open)
                 {
                     if (IsPopupOpen)

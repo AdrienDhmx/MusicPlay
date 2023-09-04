@@ -30,7 +30,7 @@
                                       Fill="{TemplateBinding FillColor}"
                                       Stroke="{TemplateBinding StrokeColor}"
                                       Margin="{TemplateBinding IconMargin}"
-                                      StrokeThickness="1"
+                                      StrokeThickness="{TemplateBinding StrokeWidth}"
                                       Panel.ZIndex="2"
                                       Width="{TemplateBinding IconWidth}"
                                       Height="{TemplateBinding IconHeight}"

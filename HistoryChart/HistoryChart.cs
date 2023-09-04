@@ -51,14 +51,20 @@ namespace HistoryChart
             DependencyProperty.Register("PrimaryColor", typeof(Brush), typeof(HistoryChart), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 250, 250, 250))));
 
         public static readonly DependencyProperty ForegroundProperty =
-            DependencyProperty.Register("Foreground", typeof(Brush), typeof(HistoryChart), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 250, 250, 250))));
+            DependencyProperty.Register("Foreground", typeof(Brush), typeof(HistoryChart), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 250, 250, 250)), OnForegroundChanged));
 
+        private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            StyleChanged?.Invoke();
+        }
 
         public int NumberOfWeek { get; private set; }
         public DateTime StartDate { get; private set; }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public List<HistoryModel> HistoryModels { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+        private static event Action StyleChanged;
 
         private int _maxPlayCount;
         private double _xTickSpace = 0;
@@ -86,6 +92,8 @@ namespace HistoryChart
         public override void EndInit()
         {
             base.EndInit();
+
+            StyleChanged += Redraw;
 
             NumberOfWeek = 2;
             StartDate = DateTime.Today.AddDays(-NumberOfWeek * 7);
@@ -513,6 +521,7 @@ namespace HistoryChart
         public void Dispose()
         {
             Children.Clear();
+            StyleChanged -= Redraw;
         }
     }
 }

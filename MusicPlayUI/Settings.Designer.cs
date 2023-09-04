@@ -418,5 +418,341 @@ namespace MusicPlayUI {
                 this["UserName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PlayPauseShortcut {
+            get {
+                return ((string)(this["PlayPauseShortcut"]));
+            }
+            set {
+                this["PlayPauseShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NextTrackShortcut {
+            get {
+                return ((string)(this["NextTrackShortcut"]));
+            }
+            set {
+                this["NextTrackShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PreviousTrackShortcut {
+            get {
+                return ((string)(this["PreviousTrackShortcut"]));
+            }
+            set {
+                this["PreviousTrackShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RepeatShortcut {
+            get {
+                return ((string)(this["RepeatShortcut"]));
+            }
+            set {
+                this["RepeatShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ShuffleShortcut {
+            get {
+                return ((string)(this["ShuffleShortcut"]));
+            }
+            set {
+                this["ShuffleShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string IncreaseVolShortcut {
+            get {
+                return ((string)(this["IncreaseVolShortcut"]));
+            }
+            set {
+                this["IncreaseVolShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DecreaseVolShortcut {
+            get {
+                return ((string)(this["DecreaseVolShortcut"]));
+            }
+            set {
+                this["DecreaseVolShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MuteVolShortcut {
+            get {
+                return ((string)(this["MuteVolShortcut"]));
+            }
+            set {
+                this["MuteVolShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavHomeShortcut {
+            get {
+                return ((string)(this["NavHomeShortcut"]));
+            }
+            set {
+                this["NavHomeShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavAlbumsShortcut {
+            get {
+                return ((string)(this["NavAlbumsShortcut"]));
+            }
+            set {
+                this["NavAlbumsShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavArtistsShortcut {
+            get {
+                return ((string)(this["NavArtistsShortcut"]));
+            }
+            set {
+                this["NavArtistsShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavPlaylistsShortcut {
+            get {
+                return ((string)(this["NavPlaylistsShortcut"]));
+            }
+            set {
+                this["NavPlaylistsShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavImportShortcut {
+            get {
+                return ((string)(this["NavImportShortcut"]));
+            }
+            set {
+                this["NavImportShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavSettingsShortcut {
+            get {
+                return ((string)(this["NavSettingsShortcut"]));
+            }
+            set {
+                this["NavSettingsShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavNowPlayingShortcut {
+            get {
+                return ((string)(this["NavNowPlayingShortcut"]));
+            }
+            set {
+                this["NavNowPlayingShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavBackShortcut {
+            get {
+                return ((string)(this["NavBackShortcut"]));
+            }
+            set {
+                this["NavBackShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ToggleFavShortcut {
+            get {
+                return ((string)(this["ToggleFavShortcut"]));
+            }
+            set {
+                this["ToggleFavShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Rating0Shortcut {
+            get {
+                return ((string)(this["Rating0Shortcut"]));
+            }
+            set {
+                this["Rating0Shortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Rating1Shortcut {
+            get {
+                return ((string)(this["Rating1Shortcut"]));
+            }
+            set {
+                this["Rating1Shortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Rating2Shortcut {
+            get {
+                return ((string)(this["Rating2Shortcut"]));
+            }
+            set {
+                this["Rating2Shortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Rating3Shortcut {
+            get {
+                return ((string)(this["Rating3Shortcut"]));
+            }
+            set {
+                this["Rating3Shortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Rating4Shortcut {
+            get {
+                return ((string)(this["Rating4Shortcut"]));
+            }
+            set {
+                this["Rating4Shortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Rating5Shortcut {
+            get {
+                return ((string)(this["Rating5Shortcut"]));
+            }
+            set {
+                this["Rating5Shortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ToggleFullScreenShortcut {
+            get {
+                return ((string)(this["ToggleFullScreenShortcut"]));
+            }
+            set {
+                this["ToggleFullScreenShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string EscapeFullScreenShortcut {
+            get {
+                return ((string)(this["EscapeFullScreenShortcut"]));
+            }
+            set {
+                this["EscapeFullScreenShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ToggleQueueShortcut {
+            get {
+                return ((string)(this["ToggleQueueShortcut"]));
+            }
+            set {
+                this["ToggleQueueShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ToggleLightThemeShortcut {
+            get {
+                return ((string)(this["ToggleLightThemeShortcut"]));
+            }
+            set {
+                this["ToggleLightThemeShortcut"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public string AutoForeground {
+            get {
+                return ((string)(this["AutoForeground"]));
+            }
+            set {
+                this["AutoForeground"] = value;
+            }
+        }
     }
 }

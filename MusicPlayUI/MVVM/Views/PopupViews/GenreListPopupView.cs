@@ -27,15 +27,15 @@ namespace MusicPlayUI.MVVM.Views.PopupViews
             InitializeComponent();
         }
 
-        public ObservableCollection<GenreModel> Genres
+        public ObservableCollection<TagModel> Genres
         {
-            get { return (ObservableCollection<GenreModel>)GetValue(GenresProperty); }
+            get { return (ObservableCollection<TagModel>)GetValue(GenresProperty); }
             set { SetValue(GenresProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Genre.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for CurrentTagView.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty GenresProperty =
-            DependencyProperty.Register("Genre", typeof(ObservableCollection<GenreModel>), typeof(GenreListPopupView), new PropertyMetadata(new ObservableCollection<GenreModel>()));
+            DependencyProperty.Register("CurrentTagView", typeof(ObservableCollection<TagModel>), typeof(GenreListPopupView), new PropertyMetadata(new ObservableCollection<TagModel>()));
 
         public ICommand Command
         {

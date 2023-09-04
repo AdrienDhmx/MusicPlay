@@ -18,7 +18,7 @@ namespace MusicFilesProcessor.Helpers
         /// <summary>
         /// C:\User\UserName\Music\MusicPlay\
         /// </summary>
-        public static readonly string AppFolder = Path.Combine(MusicFolder, "MusicPlay2");
+        public static readonly string AppFolder = Path.Combine(MusicFolder, "MusicPlay");
         /// <summary>
         /// C:\User\UserName\Music\MusicPlay\Covers\
         /// </summary>

@@ -27,14 +27,14 @@ namespace MusicPlayUI.MVVM.Views.ListViews
 
         }
 
-        public List<GenreModel> Genres
+        public List<TagModel> Genres
         {
-            get { return (List<GenreModel>)GetValue(GenresProperty); }
+            get { return (List<TagModel>)GetValue(GenresProperty); }
             set { SetValue(GenresProperty, value); }
         }
 
         public static readonly DependencyProperty GenresProperty =
-            DependencyProperty.Register("Genres", typeof(List<GenreModel>), typeof(ChipListView), new PropertyMetadata(new List<GenreModel>()));
+            DependencyProperty.Register("Genres", typeof(List<TagModel>), typeof(ChipListView), new PropertyMetadata(new List<TagModel>()));
 
         public ICommand NavigateToGenreCommand
         {

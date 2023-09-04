@@ -27,6 +27,7 @@
         Title="{Binding QueueService.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}"
         x:Name="Root"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}">
+
     <!-- Root Border -->
     <Border x:Name="WindowBorder"
             Background="{DynamicResource Background}"
@@ -216,7 +217,8 @@
             </Grid>
             
             <!-- Message Popup -->
-            <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right"
+            <ScrollViewer VerticalScrollBarVisibility="Hidden" 
+                          HorizontalAlignment="Right"
                           VerticalAlignment="Top"
                           Style="{DynamicResource Basestyle}"
                           Grid.Column="1"

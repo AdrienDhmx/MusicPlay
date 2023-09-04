@@ -7,8 +7,10 @@ using System.Windows;
 using System.Windows.Input;
 using AudioHandler;
 using DataBaseConnection.DataAccess;
+using MessageControl;
 using MusicPlayModels.MusicModels;
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
@@ -43,12 +45,21 @@ namespace MusicPlayUI.Core.Commands
         public ICommand NavigateToGenreCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
+        public ICommand NavigateToPlaylistCommand { get; }
 
         // popup
-        public ICommand OpenAlbumPopupCommand { get;}
+        public ICommand OpenAlbumPopupCommand { get; }
         public ICommand OpenArtistPopupCommand { get; }
         public ICommand OpenTrackPopupCommand { get; }
+        public ICommand OpenPlaylistPopupCommand { get; }
+        public ICommand OpenTagPopupCommand { get; }
         public ICommand ClosePopupCommand { get; }
+
+        // settings
+        public ICommand ToggleThemeCommand { get; }
+
+        //Covers
+        public ICommand UpdateAlbumCover { get; }
 
         // others
         public ICommand FavoriteCommand { get; }
@@ -58,6 +69,7 @@ namespace MusicPlayUI.Core.Commands
         public ICommand MinimizeCommand { get; }
         public ICommand MaximizeCommand { get; }
         public ICommand LeaveCommand { get; }
+
         public CommandsManager(IAudioPlayback audioPlayback, IQueueService queueService, INavigationService navigationService, IAudioTimeService audioTimeService)
         {
             _audioPlayback = audioPlayback;
@@ -77,9 +89,9 @@ namespace MusicPlayUI.Core.Commands
                 _queueService.PreviousTrack();
             });
 
-            DecreaseVolumeCommand = new RelayCommand(_audioPlayback.DecreaseVolume);
+            DecreaseVolumeCommand = new RelayCommand<int>((int value) => _audioPlayback.DecreaseVolume(value));
 
-            IncreaseVolumeCommand = new RelayCommand(_audioPlayback.IncreaseVolume);
+            IncreaseVolumeCommand = new RelayCommand<int>((int value) => _audioPlayback.IncreaseVolume(value));
 
             MuteVolumeCommand = new RelayCommand(_audioPlayback.Mute);
 
@@ -132,7 +144,7 @@ namespace MusicPlayUI.Core.Commands
                 _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id));
             });
 
-            NavigateToGenreCommand = new RelayCommand<GenreModel>((genre) =>
+            NavigateToGenreCommand = new RelayCommand<TagModel>((genre) =>
             {
                 _navigationService.NavigateTo(ViewNameEnum.SpecificGenre, genre);
             });
@@ -147,9 +159,17 @@ namespace MusicPlayUI.Core.Commands
                 _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, artist);
             });
 
+            NavigateToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) =>
+            {
+                _navigationService.NavigateTo(ViewNameEnum.SpecificPlaylist, playlist);
+            });
+
             OpenAlbumPopupCommand = new RelayCommand<AlbumModel>((album) => _navigationService.OpenPopup(ViewNameEnum.AlbumPopup, album));
             OpenTrackPopupCommand = new RelayCommand<UIOrderedTrackModel>((track) => _navigationService.OpenPopup(ViewNameEnum.TrackPopup, track));
             OpenArtistPopupCommand = new RelayCommand<ArtistModel>((artist) => _navigationService.OpenPopup(ViewNameEnum.ArtistPopup, artist));
+            OpenPlaylistPopupCommand = new RelayCommand<PlaylistModel>((playlist) => _navigationService.OpenPopup(ViewNameEnum.PlaylistPopup, playlist));
+            OpenTagPopupCommand = new RelayCommand<UITagModel>((tag) => _navigationService.OpenPopup(ViewNameEnum.TagPopup, tag));
+
 
             ToggleQueueDrawerCommand = new RelayCommand(_navigationService.ToggleQueueDrawer);
 
@@ -162,6 +182,17 @@ namespace MusicPlayUI.Core.Commands
             });
 
             ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);
+
+            UpdateAlbumCover = new RelayCommand<AlbumModel>((album) =>
+            {
+                if (CoverService.ChangeCover(album))
+                {
+                    if (_navigationService.CurrentViewName == ViewNameEnum.Albums || _navigationService.CurrentViewName == ViewNameEnum.SpecificAlbum)
+                    {
+                        _navigationService.CurrentViewModel.Update();
+                    }
+                }
+            });
 
             MinimizeCommand = new RelayCommand(() =>
             {
@@ -183,6 +214,45 @@ namespace MusicPlayUI.Core.Commands
             LeaveCommand = new RelayCommand(() =>
             {
                 App.Current.Shutdown();
+            });
+
+            ToggleThemeCommand = new RelayCommand(() =>
+            {
+                static void ChangeTheme(bool changeTheme)
+                {
+                    if (changeTheme)
+                    {
+                        if (AppThemeService.IsSystemSync)
+                        {
+                            ConfigurationService.SetPreference(SettingsEnum.SystemSyncTheme, "0");
+                        }
+                        else if (AppThemeService.IsSunsetSunrise)
+                        {
+                            ConfigurationService.SetPreference(SettingsEnum.SunsetSunrise, "0");
+                        }
+
+                        // invert the theme in the config
+                        ConfigurationService.SetPreference(SettingsEnum.LightTheme, AppThemeService.IsLightTheme ? "0" : "1");
+
+                        // reload app theme
+                        AppThemeService.InitializeAppTheme();
+
+                        // warn listeners that the theme has changed
+                        AppThemeService.OnThemeChanged();
+                    }
+                }
+
+                if (AppThemeService.IsSystemSync)
+                {
+                    MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the system theme. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
+                } 
+                else if (AppThemeService.IsSunsetSunrise)
+                {
+                    MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the time of day. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
+                } else
+                {
+                    ChangeTheme(true);
+                }
             });
         }
 
@@ -218,6 +288,8 @@ namespace MusicPlayUI.Core.Commands
                 CommandEnums.NavigateBack => NavigateBackCommand,
                 CommandEnums.EscapeFullScreen => EscapeFullScreenCommand,
                 CommandEnums.ToggleFullScreen => ToggleFullScreenCommand,
+                CommandEnums.ToggleQueueDrawer => ToggleQueueDrawerCommand,
+                CommandEnums.ToggleTheme => ToggleThemeCommand,
                 _ => null,
             };
         }

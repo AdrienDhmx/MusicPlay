@@ -24,7 +24,8 @@ namespace MusicPlayUI.Core.Enums
         Playlists = 4,
         Import = 5,
         Settings = 6,
-        NowPlaying = 7, // now in menu
+        NowPlaying = 7,
+        Genres = 8,
 
         // Main Views (not in menu)
         SpecificAlbum = 10,
@@ -44,15 +45,20 @@ namespace MusicPlayUI.Core.Enums
 
         // Modal Views
         CreatePlaylist = 40,
-        UpdatePlaylist = 41,
         ConfirmAction = 42,
         TrackProperties = 43,
+        AlbumProperties = 44,
+        Artistproperties = 45,
+        GenreProperties = 46,
+        UpdateShortcut = 47,
+        CreateTag = 48,
 
         // PopupViewModel Views
         TrackPopup = 50,
         AlbumPopup = 51,
         ArtistPopup = 52,
         PlaylistPopup = 53,
+        TagPopup = 54,
 
         // Settings Views
         General = 60,
@@ -85,7 +91,9 @@ namespace MusicPlayUI.Core.Enums
                 case ViewNameEnum.Artists:
                     return "Artists";
                 case ViewNameEnum.Playlists:
-                    return "Playlists";
+                    return "BindedPlaylists";
+                case ViewNameEnum.Genres:
+                    return "Tags";
                 case ViewNameEnum.Import:
                     return "Import";
                 case ViewNameEnum.Settings:
@@ -141,8 +149,10 @@ namespace MusicPlayUI.Core.Enums
                     return ViewNameEnum.Albums;
                 case "Artists":
                     return ViewNameEnum.Artists;
-                case "Playlists":
+                case "BindedPlaylists":
                     return ViewNameEnum.Playlists;
+                case "Tags":
+                    return ViewNameEnum.Genres;
                 case "Import":
                     return ViewNameEnum.Import;
                 case "Settings":
