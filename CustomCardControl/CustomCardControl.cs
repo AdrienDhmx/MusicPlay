@@ -51,6 +51,18 @@ namespace CustomCardControl
 
 
 
+        public double StrokeWidth
+        {
+            get { return (double)GetValue(StrokeWidthProperty); }
+            set { SetValue(StrokeWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for StrokeWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty StrokeWidthProperty =
+            DependencyProperty.Register("StrokeWidth", typeof(double), typeof(CustomCardControl), new PropertyMetadata(1d));
+
+
+
         public double IconWidth
         {
             get { return (double)GetValue(IconWidthProperty); }
@@ -160,8 +172,6 @@ namespace CustomCardControl
             DependencyProperty.Register("TextAlignment", typeof(TextAlignment), typeof(CustomCardControl), new PropertyMetadata(TextAlignment.Left));
 
 
-
-
         public Visibility CardDescriptionVisibility
         {
             get { return (Visibility)GetValue(CardDescriptionVisibilityProperty); }
@@ -172,8 +182,6 @@ namespace CustomCardControl
         public static readonly DependencyProperty CardDescriptionVisibilityProperty =
             DependencyProperty.Register("CardDescriptionVisibility", typeof(Visibility), typeof(CustomCardControl), new PropertyMetadata(Visibility.Visible));
 
-
-
         public double BackgroundOpacity
         {
             get { return (double)GetValue(BackgroundOpacityProperty); }
@@ -183,6 +191,18 @@ namespace CustomCardControl
         // Using a DependencyProperty as the backing store for BackgroundOpacity.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BackgroundOpacityProperty =
             DependencyProperty.Register("BackgroundOpacity", typeof(double), typeof(CustomCardControl), new PropertyMetadata(1d));
+
+
+
+        public Brush MouseOverBackgroundColor
+        {
+            get { return (Brush)GetValue(MouseOverBackgroundColorProperty); }
+            set { SetValue(MouseOverBackgroundColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MouseOverBackgroundColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MouseOverBackgroundColorProperty =
+            DependencyProperty.Register("MouseOverBackgroundColor", typeof(Brush), typeof(CustomCardControl), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(0, 0, 0, 0))));
 
 
 

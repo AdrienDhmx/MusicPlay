@@ -72,47 +72,49 @@ namespace MusicFilesProcessor.Lyrics
             return _lyricsFileHelper.GetFilePath(GetFileName(title, artist));
         }
 
-        public async Task<LyricsModel> GetLyrics(string title, string artist, string audioFilePath)
+        public async Task<LyricsModel> GetLyrics(string title, string artist, string audioFilePath, bool acceptTimedLyrics = true)
         {
             CurrentURL = "";
+            string filePath;
 
-            // Try with timed lyrics first
-            ChangeLyricsFileHelper(true); 
-
-            if (TimedLyricsExists(GetFileName(title, artist)))
+            if (acceptTimedLyrics)
             {
-                string filePath = GetFilePath(title, artist);
+                // Try with timed lyrics first
+                ChangeLyricsFileHelper(true); 
+
+                if (TimedLyricsExists(GetFileName(title, artist)))
+                {
+                    filePath = GetFilePath(title, artist);
+                    return _lyricsFileHelper.GetLyrics(filePath);
+                }
+            }
+
+            // Then try with normal lyrics
+            ChangeLyricsFileHelper();
+            filePath = GetFilePath(title, artist);
+            if (File.Exists(filePath))
+            {
                 return _lyricsFileHelper.GetLyrics(filePath);
             }
             else
             {
-                // Then try with not timed lyrics
-                ChangeLyricsFileHelper(); 
-                string filePath = GetFilePath(title, artist);
-                if (File.Exists(filePath))
+                // then try in the file as metadata
+                string lyrics = GetLyricsInMetaData(audioFilePath);
+                if (string.IsNullOrWhiteSpace(lyrics))
                 {
-                    return _lyricsFileHelper.GetLyrics(filePath);
+                    // finally try finding the lyrics on the web
+                    try
+                    {
+                        return await GetLyricsOnTheWeb(title, artist);
+                    }
+                    catch (Exception)
+                    {
+                        return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
+                    }
                 }
                 else
                 {
-                    // then try in the file as metadata
-                    string lyrics = GetLyricsInMetaData(audioFilePath);
-                    if (string.IsNullOrWhiteSpace(lyrics))
-                    {
-                        // finally try finding the lyrics on the web
-                        try
-                        {
-                            return await GetLyricsOnTheWeb(title, artist);
-                        }
-                        catch (Exception)
-                        {
-                            return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
-                        }
-                    }
-                    else
-                    {
-                        return CreateLyricsModel(lyrics, "", "", GetFileName(title, artist), true, false);
-                    }
+                    return CreateLyricsModel(lyrics, "", "", GetFileName(title, artist), true, false);
                 }
             }
         }

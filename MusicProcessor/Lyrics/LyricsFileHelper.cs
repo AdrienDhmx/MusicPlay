@@ -40,7 +40,7 @@ namespace MusicFilesProcessor.Lyrics.Helper
             }
             catch (Exception)
             {
-                return lyrics;
+                return null;
             }
             return lyrics;
         }

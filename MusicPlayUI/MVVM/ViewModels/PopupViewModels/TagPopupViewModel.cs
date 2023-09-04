@@ -9,6 +9,7 @@ using MusicPlayModels;
 using MusicPlayModels.MusicModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
@@ -53,17 +54,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
             DeleteTagCommand = new RelayCommand(() =>
             {
-                DataAccess.Connection.DeleteTag(Tag.Id);
-
-                if(_navigationService.CurrentViewName == ViewNameEnum.SpecificGenre)
-                {
-                    _navigationService.NavigateBack();
-                } 
-                else if(_navigationService.CurrentViewName == ViewNameEnum.Genres)
-                {
-                    _navigationService.CurrentViewModel.Update();
-                }
-                _navigationService.ClosePopup();
+                _modalService.OpenModal(ViewNameEnum.ConfirmAction, DeleteTag, ConfirmActionModelFactory.CreateConfirmDeleteModel(Tag.Name, ModelTypeEnum.Genre));
             });
 
             Update();
@@ -82,7 +73,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             _navigationService.ClosePopup();
         }
 
-        public async Task<List<TrackModel>> GetPlaylistsTracks()
+        private async Task<List<TrackModel>> GetPlaylistsTracks()
         {
             List<TrackModel> tracks = new();
 
@@ -91,6 +82,23 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
                 tracks.AddRange(await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id));
             }
             return tracks;
+        }
+
+        private void DeleteTag(bool canceled)
+        {
+            if (canceled) return;
+
+            DataAccess.Connection.DeleteTag(Tag.Id);
+
+            if (_navigationService.CurrentViewName == ViewNameEnum.SpecificGenre)
+            {
+                _navigationService.NavigateBack();
+            }
+            else if (_navigationService.CurrentViewName == ViewNameEnum.Genres)
+            {
+                _navigationService.CurrentViewModel.Update();
+            }
+            _navigationService.ClosePopup();
         }
 
         public override void Update(BaseModel parameter = null)

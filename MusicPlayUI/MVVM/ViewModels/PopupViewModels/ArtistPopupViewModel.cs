@@ -121,7 +121,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private async Task GetUserPlaylists()
         {
-            UserPlaylists = new(await DataAccess.Connection.GetAllPlaylists());
+            UserPlaylists = new((await DataAccess.Connection.GetAllPlaylists()).OrderBy(p => p.Name));
         }
 
         private async void LoadData()

@@ -46,7 +46,6 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <textbtn:TextButton Height="30"
-                                                Padding="2,0"
                                                 Text="{Binding Name}"
                                                 Command="{Binding DataContext.AddToTagCommand, ElementName=TagRootPopup}"
                                                 CommandParameter="{Binding .}"

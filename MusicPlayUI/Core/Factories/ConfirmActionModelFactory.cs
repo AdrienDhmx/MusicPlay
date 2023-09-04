@@ -58,6 +58,9 @@ namespace MusicPlayUI.Core.Factories
                 case ModelTypeEnum.Playlist:
                     dataType = Resources.Playlist;
                     break;
+                case ModelTypeEnum.Genre:
+                    dataType = "tag";
+                    break;
                 default:
                     break;
             }

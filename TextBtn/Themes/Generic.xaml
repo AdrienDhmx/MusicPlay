@@ -28,7 +28,7 @@
                                            FontFamily="{TemplateBinding FontFamily}"
                                            TextAlignment="{TemplateBinding TextAlignment}"
                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                           HorizontalAlignment="Stretch"/>
                         </Border>
                         <Border Background="{TemplateBinding MouseOverBtnColor}"
                                 CornerRadius="{TemplateBinding CornerRadius}"

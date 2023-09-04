@@ -87,7 +87,7 @@
                      Color="#4054643d"/>
 
     <SolidColorBrush x:Key="ErrorHover"
-                     Color="#60B3261E"/>
+                     Color="#40B3261E"/>
 
     <SolidColorBrush x:Key="TransparentHover"
                      Color="#901C1B1F"/>

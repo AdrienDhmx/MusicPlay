@@ -235,7 +235,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         internal async Task GetTags(IEnumerable<int> tagsIdsToRemove)
         {
             List<TagModel> tags = await DataAccess.Connection.GetAllTags();
-            AllTags = new(tags.Where(t => !tagsIdsToRemove.Contains(t.Id)));
+            AllTags = new(tags.Where(t => !tagsIdsToRemove.Contains(t.Id)).OrderBy(t => t.Name));
         }
     }
 }

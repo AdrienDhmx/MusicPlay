@@ -368,6 +368,9 @@
                 <iconbtn:IconButton Grid.Column="3"
                                     Style="{DynamicResource NormalIconBtn}"
                                      Icon="{DynamicResource QueueIcon}"
+                                    StrokeColor="{DynamicResource OnPrimaryContainer}"
+                                    FillColor="{DynamicResource PrimaryHover}"
+                                    StrokeWidth="2"
                                     Command="{Binding OpenCloseQueuePopupCommand}">
                 </iconbtn:IconButton>
             </Grid>
