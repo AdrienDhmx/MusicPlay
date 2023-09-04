@@ -130,7 +130,9 @@
                             Background="{DynamicResource WhiteForeground}"/>
 
                     <customButton:IconButton Icon="{DynamicResource QueueIcon}"
-                                            FillColor="{DynamicResource WhiteForeground}"
+                                            StrokeColor="{DynamicResource WhiteForeground}"
+                                            FillColor="Transparent"
+                                            StrokeWidth="2"
                                             Command="{Binding OpenCloseSubViewCommand}"
                                              CommandParameter="41">
                         <customButton:IconButton.Style>
