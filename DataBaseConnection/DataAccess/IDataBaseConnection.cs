@@ -1,6 +1,7 @@
 ﻿using MusicPlayModels.MusicModels;
 using MusicPlayModels.Enums;
 using MusicPlayModels.StatsModels;
+using AudioHandler.Models;
 
 namespace DataBaseConnection.DataAccess
 {
@@ -529,5 +530,39 @@ namespace DataBaseConnection.DataAccess
         /// </summary>
         /// <returns></returns>
         public Task DeleQueue();
+
+        /// <summary>
+        /// Get all the preset
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<EQPresetModel>> GetAllEQPresets();
+
+        /// <summary>
+        /// Insert a new Equalizer Preset in the database with all its bands
+        /// </summary>
+        /// <param name="eqPreset"></param>
+        /// <returns></returns>
+        public Task<int> InsertEQPreset(EQPresetModel eqPreset);
+
+        /// <summary>
+        /// Update the Equalizer Preset name
+        /// </summary>
+        /// <param name="eqPreset"></param>
+        /// <returns></returns>
+        public Task UpdateEQPreset(EQPresetModel eqPreset);
+
+        /// <summary>
+        /// Update the Equalizer band
+        /// </summary>
+        /// <param name="eqBand"></param>
+        /// <returns></returns>
+        public Task UpdateEQBand(EQEffectModel eqBand);
+
+        /// <summary>
+        /// Delete the Equalizer preset and all its bands
+        /// </summary>
+        /// <param name="eqPreset"></param>
+        /// <returns></returns>
+        public Task DeleteEQPreset(EQPresetModel eqPreset);
     }
 }

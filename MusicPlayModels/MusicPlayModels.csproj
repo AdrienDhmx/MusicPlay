@@ -14,4 +14,10 @@
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="ManagedBass">
+      <HintPath>..\ManagedBass.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

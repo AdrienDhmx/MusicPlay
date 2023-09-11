@@ -5,6 +5,11 @@ namespace AudioHandler
     public interface IAudioPlayback
     {
         /// <summary>
+        /// Manage the EQ settings
+        /// </summary>
+        EQManager EQManager { get; }
+
+        /// <summary>
         /// The device currently used
         /// </summary>
         DeviceModel Device { get; }

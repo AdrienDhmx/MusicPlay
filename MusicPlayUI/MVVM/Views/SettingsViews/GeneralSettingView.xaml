@@ -8,11 +8,12 @@
              xmlns:settingsviewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
              xmlns:cardExpender="clr-namespace:CardDropDown;assembly=CardDropDown"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:eq="clr-namespace:Equalizer;assembly=Equalizer"
              d:DataContext="{d:DesignInstance Type=settingsviewmodel:GeneralSettingsViewModel}"
              xmlns:placeholdertextbox="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox"
              mc:Ignorable="d" 
              x:Name="RootView"
-             d:DesignHeight="800" d:DesignWidth="800">
+             d:DesignHeight="1200" d:DesignWidth="800">
     <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
           helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
           helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">

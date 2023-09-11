@@ -9,6 +9,7 @@ using DataBaseConnection.DataAccess;
 using MusicPlayModels;
 using MusicPlayModels.MusicModels;
 using MusicPlayUI.Core.Commands;
+using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
 using static Humanizer.On;
@@ -76,13 +77,20 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             CreateGenreCommand = new RelayCommand(() =>
             {
-                _modalService.OpenModal(Core.Enums.ViewNameEnum.CreateTag, (canceled) =>
+                Action<string> createTag = async (string newName) =>
+                {
+                    TagModel tag = new();
+                    tag.Name = newName;
+                    await DataAccess.Connection.InserTag(tag);
+                };
+                CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, createTag, null);
+                _modalService.OpenModal(ViewNameEnum.CreateTag, (canceled) =>
                 {
                     if (!canceled)
                     {
                         Update();
                     }
-                });
+                }, model);
             });
 
             NavigateToGenreCommand = new RelayCommand<UITagModel>((genre) =>
@@ -96,7 +104,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 tracks = await DataAccess.Connection.GetTracksFromArtists(genre.Artists.Select(a => a.Id));
                 tracks = tracks.DistinctBy(t => t.Id).ToList();
 
-                queueService.SetNewQueue(tracks, new(genre.Name, Core.Enums.ModelTypeEnum.Genre, genre.Id), genre.Cover);
+                queueService.SetNewQueue(tracks, new(genre.Name, Core.Enums.ModelTypeEnum.Tag, genre.Id), genre.Cover);
             }));
 
             OpenTagPopupCommand = _commandsManager.OpenTagPopupCommand;

@@ -619,7 +619,7 @@ namespace MusicPlayUI.Core.Services
                             parameter = await DataAccess.Connection.GetPlaylist(id);
                         }
                         break;
-                    case ModelTypeEnum.Genre:
+                    case ModelTypeEnum.Tag:
                         viewName = ViewNameEnum.SpecificGenre;
                         parameter = await DataAccess.Connection.GetTag(id);
                         break;

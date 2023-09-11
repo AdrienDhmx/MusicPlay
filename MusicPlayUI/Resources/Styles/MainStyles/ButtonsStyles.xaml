@@ -330,9 +330,9 @@
     <Style x:Key="SmallDeleteButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource SmallBtn}">
         <Setter Property="Icon" Value="{StaticResource Trash}"/>
-        <Setter Property="FillColor" Value="{DynamicResource OnTertiary}"/>
-        <Setter Property="Background" Value="{DynamicResource Tertiary}"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource TertiaryHover}"/>
+        <Setter Property="FillColor" Value="{DynamicResource OnError}"/>
+        <Setter Property="Background" Value="{DynamicResource Error}"/>
+        <Setter Property="MouseOverBackground" Value="{DynamicResource ErrorHover}"/>
     </Style>
 
     <Style x:Key="BackButton" TargetType="IconButton:IconButton"
@@ -504,6 +504,15 @@
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Foreground" Value="{DynamicResource Secondary}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Secondary}"/>
+                <Setter Property="MouseOverBtnColor" Value="{DynamicResource SecondaryHover}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="EditBtn" TargetType="textbtn:TextButton"

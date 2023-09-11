@@ -49,12 +49,18 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
             EditTagCommand = new RelayCommand(() =>
             {
-                _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => { }, Tag);
+                Action<string> updateTag = async (string newName) =>
+                {
+                    Tag.Name = newName;
+                    await DataAccess.Connection.UpdateTag(Tag);
+                };
+                CreateEditNameModel model = new CreateEditNameModel(Tag.Name, "Tag", true, null, updateTag);
+                _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => { }, model);
             });
 
             DeleteTagCommand = new RelayCommand(() =>
             {
-                _modalService.OpenModal(ViewNameEnum.ConfirmAction, DeleteTag, ConfirmActionModelFactory.CreateConfirmDeleteModel(Tag.Name, ModelTypeEnum.Genre));
+                _modalService.OpenModal(ViewNameEnum.ConfirmAction, DeleteTag, ConfirmActionModelFactory.CreateConfirmDeleteModel(Tag.Name, ModelTypeEnum.Tag));
             });
 
             Update();

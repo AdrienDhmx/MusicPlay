@@ -4,20 +4,21 @@ using MusicPlayModels;
 using MusicPlayModels.MusicModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
+using MusicPlayUI.MVVM.Models;
 
 namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 {
-    public class CreateTagViewModel : ModalViewModel
+    public class CreateModelNameViewModel : ModalViewModel
     {
         private string _originalName = string.Empty;
 
-        private TagModel _tag = new();
-        public TagModel Tag 
+        private CreateEditNameModel _model;
+        public CreateEditNameModel Model 
         {
-            get => _tag;
+            get => _model;
             set
             {
-                SetField(ref _tag, value);
+                SetField(ref _model, value);
             }
         }
 
@@ -42,21 +43,21 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
         }
 
         public ICommand CreateTagCommand { get; }
-        public CreateTagViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
+        public CreateModelNameViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
         {
             CreateTagCommand = new RelayCommand(() =>
             {
-                ValidName = !string.IsNullOrWhiteSpace(Tag.Name);
+                ValidName = !string.IsNullOrWhiteSpace(Model.Name);
 
                 if (ValidName)
                 {
                     if(IsEdit)
                     {
-                        DataAccess.Connection.UpdateTag(Tag);
+                        Model.OnEdit(Model.Name);
                     } 
                     else
                     {
-                        DataAccess.Connection.InserTag(Tag);
+                        Model.OnCreate(Model.Name);
                     }
                     CloseModal();
                 }
@@ -67,7 +68,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
         {
             if(canceled)
             {
-                Tag.Name = _originalName;
+                Model.Name = _originalName;
             }
 
             base.CloseModal(canceled);
@@ -75,12 +76,15 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 
         public override void Update(BaseModel parameter = null)
         {
-            IsEdit = parameter != null;
-
-            if (IsEdit)
+            if(parameter is CreateEditNameModel model)
             {
-                Tag = parameter as TagModel;
-                _originalName = Tag.Name;
+                Model = model;
+                IsEdit = Model.Edit;
+                _originalName = Model.Name;
+            }
+            else
+            {
+                throw new System.Exception($"The parameter type is not supported, {typeof(CreateEditNameModel)} is expected.");
             }
         }
     }

@@ -18,9 +18,9 @@ namespace MusicPlayUI.MVVM.Views.ModalViews
     /// <summary>
     /// Interaction logic for CreateTagModal.xaml
     /// </summary>
-    public partial class CreateTagModal : UserControl
+    public partial class CreateModelNameModal : UserControl
     {
-        public CreateTagModal()
+        public CreateModelNameModal()
         {
             InitializeComponent();
         }

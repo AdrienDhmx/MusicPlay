@@ -103,7 +103,7 @@ namespace MusicFilesProcessor.Helpers
 
         public static string CreateCoverFilename()
         {
-            return Path.GetRandomFileName() + imgFormat;
+            return Path.GetRandomFileName().Replace(".", "") + imgFormat;
         }
 
         private static string FormatSyntax(this string text)

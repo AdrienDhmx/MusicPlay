@@ -77,8 +77,6 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void Dispose()
         {
-            NavigationService.SecondaryViewModel?.Dispose();
-
             GC.SuppressFinalize(this);
         }
 

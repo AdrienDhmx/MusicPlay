@@ -296,11 +296,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
         private void OnDeviceChanged()
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                CurrentDevice = _audioPlayback.Device.CreateDeviceModal();
-            });
+             CurrentDevice = _audioPlayback.Device.CreateDeviceModal();
         }
-
     }
 }

@@ -13,6 +13,8 @@
                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                             Padding="{TemplateBinding Padding}"
                             Width="{TemplateBinding Width}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
                             Height="{TemplateBinding Height}">
                         <Grid>
                             <Border 
@@ -25,13 +27,9 @@
                                x:Name="MouseOverBgcBorder"/>
 
                             <Border Grid.ColumnSpan="2"
-                                     BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="{TemplateBinding CornerRadius}"
                                     Background="{TemplateBinding Background}"
-                                    Opacity="{TemplateBinding BackgroundOpacity}">
-
-                            </Border>
+                                    Opacity="{TemplateBinding BackgroundOpacity}"/>
 
                             <Grid Margin="5,2">
                                 <Grid.ColumnDefinitions>

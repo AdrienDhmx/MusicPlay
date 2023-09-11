@@ -9,6 +9,6 @@ namespace MusicPlayModels
 {
     public class BaseModel : ObservableObject
     {
-        public int Id { get; set; }
+        public int Id { get; set; } = -1;
     }
 }

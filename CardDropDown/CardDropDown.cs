@@ -167,11 +167,6 @@ namespace CardDropDown
             }
         }
 
-        private void CardDropDown_MouseEnter(object sender, MouseEventArgs e)
-        {
-            
-        }
-
         private void CardDropDown_MouseDown(object sender, MouseButtonEventArgs e)
         {
 
@@ -186,7 +181,7 @@ namespace CardDropDown
                     if (IsOpen)
                     {
                         contentPresenter.Measure(new Size(contentPresenter.MaxWidth, contentPresenter.MaxHeight + 10));
-                        DoubleAnimation doubleAnimation = new(contentPresenter.DesiredSize.Height, _openCloseDuration);
+                        DoubleAnimation doubleAnimation = new(contentPresenter.DesiredSize.Height + 8, _openCloseDuration);
                         expanding.BeginAnimation(HeightProperty, doubleAnimation);
                     }
                     else

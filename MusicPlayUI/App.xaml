@@ -41,8 +41,8 @@
             <DataTemplate DataType="{x:Type modalviewmodel:CreatePlaylistViewModel}">
                 <modalview:CreatePlaylistView/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type modalviewmodel:CreateTagViewModel}">
-                <modalview:CreateTagModal/>
+            <DataTemplate DataType="{x:Type modalviewmodel:CreateModelNameViewModel}">
+                <modalview:CreateModelNameModal/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type modalviewmodel:ValidationModalViewModel}">
                 <modalview:ValidationModalView/>
@@ -120,6 +120,9 @@
 
             <DataTemplate DataType="{x:Type settingsviewmodels:GeneralSettingsViewModel}">
                 <settingsviews:GeneralSettingView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsviewmodels:DSPSettingsViewModels}">
+                <settingsviews:DSPSettingsView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type settingsviewmodels:AppThemeSettingViewModel}">
                 <settingsviews:AppThemeSettingView/>

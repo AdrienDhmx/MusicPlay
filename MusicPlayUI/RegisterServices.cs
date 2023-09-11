@@ -130,6 +130,9 @@ namespace MusicPlayUI
                 services.AddTransient<LanguageSettingView>();
                 services.AddTransient<LanguageSettingViewModel>();
 
+                services.AddTransient<DSPSettingsView>();
+                services.AddTransient<DSPSettingsViewModels>();
+
                 services.AddTransient<VisualizerSettingView>();
                 services.AddTransient<VisualizerSettingViewModel>();
 
@@ -144,8 +147,8 @@ namespace MusicPlayUI
                 services.AddTransient<CreatePlaylistView>();
                 services.AddTransient<CreatePlaylistViewModel>();
 
-                services.AddTransient<CreateTagModal>();
-                services.AddTransient<CreateTagViewModel>();
+                services.AddTransient<CreateModelNameModal>();
+                services.AddTransient<CreateModelNameViewModel>();
 
                 services.AddTransient<ValidationModalView>();
                 services.AddTransient<ValidationModalViewModel>();

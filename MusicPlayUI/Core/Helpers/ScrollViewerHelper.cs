@@ -77,6 +77,11 @@ namespace MusicPlayUI.Core.Helpers
 
         private static void Control_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
+            if (e.Handled)
+            {
+                return;
+            }
+
             DependencyObject d = sender as DependencyObject;
             if (d == null) return;
 

@@ -12,7 +12,6 @@
                         <conv:EmptyTextToVisibilityConverter x:Key="EmptyTextToVisibilityConverter"/>
                     </ControlTemplate.Resources>
                     <Border x:Name="ROOTBORDER"
-                            Margin="{TemplateBinding Margin}"
                             CornerRadius="{TemplateBinding CornerRadius}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
@@ -42,7 +41,7 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
-                                <Grid Margin="0,15"
+                                <Grid Margin="15, 0"
                                       IsHitTestVisible="False">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60"/>
@@ -61,9 +60,11 @@
                                           VerticalAlignment="Center">
                                     </Path>
 
-                                    <StackPanel Grid.Column="1"
-                                                IsHitTestVisible="False"
-                                                VerticalAlignment="Center">
+                                    <Grid Grid.Column="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="auto"/>
+                                        </Grid.RowDefinitions>
                                         <TextBlock Text="{TemplateBinding Header}"
                                                    Foreground="{TemplateBinding Foreground}"
                                                    FontSize="{TemplateBinding FontSize}"
@@ -71,10 +72,11 @@
                                                    FontWeight="{TemplateBinding FontWeight}"
                                                    TextWrapping="Wrap"
                                                    VerticalAlignment="Center">
-                                            
+
                                         </TextBlock>
 
                                         <TextBlock Text="{TemplateBinding HeaderDescription}"
+                                                   Grid.Row="1"
                                                    Foreground="{TemplateBinding HeaderDescriptionForeground}"
                                                    FontSize="{TemplateBinding HeaderDescriptionFontSize}"
                                                    TextAlignment="{TemplateBinding TextAlignment}"
@@ -84,7 +86,7 @@
                                                    VerticalAlignment="Center">
 
                                         </TextBlock>
-                                    </StackPanel>
+                                    </Grid>
 
                                     <TextBlock Text="{TemplateBinding Applied}"
                                                Grid.Column="2"
@@ -109,6 +111,7 @@
                                     CornerRadius="{TemplateBinding CornerRadius}"
                                     BorderBrush="Transparent">
                                 <ContentPresenter Content="{TemplateBinding Content}"
+                                                  Margin="4"
                                                   ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                                   x:Name="PART_ContentHost"/>
                             </Border>

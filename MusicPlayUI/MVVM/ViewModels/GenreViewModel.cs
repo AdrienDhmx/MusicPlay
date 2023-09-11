@@ -178,29 +178,29 @@ namespace MusicPlayUI.MVVM.ViewModels
             // play commands
             PlayGenreCommand = new RelayCommand<string>((shuffle) =>
             {
-                _queueService.SetNewQueue(AllTracks.ToList(), new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(AllTracks.ToList(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
             });
 
             PlayAlbumsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
             {
                 List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbums(Albums.Select(a => a.Id));
-                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
             });
 
             PlayArtistsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
             {
                 List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromArtists(Artists.Select(a => a.Id));
-                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
             });
 
             PlayPlaylistsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
             {
-                _queueService.SetNewQueue(await GetPlaylistsTracks(), new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(await GetPlaylistsTracks(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
             });
 
             PlayTracksOnlyCommand = new RelayCommand<string>((shuffle) =>
             {
-                _queueService.SetNewQueue(Tracks.ToList(), new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(Tracks.ToList(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
             });
 
             ShowHideArtistsCommand = new RelayCommand(() =>
@@ -243,12 +243,18 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             PlayTrackCommand = new RelayCommand<TrackModel>((track) =>
             {
-                _queueService.SetNewQueue(Tracks.ToList(), new(Genre.Name, ModelTypeEnum.Genre, Genre.Id), track.AlbumCover, track);
+                _queueService.SetNewQueue(Tracks.ToList(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), track.AlbumCover, track);
             });
 
             EditTagCommand = new RelayCommand(() =>
             {
-                _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => { }, Genre);
+                Action<string> updateTag = async (string newName) =>
+                {
+                    Genre.Name = newName;
+                    await DataAccess.Connection.UpdateTag(Genre);
+                };
+                CreateEditNameModel model = new CreateEditNameModel(Genre.Name, "Tag", true, null, updateTag);
+                _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => { }, model);
             });
 
             // navigate commands

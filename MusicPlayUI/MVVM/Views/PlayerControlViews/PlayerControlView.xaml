@@ -361,7 +361,7 @@
                 <iconbtn:IconButton Grid.Column="2"
                                     Style="{DynamicResource NormalIconBtn}"
                                     x:Name="DeviceIconBtn"
-                                    Icon="{Binding CurrentDevice.Icon, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Icon="{Binding CurrentDevice.Icon}"
                                     Command="{Binding OpenDevicesPopupCommand}"/>
 
 
