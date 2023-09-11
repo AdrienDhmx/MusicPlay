@@ -503,7 +503,7 @@
            BasedOn="{StaticResource BaseTextBtn}">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="Height" Value="40"/>
-        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Style.Triggers>

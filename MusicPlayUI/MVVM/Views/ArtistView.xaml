@@ -25,50 +25,55 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <Border VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
-              Panel.ZIndex="2"
-              Background="{DynamicResource PrimaryContainer}">
 
-            <Grid x:Name="StickyPart"
+        <Grid x:Name="StickyPart"
                     MinHeight="130"
                   Height="220"
+              Panel.ZIndex="2"
                   MaxHeight="220">
-                <Grid HorizontalAlignment="Center"
+            <Border Background="{DynamicResource PrimaryContainer}">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black"
+                                          BlurRadius="6"
+                                          ShadowDepth="3"
+                                           Opacity="0.9"
+                                          Direction="-20"/>
+                </Border.Effect>
+            </Border>
+            <Grid HorizontalAlignment="Center"
                       Margin="10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Artist Cover -->
-                    <Border Grid.RowSpan="2"
+                <!-- Artist Cover -->
+                <Border Grid.RowSpan="2"
                             Margin="0,0,10,0"
                             MaxHeight="300"
                             CornerRadius="{Binding ActualWidth, RelativeSource={RelativeSource self}, Converter={StaticResource SizeConverter}, ConverterParameter='2'}"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
-                        <Border.Background>
-                            <ImageBrush ImageSource="{Binding Artist.Cover, Converter={StaticResource MNullImageConverter}, ConverterParameter=1}"
+                    <Border.Background>
+                        <ImageBrush ImageSource="{Binding Artist.Cover, Converter={StaticResource MNullImageConverter}, ConverterParameter=1}"
                                                 Stretch="UniformToFill"/>
-                        </Border.Background>
-                    </Border>
+                    </Border.Background>
+                </Border>
 
-                    <!-- Artist Name + Duration + More Opt Btn -->
-                    <Grid VerticalAlignment="Stretch"
+                <!-- Artist Name + Duration + More Opt Btn -->
+                <Grid VerticalAlignment="Stretch"
                           HorizontalAlignment="Left"
                           MaxHeight="290"
                           Margin="0,6"
                             Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
 
-                        <!--  Artist Name -->
-                        <TextBlock Text="{Binding Artist.Name}"
+                    <!--  Artist Name -->
+                    <TextBlock Text="{Binding Artist.Name}"
                                     TextWrapping="Wrap"
                                     TextTrimming="CharacterEllipsis"
                                         MaxWidth="{Binding ActualHeight, ElementName=ArtistScroll,Converter={StaticResource SizeConverter}, ConverterParameter=0.5}"
@@ -76,66 +81,65 @@
                                     MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=1.8}"
                                     Style="{DynamicResource SLargeHeaderStyle}"/>
 
-                        <StackPanel Orientation="Horizontal"
+                    <StackPanel Orientation="Horizontal"
                                     Margin="2,10"
                                         Grid.Row="1"
                                         HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding Artist.Duration}"
+                        <TextBlock Text="{Binding Artist.Duration}"
                                             Style="{DynamicResource NLargeSecondaryStyle}"/>
 
-                            <TextBlock Text="{Binding Tracks.Count, StringFormat=- {0}}"
+                        <TextBlock Text="{Binding Tracks.Count, StringFormat=- {0}}"
                                            Margin="5,0"
                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
 
-                            <TextBlock Text="{x:Static lang:Resources.Tracks}"
+                        <TextBlock Text="{x:Static lang:Resources.Tracks}"
                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
 
-                        </StackPanel>
-                        <!-- Play Buttons -->
-                        <StackPanel Grid.Row="2"
+                    </StackPanel>
+                    <!-- Play Buttons -->
+                    <StackPanel Grid.Row="2"
                                     Grid.ColumnSpan="2"
                                     Style="{DynamicResource ArtistLargePlayBtnStackPanel}"
                                     Orientation="Horizontal">
-                            <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
+                        <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
                                                 Style="{DynamicResource LargePlayButton}"/>
 
-                            <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
+                        <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
                                                                     Style="{DynamicResource LargePlayShuffleButton}"/>
 
-                            <!-- More Option Button -->
-                            <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                        <!-- More Option Button -->
+                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
                                                IconHeight="5"
                                                 IconWidth="28"
                                                     Icon="{DynamicResource MoreOptionIcon}"
                                                     Margin="6,0"
                                                     Command="{Binding OpenArtistPopupCommand}"/>
-                        </StackPanel>
+                    </StackPanel>
 
-                    </Grid>
-                    
-                    <!-- Small Play Buttons -->
-                    <StackPanel Grid.Column="2"
+                </Grid>
+
+                <!-- Small Play Buttons -->
+                <StackPanel Grid.Column="2"
                                 Grid.RowSpan="2"
                                 Style="{DynamicResource ArtistSmallPlayBtnStackPanel}"
                                 Orientation="Horizontal">
-                        <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
+                    <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
                                             Style="{DynamicResource SmallPlayButton}"/>
 
-                        <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
+                    <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
                                             Style="{DynamicResource SmallPlayShuffleButton}"/>
 
 
-                        <!-- More Option Button -->
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                    <!-- More Option Button -->
+                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
                                                 IconHeight="5"
                                                 IconWidth="28"
                                                     Icon="{DynamicResource MoreOptionIcon}"
                                                     Margin="6,0"
                                                     Command="{Binding OpenArtistPopupCommand}"/>
-                    </StackPanel>
-                </Grid>
+                </StackPanel>
             </Grid>
-        </Border>
+        </Grid>
 
         <ScrollViewer x:Name="ArtistScroll"
                       VerticalScrollBarVisibility="Hidden"

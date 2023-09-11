@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,7 +8,6 @@ using System.Windows.Shapes;
 using AudioHandler;
 using AudioHandler.Models;
 using Equalizer.Models;
-using ManagedBass.Fx;
 
 namespace Equalizer
 {
@@ -34,7 +30,6 @@ namespace Equalizer
             set { SetValue(SelectedEQBandProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SelectedEQBand.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedEQBandProperty =
             DependencyProperty.Register("SelectedEQBand", typeof(UIEQBandModel), typeof(Equalizer), new PropertyMetadata(null));
 
@@ -71,8 +66,6 @@ namespace Equalizer
         private static event Action PresetChanged;
         private static EQPresetModel preset = new();
         private static List<EQEffectModel> effects => preset.Effects;
-
-        private static SolidColorBrush graphColor;
 
         private const int fontSize = 16;
         private const double PointDiameter = 16;
@@ -140,7 +133,6 @@ namespace Equalizer
             base.EndInit();
 
             Background = DrawHelper.Tranparent;
-            graphColor = (SolidColorBrush)GraphColor;
 
             PresetChanged += Draw;
         }
@@ -198,7 +190,6 @@ namespace Equalizer
                 }
 
                 MovingEffectIndex = -1;
-                MovingPoint = null;
                 Draw();
             }   
         }
@@ -236,6 +227,7 @@ namespace Equalizer
                     // update the graph
                     EQEffectModel effect = (EQEffectModel)effects[MovingEffectIndex].Clone();
                     effect.BandWidth = newBandwidth;
+                    SelectedEQBand.BandWidth = newBandwidth;
                     effects[MovingEffectIndex] = effect;
                 }
                 else // change center freq and gain
@@ -263,6 +255,9 @@ namespace Equalizer
                     EQEffectModel effect = (EQEffectModel)effects[MovingEffectIndex].Clone();
                     effect.Gain = (Height - MovingPointPos.Y - GraphYStart) / YTickStep + YStartValue; // db can be negative (30 total => -15db ... +15db)
                     effect.CenterFrequency = GraphCoorToHz(ToGraphCoor(MovingPointPos).X);
+                    SelectedEQBand.Gain = effect.Gain;
+                    SelectedEQBand.CenterFrequency = effect.CenterFrequency;
+
                     effects[MovingEffectIndex] = effect;
                 }
                 DrawPreset(true);
@@ -289,7 +284,6 @@ namespace Equalizer
                     EQManager.UpdatePreset(effect);
                 }
                 MovingEffectIndex = -1;
-                MovingPoint = null;
                 Draw();
             }
             RightMouseDown = false;
@@ -524,6 +518,7 @@ namespace Equalizer
             if(index == 0)
             {
                 percentage = ExactIndex;
+                return XLegendValues[0] + XLegendValues[0] * percentage;
             }
             else
             {
@@ -536,7 +531,7 @@ namespace Equalizer
             }
             else if(index == XLegendValues.Length - 1)
             {
-                return XLegendValues[index] + (32000 - XLegendValues[index]) * percentage;
+                return XLegendValues[index] + XLegendValues[index] * percentage;
             }
 
             return XLegendValues[index] + (XLegendValues[index + 1] - XLegendValues[index]) * percentage;

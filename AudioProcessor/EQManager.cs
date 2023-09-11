@@ -112,6 +112,7 @@ namespace AudioHandler
             effect.Band = Preset.Effects.Count;
             Preset.Effects.Add(effect);
             ApplyEffect(effect);
+            OnPresetChanged();
         }
 
         public void RemovePreset()
@@ -123,12 +124,27 @@ namespace AudioHandler
 
         public void RemoveEffect(EQEffectModel effect)
         {
-            int index = Preset.Effects.IndexOf(effect);
+            int index = -1;
+            for (int i = 0; i < Preset.Effects.Count; i++)
+            {
+                if (Preset.Effects[i].Band == effect.Band)
+                {
+                    index = i;
+                }
+                else if(index != -1)
+                {
+                    Preset.Effects[i].Band = i - 1;
+                }
+            }
+
+            if (index == -1) return;
+                
             Preset.Effects.RemoveAt(index);
 
             Bass.ChannelRemoveFX(stream, fxHandle);
             
             ApplyPreset();
+            OnPresetChanged();
         }
 
         public void UpdatePreset(EQEffectModel effect)

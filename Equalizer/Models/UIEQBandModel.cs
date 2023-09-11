@@ -12,6 +12,8 @@ namespace Equalizer.Models
     {
         public SolidColorBrush Brush { get; }
 
+        public string BandName => $"Band {Band + 1}";
+
         public UIEQBandModel(EQEffectModel eQBand, SolidColorBrush brush)
         {
             Brush = brush;

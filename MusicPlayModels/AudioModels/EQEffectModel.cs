@@ -5,8 +5,8 @@ namespace AudioHandler.Models
 {
     public class EQEffectModel : BaseModel, ICloneable
     {
-        private const double defaultCenterfrequency = 1000.0;
-        private const double defaultBandWidth = 2.5;
+        private const double defaultCenterFrequency = 1000.0;
+        private const double defaultBandWidth = 1;
         private const double defaultGain = 0;
         private const FXChannelFlags defaultChannels = FXChannelFlags.All;
 
@@ -29,6 +29,12 @@ namespace AudioHandler.Models
             return CenterFrequency / Math.Pow(2, octave);
         }
 
+        public string CenterFrequencyName => $"{Math.Round(CenterFrequency)}Hz";
+
+        public string BandWidthName => $"{Math.Round(BandWidth, 1)} Octave";
+
+        public string GainName => $"{Math.Round(Gain, 1)}Db";
+
         private int _band;
         public int Band
         {
@@ -49,7 +55,7 @@ namespace AudioHandler.Models
             }
         }
 
-        private double _centerFrequency = defaultCenterfrequency;
+        private double _centerFrequency = defaultCenterFrequency;
         public double CenterFrequency 
         {
             get => _centerFrequency;
@@ -59,6 +65,7 @@ namespace AudioHandler.Models
                 else if(value < MinFrequency) value = MinFrequency;
 
                 SetField(ref _centerFrequency, value);
+                OnPropertyChanged(nameof(CenterFrequencyName));
             }
         }
 
@@ -69,6 +76,7 @@ namespace AudioHandler.Models
             set
             {
                 SetField(ref _bandWidth, value);
+                OnPropertyChanged(nameof(BandWidthName));
             }
         }
 
@@ -79,6 +87,7 @@ namespace AudioHandler.Models
             set
             {
                 SetField(ref _gain, value);
+                OnPropertyChanged(nameof(GainName));
             }
         }
 

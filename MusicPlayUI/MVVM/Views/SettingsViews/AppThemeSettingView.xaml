@@ -20,11 +20,21 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Background="{DynamicResource PrimaryContainer}"
+        <Grid 
               x:Name="StickyGrid"
               MaxHeight="150"
               Height="150"
-              MinHeight="100">
+              MinHeight="100"
+                Panel.ZIndex="10">
+            <Border Background="{DynamicResource PrimaryContainer}">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black"
+                                      BlurRadius="6"
+                                      ShadowDepth="3"
+                                       Opacity="0.9"
+                                      Direction="-20"/>
+                </Border.Effect>
+            </Border>
             <StackPanel Orientation="Vertical"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"

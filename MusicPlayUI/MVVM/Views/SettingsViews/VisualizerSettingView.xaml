@@ -27,11 +27,22 @@
               x:Name="StickyGrid"
               MaxHeight="150"
               Height="150"
-              MinHeight="110">
+              MinHeight="110"
+           Panel.ZIndex="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
+            <Border Background="{DynamicResource PrimaryContainer}"
+                    Grid.RowSpan="2">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black"
+                                      BlurRadius="6"
+                                      ShadowDepth="3"
+                                       Opacity="0.9"
+                                      Direction="-20"/>
+                </Border.Effect>
+            </Border>
             <TextBlock Text="{x:Static lang:Resources.VisualizerSettings}"
                        Style="{DynamicResource BStyle}"
                        HorizontalAlignment="Center"

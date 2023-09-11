@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using AudioHandler;
 using AudioHandler.Models;
@@ -43,14 +44,17 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         }
 
         private UIEQBandModel _selectedPresetBand;
-        public UIEQBandModel SelectedPresetband
+        public UIEQBandModel SelectedPresetBand
         {
             get => _selectedPresetBand;
             set
             {
                 SetField(ref _selectedPresetBand, value);
+                OnPropertyChanged(nameof(BandSelected));
             }
         }
+
+        public bool BandSelected => SelectedPresetBand != null;
 
         /// <summary>
         /// The currently applied preset to the audio
@@ -113,6 +117,11 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 SetField(ref _isPresetPopupOpen, value);
             }
         }
+
+        public bool CanAddBand => AppliedPreset.Effects.Count < MaxBandCount;
+
+        public const int MaxBandCount = 10;
+
         public ICommand ResetPresetCommand { get; }
         public ICommand TogglePresetPopupCommand { get; }
         public ICommand ToggleEqualizerCommand { get; }
@@ -121,6 +130,8 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         public ICommand SavePresetCommand { get; }
         public ICommand EditPresetNameCommand { get; }
         public ICommand DeletePresetCommand { get; }
+        public ICommand AddBandCommand { get; }
+        public ICommand RemoveBandCommand { get; }
         public DSPSettingsViewModels(INavigationService navigationService, IWindowService windowService, IAudioPlayback audioPlayback, IModalService modalService) : base(navigationService, windowService)
         {
             AudioPlayback = audioPlayback;
@@ -187,6 +198,25 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 _modalService.OpenModal(ViewNameEnum.ConfirmAction, ConfirmDelete, ConfirmActionModelFactory.CreateConfirmDeleteModel(OriginalPreset.Name, ModelTypeEnum.EQPreset));
             });
 
+            AddBandCommand = new RelayCommand(() =>
+            {
+                EQManager.AddEffect(new());
+                OnPropertyChanged(nameof(AppliedPreset));
+                OnEQBandUpdated();
+            });
+
+            RemoveBandCommand = new RelayCommand<EQEffectModel>((EQEffectModel band) =>
+            {
+                EQManager.RemoveEffect(band);
+                OnPropertyChanged(nameof(AppliedPreset));
+                OnEQBandUpdated();
+
+                if(band.Id == SelectedPresetBand.Id)
+                {
+                    SelectedPresetBand = null;
+                }
+            });
+
             // init
             Update();
         }
@@ -220,6 +250,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         private void OnEQBandUpdated()
         {
             CanSave = CanUpdate;
+            OnPropertyChanged(nameof(CanAddBand));
         }
 
         private async void GetPresets()
