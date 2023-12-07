@@ -151,7 +151,14 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         internal void CreateTag(BaseModel dataToAddToNewTag)
         {
-            _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => OnCreateTagClosed(canceled, dataToAddToNewTag));
+            Action<string> createTag = async (string newName) =>
+            {
+                TagModel tag = new();
+                tag.Name = newName;
+                await DataAccess.Connection.InserTag(tag);
+            };
+            CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, createTag, null);
+            _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => OnCreateTagClosed(canceled, dataToAddToNewTag), model);
         }
 
         private async void OnCreateTagClosed(bool isCanceled, BaseModel data)

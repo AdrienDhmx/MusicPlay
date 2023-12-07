@@ -1192,7 +1192,10 @@ namespace DataBaseConnection.DataAccess
 
         public Task UpdateTrackArtwork(TrackModel track)
         {
-            throw new NotImplementedException();
+            return new Query(Tables.TTrack).Where(Columns.Id, track.Id).AsUpdate(new Dictionary<string, object>()
+            {
+                { Columns.Artwork, track.Artwork },
+            }).ExecuteAsync();
         }
 
         public Task UpdateTrackDiscTrackNumber(TrackModel track)
@@ -1298,6 +1301,14 @@ namespace DataBaseConnection.DataAccess
             return presets;
         }
 
+        public async Task<EQPresetModel> GetEQPreset(int id)
+        {
+            EQPresetModel preset = await new Query(Tables.TEQPreset).Where(Columns.Id, id).FirstAsync<EQPresetModel>();
+
+            preset.Effects = GetEQBands(preset.Id);
+            return preset;
+        }
+
         public async Task<int> InsertEQPreset(EQPresetModel eqPreset)
         {
             int presetId = new Query(Tables.TEQPreset).AsInsert(Tables.CreateEQPresetTable(eqPreset.Name)).Insert(true);
@@ -1312,6 +1323,11 @@ namespace DataBaseConnection.DataAccess
             await queries.ExecuteAsync();
 
             return presetId;
+        }
+
+        public Task InsertEQBand(EQEffectModel eqBand, int eqPresetId)
+        {
+            return new Query(Tables.TEQBand).AsInsert(Tables.CreateEQBandTable(eqBand, eqPresetId)).ExecuteAsync();
         }
 
         private List<EQEffectModel> GetEQBands(int presetId)
@@ -1334,6 +1350,11 @@ namespace DataBaseConnection.DataAccess
             new Query(Tables.TEQPreset).Where(Columns.Id, eqPreset.Id).AsDelete().Execute();
 
             return new Query(Tables.TEQBand).Where(Columns.EQPresetId, eqPreset.Id).AsDelete().ExecuteAsync();
+        }
+
+        public Task DeleteEQBand(int eqBandId)
+        {
+            return new Query(Tables.TEQBand).Where(Columns.Id, eqBandId).AsDelete().ExecuteAsync();
         }
     }
 }

@@ -11,6 +11,7 @@ using MusicPlayModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
+using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
 
@@ -30,6 +31,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             {
                 SetField(ref _equalizerEnabled, value);
                 EQManager.Enabled = value;
+                ConfigurationService.SetPreference(SettingsEnum.EqualizerEnabled, value ? "1" : "0");
             }
         }
 
@@ -65,11 +67,12 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             set
             {
                 CanSave = false;
-                CanUpdate = value.Id != -1;
+                CanUpdate = value.Id >= 0; // preset is user made
                 // clone to not modify the saved preset in the collection
                 EQManager.ApplyPreset((EQPresetModel)value.Clone());
                 OriginalPreset = value;
                 OnPropertyChanged(nameof(AppliedPresetName));
+                ConfigurationService.SetPreference(SettingsEnum.EqualizerPreset, value.Id.ToString());
             }
         }
 
@@ -159,8 +162,6 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                     preset.Name = newName;
                     preset.Id = await DataAccess.Connection.InsertEQPreset(preset);
                     AppliedPreset = preset;
-
-                    EQManager.ApplyPreset(preset);
                 };
                 CreateEditNameModel model = new CreateEditNameModel("", "Preset", false, createPreset, null);
                 _modalService.OpenModal(ViewNameEnum.CreateTag, (canceled) => { }, model);
@@ -171,6 +172,32 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 foreach (EQEffectModel eqBand in AppliedPreset.Effects)
                 {
                     await DataAccess.Connection.UpdateEQBand(eqBand);
+                }
+
+                for (int i = 0; i < AppliedPreset.Effects.Count; i++)
+                {
+                    EQEffectModel appliedBand = AppliedPreset.Effects[i];
+
+                    // band added, insert it
+                    if(appliedBand.Id < 0)
+                    {
+                        await DataAccess.Connection.InsertEQBand(appliedBand, AppliedPreset.Id);
+                        continue;
+                    }
+                    else if (i < OriginalPreset.Effects.Count)
+                    {
+                        EQEffectModel originalBand = OriginalPreset.Effects[i];
+
+                        // a band has been removed, delete it
+                        if(appliedBand.Id !=  originalBand.Id && !AppliedPreset.Effects.Any(e => e.Id == originalBand.Id))
+                        {
+                            await DataAccess.Connection.DeleteEQBand(originalBand.Id);
+                            continue;
+                        }
+                    }
+
+                    // update the band
+                    await DataAccess.Connection.UpdateEQBand(appliedBand);
                 }
 
                 GetPresets();
@@ -245,6 +272,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             CanUpdate = false;
             OriginalPreset = null;
             OnPropertyChanged(nameof(AppliedPresetName));
+            ConfigurationService.SetPreference(SettingsEnum.EqualizerPreset, "-1");
         }
 
         private void OnEQBandUpdated()
@@ -265,8 +293,6 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         public override void Update(BaseModel parameter = null)
         {
             _equalizerEnabled = EQManager.Enabled;
-            AppliedPreset = EQManager.Preset;
-
             GetPresets();
         }
     }

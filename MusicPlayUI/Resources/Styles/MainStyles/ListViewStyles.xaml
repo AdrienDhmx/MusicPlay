@@ -61,22 +61,22 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                <Border x:Name="Border"
-                        Margin="0"
-                        Padding="4"
-                        Background="{TemplateBinding Background}"
-                        BorderThickness="0"
-                        CornerRadius="5"
-                        BorderBrush="Transparent">
-                    <ContentPresenter />
-                </Border>
-                <ControlTemplate.Triggers>
-                    <Trigger Property="IsSelected" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
-                        <Setter Property="BorderThickness" Value="1"/>
+                    <Border x:Name="Border"
+                            Margin="0"
+                            Padding="4"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="0"
+                            CornerRadius="5"
+                            BorderBrush="Transparent">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
                         </Trigger>
-                </ControlTemplate.Triggers>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -92,8 +92,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
                     <Border x:Name="Border"
-                        Margin="0"
-                        Padding="4"
+                            Margin="0, 2"
                         Background="{TemplateBinding Background}"
                             HorizontalAlignment="Stretch"
                         BorderThickness="0"
@@ -107,6 +106,13 @@
                             <Setter Property="Background" TargetName="Border"  Value="{DynamicResource PrimaryHover}"/>
                             <Setter Property="BorderThickness" TargetName="Border"  Value="1"/>
                         </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Value="False" Binding="{Binding IsSelected, RelativeSource={RelativeSource self}}"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=Border}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

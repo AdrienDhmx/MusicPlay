@@ -20,6 +20,7 @@
             MaxWidth="400"
             CornerRadius="4"
             BorderThickness="1"
+            ClipToBounds="false"
             BorderBrush="{DynamicResource Outline}">
         <Grid>
             <Grid.RowDefinitions>

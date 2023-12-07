@@ -77,6 +77,20 @@ namespace MusicPlayUI
                     MessageHelper.PublishMessage(MessageFactory.TrackDeleted(deletedTracks));
                 }
 
+                IAudioPlayback audioPlayback = _services.GetService<IAudioPlayback>();
+
+                audioPlayback.EQManager.Enabled = ConfigurationService.GetPreference(SettingsEnum.EqualizerEnabled) == 1;
+                int presetId = ConfigurationService.GetPreference(SettingsEnum.EqualizerPreset);
+
+                if(presetId >= 0) 
+                {
+                    audioPlayback.EQManager.ApplyPreset(await DataAccess.Connection.GetEQPreset(presetId));
+                }
+                else
+                {
+                    audioPlayback.EQManager.ApplyPreset(EQModelsFactory.GetPreMadePreset(presetId));
+                }
+
                 // init queue services
                 _queueService = _services.GetRequiredService<IQueueService>();
             }

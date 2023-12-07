@@ -14,6 +14,9 @@ using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using MusicFilesProcessor;
+using System.Windows.Documents;
 
 namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 {
@@ -42,6 +45,58 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             set { SetField(ref _queueService, value); }
         }
 
+        private bool _colorfulPlayerControl = ConfigurationService.GetPreference(SettingsEnum.ColorfulPlayerControl) == 1;
+        public bool ColorfulPlayerControl
+        {
+            get { return _colorfulPlayerControl; }
+            set
+            {
+                _colorfulPlayerControl = value;
+                OnPropertyChanged(nameof(ColorfulPlayerControl));
+            }
+        }
+
+        private RadialGradientBrush _radialGradientBrush;
+        public RadialGradientBrush RadialGradientBrush
+        {
+            get => _radialGradientBrush;
+            set
+            {
+                SetField(ref _radialGradientBrush, value);
+            }
+        }
+
+        private SolidColorBrush _meanColor;
+        public SolidColorBrush MeanColor
+        {
+            get => _meanColor;
+            set
+            {
+                SetField(ref _meanColor, value);
+            }
+        }
+
+        private string _blurredCover;
+        public string BlurredCover
+        {
+            get { return _blurredCover; }
+            set
+            {
+                _blurredCover = value;
+                OnPropertyChanged(nameof(BlurredCover));
+            }
+        }
+
+        private bool _showMeanColor;
+        public bool ShowMeanColor
+        {
+            get => _showMeanColor;
+            set
+            {
+                SetField(ref _showMeanColor, value);
+            }
+        }
+
         private int _volume => _audioPlayback.Volume;
         public int Volume
         {
@@ -63,10 +118,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             get { return _currentDevice; }
             set
             {
-                _currentDevice = value;
-                OnPropertyChanged(nameof(CurrentDevice));
+                SetField(ref _currentDevice, value);
+                OnPropertyChanged(nameof(CurrentDeviceIcon));
             }
         }
+
+        public Geometry CurrentDeviceIcon => CurrentDevice.Icon;
+
 
         private ObservableCollection<FullDeviceModel> _allDevices = new(AudioOutput.GetAllDevices().CreateDeviceModel());
         public ObservableCollection<FullDeviceModel> AllDevices
@@ -143,6 +201,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             _audioPlayback.VolumeChanged += OnVolumeChanged;
             _audioPlayback.DeviceChanged += OnDeviceChanged;
+
+            ConfigurationService.ColorfulPlayerControlChange += OnColorfulPlayerChanged;
+            AppThemeService.ThemeChanged += UpdateBlurredCover;
 
             Volume = ConfigurationService.GetPreference(SettingsEnum.Volume);
             OnDeviceChanged();
@@ -229,6 +290,81 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             });
 
             NavigateToPlayingFromCommand = new RelayCommand(_queueService.NavigateToPlayingFrom);
+
+            UpdateBlurredCover();
+        }
+
+        private void UpdateRadialGradient()
+        {
+            RadialGradientBrush gradientBrush = new RadialGradientBrush()
+            {
+                GradientOrigin = new System.Windows.Point(0.1, 0.5),
+                RadiusX = 0.8,
+                RadiusY = 1.6,
+            };
+ 
+            GradientStopCollection offsets = new GradientStopCollection();
+            MeanColor = BlurredCover.CalculateMeanColor();
+            double meanChannelsValue = MeanColor.CalculateBrightness();
+            ShowMeanColor = MeanColor.IsGrey(margin: 14);
+
+            if(ShowMeanColor)
+            {
+                MeanColor = MeanColor.GetEmphasizedColor();
+            }
+
+            int modifier = (int)(20 * (1 - meanChannelsValue)); // invert the mean to make dark color more important
+
+            if ((AppThemeService.IsLightTheme && meanChannelsValue < 0.65) // dark color on light color
+                || (!AppThemeService.IsLightTheme && meanChannelsValue > 0.65)) // light color on dark color
+            {
+                if (AppThemeService.IsLightTheme && meanChannelsValue > 0.45)
+                {
+                    modifier = 20;
+                }
+
+                // not too visible
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(200 - modifier), 0, 0, 0), 0));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(220 - modifier), 0, 0, 0), 0.2));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(230 - modifier), 0, 0, 0), 0.4));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(240 - modifier), 0, 0, 0), 0.6));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(250 - modifier), 0, 0, 0), 0.8));
+                offsets.Add(new GradientStop(Color.FromArgb(250, 0, 0, 0), 1));
+            }
+            else
+            {
+                if (!ShowMeanColor)
+                {
+                    if (AppThemeService.IsLightTheme && meanChannelsValue > 0.85)
+                    {
+                        modifier = -10;
+                    } 
+                    else if(!AppThemeService.IsLightTheme && meanChannelsValue < 0.28)
+                    {
+                        modifier = -20;
+                    }
+                }
+
+                // make more visible
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(190 + modifier), 0, 0, 0), 0));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(200 + modifier), 0, 0, 0), 0.2));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(210 + modifier), 0, 0, 0), 0.4));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(220 + modifier), 0, 0, 0), 0.6));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(240 + modifier / 2), 0, 0, 0), 0.8));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(250 + modifier / 2), 0, 0, 0), 1));
+            }
+
+            gradientBrush.GradientStops = offsets;
+            RadialGradientBrush = gradientBrush;
+        }
+
+        private void UpdateBlurredCover()
+        {
+            if (QueueService.PlayingTrack != null && ColorfulPlayerControl)
+            {
+                BlurredCover = QueueService.PlayingTrack.Cover.GetBlurredImage(20);
+                UpdateRadialGradient();
+            }
         }
 
         private void OpenCloseDevicePopup()
@@ -249,6 +385,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             QueueService.PlayingTrackChanged -= OnPlayingTrackChanged;
             QueueService.PlayingTrackInteractionChanged -= OnPlayingTrackChanged;
+
+            ConfigurationService.ColorfulPlayerControlChange -= OnColorfulPlayerChanged;
+            AppThemeService.ThemeChanged -= UpdateBlurredCover;
 
             _audioPlayback.Dispose(); // dispose of all audio resources
             GC.SuppressFinalize(this);
@@ -291,12 +430,19 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             {
                 IsFavorite = QueueService.PlayingTrack.IsFavorite;
                 OnPropertyChanged(nameof(Rating));
+                UpdateBlurredCover();
             }
         }
 
         private void OnDeviceChanged()
         {
              CurrentDevice = _audioPlayback.Device.CreateDeviceModal();
+        }
+
+        private void OnColorfulPlayerChanged()
+        {
+            ColorfulPlayerControl = ConfigurationService.GetPreference(SettingsEnum.ColorfulPlayerControl) == 1;
+            UpdateBlurredCover();
         }
     }
 }

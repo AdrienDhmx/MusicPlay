@@ -29,9 +29,9 @@
             <Border Background="{DynamicResource PrimaryContainer}">
                 <Border.Effect>
                     <DropShadowEffect Color="Black"
-                                      BlurRadius="6"
+                                      BlurRadius="10"
                                       ShadowDepth="3"
-                                       Opacity="0.9"
+                                       Opacity="0.8"
                                       Direction="-20"/>
                 </Border.Effect>
             </Border>
@@ -56,6 +56,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -67,25 +68,33 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox IsChecked="{Binding LightTheme}"
+                    <CheckBox IsChecked="{Binding LightTheme, Converter={StaticResource InverseBoolConverter}}"
                               Style="{DynamicResource SettingsCheckBox}"
-                              Content="Light theme"/>
+                              Content=" Dark theme"/>
                     
                     <CheckBox IsChecked="{Binding SunsetSunrise}"
                               Style="{DynamicResource SettingsCheckBox}"
-                              Content="Sunset / Sunrise"
+                              Content=" Sunset / Sunrise"
                               Margin="20,0"
                               ToolTip="Switch based on time of day."
                               Grid.Column="1"/>
                     
                     <CheckBox IsChecked="{Binding SystemSync}"
                               Style="{DynamicResource SettingsCheckBox}"
-                              Content="system Sync"
+                              Content=" System Sync"
                               Grid.Column="2"/>
                 </Grid>
 
+                <CheckBox IsChecked="{Binding ColorfulPlayerControl}"
+                      Style="{DynamicResource SettingsCheckBox}"
+                      Content=" Colorful player control"
+                          HorizontalAlignment="Center"
+                          Margin="0, 0, 0, 6"
+                          Grid.Row="1"
+                      Grid.Column="2"/>
+
                 <Border Margin="40,10,40,0"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         BorderBrush="{DynamicResource Primary}"
                         BorderThickness="0,0,0,1"
                         Background="Transparent">
@@ -94,7 +103,7 @@
                                Style="{DynamicResource SlistInfoStyle}"/>
                 </Border>
                 
-                <Border Grid.Row="2"
+                <Border Grid.Row="3"
                         Margin="20,10"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top">

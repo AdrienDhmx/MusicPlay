@@ -181,9 +181,9 @@ namespace MusicFilesProcessor
             // color dif with the highest value increased
             (double rRatio, double gRatio, double bRatio) = CalculateRatio(color.Color.R, color.Color.G, color.Color.B, emphasizeBy);
 
-            double brightness = (color.Color.R + color.Color.G + color.Color.B) / 765d;
+            double brightness = color.CalculateBrightness();
 
-            // change brightness to have a color that's eiter brighter or darker than the original (it needs to be visible)
+            // change brightness to have a color that's either brighter or darker than the original (it needs to be visible)
             red = (int)(rRatio * color.Color.R + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
             green = (int)(gRatio * color.Color.G + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
             blue = (int)(bRatio * color.Color.B + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
@@ -200,6 +200,20 @@ namespace MusicFilesProcessor
             blue = FormatRGB(blue, 1.1, (int)(maxChannelValue * brightness * bRatio));
 
             return new(System.Windows.Media.Color.FromRgb((byte)red, (byte)green, (byte)blue));
+        }
+
+        public static double CalculateBrightness(this SolidColorBrush color)
+        {
+            return (color.Color.R + color.Color.G + color.Color.B) / 765d;
+        }
+
+        public static bool IsGrey(this SolidColorBrush color, int margin = 40)
+        {
+            int r = color.Color.R;
+            int g = color.Color.G;
+            int b = color.Color.B;
+
+            return Math.Abs(r - g) <= margin && Math.Abs(g - b) <= margin && Math.Abs(b - r) <= margin;
         }
 
 

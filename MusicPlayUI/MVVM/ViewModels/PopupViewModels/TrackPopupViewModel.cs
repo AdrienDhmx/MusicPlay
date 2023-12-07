@@ -16,6 +16,7 @@ using MessageControl;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Helpers;
 using Windows.Media.Playlists;
+using System.Windows.Navigation;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
@@ -25,7 +26,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public IQueueService QueueService { get { return _queueService; } }
         
         private readonly IWindowService _windowService;
-
+        private readonly IRadioStationsService _radioStationsService;
         private UIOrderedTrackModel _selectedTrack;
         public UIOrderedTrackModel SelectedTrack
         {
@@ -102,11 +103,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand NavigateToArtistCommand { get; }
         public ICommand AddToTagCommand { get; }
         public ICommand CreateTagCommand { get; }
+        public ICommand StartRadioCommand { get; }
         public TrackPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, 
-             IWindowService windowService) : base(navigationService, modalService)
+             IWindowService windowService, IRadioStationsService radioStationsService) : base(navigationService, modalService)
         {
             _queueService = queueService;            
             _windowService = windowService;
+            _radioStationsService = radioStationsService;
 
             PlayNextCommand = new RelayCommand(PlayNext);
             AddToQueueCommand = new RelayCommand(AddToQueue);
@@ -122,6 +125,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             });
             NavigateToArtistCommand = new RelayCommand<int>(async (id) => _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id)));
 
+            StartRadioCommand = new RelayCommand(async () =>
+            {
+                PlaylistModel radio = await _radioStationsService.CreateRadioStation(SelectedTrack);
+                queueService.SetNewQueue(radio.Tracks.ToTrackModel(), new(radio.Name, ModelTypeEnum.Playlist, radio.Id), radio.Cover);
+                navigationService.ClosePopup();
+            });
+
             Task.Run(LoadData);
         }
 
@@ -133,11 +143,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         private void PlayNext()
         {
             _queueService.AddTrack(SelectedTrack);
+            _navigationService.ClosePopup();
         }
 
         private void AddToQueue()
         {
             _queueService.AddTrack(SelectedTrack, true);
+            _navigationService.ClosePopup();
         }
 
         private async void AddToPlaylist(PlaylistModel playlist)
@@ -191,11 +203,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
                 // if the button to remove from playlist is visible then the view is a the playlist the tracks has been removed from
                 _navigationService.CurrentViewModel.Update();
+                _navigationService.ClosePopup();
             }
         }
 
         private void ChangeArtwork()
         {
+            _navigationService.ClosePopup();
             SelectedTrack.ChangeCover();
         }
 

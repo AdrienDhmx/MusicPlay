@@ -43,6 +43,9 @@ namespace MusicPlayUI.MVVM.ViewModels
             get { return _searchText; }
             set
             {
+                if (string.IsNullOrWhiteSpace(SearchText) && string.IsNullOrWhiteSpace(value))
+                    return;
+
                 _searchText = value;
                 OnPropertyChanged(nameof(SearchText));
                 Task.Run(FilterSearch);

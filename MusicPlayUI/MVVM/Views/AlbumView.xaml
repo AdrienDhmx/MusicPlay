@@ -209,7 +209,7 @@
                             <TextBlock Text="{Binding Artists.Count}"
                                        Style="{DynamicResource SlistInfoStyle}"/>
 
-                            <TextBlock Text=" artists related to this album"
+                            <TextBlock Text="credited artists"
                                        Margin="0"
                                        Style="{DynamicResource SlistInfoStyle}"/>
                         </StackPanel>

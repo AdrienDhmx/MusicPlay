@@ -581,7 +581,7 @@ namespace MusicPlayUI.Core.Services
 
         public async void NavigateToPlayingFrom()
         {
-            if (QueueTracks is not null && PlayingFrom is not null && PlayingFrom.DataId != -1)
+            if (QueueTracks is not null && PlayingFrom is not null)
             {
                 ViewNameEnum viewName;
                 BaseModel parameter;
@@ -598,7 +598,7 @@ namespace MusicPlayUI.Core.Services
                         break;
                     case ModelTypeEnum.Playlist:
                         viewName = ViewNameEnum.SpecificPlaylist;
-                        if (PlayingFrom.PlayingFrom.Contains("Radio"))
+                        if (PlayingFrom.PlayingFrom.EndsWith("Radio"))
                         {
                             parameter = PlaylistsFactory.CreateRadioPlaylist(PlayingFrom.PlayingFrom, "", QueueCover, QueueTracks.ToList().ToTrackModel());
                         }

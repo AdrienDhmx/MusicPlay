@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,9 @@ namespace MusicPlayUI.Converters
         {
             if(value is List<ArtistDataRelation> artists)
             {
-                if(int.TryParse(parameter.ToString(), out int top))
+                Debug.Print(artists.Count.ToString());
+
+                if(parameter != null && int.TryParse(parameter.ToString(), out int top))
                 {
                     if (top > 0)
                     {

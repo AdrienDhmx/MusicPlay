@@ -20,27 +20,28 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border x:Name="RootFilterBorder"
-                            Height="38"
-                            CornerRadius="19"
+                            Height="32"
+                            CornerRadius="16"
                             Margin="5, 3"
                             Background="{DynamicResource SecondaryContainer}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
-                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="34"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Text="{Binding Name}"
+                                       FontSize="14"
                                    Style="{DynamicResource NChipStyle}"/>
 
                             <iconbtn:IconButton Icon="{DynamicResource CloseIcon}"
                                                 Style="{DynamicResource BaseIconButton}"
-                                                Height="38"
-                                                Width="38"
-                                                IconWidth="15"
-                                                IconHeight="15"
+                                                Height="32"
+                                                Width="32"
+                                                IconWidth="12"
+                                                IconHeight="12"
                                                 Grid.Column="1"
-                                                CornerRadius="0,19,19,0"
+                                                CornerRadius="0,16,16,0"
                                                 FillColor="{DynamicResource OnSecondaryContainer}"
                                                 Command="{Binding DataContext.RemoveFilterCommand, ElementName=ListRootView}"
                                                 CommandParameter="{Binding .}"

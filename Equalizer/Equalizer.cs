@@ -69,11 +69,11 @@ namespace Equalizer
 
         private const int fontSize = 16;
         private const double PointDiameter = 16;
-        private const double BandGraphOpacity = 0.7;
+        private const double BandGraphOpacity = 0.6;
         private const double CumulatedGraphOpacity = 1;
-        private const double PreviewGraphOpacity = 0.4;
+        private const double PreviewGraphOpacity = 0.3;
 
-        private const int pointToPlot = 220;
+        private const int pointToPlot = 300;
 
         private const double _graphLeftMargin = 40;
         private const double _graphRightMargin = 30;
@@ -93,15 +93,17 @@ namespace Equalizer
 
         private const string YLegend = "db";
         private readonly string[] XLegend = {"", "32", "64", "125", "250", "500", "1k", "2k", "4k", "8k", "16k", ""};
-        private readonly int[] XLegendValues = {16, 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 };
         private const int XLegendTopMargin = 20;
         private const int YLegendRightMargin = 10;
+
+        private const decimal _maxExponentN = 14.96578428466M; // 2^14.287 = 20000
+        private const decimal _minExponentN = 4; // 2^4 = 16
 
         private double GraphXStart => _graphLeftMargin + _yAxesWidth;
         private double GraphYStart => _graphBottomMargin + _xAxesHeight;
         private double GraphXEnd => GraphXStart + GraphWidth;
         private double GraphYEnd => GraphYStart + GraphHeight;
-        private double GraphWidth => Width - _graphHorizontalMargin - _yAxesWidth;
+        private double GraphWidth => (int)Width - _graphHorizontalMargin - _yAxesWidth;
         private double GraphHeight => Height - _graphVerticalMargin - _xAxesHeight;
         private double GraphMiddle => GraphHeight / 2;
 
@@ -253,7 +255,7 @@ namespace Equalizer
 
                     // update the graph
                     EQEffectModel effect = (EQEffectModel)effects[MovingEffectIndex].Clone();
-                    effect.Gain = (Height - MovingPointPos.Y - GraphYStart) / YTickStep + YStartValue; // db can be negative (30 total => -15db ... +15db)
+                    effect.Gain = (Height - MovingPointPos.Y - GraphYStart) / YTickStep + YStartValue; // db can be negative
                     effect.CenterFrequency = GraphCoorToHz(ToGraphCoor(MovingPointPos).X);
                     SelectedEQBand.Gain = effect.Gain;
                     SelectedEQBand.CenterFrequency = effect.CenterFrequency;
@@ -373,14 +375,15 @@ namespace Equalizer
             this.DrawRectangle(GraphXStart, GraphYStart, GraphWidth, DrawHelper.LineMinThickness, Foreground, 1);
 
             // draw the legend
-            for (int i = 0; i < XTickQty; i++)
+            for (int i = 0; i <= XTickQty; i++)
             {
-                double xPos = GraphXStart + i * XTickStep;
+                decimal distance = i * (decimal)XTickStep;
+                double xPos = GraphXStart + (double)distance;
                 double yPos = GraphYStart - XLegendTopMargin;
 
                 string legend = XLegend[i];
 
-                if(i != XTickQty)
+                if(i != XTickQty || true)
                 {
                     this.DrawRectangle(xPos, GraphYStart, DrawHelper.LineMinThickness, GraphHeight, Foreground, 0.2);
                 }
@@ -504,57 +507,23 @@ namespace Equalizer
             return new(point.X - GraphXStart, point.Y - GraphYStart);
         }
 
+        private decimal MapRange(decimal value, decimal fromMin, decimal fromMax, decimal toMin, decimal toMax)
+        {
+            decimal fromRange = fromMax - fromMin;
+            decimal toRange = toMax - toMin;
+            return (value - fromMin) * toRange / fromRange + toMin;
+        }
+
         private double GraphCoorToHz(double x)
         {
-            if (x == 0) return 16;
-
-            double percentage;
-            double ExactIndex;
-            int index;
-
-            ExactIndex = x / XTickStep;
-            index = (int)Math.Floor(ExactIndex);
-
-            if(index == 0)
-            {
-                percentage = ExactIndex;
-                return XLegendValues[0] + XLegendValues[0] * percentage;
-            }
-            else
-            {
-                percentage = ExactIndex - index;
-            }            
-
-            if(index >= XLegendValues.Length)
-            {
-                return 32000;
-            }
-            else if(index == XLegendValues.Length - 1)
-            {
-                return XLegendValues[index] + XLegendValues[index] * percentage;
-            }
-
-            return XLegendValues[index] + (XLegendValues[index + 1] - XLegendValues[index]) * percentage;
+            decimal n = MapRange((decimal)x, 0, (decimal)GraphWidth, _minExponentN, _maxExponentN);
+            return Math.Pow(2, (double)n);
         }
 
         private double HzToGraphCoor(double hz)
         {
-            if(hz <= 16) return 0;
-
-            double percentage;
-            for (int i = XLegendValues.Length - 1; i >= 0; i--)
-            {
-                if (XLegendValues[i] <= hz)
-                {
-                    percentage = hz / XLegendValues[i] - 1;
-
-                    return i * XTickStep + percentage * XTickStep;
-                }
-            }
-
-            // less than min legend value
-            percentage = hz / XLegendValues[0];
-            return XTickStep * percentage;
+            double n = Math.Log2(hz);
+            return (double)MapRange((decimal)n, _minExponentN, _maxExponentN, 0, (decimal)GraphWidth);
         }
 
         private double GainToGraphCoor(double gain)

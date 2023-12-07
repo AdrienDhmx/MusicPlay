@@ -131,7 +131,7 @@ namespace MusicPlayUI.Core.Services
             audioTimer.Tick += AudioTimer_Tick;
             audioTimer.Interval = TimeSpan.FromMilliseconds(TimerInterval);
 
-            _audioPlayback.AutoChangeOutput(ConfigurationService.GetPreference(Enums.SettingsEnum.AutoChangeOutputdevice) == 1);
+            _audioPlayback.AutoChangeOutput(ConfigurationService.GetPreference(Enums.SettingsEnum.AutoChangeOutputDevice) == 1);
         }
 
         private void AudioTimer_Tick(object sender, EventArgs e)

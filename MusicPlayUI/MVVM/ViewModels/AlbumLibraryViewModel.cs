@@ -29,10 +29,15 @@ namespace MusicPlayUI.MVVM.ViewModels
             get { return _searchText; }
             set
             {
-                _searchText = value;
-                OnPropertyChanged(nameof(SearchText));
                 if (!IsLoading)
+                {
+                    if (string.IsNullOrWhiteSpace(SearchText) && string.IsNullOrWhiteSpace(value))
+                        return; // empty and no changes
+
+                    _searchText = value;
+                    OnPropertyChanged(nameof(SearchText));
                     Task.Run(FilterSearch);
+                }
             }
         }
 
@@ -316,7 +321,16 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private async void FilterSearch()
         {
-            Albums = new(await SearchHelper.FilterAlbum(SelectedFilters.ToList(), SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending));
+            List<AlbumModel> albumModels = await SearchHelper.FilterAlbum(SelectedFilters.ToList(), SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending);
+
+            foreach (var album in albumModels)
+            {
+                album.Artists = album.Artists.Order();
+            }
+
+            Albums = new(albumModels);
+
+
 
             NoAlbumFoundVisibility = Albums.Count == 0;
             AlbumCount = $"{Albums.Count} of {_totalAlbumCount}";

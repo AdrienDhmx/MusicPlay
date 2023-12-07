@@ -183,6 +183,7 @@
 
                     <!-- Albums -->
                     <listviews:AlbumListView Albums="{Binding MainAlbums}"
+                                             ShowArtist="false"
                                              Visibility="{Binding MainAlbumsVisibility}"
                                              Margin="30,5"/>
                 </StackPanel>
@@ -209,6 +210,7 @@
 
                     <!-- Albums -->
                     <listviews:AlbumListView Albums="{Binding SinglesAndEP}"
+                                             ShowArtist="false"
                                              Visibility="{Binding SinglesAndEPVisibility}"
                                              Margin="30,5"/>
                 </StackPanel>
@@ -235,6 +237,7 @@
 
                     <!-- Albums -->
                     <listviews:AlbumListView Albums="{Binding FeaturedInAlbum}"
+                                             ShowArtist="false"
                                              Visibility="{Binding FeaturedInAlbumsVisbility}"
                                              Margin="30,5"/>
                 </StackPanel>

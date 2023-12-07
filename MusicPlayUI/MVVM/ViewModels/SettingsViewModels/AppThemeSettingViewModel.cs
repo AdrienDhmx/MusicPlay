@@ -91,6 +91,17 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             }
         }
 
+        private bool _colorfulPlayerControl;
+        public bool ColorfulPlayerControl
+        {
+            get => _colorfulPlayerControl;
+            set
+            {
+                SetField(ref _colorfulPlayerControl, value);
+                SetPreference(SettingsEnum.ColorfulPlayerControl, BoolToString(_colorfulPlayerControl));
+            }
+        }
+
         public ICommand SetThemeCommand { get; }
         public AppThemeSettingViewModel()
         {            
@@ -114,10 +125,12 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             _lightTheme = AppThemeService.IsLightTheme;
             _sunsetSunrise = ConfigurationService.GetPreference(SettingsEnum.SunsetSunrise) == 1;
             _systemSync = ConfigurationService.GetPreference(SettingsEnum.SystemSyncTheme) == 1;
+            _colorfulPlayerControl = ConfigurationService.GetPreference(SettingsEnum.ColorfulPlayerControl) == 1;
 
             OnPropertyChanged(nameof(LightTheme));
             OnPropertyChanged(nameof(SunsetSunrise));
             OnPropertyChanged(nameof(SystemSync));
+            OnPropertyChanged(nameof(ColorfulPlayerControl));
 
             LoadThemes();
         }

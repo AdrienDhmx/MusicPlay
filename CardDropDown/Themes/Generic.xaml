@@ -60,7 +60,8 @@
                                           VerticalAlignment="Center">
                                     </Path>
 
-                                    <Grid Grid.Column="1">
+                                    <Grid Grid.Column="1"
+                                          VerticalAlignment="Center">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*"/>
                                             <RowDefinition Height="auto"/>

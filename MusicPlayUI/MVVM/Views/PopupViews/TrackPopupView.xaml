@@ -68,6 +68,7 @@
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="40"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
@@ -100,8 +101,14 @@
                                     x:Name="RemomveFromGenreBorder"
                                     Style="{DynamicResource PopupBtn}"/>
 
-                <textbtn:TextButton Text="{x:Static lang:Resources.Remove_From_Playlist}"
+                <textbtn:TextButton Text="Start radio"
                                     Grid.Row="5"
+                                    CornerRadius="0,0,4,4"
+                                   Style="{DynamicResource PopupBtn}"
+                                    Command="{Binding StartRadioCommand}"/>
+
+                <textbtn:TextButton Text="{x:Static lang:Resources.Remove_From_Playlist}"
+                                    Grid.Row="6"
                                    Style="{DynamicResource PopupBtn}"
                                     Height="40"
                                     x:Name="RemoveFromPlaylistBorder"
@@ -109,10 +116,10 @@
                                     Command="{Binding RemoveFromPlaylistCommand}"/>
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Edit}"
-                                    Grid.Row="6"
+                                    Grid.Row="7"
                                     CornerRadius="0,0,4,4"
                                    Style="{DynamicResource PopupBtn}"
-                                    Command="{Binding OpenTagWindowCommand}"/>
+                                    Command="{Binding ChangeArtworkCommand}"/>
             </Grid>
 
             <!-- Playlists Popup -->

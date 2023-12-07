@@ -160,6 +160,7 @@
             <converter:AddTextConverter x:Key="AddTextConverter"/>
             <converter:FindScrollViewerConverter x:Key="FindScrollViewerConverter"/>
             <converter:ArtistsRelationConverter x:Key="ArtistsRelationConverter"/>
+            <converter:NumberDisplayConverter x:Key="DisplayNumberHigherThan0"/>
 
             <BitmapImage x:Key="PlayImg" UriSource="Resources\Play.png" />
             <BitmapImage x:Key="PreviousImg" UriSource="Resources\Previous.png" />

@@ -11,7 +11,7 @@ namespace AudioHandler.Models
         private const FXChannelFlags defaultChannels = FXChannelFlags.All;
 
         public const int MinFrequency = 20;
-        public const int MaxFrequency = 16000;
+        public const int MaxFrequency = 20000;
 
         public double HalfBandWidth => BandWidth / 2;
         public double LowerPointHz => DownOctave(HalfBandWidth);

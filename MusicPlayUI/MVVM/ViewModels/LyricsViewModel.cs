@@ -520,14 +520,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             LyricsFound = IsSaved || IsURLValid;
             CanSave = LyricsFound;
             CanCopy = !string.IsNullOrWhiteSpace(Lyrics);
-
-            if (!LyricsFound)
-            {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage(Resources.No_Lyrics_Found));
-                }));
-            }
         }
 
         private void AddEmptyLineToLyrics()
