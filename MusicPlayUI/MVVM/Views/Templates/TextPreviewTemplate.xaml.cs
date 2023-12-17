@@ -56,7 +56,7 @@ namespace MusicPlayUI.MVVM.Views.Templates
             DependencyProperty.Register("Text", typeof(string), typeof(TextPreviewTemplate), new PropertyMetadata(""));
 
         public static readonly DependencyProperty PreviewHeightProperty =
-            DependencyProperty.Register("PreviewHeight", typeof(double), typeof(TextPreviewTemplate), new PropertyMetadata(96d));
+            DependencyProperty.Register("PreviewHeight", typeof(double), typeof(TextPreviewTemplate), new PropertyMetadata(94d));
 
         public static readonly DependencyProperty IsExtendedProperty =
             DependencyProperty.Register("IsExtended", typeof(bool), typeof(TextPreviewTemplate), new PropertyMetadata(false));

@@ -39,6 +39,8 @@
                     Visibility="{Binding IsFilterOpen, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                     Grid.RowSpan="3"/>
 
+            <Border Style="{DynamicResource PageHeaderBackgroundLight}"/>
+
             <Grid  Margin="30,10"
                    ClipToBounds="false">
                 <Grid.ColumnDefinitions>

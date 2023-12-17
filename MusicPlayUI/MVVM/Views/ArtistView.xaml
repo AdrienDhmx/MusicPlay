@@ -28,9 +28,9 @@
                   Height="220"
               Panel.ZIndex="2"
                   MaxHeight="220">
-            <Border Background="{DynamicResource PrimaryContainer}"
-                    Effect="{DynamicResource PageHeaderDropShadow}">
-            </Border>
+            <Border Background="{DynamicResource Background}"
+                    Effect="{DynamicResource PageHeaderDropShadow}"/>
+            <Border Style="{DynamicResource PageHeaderBackground}"/>
             <Grid HorizontalAlignment="Center"
                       Margin="10">
                 <Grid.ColumnDefinitions>

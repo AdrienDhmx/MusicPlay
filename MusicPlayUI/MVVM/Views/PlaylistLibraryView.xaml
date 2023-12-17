@@ -55,7 +55,9 @@
             <Border Background="{DynamicResource Background}"
                     Effect="{DynamicResource PageHeaderDropShadow}"
                     Grid.RowSpan="2"/>
-            
+
+            <Border Style="{DynamicResource PageHeaderBackgroundLight}"/>
+
             <Grid Margin="30,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.45*"/>

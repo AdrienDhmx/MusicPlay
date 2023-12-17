@@ -15,6 +15,18 @@
                     Opacity="0.6"
                     Direction="-80"/>
 
+    <Style x:Key="PageHeaderBackground" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+        <Setter Property="Opacity" Value="0.2"/>
+    </Style>
+
+    <Style x:Key="PageHeaderBackgroundLight" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+        <Setter Property="Opacity" Value="0.05"/>
+        <Setter Property="Grid.RowSpan" Value="3"/>
+        <Setter Property="Grid.ColumnSpan" Value="3"/>
+    </Style>
+
 
     <Style x:Key="RootDataBorder" TargetType="Border">
         <Setter Property="Padding" Value="20"/>

@@ -21,7 +21,6 @@ namespace MusicPlayUI.Core.Services
     {
         private static readonly string wikiAPIUrl = @"https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=1&exlimit=1&explaintext=1&titles=";
 
-
         public static async Task<string> QueryExtract(string topic)
         {
             string titleParameter = HttpUtility.UrlEncode(topic);
