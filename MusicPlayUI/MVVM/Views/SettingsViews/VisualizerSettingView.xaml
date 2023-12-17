@@ -33,16 +33,11 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
+
             <Border Background="{DynamicResource PrimaryContainer}"
-                    Grid.RowSpan="2">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black"
-                                      BlurRadius="6"
-                                      ShadowDepth="3"
-                                       Opacity="0.9"
-                                      Direction="-20"/>
-                </Border.Effect>
-            </Border>
+                    Effect="{DynamicResource PageHeaderDropShadow}"
+                    Grid.RowSpan="2"/>
+
             <TextBlock Text="{x:Static lang:Resources.VisualizerSettings}"
                        Style="{DynamicResource BStyle}"
                        HorizontalAlignment="Center"

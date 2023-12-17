@@ -19,7 +19,14 @@ namespace FilesProcessor.Helpers
         private List<string> _serversWithTooManyRequest;
         private string _lastServer;
 
-        public ConnectivityHelper()
+
+        private static ConnectivityHelper _instance;
+        public static ConnectivityHelper Instance
+        {
+            get => _instance ??= new ConnectivityHelper();
+        }
+
+        private ConnectivityHelper()
         {
             _tooManyRequest = false;
             _serversWithTooManyRequest = new List<string>();
@@ -51,7 +58,7 @@ namespace FilesProcessor.Helpers
         /// Send an async request to the specified <paramref name="url"/>.
         /// If the request is from a server that already send a "too many request" htttp error (http error 429) then the request is ignored.
         /// </summary>
-        /// <param name="url"> The url to send the resquest to. </param>
+        /// <param name="url"> The url to send the request to. </param>
         /// <param name="timeout"> The time in milliseconds to wait before the request times out. </param>
         /// <returns> The HttpResponseMessage of the request, or in case of an earlier 429 error from the same host server as the current url an empty response with that error is returned. </returns>
         public async Task<HttpResponseMessage> SendRequestAsync(string url, int timeout = 2000)
@@ -115,7 +122,7 @@ namespace FilesProcessor.Helpers
                     _tooManyRequest = true;
                     break;
                 case HttpStatusCode.InternalServerError:
-                    message = "Error: an unknown error has occured on the server.";
+                    message = "Error: an unknown error has occurred on the server.";
                     break;
                 case HttpStatusCode.ServiceUnavailable:
                     message = "Error: the server is temporarily unavailable.";

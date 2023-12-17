@@ -30,15 +30,10 @@
               Height="150"
               Panel.ZIndex="10"
               MinHeight="70">
-            <Border Background="{DynamicResource PrimaryContainer}">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black"
-                                      BlurRadius="6"
-                                      ShadowDepth="3"
-                                       Opacity="0.9"
-                                      Direction="-20"/>
-                </Border.Effect>
-            </Border>
+            
+            <Border Background="{DynamicResource PrimaryContainer}"
+                    Effect="{DynamicResource PageHeaderDropShadow}"/>
+            
             <TextBlock Text="DSP and Equalizer"
                        Style="{DynamicResource BStyle}"
                        HorizontalAlignment="Center"

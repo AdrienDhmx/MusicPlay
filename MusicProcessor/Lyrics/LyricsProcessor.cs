@@ -15,7 +15,8 @@ namespace MusicFilesProcessor.Lyrics
 {
     public class LyricsProcessor
     {
-        private readonly ConnectivityHelper _connectivityHelper;
+        private readonly ConnectivityHelper _connectivityHelper = ConnectivityHelper.Instance;
+
         private ILyricsHelper _lyricsHelper = new AZLyricsHelper();
         private ILyricsFileHelper _lyricsFileHelper = new TimedLyricsFileHelper();
         private bool _isTimed = true;
@@ -23,9 +24,14 @@ namespace MusicFilesProcessor.Lyrics
         public string CurrentWebSite { get; private set; } = "AZLyrics";
         public string CurrentURL { get; private  set; } = "";
 
-        public LyricsProcessor()
+        private static readonly LyricsProcessor _instance;
+        public static LyricsProcessor Instance
         {
-            _connectivityHelper= new ConnectivityHelper();
+            get => _instance ?? new LyricsProcessor();
+        }
+
+        private LyricsProcessor()
+        {
         }
 
         public void ChangeLyricsWebSource(LyricsWebsiteEnum webSite)

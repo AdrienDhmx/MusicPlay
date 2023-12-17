@@ -311,6 +311,16 @@ namespace DataBaseConnection.DataAccess
                 return keyValues;
             }
 
+            public static Dictionary<string, object> CreateUpdateBiography(string biography)
+            {
+                Dictionary<string, object> keyValues = new Dictionary<string, object>
+                {
+                    { Columns.Biography, biography },
+                };
+
+                return keyValues;
+            }
+
             public static Dictionary<string, object> CreateEQPresetTable(string name)
             {
                 Dictionary<string, object> keyValues = new Dictionary<string, object>
@@ -1145,6 +1155,11 @@ namespace DataBaseConnection.DataAccess
         public Task UpdateArtistCover(ArtistModel artist)
         {
             return new Query(Tables.TArtist).Where(Columns.Id, artist.Id).AsUpdate(Tables.CreateUpdateCover(artist.Cover)).ExecuteAsync();
+        }
+
+        public Task UpdateArtistBiography(ArtistModel artist)
+        {
+            return new Query(Tables.TArtist).Where(Columns.Id, artist.Id).AsUpdate(Tables.CreateUpdateBiography(artist.Biography)).ExecuteAsync();
         }
 
         public void UpdateArtistInteraction(int playCount, int id)

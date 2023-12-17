@@ -298,7 +298,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             _queueService.PlayingTrackChanged += OnPlayingTrackChanged;
             _audioService.CurrentPositionChanged += OnCurrentAudioPositionChanged;
 
-            _lyricsProcessor = new LyricsProcessor();
+            _lyricsProcessor = LyricsProcessor.Instance;
 
             SaveCommand = new RelayCommand(() => Task.Run(SaveLyrics));
             GetLyricsCommand = new RelayCommand(() => Task.Run(() => GetLyrics()));

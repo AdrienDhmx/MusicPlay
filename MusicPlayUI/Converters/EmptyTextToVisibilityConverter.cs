@@ -15,7 +15,7 @@ namespace MusicPlayUI.Converters
         {
             if (value is null || string.IsNullOrWhiteSpace(value.ToString()))
             {
-                return Visibility.Hidden;
+                return Visibility.Collapsed;
             }
             return Visibility.Visible;
         }

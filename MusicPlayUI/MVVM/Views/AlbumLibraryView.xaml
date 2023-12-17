@@ -34,7 +34,12 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Grid  Margin="30,10, 30, 0"
+            <Border Background="{DynamicResource Background}"
+                    Effect="{DynamicResource PageHeaderDropShadow}"
+                    Visibility="{Binding IsFilterOpen, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                    Grid.RowSpan="3"/>
+
+            <Grid  Margin="30,10"
                    ClipToBounds="false">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -54,7 +59,7 @@
                                                             Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
 
-            <Grid Margin="30, 5"
+            <Grid Margin="30, 0, 30, 6"
                   ClipToBounds="false"
                  Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -85,15 +90,8 @@
 
             <Grid  Grid.Row="2"
                     Visibility="{Binding IsFilterOpen, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Border Style="{DynamicResource FiltersBorder}">
-                    <Border.Effect>
-                        <DropShadowEffect Color="#101010"
-                                          BlurRadius="10"
-                                          Opacity="0.6"
-                                          Direction="-80"
-                                         />
-                    </Border.Effect>
-                </Border>
+                <Border Style="{DynamicResource FiltersBorder}"
+                        Effect="{DynamicResource FilterPanelDropShadow}"/>
                 <Border Style="{DynamicResource FiltersBorder}">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                       Padding="0,0,0,4"

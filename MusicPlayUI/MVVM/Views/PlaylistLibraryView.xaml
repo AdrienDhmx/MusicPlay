@@ -46,60 +46,62 @@
                                     Background="Transparent"
                                     Visibility="{Binding FilesDropped, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-        <Grid Margin="30,10"> 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.45*"/>
-                <ColumnDefinition Width="0.18*"/>
-                <ColumnDefinition Width="0.45*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel>
-                <TextBlock Text="{x:Static lang:Resources.MyPlaylists}"
-                                       Style="{DynamicResource SLargeHeaderStyle}"/>
-
-                <TextBlock Text="{Binding PlaylistCount}"
-                                   HorizontalAlignment="Left"
-                                       Style="{DynamicResource NLargeSecondaryStyle}"/>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal"
-                        Grid.Column="1"
-                        HorizontalAlignment="Center">
-                <iconbtn:IconButton Icon="{DynamicResource addSign}"
-                                      Style="{DynamicResource PlaylistIconButton}"
-                                        ToolTip="Create an empty playlist. You can also drop a folder here to create a playlist."
-                                            Command="{Binding CreatePlaylistCommand}"/>
-
-                <iconbtn:IconButton Icon="{DynamicResource PlaylistLibrary}"
-                                    Margin="20,0,0,0"
-                                         Style="{DynamicResource PlaylistIconButton}"
-                                        ToolTip="Create a radio based on a random track."
-                                            Command="{Binding CreateAutoPlaylistCommand}"/>
-            </StackPanel>
-
-            <Border Grid.Column="2"
-                    HorizontalAlignment="Stretch"
-                    x:Name="searchBarBorder">
-                <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
-                                                    HorizontalAlignment="Right"
-                                                    MaxWidth="300"
-                                                    MinWidth="200"
-                                                    Width="{Binding ActualWidth, ElementName=searchBarBorder, Converter={StaticResource SubstractionConverter}, ConverterParameter=40, UpdateSourceTrigger=PropertyChanged}"
-                                                    Style="{DynamicResource SearchBarStyle}"
-                                                    Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
-                
-            </Border>
-        </Grid>
-
-        <Grid Margin="10,0"
-              Background="Transparent"
-                  Grid.Row="1">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="180"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <ItemsControl Grid.Row="0"
+            <Border Background="{DynamicResource Background}"
+                    Effect="{DynamicResource PageHeaderDropShadow}"
+                    Grid.RowSpan="2"/>
+            
+            <Grid Margin="30,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.45*"/>
+                    <ColumnDefinition Width="0.18*"/>
+                    <ColumnDefinition Width="0.45*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="{x:Static lang:Resources.MyPlaylists}"
+                                           Style="{DynamicResource SLargeHeaderStyle}"/>
+
+                    <TextBlock Text="{Binding PlaylistCount}"
+                                       HorizontalAlignment="Left"
+                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center">
+                    <iconbtn:IconButton Icon="{DynamicResource addSign}"
+                                          Style="{DynamicResource PlaylistIconButton}"
+                                            ToolTip="Create an empty playlist. You can also drop a folder here to create a playlist."
+                                                Command="{Binding CreatePlaylistCommand}"/>
+
+                    <iconbtn:IconButton Icon="{DynamicResource PlaylistLibrary}"
+                                        Margin="20,0,0,0"
+                                             Style="{DynamicResource PlaylistIconButton}"
+                                            ToolTip="Create a radio based on a random track."
+                                                Command="{Binding CreateAutoPlaylistCommand}"/>
+                </StackPanel>
+
+                <Border Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        x:Name="searchBarBorder">
+                    <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
+                                                        HorizontalAlignment="Right"
+                                                        MaxWidth="300"
+                                                        MinWidth="200"
+                                                        Width="{Binding ActualWidth, ElementName=searchBarBorder, Converter={StaticResource SubstractionConverter}, ConverterParameter=40, UpdateSourceTrigger=PropertyChanged}"
+                                                        Style="{DynamicResource SearchBarStyle}"
+                                                        Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                </Border>
+            </Grid>
+
+            <ItemsControl Grid.Row="1"
                             x:Name="ConstAutoPlaylists"
                                 HorizontalAlignment="Center"
                                 HorizontalContentAlignment="Center"
@@ -116,7 +118,8 @@
                     <DataTemplate>
                         <Grid Width="140"
                             Height="160"
-                            Margin="2,20,2,2"
+                              Cursor="Hand"
+                            Margin="2,6,2,2"
                             x:Name="itemgrid">
                             <Grid.InputBindings>
                                 <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToPlaylistCommand, Source={x:Reference RootView}}"
@@ -215,10 +218,13 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <Border Grid.Row="1">
-                <listviews:PlaylistListView DataContext="{Binding DataContext, ElementName=RootView}"
-                                                Grid.Row="1"/>
-            </Border>
         </Grid>
+
+        <Border Grid.Row="1"
+                    Margin="10,0"
+                    Background="Transparent">
+            <listviews:PlaylistListView DataContext="{Binding DataContext, ElementName=RootView}"
+                                        Grid.Row="1"/>
+        </Border>
     </Grid>
 </UserControl>

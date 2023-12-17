@@ -18,7 +18,8 @@
                         Width="{Binding ActualWidth, ElementName=RootListView, Converter={StaticResource SizeConverter}, ConverterParameter=4.1}"
                         MinWidth="350"
                         Height="{Binding ActualWidth, RelativeSource={RelativeSource self}, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
-                        Padding="6"
+                        Padding="10"
+                        Cursor="Hand"
                         ClipToBounds="True">
                     <Border.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToGenreCommand, ElementName=RootListView}"

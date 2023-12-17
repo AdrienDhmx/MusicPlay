@@ -18,53 +18,60 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Margin="30,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.45*"/>
-                <ColumnDefinition Width="0.18*"/>
-                <ColumnDefinition Width="0.45*"/>
-            </Grid.ColumnDefinitions>
+        <Grid ClipToBounds="False"
+              Panel.ZIndex="4">
+            <Border Background="{DynamicResource Background}"
+                    ClipToBounds="False"
+                    Effect="{DynamicResource PageHeaderDropShadow}"/>
 
-            <StackPanel>
-                <TextBlock Text="My Tags"
-                        Style="{DynamicResource SLargeHeaderStyle}"/>
+            <Grid Margin="30,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.45*"/>
+                    <ColumnDefinition Width="0.18*"/>
+                    <ColumnDefinition Width="0.45*"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{Binding GenreCount}"
-                                   HorizontalAlignment="Left"
-                                       Style="{DynamicResource NLargeSecondaryStyle}"/>
-            </StackPanel>
 
-            <StackPanel Orientation="Horizontal"
-                        Grid.Column="1"
-                        HorizontalAlignment="Center">
-                <iconbtn:IconButton Icon="{DynamicResource addSign}"
-                                      Style="{DynamicResource PlaylistIconButton}"
-                                            Command="{Binding CreateGenreCommand}"/>
-            </StackPanel>
 
-            <Border Grid.Column="2"
-                    HorizontalAlignment="Stretch"
-                    x:Name="searchBarBorder">
-                <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
-                                                    HorizontalAlignment="Right"
-                                                    MaxWidth="300"
-                                                    MinWidth="200"
-                                                    Width="{Binding ActualWidth, ElementName=searchBarBorder, Converter={StaticResource SubstractionConverter}, ConverterParameter=40, UpdateSourceTrigger=PropertyChanged}"
-                                                    Style="{DynamicResource SearchBarStyle}"
-                                                    Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                <StackPanel>
+                    <TextBlock Text="My Tags"
+                            Style="{DynamicResource SLargeHeaderStyle}"/>
 
-            </Border>
+                    <TextBlock Text="{Binding GenreCount}"
+                                       HorizontalAlignment="Left"
+                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center">
+                    <iconbtn:IconButton Icon="{DynamicResource addSign}"
+                                          Style="{DynamicResource PlaylistIconButton}"
+                                                Command="{Binding CreateGenreCommand}"/>
+                </StackPanel>
+
+                <Border Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        x:Name="searchBarBorder">
+                    <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
+                                                        HorizontalAlignment="Right"
+                                                        MaxWidth="300"
+                                                        MinWidth="200"
+                                                        Width="{Binding ActualWidth, ElementName=searchBarBorder, Converter={StaticResource SubstractionConverter}, ConverterParameter=40, UpdateSourceTrigger=PropertyChanged}"
+                                                        Style="{DynamicResource SearchBarStyle}"
+                                                        Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+
+                </Border>
+            </Grid>
         </Grid>
 
-        <Grid Margin="10,0"
-              Background="Transparent"
-                  Grid.Row="1">
+        <Grid Margin="2,0"
+              Background="{DynamicResource Background}"
+              ClipToBounds="True"
+            Grid.Row="1">
 
-            <Border Grid.Row="1">
-                <listviews:GenreListView Tags="{Binding BindedGenres}">
-                    
-                </listviews:GenreListView>
-            </Border>
+            <listviews:GenreListView Tags="{Binding BindedGenres}"
+                                     Panel.ZIndex="0"/>
         </Grid>
     </Grid>
 

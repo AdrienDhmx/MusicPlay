@@ -72,18 +72,24 @@
                         Background="{DynamicResource SurfaceVariant}"
                         CornerRadius="{DynamicResource PrimaryCornerRadius}"
                         Margin="40, 20">
-                    <Grid Margin="0, 20, 0,0">
+                    <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
+
+                        <Border  Background="{DynamicResource SurfaceVariant}"
+                                 CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                 Effect="{DynamicResource FilterPanelDropShadow}"
+                                 Grid.RowSpan="2"/>
+
                         <TextBlock Text="{Binding TodayStats}"
                                         Foreground="{DynamicResource OnSurfaceVariant}"
                                         VerticalAlignment="Center"
                                         FontSize="25"
                                         FontWeight="SemiBold"
                                         HorizontalAlignment="Center"
-                                        Margin="40, 0, 40, 20"
+                                        Margin="40, 20"
                                    Visibility="{Binding TodayStats.Length, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <chart:HistoryChart Foreground="{DynamicResource OnSurfaceVariant}"

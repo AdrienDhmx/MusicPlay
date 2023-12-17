@@ -34,7 +34,7 @@
         <Setter Property="IconMargin" Value="20,0,0,0"/>
         <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
         <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
-        <Setter Property="BackgroundOpacity" Value="0.6"/>
+        <Setter Property="BackgroundOpacity" Value="0.8"/>
         <Setter Property="MouseOverBackgroundColor" Value="{DynamicResource PrimaryContainer}"/>
         <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
         <Setter Property="FontSize" Value="28"/>

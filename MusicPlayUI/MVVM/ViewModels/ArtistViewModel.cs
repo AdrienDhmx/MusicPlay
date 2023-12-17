@@ -11,18 +11,26 @@ using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
-using System.Windows.Navigation;
 using MusicPlayModels;
 using System.Collections.ObjectModel;
 using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.MVVM.Models;
 using Resources = MusicPlay.Language.Resources;
 using System.Windows;
+using System.Web;
+using FilesProcessor.Helpers;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using MessageControl;
+using System.Text.RegularExpressions;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class ArtistViewModel : ViewModel
     {
+        private readonly ConnectivityHelper _connectivityHelper;
+
         public IQueueService QueueService { get; }
         private readonly INavigationService _navigationService;
         private readonly ICommandsManager _commandsManager;
@@ -168,6 +176,16 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 _artist = value;
                 OnPropertyChanged(nameof(Artist));
+            }
+        }
+
+        private string _biography;
+        public string Biography
+        {
+            get => _biography;
+            set
+            {
+                SetField(ref _biography, value);
             }
         }
 
@@ -381,6 +399,26 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             // load
             Update();
+
+            if((string.IsNullOrWhiteSpace(Artist.Biography) || Artist.Biography == "0"))
+            {
+                TryGetBiography();
+            } 
+            else
+            {
+                Biography = Artist.Biography;
+            }
+        }
+
+        private async void TryGetBiography()
+        {
+            Biography = await WikiAPIService.QueryExtract(Artist.Name);
+
+            if(!string.IsNullOrWhiteSpace(Biography))
+            {
+                Artist.Biography = Biography;
+                await DataAccess.Connection.UpdateArtistBiography(Artist);
+            }
         }
 
         private void PlayArtist(bool shuffle = false, TrackModel startingTrack = null)

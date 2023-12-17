@@ -167,6 +167,8 @@ namespace DataBaseConnection.DataAccess
 
         public void UpdateArtistInteraction(int playCount, int id);
 
+        public Task UpdateArtistBiography(ArtistModel artist);
+
         /// <summary>
         /// Update the artist data (only the IsAlbumArtist and IsPerformer)
         /// </summary>

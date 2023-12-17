@@ -26,15 +26,10 @@
               Height="150"
               x:Name="StickyGrid"
           Panel.ZIndex="10" >
-            <Border Background="{DynamicResource PrimaryContainer}">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black"
-                                      BlurRadius="6"
-                                      ShadowDepth="3"
-                                       Opacity="0.9"
-                                      Direction="-20"/>
-                </Border.Effect>
-            </Border>
+
+            <Border Background="{DynamicResource PrimaryContainer}"
+                    Effect="{DynamicResource PageHeaderDropShadow}"/>
+
             <StackPanel Orientation="Vertical"
                     HorizontalAlignment="Center"
                         Margin="0,10"

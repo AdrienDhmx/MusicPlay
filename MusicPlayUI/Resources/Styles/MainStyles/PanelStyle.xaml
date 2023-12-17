@@ -3,6 +3,19 @@
                     xmlns:converter="clr-namespace:MusicPlayUI.Converters">
     <converter:LowerThanConverter x:Key="LowerThanConverter"/>
 
+    <DropShadowEffect x:Key="PageHeaderDropShadow" 
+                    BlurRadius="12" ShadowDepth="2" Color="#101010"
+                    Direction="-20"
+                    Opacity="0.6"/>
+
+    <DropShadowEffect x:Key="FilterPanelDropShadow" 
+                    Color="#101010"
+                    BlurRadius="12"
+                    ShadowDepth="2"
+                    Opacity="0.6"
+                    Direction="-80"/>
+
+
     <Style x:Key="RootDataBorder" TargetType="Border">
         <Setter Property="Padding" Value="20"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
@@ -614,6 +627,7 @@
     <Style x:Key="LibraryItemsImageBorder" TargetType="Border">
         <Setter Property="Width" Value="150"/>
         <Setter Property="Height" Value="150"/>
+        <Setter Property="Margin" Value="0, 6, 0, 0"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
