@@ -125,6 +125,7 @@
         <Setter Property="VerticalAlignment" Value="Top"/>
         <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="MaxHeight" Value="50"/>
+        <Setter Property="Margin" Value="4, 0"/>
     </Style>
 
     <!-- For libraries Header and data names in their views (album name, artist name...) -->
@@ -226,6 +227,7 @@
     <Style x:Key="NLRun" TargetType="Run"
            BasedOn="{StaticResource NRun}">
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>

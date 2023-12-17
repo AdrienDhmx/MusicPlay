@@ -5,7 +5,9 @@ using System.Collections.Immutable;
 using System.Data;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
+using AudioHandler.Models;
 using DataBaseConnection.Model;
+using Humanizer.Localisation;
 using MusicPlayModels.Enums;
 using MusicPlayModels.MusicModels;
 using MusicPlayModels.StatsModels;
@@ -34,6 +36,8 @@ namespace DataBaseConnection.DataAccess
             public const string TQueueTracks = "QueueTracks";
             public const string TTrack = "Track";
             public const string TTrackArtists = "TrackArtists";
+            public const string TEQPreset = "EQPreset";
+            public const string TEQBand = "EQBand";
 
             public static Dictionary<string, object> CreateTable(AlbumModel album)
             {
@@ -240,7 +244,6 @@ namespace DataBaseConnection.DataAccess
                 return keyValues;
             }
 
-
             public static Dictionary<string, object> CreateQueueTracksTable(int queueId, int trackId, int trackIndex)
             {
                 Dictionary<string, object> keyValues = new Dictionary<string, object>
@@ -307,6 +310,43 @@ namespace DataBaseConnection.DataAccess
 
                 return keyValues;
             }
+
+            public static Dictionary<string, object> CreateEQPresetTable(string name)
+            {
+                Dictionary<string, object> keyValues = new Dictionary<string, object>
+                {
+                    { Columns.Name, name },
+                };
+
+                return keyValues;
+            }
+
+            public static Dictionary<string, object> CreateEQBandTable(EQEffectModel eqBand, int EQPresetId)
+            {
+                Dictionary<string, object> keyValues = new Dictionary<string, object>
+                {
+                    { Columns.Band, eqBand.Band },
+                    { Columns.BandWidth, eqBand.BandWidth },
+                    { Columns.CenterFrequency, eqBand.CenterFrequency },
+                    { Columns.Gain, eqBand.Gain },
+                    { Columns.EQPresetId, EQPresetId },
+                };
+
+                return keyValues;
+            }
+
+            public static Dictionary<string, object> CreateEQBandTable(EQEffectModel eqBand)
+            {
+                Dictionary<string, object> keyValues = new Dictionary<string, object>
+                {
+                    { Columns.Band, eqBand.Band },
+                    { Columns.BandWidth, eqBand.BandWidth },
+                    { Columns.CenterFrequency, eqBand.CenterFrequency },
+                    { Columns.Gain, eqBand.Gain },
+                };
+
+                return keyValues;
+            }
         }
 
         internal class Columns
@@ -354,6 +394,11 @@ namespace DataBaseConnection.DataAccess
             public const string DiscNumber = "DiscNumber";
             public const string IsFavorite = "IsFavorite";
             public const string Rating = "Rating";
+            public const string Band = "Band";
+            public const string BandWidth = "BandWidth";
+            public const string CenterFrequency = "CenterFrequency";
+            public const string Gain = "Gain";
+            public const string EQPresetId = "EQPresetId";
         }
 
         public SQLDataAccess()
@@ -1147,7 +1192,10 @@ namespace DataBaseConnection.DataAccess
 
         public Task UpdateTrackArtwork(TrackModel track)
         {
-            throw new NotImplementedException();
+            return new Query(Tables.TTrack).Where(Columns.Id, track.Id).AsUpdate(new Dictionary<string, object>()
+            {
+                { Columns.Artwork, track.Artwork },
+            }).ExecuteAsync();
         }
 
         public Task UpdateTrackDiscTrackNumber(TrackModel track)
@@ -1239,6 +1287,74 @@ namespace DataBaseConnection.DataAccess
             new Query(Tables.TTrackGenres).Where(Columns.GenreId, tagId).AsDelete().Delete();
 
             return new Query(Tables.TGenre).Where(Columns.Id, tagId).AsDelete().DeleteAsync();
+        }
+
+        public async Task<List<EQPresetModel>> GetAllEQPresets()
+        {
+            List<EQPresetModel> presets = await new Query(Tables.TEQPreset).GetAsync<EQPresetModel>();
+
+            foreach (var preset in presets)
+            {
+                preset.Effects = GetEQBands(preset.Id);
+            }
+
+            return presets;
+        }
+
+        public async Task<EQPresetModel> GetEQPreset(int id)
+        {
+            EQPresetModel preset = await new Query(Tables.TEQPreset).Where(Columns.Id, id).FirstAsync<EQPresetModel>();
+
+            preset.Effects = GetEQBands(preset.Id);
+            return preset;
+        }
+
+        public async Task<int> InsertEQPreset(EQPresetModel eqPreset)
+        {
+            int presetId = new Query(Tables.TEQPreset).AsInsert(Tables.CreateEQPresetTable(eqPreset.Name)).Insert(true);
+
+            List<Query> queries = new List<Query>();
+
+            foreach (EQEffectModel eqBand in eqPreset.Effects)
+            {
+                queries.Add(new Query(Tables.TEQBand).AsInsert(Tables.CreateEQBandTable(eqBand, presetId)));
+            }
+
+            await queries.ExecuteAsync();
+
+            return presetId;
+        }
+
+        public Task InsertEQBand(EQEffectModel eqBand, int eqPresetId)
+        {
+            return new Query(Tables.TEQBand).AsInsert(Tables.CreateEQBandTable(eqBand, eqPresetId)).ExecuteAsync();
+        }
+
+        private List<EQEffectModel> GetEQBands(int presetId)
+        {
+            return new Query(Tables.TEQBand).Where(Columns.EQPresetId, presetId).Get<EQEffectModel>();
+        }
+
+        public Task UpdateEQPreset(EQPresetModel eqPreset)
+        {
+            return new Query(Tables.TEQPreset).Where(Columns.Id, eqPreset.Id).AsUpdate(Tables.CreateEQPresetTable(eqPreset.Name)).ExecuteAsync();
+        }
+
+        public Task UpdateEQBand(EQEffectModel eqBand)
+        {
+            return new Query(Tables.TEQBand).Where(Columns.Id, eqBand.Id).AsUpdate(Tables.CreateEQBandTable(eqBand)).ExecuteAsync();
+        }
+
+        public Task DeleteEQPreset(EQPresetModel eqPreset)
+        {
+            new Query(Tables.TEQPreset).Where(Columns.Id, eqPreset.Id).AsDelete().Execute();
+
+            return new Query(Tables.TEQBand).Where(Columns.EQPresetId, eqPreset.Id).AsDelete().ExecuteAsync();
+        }
+
+        public Task DeleteEQBand(int eqBandId)
+        {
+            return new Query(Tables.TEQBand).Where(Columns.Id, eqBandId).AsDelete().ExecuteAsync();
         }
     }
 }

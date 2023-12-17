@@ -13,8 +13,7 @@
                         HorizontalAlignment="Left"
                         Background="Transparent"
                         IsHitTestVisible="True"
-                        Panel.ZIndex="2"
-                        Grid.Column="2">
+                        Panel.ZIndex="2">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal"

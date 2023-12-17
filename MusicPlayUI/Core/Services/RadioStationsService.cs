@@ -92,9 +92,12 @@ namespace MusicPlayUI.Core.Services
             ArtistModel artist = await DataAccess.Connection.GetArtist(ArtistDataRelation.ArtistId);
 
             List<TagModel> genres = await DataAccess.Connection.GetAlbumTag(album.Id);
+            genres.AddRange(await DataAccess.Connection.GetTrackTag(track.Id));
+
             List<TrackModel> RadioTracks = new();
             List<TrackModel> Tracks = new();
             List<AlbumModel> albums = new();
+            List<PlaylistModel> playlists = new();
 
             PlaylistModel radio = new();
             radio.Name = $"{track.Title} - Radio";
@@ -108,8 +111,17 @@ namespace MusicPlayUI.Core.Services
                 if (genreModel is null) continue;
 
                 albums = await DataAccess.Connection.GetAlbumFromTag(genreModel.Id);
+                playlists = await DataAccess.Connection.GetPlaylistFromTag(genreModel.Id);
 
+                foreach (var playlist in playlists)
+                {
+
+                    Tracks.AddRange(await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id));
+                }
+
+ 
                 Tracks.AddRange(await GetTracksFromAlbums(albums));
+                Tracks.AddRange(await DataAccess.Connection.GetTrackFromTag(genreModel.Id));
             }
 
             // add tracks from the same performer
@@ -128,9 +140,7 @@ namespace MusicPlayUI.Core.Services
                 }
             }
 
-            Tracks = TrackListHelper.Shuffle(Tracks).ToList();
-
-            RadioTracks = RadioTracks.DistinctBy(t => t?.Id).ToList();
+            Tracks = Tracks.DistinctBy(t => t?.Id).Shuffle().ToList();
             if(Tracks.Count >= RadioStationTrackNumber)
             {
                 RadioTracks = Tracks.GetRange(0, RadioStationTrackNumber);

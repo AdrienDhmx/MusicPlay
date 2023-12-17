@@ -13,62 +13,74 @@
                   Style="{DynamicResource LibraryItemsControl}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Grid Style="{DynamicResource LibraryItemsRootGrid}"
-                      x:Name="itemgrid">
+                <Grid x:Name="itemgrid"
+                   Style="{DynamicResource LibraryItemsRootGrid}">
                     <Grid.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToAlbumCommand, ElementName=AlbumListView}"
-                                                  CommandParameter="{Binding .}"/>
-                        <MouseBinding Gesture="RightClick"
-                                                    Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=AlbumListView}"
-                                                    CommandParameter="{Binding .}"/>
+                                              CommandParameter="{Binding }"/>
+                        <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=AlbumListView}"
+                                              CommandParameter="{Binding }"/>
                     </Grid.InputBindings>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
                     <Border x:Name="MouseOverBorder"
-                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
-                            Grid.Row="0"
-                            Panel.ZIndex="2"
-                            Opacity="0"
-                            Background="{DynamicResource TransparentGradient}"/>
+                        Grid.Row="0"
+                        Panel.ZIndex="3"
+                        Opacity="0"
+                        Style="{DynamicResource LibraryItemsRoundedImageBorder}"
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                        Background="{DynamicResource TransparentGradient}"/>
 
                     <Border Style="{DynamicResource LibraryItemsRoundedImageBorder}"
-                            x:Name="BorderImage">
+                        x:Name="BorderImage">
                         <Border.Background>
                             <ImageBrush ImageSource="{Binding AlbumCover, Converter={StaticResource MNullImageConverter}}"
-                                        Stretch="UniformToFill"
-                                        RenderOptions.BitmapScalingMode="Linear"
-                                        RenderOptions.EdgeMode="Aliased"/>
+                                    Stretch="UniformToFill"
+                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                    RenderOptions.EdgeMode="Unspecified"/>
                         </Border.Background>
                     </Border>
 
                     <Grid Opacity="0"
-                          VerticalAlignment="Bottom"
-                          Panel.ZIndex="3"
-                          Margin="12,5, 12, 5"
-                          x:Name="BtnGrid">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
+                      VerticalAlignment="Bottom"
+                      Panel.ZIndex="4"
+                      Margin="12,5, 12, 5"
+                      IsHitTestVisible="True"
+                      x:Name="BtnGrid">
 
                         <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
-                                            Command="{Binding DataContext.PlayAlbumCommand, ElementName=AlbumListView}"
-                                            CommandParameter="{Binding .}"/>
+                                        Command="{Binding DataContext.PlayAlbumCommand, ElementName=AlbumListView}"
+                                        CommandParameter="{Binding .}"/>
 
                         <iconbtn:IconButton Style="{DynamicResource CircledMoreOptionButton}"
-                                                            Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=AlbumListView}"
-                                                        CommandParameter="{Binding .}"
-                                                        Grid.Column="2"/>
+                                            Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=AlbumListView}"
+                                        CommandParameter="{Binding .}"/>
                     </Grid>
 
                     <TextBlock Text="{Binding Name}"
-                               Style="{DynamicResource SListItemNameStyle}"
-                               Panel.ZIndex="3"
-                               Grid.Row="1"/>
+                            Style="{DynamicResource SListItemNameStyle}"
+                           Panel.ZIndex="3"
+                           HorizontalAlignment="Left"
+                           TextAlignment="Left"
+                           Padding="2, 2, 2, 0"
+                            Grid.Row="1"/>
+
+                    <TextBlock Text="{Binding Artists[0].Name}"
+                            Style="{DynamicResource SListItemNameStyle}"
+                           Panel.ZIndex="3"
+                           TextWrapping="NoWrap"
+                           TextTrimming="CharacterEllipsis"
+                           HorizontalAlignment="Left"
+                           TextAlignment="Left"
+                           FontSize="14"
+                           Padding="2, 0"
+                           FontWeight="Normal"
+                           Foreground="{DynamicResource OnSurfaceVariant}"
+                            Grid.Row="2"/>
                 </Grid>
                 <DataTemplate.Triggers>
                     <Trigger Property="IsMouseOver" Value="True" SourceName="itemgrid">

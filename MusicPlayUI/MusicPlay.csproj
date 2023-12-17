@@ -63,6 +63,7 @@
     <ProjectReference Include="..\CustomCardControl\CustomCardControl.csproj" />
     <ProjectReference Include="..\DataBaseConnection\DataBaseConnection.csproj" />
     <ProjectReference Include="..\DynamicScrollViewer\DynamicScrollViewer.csproj" />
+    <ProjectReference Include="..\Equalizer\Equalizer.csproj" />
     <ProjectReference Include="..\HistoryChart\HistoryChart.csproj" />
     <ProjectReference Include="..\IconButton\IconButton.csproj" />
     <ProjectReference Include="..\LoadingControl\LoadingControl.csproj" />
@@ -76,6 +77,7 @@
     <ProjectReference Include="..\SpectrumVisualizer\SpectrumVisualizer.csproj" />
     <ProjectReference Include="..\Stepper\Stepper.csproj" />
     <ProjectReference Include="..\TextBtn\TextBtn.csproj" />
+    <ProjectReference Include="..\ToggleSwitch\ToggleSwitch.csproj" />
     <ProjectReference Include="..\VirtualizingControls\VirtualizingControls.csproj" />
   </ItemGroup>
 

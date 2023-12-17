@@ -19,203 +19,208 @@
 
     <Grid helper:ScrollViewerHelper.IsStickyEnabled="True"
           helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=PlaylistScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyPart}">
+          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyPart}"
+          Panel.ZIndex="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
-              Panel.ZIndex="2"
-              Background="{DynamicResource PrimaryContainer}">
+        <Grid x:Name="StickyPart"
+                MinHeight="120"
+                Height="230"
+                Panel.ZIndex="2"
+                MaxHeight="230">
+            <Border Background="{DynamicResource PrimaryContainer}">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black"
+                                    BlurRadius="6"
+                                    ShadowDepth="3"
+                                    Opacity="0.9"
+                                    Direction="-20"/>
+                </Border.Effect>
+            </Border>
+            <Grid  Margin="0,5,5,5"
+                HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
 
-            <Grid x:Name="StickyPart"
-                    MinHeight="120"
-                  Height="230"
-                  Margin="10"
-                  MaxHeight="230">
-                <Grid  Margin="0,5,5,5"
-                    HorizontalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Playlist Cover -->
-                    <Border Grid.RowSpan="2"
+                <!-- Playlist Cover -->
+                <Border Grid.RowSpan="2"
+                        Margin="0,0,10,0"
+                        MaxHeight="210"
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                        Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
+                    <Border.Background>
+                        <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource MNullImageConverter}}"
+                                            Stretch="UniformToFill"/>
+                    </Border.Background>
+                </Border>
+                <!--  Auto playlist Cover-->
+                <Border Grid.RowSpan="2"
+                            CornerRadius="{DynamicResource SecondaryCornerRadius}"
                             Margin="0,0,10,0"
-                            MaxHeight="210"
-                            CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                            Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverterInverted}}"
-                            Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
-                        <Border.Background>
-                            <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource MNullImageConverter}}"
-                                                Stretch="UniformToFill"/>
-                        </Border.Background>
-                    </Border>
-                    <!--  Auto playlist Cover-->
-                    <Border Grid.RowSpan="2"
-                                CornerRadius="{DynamicResource SecondaryCornerRadius}"
-                                Margin="0,0,10,0"
-                            MaxHeight="210"
-                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"
-                                Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <Path Data="{Binding PathCover}"
-                                  Margin="10"
-                                  Fill="{DynamicResource OnPrimaryContainer}"
-                                  Stretch="Uniform">
-                        </Path>
-                    </Border>
+                        MaxHeight="210"
+                            Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"
+                            Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Path Data="{Binding PathCover}"
+                                Margin="10"
+                                Fill="{DynamicResource OnPrimaryContainer}"
+                                Stretch="Uniform">
+                    </Path>
+                </Border>
 
-                    <!-- Artist Name + Duration + More Opt Btn -->
-                    <Grid VerticalAlignment="Stretch"
-                          Grid.RowSpan="2"
-                          HorizontalAlignment="Stretch"
-                            Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
+                <!-- Artist Name + Duration + More Opt Btn -->
+                <Grid VerticalAlignment="Stretch"
+                        Grid.RowSpan="2"
+                        HorizontalAlignment="Stretch"
+                        Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
 
-                        <StackPanel Margin="0,5,0,0"
+                    <StackPanel Margin="0,5,0,0"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Top">
+                        <!--  Artist Name -->
+                        <TextBlock Text="{Binding Playlist.Name}"
+                                    Style="{DynamicResource SLargeHeaderStyle}"
                                     HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Top">
-                            <!--  Artist Name -->
-                            <TextBlock Text="{Binding Playlist.Name}"
-                                       Style="{DynamicResource SLargeHeaderStyle}"
-                                       HorizontalAlignment="Stretch"
-                                       MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
-                                       TextWrapping="NoWrap"
-                                       Margin="0,0,0,4"/>
+                                    MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
+                                    TextWrapping="NoWrap"
+                                    Margin="0,0,0,4"/>
 
-                            <Border HorizontalAlignment="Left">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Visibility" Value="visible"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=230}" Value="true">
-                                                <DataTrigger.EnterActions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <DoubleAnimation Duration="0:0:0:0.2"  From="1" To="0"
-                                                                              Storyboard.TargetProperty="Opacity"/>
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </DataTrigger.EnterActions>
-                                                <DataTrigger.ExitActions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <DoubleAnimation Duration="0:0:0:0.2"  From="0" To="1"
-                                                                              Storyboard.TargetProperty="Opacity"/>
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </DataTrigger.ExitActions>
-                                            </DataTrigger>
-                                            <Trigger Property="Opacity" Value="0">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <TextBlock Text="{Binding Playlist.Description}"
-                                           Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
-                                       Style="{DynamicResource SSubDataStyle}"
-                                           HorizontalAlignment="Left"
-                                           MaxWidth="650"
-                                           TextTrimming="CharacterEllipsis"/>
-                            </Border>
-                        </StackPanel>
+                        <Border HorizontalAlignment="Left">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=230}" Value="true">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Duration="0:0:0:0.2"  From="1" To="0"
+                                                                            Storyboard.TargetProperty="Opacity"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Duration="0:0:0:0.2"  From="0" To="1"
+                                                                            Storyboard.TargetProperty="Opacity"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                        <Trigger Property="Opacity" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding Playlist.Description}"
+                                        Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Style="{DynamicResource SSubDataStyle}"
+                                        HorizontalAlignment="Left"
+                                        MaxWidth="650"
+                                        TextTrimming="CharacterEllipsis"/>
+                        </Border>
+                    </StackPanel>
 
-                        <StackPanel Orientation="Horizontal"
-                                     Grid.Row="1"
-                                    Margin="0,5, 0, 10"
-                                        HorizontalAlignment="Left">
-                            <TextBlock Text="{Binding PlaylistDuration}"
-                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                            <TextBlock Text="{Binding PlaylistTracks.Count, StringFormat=- {0}}"
-                                           Margin="5,0"
-                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                            <TextBlock Text="{x:Static lang:Resources.Tracks}"
-                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                        </StackPanel>
-
-                        <!-- Play Buttons -->
-                        <StackPanel Grid.Row="2"
-                                    Style="{DynamicResource LargePlaylistBtnStackPanel}"
-                                    Orientation="Horizontal">
-                            <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
-                                                Style="{DynamicResource LargePlayButton}"/>
-
-                            <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
-                                                                    Style="{DynamicResource LargePlayShuffleButton}"/>
-
-                            <!-- More Option Button -->
-                            <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
-                                                CommandParameter="{Binding Playlist}"
-                                                    Command="{Binding OpenPlaylistPopupCommand}"/>
-
-                            <iconbtn:IconButton Icon="{DynamicResource Edit}"
-                                                       Command="{Binding EditPlaylistCommand}"
-                                                       IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
-                                                   Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverterInverted}}"
-                                                Style="{DynamicResource SmallBtn}"/>
-
-                            <!-- Save Radio Button -->
-                            <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                        Icon="{DynamicResource SaveIcon}"
-                                                        Grid.Column="1"
-                                                   Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                        Command="{Binding SaveRadioCommand}"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Small btn -->
                     <StackPanel Orientation="Horizontal"
-                                     Grid.Column="2"
-                                VerticalAlignment="Center"
-                                    Style="{DynamicResource PlaylistSmallBtnStackPanel}">
+                                    Grid.Row="1"
+                                Margin="0,5, 0, 10"
+                                    HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding PlaylistDuration}"
+                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
 
+                        <TextBlock Text="{Binding PlaylistTracks.Count, StringFormat=- {0}}"
+                                        Margin="5,0"
+                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+                        <TextBlock Text="{x:Static lang:Resources.Tracks}"
+                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+                    </StackPanel>
+
+                    <!-- Play Buttons -->
+                    <StackPanel Grid.Row="2"
+                                Style="{DynamicResource LargePlaylistBtnStackPanel}"
+                                Orientation="Horizontal">
                         <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
-                                            Style="{DynamicResource SmallPlayButton}"/>
+                                            Style="{DynamicResource LargePlayButton}"/>
 
                         <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
-                                            Style="{DynamicResource SmallPlayShuffleButton}"/>
+                                                                Style="{DynamicResource LargePlayShuffleButton}"/>
 
                         <!-- More Option Button -->
                         <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
+                                            IconHeight="5"
+                                            IconWidth="28"
+                                                Icon="{DynamicResource MoreOptionIcon}"
+                                                Margin="6,0"
                                             CommandParameter="{Binding Playlist}"
-                                                    Command="{Binding OpenPlaylistPopupCommand}"/>
+                                                Command="{Binding OpenPlaylistPopupCommand}"/>
 
                         <iconbtn:IconButton Icon="{DynamicResource Edit}"
-                                                       Command="{Binding EditPlaylistCommand}"
-                                                       IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
-                                                   Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                                    Command="{Binding EditPlaylistCommand}"
+                                                    IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
+                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                                             Style="{DynamicResource SmallBtn}"/>
 
                         <!-- Save Radio Button -->
                         <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                        Icon="{DynamicResource SaveIcon}"
-                                                        Grid.Column="1"
-                                                   Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                        Command="{Binding SaveRadioCommand}"/>
+                                                    Icon="{DynamicResource SaveIcon}"
+                                                    Grid.Column="1"
+                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                    Command="{Binding SaveRadioCommand}"/>
                     </StackPanel>
                 </Grid>
+
+                <!-- Small btn -->
+                <StackPanel Orientation="Horizontal"
+                                    Grid.Column="2"
+                            VerticalAlignment="Center"
+                                Style="{DynamicResource PlaylistSmallBtnStackPanel}">
+
+                    <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
+                                        Style="{DynamicResource SmallPlayButton}"/>
+
+                    <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
+                                        Style="{DynamicResource SmallPlayShuffleButton}"/>
+
+                    <!-- More Option Button -->
+                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                                            IconHeight="5"
+                                            IconWidth="28"
+                                                Icon="{DynamicResource MoreOptionIcon}"
+                                                Margin="6,0"
+                                        CommandParameter="{Binding Playlist}"
+                                                Command="{Binding OpenPlaylistPopupCommand}"/>
+
+                    <iconbtn:IconButton Icon="{DynamicResource Edit}"
+                                                    Command="{Binding EditPlaylistCommand}"
+                                                    IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
+                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                        Style="{DynamicResource SmallBtn}"/>
+
+                    <!-- Save Radio Button -->
+                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                                                    Icon="{DynamicResource SaveIcon}"
+                                                    Grid.Column="1"
+                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                    Command="{Binding SaveRadioCommand}"/>
+                </StackPanel>
             </Grid>
-        </Border>
+        </Grid>
+
         <ScrollViewer x:Name="PlaylistScroll"
                       Grid.Row="1"
                           VerticalScrollBarVisibility="Hidden">

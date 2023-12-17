@@ -29,6 +29,7 @@
                             Grid.Row="0"
                             Panel.ZIndex="2"
                             Opacity="0"
+                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             Background="{DynamicResource TransparentGradient}"/>
 

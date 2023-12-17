@@ -66,6 +66,7 @@ namespace MusicPlayUI.Core.Enums
         Language = 62,
         Visualizer = 63,
         Shortcuts = 64,
+        DSP = 65,
 
 
     }

@@ -25,11 +25,24 @@
                 Height="211"
                 VerticalAlignment="Top"
                 HorizontalAlignment="Stretch"
+                    Panel.ZIndex="10"
                 MaxHeight="211">
+            
+            <Border Background="{DynamicResource Background}">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black"
+                                      BlurRadius="6"
+                                      ShadowDepth="3"
+                                       Opacity="0.9"
+                                      Direction="-20"/>
+                </Border.Effect>
+            </Border>
 
             <Border Background="{DynamicResource SecondaryContainer}"
                     Panel.ZIndex="1"
-                    Opacity="0.8"/>
+                    Opacity="0.8">
+            </Border>
+            
 
             <ItemsControl ItemsSource="{Binding Genre.MultipleCovers}"
                           HorizontalAlignment="Stretch"

@@ -22,22 +22,20 @@
               MouseDown="RootGrid_MouseDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="auto"/>
-        </Grid.ColumnDefinitions>
 
         <!-- SearchBar + Filters -->
-        <Grid Grid.ColumnSpan="2">
+        <Grid ClipToBounds="false"
+              Panel.ZIndex="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Grid  Margin="30,10, 30, 0">
+            <Grid  Margin="30,10, 30, 0"
+                   ClipToBounds="false">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
@@ -57,6 +55,7 @@
             </Grid>
 
             <Grid Margin="30, 5"
+                  ClipToBounds="false"
                  Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -84,157 +83,170 @@
                                             Command="{Binding OpenSortingPopupCommand}"/>
             </Grid>
 
-            <Border  Grid.Row="2"
-                    Style="{DynamicResource FiltersBorder}"
-                        Visibility="{Binding IsFilterOpen, Converter={StaticResource BoolToVisibilityConverter}}">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                  Padding="0,0,0,4"
-                                  VerticalScrollBarVisibility="Disabled">
-                    <Grid HorizontalAlignment="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+            <Grid  Grid.Row="2"
+                    Visibility="{Binding IsFilterOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Border Style="{DynamicResource FiltersBorder}">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#101010"
+                                          BlurRadius="10"
+                                          Opacity="0.6"
+                                          Direction="-80"
+                                         />
+                    </Border.Effect>
+                </Border>
+                <Border Style="{DynamicResource FiltersBorder}">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      Padding="0,0,0,4"
+                                      VerticalScrollBarVisibility="Disabled">
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="40"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
 
-                            <TextBlock Text="Tags"
-                                           Style="{DynamicResource SFilterHeaderStyle}"/>
+                                <TextBlock Text="Tags"
+                                               Style="{DynamicResource SFilterHeaderStyle}"/>
 
-                            <Border VerticalAlignment="Bottom"
-                                        Height="2"
-                                        Margin="0,0,0,2"
-                                        Background="{DynamicResource OnSecondaryContainer}"
-                                        Opacity="0.5"/>
+                                <Border VerticalAlignment="Bottom"
+                                            Height="2"
+                                            Margin="0,0,0,2"
+                                            Background="{DynamicResource OnSecondaryContainer}"
+                                            Opacity="0.5"/>
 
-                            <ItemsControl Grid.Row="1"
-                                          ItemsSource="{Binding GenreFilters}"
-                                          Background="Transparent">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Vertical"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border x:Name="ItemRootBorder"
-                                                Cursor="Hand"
-                                                         Style="{DynamicResource FilterItemRootBorder}">
-                                            <Border.InputBindings>
-                                                <MouseBinding Gesture="LeftClick"
-                                                            Command="{Binding DataContext.AddFilterCommand, ElementName=RootView}"
-                                                            CommandParameter="{Binding .}"/>
-                                            </Border.InputBindings>
-                                            <TextBlock Text="{Binding Name}"
-                                                           Style="{DynamicResource SFilterStyle}"
-                                                           x:Name="FilterName"/>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Grid>
+                                <ItemsControl Grid.Row="1"
+                                              ItemsSource="{Binding GenreFilters}"
+                                              Background="Transparent">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border x:Name="ItemRootBorder"
+                                                    Cursor="Hand"
+                                                             Style="{DynamicResource FilterItemRootBorder}">
+                                                <Border.InputBindings>
+                                                    <MouseBinding Gesture="LeftClick"
+                                                                Command="{Binding DataContext.AddFilterCommand, ElementName=RootView}"
+                                                                CommandParameter="{Binding .}"/>
+                                                </Border.InputBindings>
+                                                <TextBlock Text="{Binding Name}"
+                                                               Style="{DynamicResource SFilterStyle}"
+                                                               x:Name="FilterName"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
 
-                        <Grid Grid.Column="1"
-                              Margin="20,0,0,0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="40"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Text="Album Type"
-                                           Style="{DynamicResource SFilterHeaderStyle}"/>
-
-                            <Border VerticalAlignment="Bottom"
-                                        Height="2"
-                                        Margin="0,0,0,2"
-                                        Background="{DynamicResource OnSecondaryContainer}"
-                                        Opacity="0.5"/>
-
-                            <ItemsControl Grid.Row="1"
-                                          ItemsSource="{Binding AlbumTypeFilters}"
-                                          Background="Transparent">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Vertical"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border x:Name="ItemRootBorder"
-                                                Cursor="Hand"
-                                                         Style="{DynamicResource FilterItemRootBorder}">
-                                            <Border.InputBindings>
-                                                <MouseBinding Gesture="LeftClick"
-                                                            Command="{Binding DataContext.AddFilterCommand, ElementName=RootView}"
-                                                            CommandParameter="{Binding .}"/>
-                                            </Border.InputBindings>
-                                            <TextBlock Text="{Binding Name}"
-                                                           Style="{DynamicResource SFilterStyle}"
-                                                           x:Name="FilterName"/>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Grid>
-
-                        <Grid Grid.Column="2"
+                            <Grid Grid.Column="1"
                                   Margin="20,0,0,0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="40"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
 
-                            <TextBlock Text="{x:Static lang:Resources.Artists_View}"
-                                           HorizontalAlignment="Center"
-                                           Foreground="{DynamicResource OnSecondaryContainer}"
-                                           Style="{DynamicResource SFilterHeaderStyle}"/>
-                            <Border VerticalAlignment="Bottom"
-                                        Height="2"
-                                        Margin="0,0,0,2"
-                                        Background="{DynamicResource OnSecondaryContainer}"
-                                        Opacity="0.5"/>
+                                <TextBlock Text="Album Type"
+                                               Style="{DynamicResource SFilterHeaderStyle}"/>
 
-                            <ItemsControl Grid.Row="1"
-                                          ItemsSource="{Binding ArtistsFilters}"
-                                          Background="Transparent">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Vertical"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border x:Name="ItemRootBorder"
-                                                Cursor="Hand"
-                                                         Style="{DynamicResource FilterItemRootBorder}">
-                                            <Border.InputBindings>
-                                                <MouseBinding Gesture="LeftClick"
-                                                            Command="{Binding DataContext.AddFilterCommand, ElementName=RootView}"
-                                                            CommandParameter="{Binding .}"/>
-                                            </Border.InputBindings>
-                                            <TextBlock Text="{Binding Name}"
-                                                           Style="{DynamicResource SFilterStyle}"
-                                                           x:Name="FilterName"/>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                <Border VerticalAlignment="Bottom"
+                                            Height="2"
+                                            Margin="0,0,0,2"
+                                            Background="{DynamicResource OnSecondaryContainer}"
+                                            Opacity="0.5"/>
+
+                                <ItemsControl Grid.Row="1"
+                                              ItemsSource="{Binding AlbumTypeFilters}"
+                                              Background="Transparent">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border x:Name="ItemRootBorder"
+                                                    Cursor="Hand"
+                                                             Style="{DynamicResource FilterItemRootBorder}">
+                                                <Border.InputBindings>
+                                                    <MouseBinding Gesture="LeftClick"
+                                                                Command="{Binding DataContext.AddFilterCommand, ElementName=RootView}"
+                                                                CommandParameter="{Binding .}"/>
+                                                </Border.InputBindings>
+                                                <TextBlock Text="{Binding Name}"
+                                                               Style="{DynamicResource SFilterStyle}"
+                                                               x:Name="FilterName"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+
+                            <Grid Grid.Column="2"
+                                      Margin="20,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="{x:Static lang:Resources.Artists_View}"
+                                               HorizontalAlignment="Center"
+                                               Foreground="{DynamicResource OnSecondaryContainer}"
+                                               Style="{DynamicResource SFilterHeaderStyle}"/>
+                                <Border VerticalAlignment="Bottom"
+                                            Height="2"
+                                            Margin="0,0,0,2"
+                                            Background="{DynamicResource OnSecondaryContainer}"
+                                            Opacity="0.5"/>
+
+                                <ItemsControl Grid.Row="1"
+                                              ItemsSource="{Binding ArtistsFilters}"
+                                              Background="Transparent">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border x:Name="ItemRootBorder"
+                                                    Cursor="Hand"
+                                                             Style="{DynamicResource FilterItemRootBorder}">
+                                                <Border.InputBindings>
+                                                    <MouseBinding Gesture="LeftClick"
+                                                                Command="{Binding DataContext.AddFilterCommand, ElementName=RootView}"
+                                                                CommandParameter="{Binding .}"/>
+                                                </Border.InputBindings>
+                                                <TextBlock Text="{Binding Name}"
+                                                               Style="{DynamicResource SFilterStyle}"
+                                                               x:Name="FilterName"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </ScrollViewer>
-            </Border>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
         </Grid>
+        
         <TextBlock Style="{DynamicResource SListPlaceHolderStyle}"
                        Visibility="{Binding NoAlbumFoundVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
                        Text="{x:Static lang:Resources.No_Albums_Found}"
                        Grid.Row="1"/>
 
         <Border Grid.Row="1"
+                Panel.ZIndex="0"
+                Background="{DynamicResource Background}"
                 Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverterInverted}}">
 
             <listviews:AlbumListView Albums="{Binding Albums}"

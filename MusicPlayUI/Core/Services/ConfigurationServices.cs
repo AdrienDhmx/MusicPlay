@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Drawing;
-using System.Timers;
-using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
-using MessageControl;
 using MusicPlayUI.Core.Enums;
-using MusicPlayUI.Core.Factories;
-using Windows.UI;
-using Windows.UI.ViewManagement;
 
 namespace MusicPlayUI.Core.Services
 {
@@ -18,6 +10,12 @@ namespace MusicPlayUI.Core.Services
         private static void OnQueueCoverChanged()
         {
             QueueCoversChange?.Invoke();
+        }
+
+        public static event Action ColorfulPlayerControlChange;
+        private static void OnColorfulPlayerControlChanged()
+        {
+            ColorfulPlayerControlChange?.Invoke();
         }
 
         public static int GetPreference(SettingsEnum key)
@@ -30,11 +28,12 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.LightTheme => Settings.Default.LightTheme,
                 SettingsEnum.SunsetSunrise => Settings.Default.SunsetSunrise,
                 SettingsEnum.SystemSyncTheme => Settings.Default.SystemSyncTheme,
+                SettingsEnum.ColorfulPlayerControl => Settings.Default.ColorfulPlayerControl,
                 SettingsEnum.Language => Settings.Default.Language,
                 SettingsEnum.TimerInterval => Settings.Default.TimerInterval,
                 SettingsEnum.NowPlayingStartingSubView => Settings.Default.NowPlayingStartingSubView,
                 SettingsEnum.QueueCovers => Settings.Default.QueueCover,
-                SettingsEnum.AutoChangeOutputdevice => Settings.Default.AutoChangeOutputDevice,
+                SettingsEnum.AutoChangeOutputDevice => Settings.Default.AutoChangeOutputDevice,
                 SettingsEnum.ArtistFilter => Settings.Default.ArtistsFilter,
                 SettingsEnum.ArtistOrder => Settings.Default.ArtistOrder,
                 SettingsEnum.AlbumFilter => Settings.Default.AlbumFilter,
@@ -55,6 +54,8 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.VAutoColor => Settings.Default.VAutoColor,
                 SettingsEnum.VCenterFreq => Settings.Default.VCenterFreq,
                 SettingsEnum.AutoForeground => Settings.Default.AutoForeground,
+                SettingsEnum.EqualizerEnabled => Settings.Default.EqualizerEnabled,
+                SettingsEnum.EqualizerPreset => Settings.Default.EqualizerPreset,
                 _ => "",
             };
             return int.TryParse(storedInt, out int id) ? id : -2;
@@ -116,7 +117,7 @@ namespace MusicPlayUI.Core.Services
         /// </summary>
         /// <param name="key"> the setting the value correspond to </param>
         /// <param name="value"> the value to save </param>
-        /// <param name="force"> force the value even if it is valid (empty string or null value) </param>
+        /// <param name="force"> force the value even if it's not valid (empty string or null value) </param>
         /// <returns></returns>
         public static bool SetPreference(SettingsEnum key, string value, bool force = false)
         {
@@ -140,6 +141,10 @@ namespace MusicPlayUI.Core.Services
                 case SettingsEnum.SystemSyncTheme:
                     Settings.Default.SystemSyncTheme = value;
                     break;
+                case SettingsEnum.ColorfulPlayerControl:
+                    Settings.Default.ColorfulPlayerControl = value;
+                    OnColorfulPlayerControlChanged();
+                    break;
                 case SettingsEnum.Language:
                     Settings.Default.Language = value;
                     break;
@@ -153,7 +158,7 @@ namespace MusicPlayUI.Core.Services
                     Settings.Default.QueueCover = value;
                     OnQueueCoverChanged();
                     break;
-                case SettingsEnum.AutoChangeOutputdevice:
+                case SettingsEnum.AutoChangeOutputDevice:
                     Settings.Default.AutoChangeOutputDevice = value;
                     break;
                 case SettingsEnum.LyricsFontSize:
@@ -304,6 +309,12 @@ namespace MusicPlayUI.Core.Services
                     break;
                 case SettingsEnum.ToggleTheme:
                     Settings.Default.ToggleLightThemeShortcut = value;
+                    break;
+                case SettingsEnum.EqualizerEnabled:
+                    Settings.Default.EqualizerEnabled = value;
+                    break;
+                case SettingsEnum.EqualizerPreset:
+                    Settings.Default.EqualizerPreset = value;
                     break;
                 default:
                     return false;

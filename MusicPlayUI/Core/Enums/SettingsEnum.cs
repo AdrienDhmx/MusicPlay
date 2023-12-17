@@ -13,11 +13,10 @@ namespace MusicPlayUI.Core.Enums
         NowPlayingStartingSubView = 1,
 
         TimerInterval = 2,
-        DefaultBackgroundOpacity = 3,
 
         QueueCovers = 4,
 
-        AutoChangeOutputdevice = 5,
+        AutoChangeOutputDevice = 5,
 
         Volume = 6,
 
@@ -30,6 +29,7 @@ namespace MusicPlayUI.Core.Enums
         LightTheme =11, // theme is light or dark (bool)
         SunsetSunrise = 12, // theme is light or dark based on the time of the day (bool)
         SystemSyncTheme = 13, // theme is (light or dark) sync with the system (bool)
+        ColorfulPlayerControl = 14, // (bool)
 
         Language = 20,
         UserName = 21,
@@ -57,6 +57,8 @@ namespace MusicPlayUI.Core.Enums
         AlbumFilter = 72,
         AlbumOrder = 73,
 
+
+        // shortcuts
         PlayPause = 100,
         NexTrack = 101,
         PreviousTrack = 102,
@@ -85,6 +87,12 @@ namespace MusicPlayUI.Core.Enums
         ToggleFullScreen = 125,
         ToggleTheme = 126,
 
+
+        // DSP settings
+        EqualizerEnabled = 200, // bool
+        EqualizerPreset = 201, // id of the preset
+
+
         UNKNOWN = -1
     }
 
@@ -104,8 +112,6 @@ namespace MusicPlayUI.Core.Enums
                     return "TimerInterval";
                 case SettingsEnum.NowPlayingStartingSubView:
                     return "NowPlayingStartingSubView";
-                case SettingsEnum.DefaultBackgroundOpacity:
-                    return "DefaultBackgroundOpacity";
                 default:
                     return null;
             }
@@ -125,8 +131,6 @@ namespace MusicPlayUI.Core.Enums
                     return SettingsEnum.TimerInterval;
                 case "NowPlayingStartingSubView":
                     return SettingsEnum.NowPlayingStartingSubView;
-                case "DefaultBackgroundOpacity":
-                    return SettingsEnum.DefaultBackgroundOpacity;
                 default:
                     return SettingsEnum.UNKNOWN;
             }

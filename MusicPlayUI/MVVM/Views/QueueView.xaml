@@ -25,7 +25,6 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
 
             <!-- Queue Info -->
@@ -38,9 +37,12 @@
                 
                 <!-- Playing From -->
                 <TextBlock Text="{Binding QueueService.PlayingFrom.PlayingFrom, UpdateSourceTrigger=PropertyChanged}"
-                           Style="{DynamicResource SLargeHeaderStyle}"
+                           Style="{DynamicResource SLlistInfoStyle}"
                            HorizontalAlignment="Center"
                            TextAlignment="Center"
+                           FontSize="36"
+                           FontFamily="Times New Roman"
+                           Margin="10"
                             Foreground="{DynamicResource WhiteForeground}">
                     <TextBlock.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToPlayingFromCommand}"/>
@@ -234,7 +236,7 @@
                                             <Setter Property="Opacity" Value="0.6"/>
                                             <Style.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="FillColor" Value="{DynamicResource ErrorHover}"/>
+                                                    <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
                                                     <Setter Property="Opacity" Value="1"/>
                                                 </Trigger>
                                             </Style.Triggers>
@@ -252,22 +254,6 @@
                     </DataTemplate>
                 </vcontrol:VirtualizingListView.ItemTemplate>
             </vcontrol:VirtualizingListView>
-
-            <StackPanel Grid.Row="2"
-                        Margin="0,0,20,0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
-                <customButton:IconButton Grid.Row="2"
-                                     HorizontalAlignment="Right"
-                                     VerticalAlignment="Bottom"
-                                     Panel.ZIndex="2"
-                                     Icon="{DynamicResource PlaylistLibrary}"
-                                         MouseOverBackground="{DynamicResource TertiaryHover}"
-                                         FillColor="{DynamicResource WhiteForeground}"
-                                     Command="{Binding SaveQueueAsPlaylistCommand}"
-                                         Style="{DynamicResource NowPlayingIconButton}"/>
-            </StackPanel>
         </Grid>
     </Border>
 </UserControl>

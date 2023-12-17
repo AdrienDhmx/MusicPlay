@@ -41,8 +41,8 @@
             <DataTemplate DataType="{x:Type modalviewmodel:CreatePlaylistViewModel}">
                 <modalview:CreatePlaylistView/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type modalviewmodel:CreateTagViewModel}">
-                <modalview:CreateTagModal/>
+            <DataTemplate DataType="{x:Type modalviewmodel:CreateModelNameViewModel}">
+                <modalview:CreateModelNameModal/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type modalviewmodel:ValidationModalViewModel}">
                 <modalview:ValidationModalView/>
@@ -121,6 +121,9 @@
             <DataTemplate DataType="{x:Type settingsviewmodels:GeneralSettingsViewModel}">
                 <settingsviews:GeneralSettingView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsviewmodels:DSPSettingsViewModels}">
+                <settingsviews:DSPSettingsView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type settingsviewmodels:AppThemeSettingViewModel}">
                 <settingsviews:AppThemeSettingView/>
             </DataTemplate>
@@ -157,6 +160,7 @@
             <converter:AddTextConverter x:Key="AddTextConverter"/>
             <converter:FindScrollViewerConverter x:Key="FindScrollViewerConverter"/>
             <converter:ArtistsRelationConverter x:Key="ArtistsRelationConverter"/>
+            <converter:NumberDisplayConverter x:Key="DisplayNumberHigherThan0"/>
 
             <BitmapImage x:Key="PlayImg" UriSource="Resources\Play.png" />
             <BitmapImage x:Key="PreviousImg" UriSource="Resources\Previous.png" />

@@ -21,513 +21,562 @@
             BorderBrush="{DynamicResource SurfaceVariant}"
             Background="{DynamicResource Background}">
 
-        <!-- Main Grid -->
-        <Grid Margin="4,0"
-              Background="Transparent">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.35*"/>
-                <ColumnDefinition Width="0.3*"/>
-                <ColumnDefinition Width="0.35*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Track Info -->
-            <Grid Margin="4,0,0,0"
-                  VerticalAlignment="Center"
-                  Visibility="{Binding QueueService.QueueDuration, Converter={StaticResource EmptyTextToVisibilityConverter}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
- 
-                <!-- Cover -->
-                <Border Height="80"
-                        Width="80"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        x:Name="Cover"
-                        Visibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid>
+            <Grid Visibility="{Binding ColorfulPlayerControl, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Border Opacity="1"
+                        Visibility="{Binding ShowMeanColor, Converter={StaticResource BoolToVisibilityConverterInverted}}">
                     <Border.Background>
-                        <ImageBrush Stretch="Uniform"
-                                    ImageSource="{Binding QueueService.PlayingTrack.Cover, Converter={StaticResource ONullImageConverter}}">
-                        </ImageBrush>
+                        <ImageBrush ImageSource="{Binding BlurredCover, Converter={StaticResource ONullImageConverter}, ConverterParameter=-1}"
+                                    Stretch="UniformToFill"/>
                     </Border.Background>
-                    <Border.InputBindings>
-                        <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToNowPlayingCommand}"/>
-                    </Border.InputBindings>
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Setter Property="Opacity" Value="1"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Opacity" Value="0.8"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    <Path Data="{DynamicResource music_icon}"
-                            Fill="{DynamicResource OnBackground}"
-                            StrokeThickness="0"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            Margin="0,0,5,0"
-                            Visibility="{Binding IsMouseOver, ElementName=Cover, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </Border>
 
-                
-                <!-- Playing Track Info (title, performer, PlayingFrom) -->
-                <Grid Grid.Column="1"
+                <Border Background="{Binding MeanColor}"
+                        Visibility="{Binding ShowMeanColor, Converter={StaticResource BoolToVisibilityConverter}}">
+                </Border>
+
+                <Border Background="{DynamicResource Background}"
+                        OpacityMask="{Binding RadialGradientBrush}">
+                </Border>
+            </Grid>
+
+            <!-- Main Grid -->
+            <Grid Margin="0,0"
+                    Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.35*"/>
+                    <ColumnDefinition Width="0.3*"/>
+                    <ColumnDefinition Width="0.35*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Track Info -->
+                <Border Panel.ZIndex="10"
+                        Background="#01000000">
+                    <Grid Margin="12,0,0,0"
                             VerticalAlignment="Center"
-                            Margin="10,0,0,5"
-                      x:Name="PlayingTrackInfoGrid">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    
-                    <Grid>
+                            Visibility="{Binding QueueService.QueueDuration, Converter={StaticResource EmptyTextToVisibilityConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="6"/>
-                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        
-                        <!-- Title -->
-                        <TextBlock Text="{Binding QueueService.PlayingTrack.Title}"
-                               Style="{DynamicResource SLStyle}"
-                                   MaxWidth="{Binding ActualWidth, ElementName=PlayingTrackInfoGrid, Converter={StaticResource SubstractionConverter}, ConverterParameter=40}"
-                                   Margin="0,0,5,0"
-                                MaxHeight="30">
-                            <TextBlock.InputBindings>
-                                <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToAlbumCommand}"/>
-                            </TextBlock.InputBindings>
-                        </TextBlock>
 
-                        <!-- Favorite -->
-                        <iconbtn:IconButton Grid.Column="1"
-                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"
-                                    Width="20"
-                                    Height="20"
-                                    IconWidth="16"
-                                    IconHeight="14"
-                                    IconMargin="0"
-                                    IconStretch="Fill"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    StrokeColor="Transparent"
-                                            Cursor="Hand"
-                                    Command="{Binding IsFavoriteCommand}"
-                                    MouseOverBackground="Transparent"
-                                    FillColor="{DynamicResource Primary}">
-                            <iconbtn:IconButton.Style>
-                                <Style TargetType="iconbtn:IconButton">
-                                    <Setter Property="Icon" Value="{DynamicResource HeartIcon}"/>
+                        <!-- Cover -->
+                        <Border Height="70"
+                                Width="70"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                x:Name="Cover"
+                                Visibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Border.Background>
+                                <ImageBrush Stretch="Uniform"
+                                            ImageSource="{Binding QueueService.PlayingTrack.Cover, Converter={StaticResource ONullImageConverter}}">
+                                </ImageBrush>
+                            </Border.Background>
+                            <Border.InputBindings>
+                                <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToNowPlayingCommand}"/>
+                            </Border.InputBindings>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Opacity" Value="1"/>
                                     <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter Property="Icon" Value="{DynamicResource BrokenHeartIcon}"/>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.8"/>
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
-                            </iconbtn:IconButton.Style>
-                        </iconbtn:IconButton>
+                            </Border.Style>
+                            <Border.Effect>
+                                <DropShadowEffect Color="#101010"
+                                                  Opacity="0.4"
+                                                  BlurRadius="12"
+                                                  Direction="-60"/>
+                            </Border.Effect>
+                            <Path Data="{DynamicResource music_icon}"
+                                    Fill="{DynamicResource OnBackground}"
+                                    StrokeThickness="0"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,5,0"
+                                    Visibility="{Binding IsMouseOver, ElementName=Cover, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </Border>
 
-                        <!-- Favorite -->
-                        <iconbtn:IconButton Grid.Column="1"
-                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverterInverted}}"
-                                    Icon="{DynamicResource HeartIcon}"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                            Cursor="Hand"
-                                    Width="20"
-                                    Height="20"
-                                    IconWidth="16"
-                                    IconHeight="14"
-                                    IconMargin="0"
-                                    IconStretch="Fill"
-                                    MouseOverBackground="Transparent"
-                                    Command="{Binding IsFavoriteCommand}"
-                                    StrokeColor="{DynamicResource Primary}">
-                            <iconbtn:IconButton.Style>
-                                <Style TargetType="iconbtn:IconButton">
-                                    <Setter Property="FillColor" Value="Transparent"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter Property="FillColor" Value="{DynamicResource PrimaryHover}"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </iconbtn:IconButton.Style>
-                        </iconbtn:IconButton>
 
-                        <!-- More Option Button -->
-                        <iconbtn:IconButton Style="{DynamicResource BaseIconButton}"
-                                            Icon="{DynamicResource MoreOptionIcon}"
-                                            FillColor="{DynamicResource OnBackground}"
-                                            IconStretch="Uniform"
-                                            IsHitTestVisible="True"
-                                            Grid.Column="3"
-                                            HorizontalAlignment="Left"
-                                            Command="{Binding OpenTrackPopupCommand}">
-                        </iconbtn:IconButton>
+                        <!-- Playing Track Info (title, performer, PlayingFrom) -->
+                        <Grid Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Margin="10,0,0,5"
+                                x:Name="PlayingTrackInfoGrid">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="20"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Title -->
+                                <TextBlock Text="{Binding QueueService.PlayingTrack.Title}"
+                                        Style="{DynamicResource SLStyle}"
+                                            MaxWidth="{Binding ActualWidth, ElementName=PlayingTrackInfoGrid, Converter={StaticResource SubstractionConverter}, ConverterParameter=40}"
+                                            Margin="0,0,5,0"
+                                        MaxHeight="30">
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToAlbumCommand}"/>
+                                    </TextBlock.InputBindings>
+                                </TextBlock>
+
+                                <!-- Favorite -->
+                                <iconbtn:IconButton Grid.Column="1"
+                                            Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            Width="20"
+                                            Height="20"
+                                            IconWidth="16"
+                                            IconHeight="14"
+                                            IconMargin="0"
+                                            IconStretch="Fill"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            StrokeColor="Transparent"
+                                                    Cursor="Hand"
+                                            Command="{Binding IsFavoriteCommand}"
+                                            MouseOverBackground="Transparent"
+                                            FillColor="{DynamicResource Primary}">
+                                    <iconbtn:IconButton.Style>
+                                        <Style TargetType="iconbtn:IconButton">
+                                            <Setter Property="Icon" Value="{DynamicResource HeartIcon}"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="true">
+                                                    <Setter Property="Icon" Value="{DynamicResource BrokenHeartIcon}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </iconbtn:IconButton.Style>
+                                </iconbtn:IconButton>
+
+                                <!-- Favorite -->
+                                <iconbtn:IconButton Grid.Column="1"
+                                            Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                            Icon="{DynamicResource HeartIcon}"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                                    Cursor="Hand"
+                                            Width="20"
+                                            Height="20"
+                                            IconWidth="16"
+                                            IconHeight="14"
+                                            IconMargin="0"
+                                            IconStretch="Fill"
+                                            MouseOverBackground="Transparent"
+                                            Command="{Binding IsFavoriteCommand}"
+                                            StrokeColor="{DynamicResource Primary}">
+                                    <iconbtn:IconButton.Style>
+                                        <Style TargetType="iconbtn:IconButton">
+                                            <Setter Property="FillColor" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="true">
+                                                    <Setter Property="FillColor" Value="{DynamicResource PrimaryHover}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </iconbtn:IconButton.Style>
+                                </iconbtn:IconButton>
+
+                                <!-- More Option Button -->
+                                <iconbtn:IconButton Style="{DynamicResource BaseIconButton}"
+                                                    Icon="{DynamicResource MoreOptionIcon}"
+                                                    FillColor="{DynamicResource OnBackground}"
+                                                    IconStretch="Uniform"
+                                                    IsHitTestVisible="True"
+                                                    Grid.Column="3"
+                                                    HorizontalAlignment="Left"
+                                                    Command="{Binding OpenTrackPopupCommand}">
+                                </iconbtn:IconButton>
+                            </Grid>
+
+                            <!-- Album -->
+                            <TextBlock MaxHeight="30"
+                                       Margin="0, 3, 0, 2"
+                                        Foreground="{StaticResource OnSurfaceVariant}"
+                                        Grid.Row="1">
+                                <Run Text="On"
+                                    Style="{DynamicResource NRun}"/>
+                                <Run Text="{Binding QueueService.PlayingTrack.AlbumName}"
+                                        Style="{DynamicResource NLRun}">
+                                    <Run.InputBindings>
+                                            <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToAlbumCommand}"/>
+                                    </Run.InputBindings>
+                                </Run>
+                            </TextBlock>
+
+                            <Grid Grid.Row="2"
+                                    HorizontalAlignment="left">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock MaxHeight="30"
+                                            FontSize="14"
+                                            Text="By "
+                                            VerticalAlignment="top"
+                                            Foreground="{DynamicResource OnSurfaceVariant}">
+                                </TextBlock>
+
+                                <!-- Artists -->
+                                <list:TrackArtistsListView Grid.Column="1"
+                                                            Grid.Row="2"
+                                                            MaxHeight="30"
+                                                            FontSize="14"
+                                                            Foreground="{DynamicResource OnBackground}"
+                                                            Artists="{Binding QueueService.PlayingTrack.Artists}"
+                                                            Command="{Binding NavigateToArtistCommand}"/>
+                            </Grid>
+
+                        </Grid>
                     </Grid>
-                   
-                    <!-- Artists -->
-                    <list:TrackArtistsListView Grid.Row="1"
-                                                MaxHeight="30"
-                                               FontSize="14"
-                                               Foreground="{DynamicResource OnSurfaceVariant}"
-                                               Artists="{Binding QueueService.PlayingTrack.Artists}"
-                                               Command="{Binding NavigateToArtistCommand}"/>
-                    
-                    <TextBlock MaxHeight="30"
-                               Foreground="{StaticResource OnSurfaceVariant}"
-                               Grid.Row="2">
-                        <Run Text="{x:Static lang:Resources.PlayingFrom}"
-                            Style="{DynamicResource NRun}"/>
-                        <Run Text="{Binding QueueService.PlayingFrom.PlayingFrom}"
-                             Style="{DynamicResource NLRun}">
-                            <Run.InputBindings>
-                                    <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToPlayingFromCommand}"/>
-                            </Run.InputBindings>
-                        </Run>
-                    </TextBlock>
-                </Grid>
-            </Grid>
+                </Border>
 
-            <!-- Audio Position & Player Controls -->
-            <Grid Grid.Column="1"
-                  Grid.Row="1"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  Margin="5,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
+                <!-- Audio Position & Player Controls -->
+                <Grid Grid.Column="1"
+                        Grid.Row="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Margin="5,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
                 
-                <!-- Controls -->
-                <StackPanel Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center">
-                    <!-- Shuffle -->
-                    <iconbtn:IconButton Icon="{DynamicResource ShuffleIcon}"
-                                        Command="{Binding ShuffleCommand}">
-                        <iconbtn:IconButton.Style>
-                            <Style TargetType="iconbtn:IconButton"
-                                   BasedOn="{StaticResource ThirdPlayBackButton}">
-                                <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DataContext.QueueService.IsShuffled, ElementName=RootView}" Value="true">
-                                        <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-                                        <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </iconbtn:IconButton.Style>
-                    </iconbtn:IconButton>
-                    
-                    <!-- Previous Track -->
-                    <iconbtn:IconButton  Style="{DynamicResource ScdPlayBackButton}"
-                                         Icon="{DynamicResource PreviousIcon}"
-                                         Command="{Binding PreviousTrackCommand}">
-                    </iconbtn:IconButton>
-
-                    <!-- Play/Pause -->
-                    <iconbtn:IconButton Command="{Binding PlayPauseCommand}">
-                        <iconbtn:IconButton.Style>
-                            <Style BasedOn="{StaticResource PlayBackButton}" 
-                                   TargetType="iconbtn:IconButton">
-                                <Setter Property="Icon" Value="{DynamicResource PlayIcon}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsPlaying, ElementName=RootView}" Value="true">
-                                        <Setter Property="Icon" Value="{DynamicResource PauseIcon}"/>
-                                        <Setter Property="ToolTip" Value="{x:Static lang:Resources.Pause}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </iconbtn:IconButton.Style>
-                    </iconbtn:IconButton>
-
-                    <!-- Next Track -->
-                    <iconbtn:IconButton  Style="{DynamicResource ScdPlayBackButton}"
-                                         Icon="{DynamicResource NextIcon}"
-                                         Command="{Binding NextTrackCommand}">
-                    </iconbtn:IconButton>
-
-                    <!-- Repeat/Repeat One -->
-                    <iconbtn:IconButton Command="{Binding RepeatCommand}">
-                        <iconbtn:IconButton.Style>
-                            <Style TargetType="iconbtn:IconButton"
-                                   BasedOn="{StaticResource ThirdPlayBackButton}">
-                                <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-                                <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
-                                <Setter Property="Icon" Value="{DynamicResource RepeatIcon}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DataContext.QueueService.IsOnRepeat, ElementName=RootView}" Value="false">
-                                        <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
-                                        <Setter Property="Background" Value="Transparent"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootView}" Value="true">
-                                        <Setter Property="Icon" Value="{DynamicResource RepeatOneIcon}"/>
-                                        <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-                                        <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </iconbtn:IconButton.Style>
-                    </iconbtn:IconButton>
-                </StackPanel>
-                
-                <!-- Audio Position -->
-                <Grid Grid.Row="1"
-                      Margin="0,0,0,10"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding AudioService.CurrentPosition}"
-                               Foreground="{DynamicResource OnBackground}"
-                               FontSize="14"
-                               Margin="0,0,4,0"/>
-
-                    <!-- Audio Slider -->
-                    <Slider Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                             VerticalAlignment="Center"
-                            Value="{Binding AudioService.CurrentPositionMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Minimum="0"
-                            Maximum="{Binding AudioService.MaxPositionMs}"
-                             IsMoveToPointEnabled="True"
-                            helper:SliderDragHelper.IsDragEnabled="True"
-                            helper:SliderDragHelper.DragTarget="{Binding AudioService}">
-                    </Slider>
-                    
-                    <TextBlock Text="{Binding QueueService.PlayingTrack.Duration}"
-                               Foreground="{DynamicResource OnBackground}"
-                               FontSize="14"
-                               Margin="4,0,0,0"
-                               Grid.Column="2"/>
-                </Grid>
-            </Grid>
-
-            <!-- Volume, Rating, Favorite... -->
-            <Grid Grid.Column="2"
-                  Grid.Row="1"
-                  Margin="10,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.15*"/>
-                    <ColumnDefinition  Width="0.2*"/>
-                    <ColumnDefinition Width="0.45*"/>
-                    <ColumnDefinition Width="0.2*"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Volume -->
-                <Border x:Name="VolumeGrid"
-                        Grid.Column="1"
-                        Margin="10,0"
-                            VerticalAlignment="Center"
-                            Background="Transparent">
-                        <iconbtn:IconButton x:Name="VolumeIcon"
-                                                Margin="0,0,0,5"
-                                            IconWidth="25"
-                                            IconHeight="25"
-                                                FillColor="{DynamicResource OnPrimaryContainer}"
-                                                Command="{Binding MuteCommand}">
+                    <!-- Controls -->
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        <!-- Shuffle -->
+                        <iconbtn:IconButton Icon="{DynamicResource ShuffleIcon}"
+                                            Command="{Binding ShuffleCommand}">
                             <iconbtn:IconButton.Style>
                                 <Style TargetType="iconbtn:IconButton"
-                                       BasedOn="{StaticResource BaseIconButton}">
-                                    <Setter Property="Icon" Value="{DynamicResource VolumeFullIcon}"/>
+                                        BasedOn="{StaticResource ThirdPlayBackButton}">
+                                    <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=60}" Value="true">
-                                            <Setter Property="Icon" Value="{DynamicResource VolumeMediumIcon}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=30}" Value="true">
-                                            <Setter Property="Icon" Value="{DynamicResource VolumeLowIcon}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding VolumePercentage}" Value="0">
-                                            <Setter Property="Icon" Value="{DynamicResource VolumeOffIcon}"/>
+                                        <DataTrigger Binding="{Binding DataContext.QueueService.IsShuffled, ElementName=RootView}" Value="true">
+                                            <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+                                            <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </iconbtn:IconButton.Style>
                         </iconbtn:IconButton>
-                </Border>
+                    
+                        <!-- Previous Track -->
+                        <iconbtn:IconButton  Style="{DynamicResource ScdPlayBackButton}"
+                                                Icon="{DynamicResource PreviousIcon}"
+                                                Command="{Binding PreviousTrackCommand}">
+                        </iconbtn:IconButton>
+
+                        <!-- Play/Pause -->
+                        <iconbtn:IconButton Command="{Binding PlayPauseCommand}">
+                            <iconbtn:IconButton.Style>
+                                <Style BasedOn="{StaticResource PlayBackButton}" 
+                                        TargetType="iconbtn:IconButton">
+                                    <Setter Property="Icon" Value="{DynamicResource PlayIcon}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsPlaying, ElementName=RootView}" Value="true">
+                                            <Setter Property="Icon" Value="{DynamicResource PauseIcon}"/>
+                                            <Setter Property="ToolTip" Value="{x:Static lang:Resources.Pause}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </iconbtn:IconButton.Style>
+                        </iconbtn:IconButton>
+
+                        <!-- Next Track -->
+                        <iconbtn:IconButton  Style="{DynamicResource ScdPlayBackButton}"
+                                                Icon="{DynamicResource NextIcon}"
+                                                Command="{Binding NextTrackCommand}">
+                        </iconbtn:IconButton>
+
+                        <!-- Repeat/Repeat One -->
+                        <iconbtn:IconButton Command="{Binding RepeatCommand}">
+                            <iconbtn:IconButton.Style>
+                                <Style TargetType="iconbtn:IconButton"
+                                        BasedOn="{StaticResource ThirdPlayBackButton}">
+                                    <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="Icon" Value="{DynamicResource RepeatIcon}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.QueueService.IsOnRepeat, ElementName=RootView}" Value="false">
+                                            <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootView}" Value="true">
+                                            <Setter Property="Icon" Value="{DynamicResource RepeatOneIcon}"/>
+                                            <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+                                            <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </iconbtn:IconButton.Style>
+                        </iconbtn:IconButton>
+                    </StackPanel>
                 
-                <!-- Devices btn -->
-                <iconbtn:IconButton Grid.Column="2"
-                                    Style="{DynamicResource NormalIconBtn}"
-                                    x:Name="DeviceIconBtn"
-                                    Icon="{Binding CurrentDevice.Icon, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Command="{Binding OpenDevicesPopupCommand}"/>
+                    <!-- Audio Position -->
+                    <Grid Grid.Row="1"
+                            Margin="0,0,0,10"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding AudioService.CurrentPosition}"
+                                    Foreground="{DynamicResource OnBackground}"
+                                    FontSize="14"
+                                    Margin="0,0,4,0"/>
+
+                        <!-- Audio Slider -->
+                        <Slider Grid.Column="1"
+                                HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                Value="{Binding AudioService.CurrentPositionMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Minimum="0"
+                                Maximum="{Binding AudioService.MaxPositionMs}"
+                                    IsMoveToPointEnabled="True"
+                                helper:SliderDragHelper.IsDragEnabled="True"
+                                helper:SliderDragHelper.DragTarget="{Binding AudioService}">
+                        </Slider>
+                    
+                        <TextBlock Text="{Binding QueueService.PlayingTrack.Duration}"
+                                    Foreground="{DynamicResource OnBackground}"
+                                    FontSize="14"
+                                    Margin="4,0,0,0"
+                                    Grid.Column="2"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Volume, Rating, Favorite... -->
+                <Grid Grid.Column="2"
+                        Grid.Row="1"
+                        Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.15*"/>
+                        <ColumnDefinition  Width="0.2*"/>
+                        <ColumnDefinition Width="0.45*"/>
+                        <ColumnDefinition Width="0.2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Volume -->
+                    <Border x:Name="VolumeGrid"
+                            Grid.Column="1"
+                            Margin="10,0"
+                                VerticalAlignment="Center"
+                                Background="Transparent">
+                            <iconbtn:IconButton x:Name="VolumeIcon"
+                                                    Margin="0,0,0,5"
+                                                IconWidth="25"
+                                                IconHeight="25"
+                                                    FillColor="{DynamicResource OnPrimaryContainer}"
+                                                    Command="{Binding MuteCommand}">
+                                <iconbtn:IconButton.Style>
+                                    <Style TargetType="iconbtn:IconButton"
+                                            BasedOn="{StaticResource BaseIconButton}">
+                                        <Setter Property="Icon" Value="{DynamicResource VolumeFullIcon}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=60}" Value="true">
+                                                <Setter Property="Icon" Value="{DynamicResource VolumeMediumIcon}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=30}" Value="true">
+                                                <Setter Property="Icon" Value="{DynamicResource VolumeLowIcon}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding VolumePercentage}" Value="0">
+                                                <Setter Property="Icon" Value="{DynamicResource VolumeOffIcon}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </iconbtn:IconButton.Style>
+                            </iconbtn:IconButton>
+                    </Border>
+                
+                    <!-- Devices btn -->
+                    <iconbtn:IconButton Grid.Column="2"
+                                        Style="{DynamicResource NormalIconBtn}"
+                                        x:Name="DeviceIconBtn"
+                                        Icon="{Binding CurrentDeviceIcon}"
+                                        Command="{Binding OpenDevicesPopupCommand}"/>
 
 
-                <iconbtn:IconButton Grid.Column="3"
-                                    Style="{DynamicResource NormalIconBtn}"
-                                     Icon="{DynamicResource QueueIcon}"
-                                    StrokeColor="{DynamicResource OnPrimaryContainer}"
-                                    FillColor="{DynamicResource PrimaryHover}"
-                                    StrokeWidth="2"
-                                    Command="{Binding OpenCloseQueuePopupCommand}">
-                </iconbtn:IconButton>
-            </Grid>
+                    <iconbtn:IconButton Grid.Column="3"
+                                        Style="{DynamicResource NormalIconBtn}"
+                                            Icon="{DynamicResource QueueIcon}"
+                                        StrokeColor="{DynamicResource OnPrimaryContainer}"
+                                        FillColor="{DynamicResource PrimaryHover}"
+                                        StrokeWidth="2"
+                                        Command="{Binding OpenCloseQueuePopupCommand}">
+                    </iconbtn:IconButton>
+                </Grid>
 
-            <!-- Volume Popup -->
-            <Popup AllowsTransparency="True"
-                   x:Name="VolumePopup"
-                   PopupAnimation="None"
-                   HorizontalAlignment="Center"
-                   StaysOpen="True">
-                <Popup.Style>
-                    <Style TargetType="Popup">
-                        <Setter Property="PlacementTarget" Value="{Binding ElementName=VolumeIcon}"/>
-                        <Setter Property="Placement" Value="Top"/>
-                        <Setter Property="IsOpen" Value="false"/>
-                        <Setter Property="HorizontalOffset" Value="-19"/>
-                        <Setter Property="VerticalOffset" Value="0"/>
-                        <Setter Property="Child">
-                            <Setter.Value>
-                                <Grid Background="#01000000"
-                                        IsHitTestVisible="True">
+                <!-- Volume Popup -->
+                <Popup AllowsTransparency="True"
+                        x:Name="VolumePopup"
+                        PopupAnimation="None"
+                        HorizontalAlignment="Center"
+                        StaysOpen="True">
+                    <Popup.Style>
+                        <Style TargetType="Popup">
+                            <Setter Property="PlacementTarget" Value="{Binding ElementName=VolumeIcon}"/>
+                            <Setter Property="Placement" Value="Top"/>
+                            <Setter Property="IsOpen" Value="false"/>
+                            <Setter Property="HorizontalOffset" Value="-19"/>
+                            <Setter Property="VerticalOffset" Value="0"/>
+                            <Setter Property="Child">
+                                <Setter.Value>
+                                    <Grid Background="#01000000"
+                                            IsHitTestVisible="True">
+                                        <Border Height="auto"
+                                                Background="{DynamicResource Background}"
+                                                BorderBrush="{DynamicResource Outline}"
+                                                BorderThickness="1"
+                                                Width="40"
+                                                Margin="8"
+                                                Padding="5, 8, 5, 5"
+                                                CornerRadius="5">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="25"/>
+                                                </Grid.RowDefinitions>
+                                                <Slider Value="{Binding Volume}"
+                                                        IsMoveToPointEnabled="True"
+                                                        Maximum="10000"
+                                                        Cursor="Hand"
+                                                        Minimum="0"
+                                                        Orientation="Vertical"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Height="100">
+                                                </Slider>
+                                                <TextBlock Text="{Binding VolumePercentage}"
+                                                            Grid.Row="1"
+                                                            FontSize="14"
+                                                            Width="40"
+                                                                Margin="0,5,0,0"
+                                                                TextAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                            Foreground="{DynamicResource OnPrimaryContainer}"
+                                                            VerticalAlignment="Center"/> 
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="IsOpen" Value="True"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding IsMouseOver, ElementName=VolumeGrid}" Value="true">
+                                    <Setter Property="IsOpen" Value="True"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Popup.Style>
+                </Popup>
+
+                <!-- Devices Popup -->
+                <Popup AllowsTransparency="True"
+                        x:Name="DevicePopup"
+                        PopupAnimation="None"
+                        IsOpen="{Binding IsDevicesPopupOpen, Mode=OneWay}"
+                        StaysOpen="True">
+                    <Popup.Style>
+                        <Style TargetType="Popup">
+                            <Setter Property="PlacementTarget" Value="{Binding ElementName=DeviceIconBtn}"/>
+                            <Setter Property="Placement" Value="Top"/>
+                            <Setter Property="IsOpen" Value="false"/>
+                            <Setter Property="HorizontalOffset" Value="-110"/>
+                            <Setter Property="VerticalOffset" Value="-8"/>
+                            <Setter Property="Child">
+                                <Setter.Value>
                                     <Border Height="auto"
                                             Background="{DynamicResource Background}"
-                                            BorderBrush="{DynamicResource Outline}"
                                             BorderThickness="1"
-                                            Width="40"
-                                            Margin="8"
-                                            Padding="5, 8, 5, 5"
+                                            BorderBrush="{DynamicResource Outline}"
+                                            Width="250"
                                             CornerRadius="5">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="25"/>
-                                            </Grid.RowDefinitions>
-                                            <Slider Value="{Binding Volume}"
-                                                    IsMoveToPointEnabled="True"
-                                                    Maximum="10000"
-                                                    Cursor="Hand"
-                                                    Minimum="0"
-                                                    Orientation="Vertical"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    Height="100">
-                                            </Slider>
-                                            <TextBlock Text="{Binding VolumePercentage}"
-                                                       Grid.Row="1"
-                                                       FontSize="14"
-                                                       Width="40"
-                                                           Margin="0,5,0,0"
-                                                           TextAlignment="Center"
-                                                           HorizontalAlignment="Center"
-                                                       Foreground="{DynamicResource OnPrimaryContainer}"
-                                                       VerticalAlignment="Center"/> 
-                                        </Grid>
-                                    </Border>
-                                </Grid>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="IsOpen" Value="True"/>
-                            </Trigger>
-                            <DataTrigger Binding="{Binding IsMouseOver, ElementName=VolumeGrid}" Value="true">
-                                <Setter Property="IsOpen" Value="True"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Popup.Style>
-            </Popup>
+                                        <ItemsControl ItemsSource="{Binding AllDevices}"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Center"
+                                                Height="auto"
+                                                        Margin="2">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Height="50"
+                                                            x:Name="border"
+                                                            CornerRadius="5"
+                                                            Background="Transparent">
+                                                        <Border.InputBindings>
+                                                            <MouseBinding Gesture="LeftClick"
+                                                                            Command="{Binding DataContext.ChangeOutputDeviceCommand, ElementName=RootView}"
+                                                                            CommandParameter="{Binding .}"/>
+                                                        </Border.InputBindings>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="50"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
 
-            <!-- Devices Popup -->
-            <Popup AllowsTransparency="True"
-                   x:Name="DevicePopup"
-                   PopupAnimation="None"
-                   IsOpen="{Binding IsDevicesPopupOpen, Mode=OneWay}"
-                   StaysOpen="True">
-                <Popup.Style>
-                    <Style TargetType="Popup">
-                        <Setter Property="PlacementTarget" Value="{Binding ElementName=DeviceIconBtn}"/>
-                        <Setter Property="Placement" Value="Top"/>
-                        <Setter Property="IsOpen" Value="false"/>
-                        <Setter Property="HorizontalOffset" Value="-110"/>
-                        <Setter Property="VerticalOffset" Value="-8"/>
-                        <Setter Property="Child">
-                            <Setter.Value>
-                                <Border Height="auto"
-                                        Background="{DynamicResource Background}"
-                                        BorderThickness="1"
-                                        BorderBrush="{DynamicResource Outline}"
-                                        Width="250"
-                                        CornerRadius="5">
-                                    <ItemsControl ItemsSource="{Binding AllDevices}"
-                                            HorizontalAlignment="Stretch"
-                                            VerticalAlignment="Center"
-                                            Height="auto"
-                                                  Margin="2">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border Height="50"
-                                                        x:Name="border"
-                                                        CornerRadius="5"
-                                                        Background="Transparent">
-                                                    <Border.InputBindings>
-                                                        <MouseBinding Gesture="LeftClick"
-                                                                      Command="{Binding DataContext.ChangeOutputDeviceCommand, ElementName=RootView}"
-                                                                      CommandParameter="{Binding .}"/>
-                                                    </Border.InputBindings>
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="50"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <Path Data="{Binding Icon}"
-                                                                Stretch="Uniform"
-                                                                Fill="{DynamicResource OnBackground}"
-                                                                Stroke="Transparent"
-                                                                Height="30"
-                                                                Width="30"
-                                                              x:Name="DeviceIcon"/>
+                                                            <Path Data="{Binding Icon}"
+                                                                    Stretch="Uniform"
+                                                                    Fill="{DynamicResource OnBackground}"
+                                                                    Stroke="Transparent"
+                                                                    Height="30"
+                                                                    Width="30"
+                                                                    x:Name="DeviceIcon"/>
                                                         
-                                                        <TextBlock Text="{Binding Name}"
-                                                                       TextWrapping="Wrap"
-                                                                       FontSize="16"
-                                                                       Grid.Column="1"
-                                                                       x:Name="Name"
-                                                                   Margin="0,2"
-                                                                   VerticalAlignment="Center"
-                                                                   HorizontalAlignment="Center"
-                                                                   TextAlignment="Left"
-                                                                       Foreground="{DynamicResource OnBackground}"/>
-                                                        <TextBlock/>
-                                                    </Grid>
-                                                </Border>
-                                                <DataTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True"
-                                                             SourceName="border">
-                                                        <Setter Property="Background" TargetName="border"
-                                                                Value="{DynamicResource PrimaryHover}"/>
-                                                    </Trigger>
-                                                    <DataTrigger Binding="{Binding IsInitialized}"
-                                                                 Value="true">
-                                                        <Setter Property="TextElement.Foreground" Value="{DynamicResource Primary}"
-                                                                TargetName="Name"/>
-                                                        <Setter Property="Fill" Value="{DynamicResource Primary}" TargetName="DeviceIcon"/>
-                                                    </DataTrigger>
-                                                </DataTemplate.Triggers>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </Border>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Popup.Style>
-            </Popup>
+                                                            <TextBlock Text="{Binding Name}"
+                                                                            TextWrapping="Wrap"
+                                                                            FontSize="16"
+                                                                            Grid.Column="1"
+                                                                            x:Name="Name"
+                                                                        Margin="0,2"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Center"
+                                                                        TextAlignment="Left"
+                                                                            Foreground="{DynamicResource OnBackground}"/>
+                                                            <TextBlock/>
+                                                        </Grid>
+                                                    </Border>
+                                                    <DataTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True"
+                                                                    SourceName="border">
+                                                            <Setter Property="Background" TargetName="border"
+                                                                    Value="{DynamicResource PrimaryHover}"/>
+                                                        </Trigger>
+                                                        <DataTrigger Binding="{Binding IsInitialized}"
+                                                                        Value="true">
+                                                            <Setter Property="TextElement.Foreground" Value="{DynamicResource Primary}"
+                                                                    TargetName="Name"/>
+                                                            <Setter Property="Fill" Value="{DynamicResource Primary}" TargetName="DeviceIcon"/>
+                                                        </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Border>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Popup.Style>
+                </Popup>
 
+            </Grid>
         </Grid>
+
     </Border>
 </UserControl>

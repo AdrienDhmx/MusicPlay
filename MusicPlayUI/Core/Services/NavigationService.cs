@@ -222,6 +222,10 @@ namespace MusicPlayUI.Core.Services
                     ScdViewName = viewName;
                     NavigateToSecondaryView<LanguageSettingViewModel>();
                     break;
+                case ViewNameEnum.DSP:
+                    ScdViewName = viewName;
+                    NavigateToSecondaryView<DSPSettingsViewModels>();
+                    break;
                 case ViewNameEnum.Visualizer:
                     ScdViewName = viewName;
                     NavigateToSecondaryView<VisualizerSettingViewModel>();

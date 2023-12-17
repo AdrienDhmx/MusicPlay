@@ -2,7 +2,6 @@ using System.Timers;
 using AudioHandler.Enums;
 using AudioHandler.Models;
 using ManagedBass;
-using ManagedBass.Fx;
 using MessageControl;
 using MusicPlayModels;
 using Timer = System.Timers.Timer;
@@ -11,6 +10,8 @@ namespace AudioHandler
 {
     public class AudioPlayback : ObservableObject, IAudioPlayback
     {
+        public EQManager EQManager { get; set; } = new();
+
         private readonly Timer deviceTimer;
         private string _file;
         private int _savedVolume = 100;
@@ -23,6 +24,8 @@ namespace AudioHandler
             private set
             {
                 _stream = value;
+                // pass the new stream to the equalizer
+                EQManager.ApplyPreset(Stream);
                 OnStreamChanged();
             }
         }
@@ -328,7 +331,7 @@ namespace AudioHandler
                 Bass.StreamFree(Stream);
             }
 
-            Stream = Bass.CreateStream(file, Flags: BassFlags.Default);
+            Stream = Bass.CreateStream(file);
         }
 
         public void Play()

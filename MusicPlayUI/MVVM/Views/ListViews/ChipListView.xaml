@@ -41,7 +41,6 @@
                             </Border>
                             <TextBlock Text="{Binding Name}"
                                        Margin="20,0"
-                                       FontSize="16"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
                                        Foreground="{DynamicResource OnTertiaryContainer}"
