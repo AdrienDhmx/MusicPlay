@@ -49,7 +49,7 @@
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
         <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
     </Style>
 
@@ -104,7 +104,6 @@
         <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
     </Style>
 
-    <!-- For playing from -->
     <Style x:Key="NRun" TargetType="Run">
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
@@ -141,14 +140,14 @@
     <!-- For libraries Header and data names in their views (album name, artist name...) -->
     <Style x:Key="SLargeHeaderStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
-        <Setter Property="FontSize" Value="50"/>
+        <Setter Property="FontSize" Value="48"/>
         <Setter Property="FontFamily" Value="Times New Roman"/>
     </Style>
 
     <!-- For sub data like the artist of the album -->
     <Style x:Key="SSubDataStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
-        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontSize" Value="20"/>
     </Style>
 
     <!-- For lists name (recent artist, recent albums...) -->

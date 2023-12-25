@@ -33,6 +33,10 @@ namespace MusicPlayUI.Converters
             try
             {
                 decimal result = Parse(parameter.ToString()).Eval(values);
+                if(result < 0)
+                {
+                    result = 0;
+                }
                 if (targetType == typeof(decimal)) return result;
                 if (targetType == typeof(string)) return result.ToString();
                 if (targetType == typeof(int)) return (int)result;

@@ -7,7 +7,7 @@
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" xmlns:dynamicscrollviewer="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer" xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
              d:DataContext="{d:DesignInstance Type=viewmodel:AlbumViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
@@ -23,7 +23,7 @@
 
         <Grid x:Name="StickyPart"
                   Panel.ZIndex="2"
-                    MinHeight="180"
+                    MinHeight="125"
                   Height="300"
                   HorizontalAlignment="Stretch"
                   MaxHeight="300">
@@ -33,13 +33,22 @@
             <Border Style="{DynamicResource PageHeaderBackground}"/>
             
             <Grid Grid.Column="1"
-                    Margin="10"
-                    HorizontalAlignment="Center">
+                    Margin="20, 10"
+                    HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
+
+                <Border Visibility="Hidden"
+                            x:Name="BorderAnimationPercentage">
+                    <Border.Opacity>
+                        <!-- Map range the height of the sticky part to a 0 - 1 scale -->
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 125) / (300 - 125)">
+                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
+                        </MultiBinding>
+                    </Border.Opacity>
+                </Border>
 
                 <!-- Album Cover -->
                 <Border Grid.RowSpan="2"
@@ -56,41 +65,49 @@
                 <!-- Album & Artist Name + Duration + More Opt Btn -->
                 <Grid VerticalAlignment="Stretch"
                           HorizontalAlignment="Stretch"
+                            Margin="0, 4"
                           MaxHeight="280"
-                          Margin="0, 4, 0, 0"
+                          x:Name="AlbumInfoGrid"
                             Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Text="{Binding Album.Year}"
-                                   Visibility="{Binding Album.Year, Converter={StaticResource BoolToVisibilityConverter}}"
-                                        Style="{DynamicResource NLargeStyle}"/>
-
-                    <Grid Grid.Row="1"
-                              VerticalAlignment="Top">
+                    <Grid VerticalAlignment="Top">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
                             <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*" MinHeight="55"/>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
 
+                        <TextBlock Text="{Binding Album.Year}"
+                                   Visibility="{Binding Album.Year, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        Style="{DynamicResource NLargeStyle}"
+                               Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}">
+                            <TextBlock.Height>
+                                <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="24 * a">
+                                    <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                                </MultiBinding>
+                            </TextBlock.Height>
+                        </TextBlock>
+
                         <!--  Album Name -->
                         <TextBlock Text="{Binding Album.Name}"
-                                       Grid.ColumnSpan="2"
-                                       MaxWidth="{Binding ActualHeight, ElementName=AlbumScroll,Converter={StaticResource SizeConverter}, ConverterParameter=0.5}"
-                                       HorizontalAlignment="Stretch"
+                                       Grid.Row="1"
+                                       HorizontalAlignment="Left"
                                        VerticalAlignment="Center"
-                                       MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
-                                       Style="{DynamicResource SLargeHeaderStyle}"/>
+                                        MaxHeight="140"
+                                       Style="{DynamicResource SLargeHeaderStyle}">
+                            <TextBlock.MaxWidth>
+                                <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="640 + (1-b) * a">
+                                    <Binding ElementName="AlbumInfoGrid" Path="ActualWidth"/>
+                                    <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                                </MultiBinding>
+                            </TextBlock.MaxWidth>
+                        </TextBlock>
+
 
                         <!--  Artist Name -->
                         <TextBlock Text="{Binding MainArtist.Name}"
-                                       Grid.Row="1"
-                                       MaxWidth="650"
+                                       Grid.Row="2"
+                                   Margin="0, 6, 0, 0"
                                        Style="{DynamicResource SLSubDataStyle}">
                             <TextBlock.InputBindings>
                                 <MouseBinding Gesture="LeftClick"
@@ -100,9 +117,17 @@
                         </TextBlock>
 
                         <StackPanel Orientation="Horizontal"
-                                     Grid.Row="2"
+                                     Grid.Row="3"
                                     Margin="0,10"
-                                        HorizontalAlignment="Left">
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}">
+                            <StackPanel.Height>
+                                <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="20 * a">
+                                    <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                                </MultiBinding>
+                            </StackPanel.Height>
+
                             <TextBlock Text="{Binding Album.Duration}"
                                             Style="{DynamicResource NLargeSecondaryStyle}"/>
 
@@ -116,54 +141,58 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Play Buttons -->
-                    <StackPanel Grid.Row="2"
-                                    Grid.ColumnSpan="2"
-                                    Style="{DynamicResource LargePlayBtnStackPanel}"
-                                    Orientation="Horizontal">
-                        <iconbtn:IconButton Command="{Binding PlayAlbumCommand}"
-                                                                    Style="{DynamicResource LargePlayButton}"/>
+                    <Border Visibility="Hidden"
+                            MinWidth="50"
+                            x:Name="BorderButtonWidthValue">
+                        <Border.Width>
+                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="80 * a + 48">
+                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                            </MultiBinding>
+                        </Border.Width>
+                    </Border>
 
-                        <iconbtn:IconButton Command="{Binding PlayShuffledAlbumCommand}"
-                                                                    Style="{DynamicResource LargePlayShuffleButton}"/>
+                    <!-- Action Buttons -->
+                    <Border VerticalAlignment="Bottom"
+                            MaxWidth="{Binding ActualWidth, ElementName=AlbumInfoGrid}"
+                            MinWidth="50"
+                            HorizontalAlignment="Left">
+                        <Border.Width>
+                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(1 - a) * b + 340">
+                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                                <Binding ElementName="AlbumInfoGrid" Path="ActualWidth"/>
+                            </MultiBinding>
+                        </Border.Width>
 
-                        <!-- More Option Button -->
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
-                                                    Command="{Binding OpenAlbumPopupCommand}"
-                                                CommandParameter="{Binding Album}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right">
+                            <iconbtn:IconButton Command="{Binding PlayAlbumCommand}"
+                                                                        Style="{DynamicResource LargePlayButton}"
+                                                Width="{Binding Width, ElementName=BorderButtonWidthValue}">
+                            </iconbtn:IconButton>
+
+                            <iconbtn:IconButton Command="{Binding PlayShuffledAlbumCommand}"
+                                                                        Style="{DynamicResource LargePlayShuffleButton}"
+                                                 Width="{Binding Width, ElementName=BorderButtonWidthValue}">
+                            </iconbtn:IconButton>
+
+                            <!-- More Option Button -->
+                            <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                                                    IconHeight="5"
+                                                    IconWidth="28"
+                                                        Icon="{DynamicResource MoreOptionIcon}"
+                                                        Margin="6,0"
+                                                        Command="{Binding OpenAlbumPopupCommand}"
+                                                    CommandParameter="{Binding Album}"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
-
-                <!-- Small Play Buttons -->
-                <StackPanel Grid.Column="2"
-                                Grid.RowSpan="2"
-                                Style="{DynamicResource SmallPlayBtnStackPanel}"
-                                Orientation="Horizontal">
-                    <iconbtn:IconButton Command="{Binding PlayAlbumCommand}"
-                                            Style="{DynamicResource SmallPlayButton}"/>
-
-                    <iconbtn:IconButton Command="{Binding PlayShuffledAlbumCommand}"
-                                            Style="{DynamicResource SmallPlayShuffleButton}"/>
-
-                    <!-- More Option Button -->
-                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
-                                                    Command="{Binding OpenAlbumPopupCommand}"
-                                            CommandParameter="{Binding Album}"/>
-                </StackPanel>
             </Grid>
         </Grid>
 
         <ScrollViewer Background="Transparent"
                       x:Name="AlbumScroll"
-                      Grid.Row="1"
+                      Grid.Row="1"            
                       VerticalScrollBarVisibility="Hidden">
             <Grid Margin="0,5,0,0">
                 <Grid.RowDefinitions>

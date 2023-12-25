@@ -284,12 +284,11 @@
         <Setter Property="MouseOverBackground" Value="{DynamicResource ScdWhiteTransparent}"/>
     </Style>
 
-    <Style x:Key="LargeBtn" TargetType="IconButton:IconButton"
+    <Style x:Key="FilledBtn" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource BaseIconButton}">
-        <Setter Property="Width" Value="150"/>
-        <Setter Property="Height" Value="50"/>
-        <Setter Property="IconHeight" Value="30"/>
-        <Setter Property="IconWidth" Value="28"/>
+        <Setter Property="MinWidth" Value="48"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="IconMargin" Value="6"/>
         <Setter Property="Margin" Value="0,0,10,0"/>
         <Setter Property="FillColor" Value="{DynamicResource OnPrimary}"/>
         <Setter Property="Background" Value="{DynamicResource Primary}"/>
@@ -315,58 +314,37 @@
     </Style>
 
     <Style x:Key="LargePlayButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource LargeBtn}">
+           BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Icon" Value="{StaticResource PlayIcon}"/>
     </Style>
 
     <Style x:Key="LargePlayShuffleButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource LargeBtn}">
+           BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Icon" Value="{StaticResource ShuffleIcon}"/>
     </Style>
 
     <Style x:Key="SmallBtn" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource BaseIconButton}">
-        <Setter Property="Width" Value="50"/>
-        <Setter Property="Height" Value="50"/>
+           BasedOn="{StaticResource FilledBtn}">
+        <Setter Property="Width" Value="48"/>
+        <Setter Property="Height" Value="48"/>
         <Setter Property="IconHeight" Value="22"/>
         <Setter Property="IconWidth" Value="20"/>
         <Setter Property="Margin" Value="8,0"/>
-        <Setter Property="FillColor" Value="{DynamicResource OnPrimary}"/>
-        <Setter Property="Background" Value="{DynamicResource Primary}"/>
-        <Setter Property="CornerRadius" Value="{DynamicResource SecondaryCornerRadius}"/>
-        <Setter Property="Effect" Value="{DynamicResource MouseOverDropShadow}"/>
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.4"/>
-            </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Trigger.EnterActions>
-                    <BeginStoryboard
-                      Storyboard="{StaticResource GlowOn}"/>
-                </Trigger.EnterActions>
-
-                <Trigger.ExitActions>
-                    <BeginStoryboard
-                      Storyboard="{StaticResource GlowOff}"/>
-                </Trigger.ExitActions>
-
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <Style x:Key="SmallPlayButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource SmallBtn}">
+           BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Icon" Value="{StaticResource PlayIcon}"/>
 
     </Style>
 
     <Style x:Key="SmallPlayShuffleButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource SmallBtn}">
+           BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Icon" Value="{StaticResource ShuffleIcon}"/>
     </Style>
 
     <Style x:Key="SmallDeleteButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource SmallBtn}">
+           BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Icon" Value="{StaticResource Trash}"/>
         <Setter Property="FillColor" Value="{DynamicResource OnError}"/>
         <Setter Property="Background" Value="{DynamicResource Error}"/>

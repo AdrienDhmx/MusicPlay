@@ -37,6 +37,7 @@
                                 Foreground="{DynamicResource OnSecondaryContainer}"
                                 HorizontalAlignment="Center"
                                 TextAlignment="Center"
+                               VerticalAlignment="Center"
                                 FontSize="14"
                                 Margin="14,0"
                                 x:Name="name"/>

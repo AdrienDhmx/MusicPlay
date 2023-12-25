@@ -32,6 +32,7 @@
 
                             <TextBlock Text="{Binding Name}"
                                        FontSize="14"
+                                        VerticalAlignment="Center"
                                    Style="{DynamicResource NChipStyle}"/>
 
                             <iconbtn:IconButton Icon="{DynamicResource CloseIcon}"

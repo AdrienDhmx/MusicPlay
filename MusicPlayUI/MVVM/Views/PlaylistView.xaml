@@ -12,7 +12,7 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
              xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
-             xmlns:model="clr-namespace:MusicPlayModels.MusicModels;assembly=MusicPlayModels"
+             xmlns:model="clr-namespace:MusicPlayModels.MusicModels;assembly=MusicPlayModels" xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="800" d:DesignWidth="800">
@@ -27,27 +27,36 @@
         </Grid.RowDefinitions>
 
         <Grid x:Name="StickyPart"
-                MinHeight="120"
-                Height="230"
+                MinHeight="125"
+                Height="250"
                 Panel.ZIndex="2"
-                MaxHeight="230">
+                MaxHeight="250">
 
             <Border Background="{DynamicResource Background}"
                     Effect="{DynamicResource PageHeaderDropShadow}"/>
             <Border Style="{DynamicResource PageHeaderBackground}"/>
 
-            <Grid  Margin="0,5,5,5"
-                HorizontalAlignment="Center">
+            <Border Visibility="Hidden"
+                        x:Name="BorderAnimationPercentage">
+                <Border.Opacity>
+                    <!-- Map range the height of the sticky part to a 0 - 1 scale -->
+                    <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 125) / (250 - 125)">
+                        <Binding ElementName="StickyPart" Path="ActualHeight"/>
+                    </MultiBinding>
+                </Border.Opacity>
+            </Border>
+            
+            <Grid  Margin="20, 10"
+                HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
+
 
                 <!-- Playlist Cover -->
                 <Border Grid.RowSpan="2"
                         Margin="0,0,10,0"
-                        MaxHeight="210"
                         CornerRadius="{DynamicResource PrimaryCornerRadius}"
                         Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
@@ -60,7 +69,6 @@
                 <Border Grid.RowSpan="2"
                             CornerRadius="{DynamicResource SecondaryCornerRadius}"
                             Margin="0,0,10,0"
-                        MaxHeight="210"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"
                             Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Path Data="{Binding PathCover}"
@@ -71,69 +79,43 @@
                 </Border>
 
                 <!-- Artist Name + Duration + More Opt Btn -->
-                <Grid VerticalAlignment="Stretch"
-                        Grid.RowSpan="2"
-                        HorizontalAlignment="Stretch"
+                <Grid VerticalAlignment="Top"
+                      x:Name="PlaylistInfoGrid"
                         Grid.Column="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-
-                    <StackPanel Margin="0,5,0,0"
+                    <!--  Artist Name -->
+                    <TextBlock Text="{Binding Playlist.Name}"
+                                Style="{DynamicResource SLargeHeaderStyle}"
                                 HorizontalAlignment="Stretch"
-                                VerticalAlignment="Top">
-                        <!--  Artist Name -->
-                        <TextBlock Text="{Binding Playlist.Name}"
-                                    Style="{DynamicResource SLargeHeaderStyle}"
-                                    HorizontalAlignment="Stretch"
-                                    MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
-                                    TextWrapping="NoWrap"
-                                    Margin="0,0,0,4"/>
+                                MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
+                                TextWrapping="NoWrap"
+                                Margin="0,0,0,4"/>
 
-                        <Border HorizontalAlignment="Left">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Visibility" Value="visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=230}" Value="true">
-                                            <DataTrigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation Duration="0:0:0:0.2"  From="1" To="0"
-                                                                            Storyboard.TargetProperty="Opacity"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.EnterActions>
-                                            <DataTrigger.ExitActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation Duration="0:0:0:0.2"  From="0" To="1"
-                                                                            Storyboard.TargetProperty="Opacity"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.ExitActions>
-                                        </DataTrigger>
-                                        <Trigger Property="Opacity" Value="0">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <TextBlock Text="{Binding Playlist.Description}"
+                    <TextBlock Text="{Binding Playlist.Description}"
                                         Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
                                     Style="{DynamicResource SSubDataStyle}"
                                         HorizontalAlignment="Left"
+                               Grid.Row="1"
                                         MaxWidth="650"
-                                        TextTrimming="CharacterEllipsis"/>
-                        </Border>
-                    </StackPanel>
+                               x:Name="description"
+                                   Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}"
+                                        TextTrimming="CharacterEllipsis">
+                    </TextBlock>
 
                     <StackPanel Orientation="Horizontal"
-                                    Grid.Row="1"
-                                Margin="0,5, 0, 10"
-                                    HorizontalAlignment="Left">
+                                VerticalAlignment="Top"
+                                    Grid.Row="2"
+                                Margin="0,5, 0, 0"
+                                    Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}">
+                        <StackPanel.Height>
+                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="24 * a">
+                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                            </MultiBinding>
+                        </StackPanel.Height>
                         <TextBlock Text="{Binding PlaylistDuration}"
                                         Style="{DynamicResource NLargeSecondaryStyle}"/>
 
@@ -143,77 +125,55 @@
 
                         <TextBlock Text="{x:Static lang:Resources.Tracks}"
                                         Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                    </StackPanel>
-
-                    <!-- Play Buttons -->
-                    <StackPanel Grid.Row="2"
-                                Style="{DynamicResource LargePlaylistBtnStackPanel}"
-                                Orientation="Horizontal">
-                        <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
-                                            Style="{DynamicResource LargePlayButton}"/>
-
-                        <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
-                                                                Style="{DynamicResource LargePlayShuffleButton}"/>
-
-                        <!-- More Option Button -->
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                            IconHeight="5"
-                                            IconWidth="28"
-                                                Icon="{DynamicResource MoreOptionIcon}"
-                                                Margin="6,0"
-                                            CommandParameter="{Binding Playlist}"
-                                                Command="{Binding OpenPlaylistPopupCommand}"/>
-
-                        <iconbtn:IconButton Icon="{DynamicResource Edit}"
-                                                    Command="{Binding EditPlaylistCommand}"
-                                                    IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
-                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverterInverted}}"
-                                            Style="{DynamicResource SmallBtn}"/>
-
-                        <!-- Save Radio Button -->
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                    Icon="{DynamicResource SaveIcon}"
-                                                    Grid.Column="1"
-                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                    Command="{Binding SaveRadioCommand}"/>
                     </StackPanel>
                 </Grid>
 
-                <!-- Small btn -->
-                <StackPanel Orientation="Horizontal"
-                                    Grid.Column="2"
-                            VerticalAlignment="Center"
-                                Style="{DynamicResource PlaylistSmallBtnStackPanel}">
+                <Border Visibility="Hidden"
+                            MinWidth="50"
+                            x:Name="BorderButtonWidthValue">
+                    <Border.Width>
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="80 * a + 48">
+                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                        </MultiBinding>
+                    </Border.Width>
+                </Border>
 
-                    <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
-                                        Style="{DynamicResource SmallPlayButton}"/>
+                <!-- Action Buttons -->
+                <Border VerticalAlignment="Bottom"
+                            MaxWidth="{Binding ActualWidth, ElementName=PlaylistInfoGrid}"
+                            MinWidth="50"
+                        Grid.Column="1"
+                            HorizontalAlignment="Left">
+                    <Border.Width>
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(1 - a) * b + 340">
+                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                            <Binding ElementName="PlaylistInfoGrid" Path="ActualWidth"/>
+                        </MultiBinding>
+                    </Border.Width>
 
-                    <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
-                                        Style="{DynamicResource SmallPlayShuffleButton}"/>
+                    <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right">
+                        <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
+                                                                        Style="{DynamicResource LargePlayButton}"
+                                                Width="{Binding Width, ElementName=BorderButtonWidthValue}">
+                        </iconbtn:IconButton>
 
-                    <!-- More Option Button -->
-                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                            IconHeight="5"
-                                            IconWidth="28"
-                                                Icon="{DynamicResource MoreOptionIcon}"
-                                                Margin="6,0"
-                                        CommandParameter="{Binding Playlist}"
-                                                Command="{Binding OpenPlaylistPopupCommand}"/>
+                        <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
+                                                                        Style="{DynamicResource LargePlayShuffleButton}"
+                                                 Width="{Binding Width, ElementName=BorderButtonWidthValue}">
+                        </iconbtn:IconButton>
 
-                    <iconbtn:IconButton Icon="{DynamicResource Edit}"
-                                                    Command="{Binding EditPlaylistCommand}"
-                                                    IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
-                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverterInverted}}"
-                                        Style="{DynamicResource SmallBtn}"/>
-
-                    <!-- Save Radio Button -->
-                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                    Icon="{DynamicResource SaveIcon}"
-                                                    Grid.Column="1"
-                                                Visibility="{Binding IsRadio, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                    Command="{Binding SaveRadioCommand}"/>
-                </StackPanel>
+                        <!-- More Option Button -->
+                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                                                    IconHeight="5"
+                                                    IconWidth="28"
+                                                        Icon="{DynamicResource MoreOptionIcon}"
+                                                        Margin="6,0"
+                                                        Command="{Binding OpenPlaylistPopupCommand}"
+                                                    CommandParameter="{Binding Playlist}"/>
+                    </StackPanel>
+                </Border>
             </Grid>
         </Grid>
 

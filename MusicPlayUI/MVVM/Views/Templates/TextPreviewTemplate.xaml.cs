@@ -20,7 +20,14 @@ namespace MusicPlayUI.MVVM.Views.Templates
             InitializeComponent();
 
             Loaded += OnLoaded;
+            SizeChanged += OnLoaded;
             
+        }
+
+        protected override void OnChildDesiredSizeChanged(UIElement child)
+        {
+            base.OnChildDesiredSizeChanged(child);
+            Init();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)

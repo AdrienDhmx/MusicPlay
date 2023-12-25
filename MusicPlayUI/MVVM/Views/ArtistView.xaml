@@ -9,7 +9,7 @@
              xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" 
-             xmlns:templates="clr-namespace:MusicPlayUI.MVVM.Views.Templates"
+             xmlns:templates="clr-namespace:MusicPlayUI.MVVM.Views.Templates" xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
              d:DataContext="{d:DesignInstance Type=viewmodels:ArtistViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
@@ -24,25 +24,34 @@
         </Grid.RowDefinitions>
 
         <Grid x:Name="StickyPart"
-                    MinHeight="130"
-                  Height="220"
               Panel.ZIndex="2"
-                  MaxHeight="220">
+                MinHeight="125"
+                Height="200"
+                MaxHeight="200">
             <Border Background="{DynamicResource Background}"
                     Effect="{DynamicResource PageHeaderDropShadow}"/>
             <Border Style="{DynamicResource PageHeaderBackground}"/>
-            <Grid HorizontalAlignment="Center"
-                      Margin="10">
+            <Grid HorizontalAlignment="Stretch"
+                Margin="20, 10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
 
+                <Border Visibility="Hidden"
+                            x:Name="BorderAnimationPercentage">
+                    <Border.Opacity>
+                        <!-- Map range the height of the sticky part to a 0 - 1 scale -->
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 125) / (200 - 125)">
+                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
+                        </MultiBinding>
+                    </Border.Opacity>
+                </Border>
+
                 <!-- Artist Cover -->
                 <Border Grid.RowSpan="2"
                             Margin="0,0,18,0"
-                            MaxHeight="300"
                             CornerRadius="{Binding ActualWidth, RelativeSource={RelativeSource self}, Converter={StaticResource SizeConverter}, ConverterParameter='2'}"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
                     <Border.Background>
@@ -52,14 +61,12 @@
                 </Border>
 
                 <!-- Artist Name + Duration + More Opt Btn -->
-                <Grid VerticalAlignment="Stretch"
-                          HorizontalAlignment="Left"
-                          MaxHeight="290"
-                          Margin="0,6"
-                            Grid.Column="1">
+                <Grid VerticalAlignment="Top"
+                          HorizontalAlignment="Stretch"
+                          Margin="0, 6, 0, 0"
+                      x:Name="GridArtistInfo"
+                        Grid.Column="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
@@ -67,75 +74,65 @@
                     <TextBlock Text="{Binding Artist.Name}"
                                     TextWrapping="Wrap"
                                     TextTrimming="CharacterEllipsis"
-                                        MaxWidth="{Binding ActualHeight, ElementName=ArtistScroll,Converter={StaticResource SizeConverter}, ConverterParameter=0.5}"
-                                    HorizontalAlignment="Stretch"
+                                    HorizontalAlignment="Left"
                                     MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=1.8}"
                                     Style="{DynamicResource SLargeHeaderStyle}"/>
+                </Grid>
+
+                <Border Visibility="Hidden"
+                            MinWidth="50"
+                            x:Name="BorderButtonWidthValue">
+                    <Border.Width>
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="80 * a + 48">
+                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                        </MultiBinding>
+                    </Border.Width>
+                </Border>
+
+                <!-- Action Buttons -->
+                <Border VerticalAlignment="Bottom"
+                        Grid.Column="1"
+                            MaxWidth="{Binding ActualWidth, ElementName=GridArtistInfo}"
+                            MinWidth="50"
+                            HorizontalAlignment="Left">
+                    <Border.Width>
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(1 - a) * b + 340">
+                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                            <Binding ElementName="GridArtistInfo" Path="ActualWidth"/>
+                        </MultiBinding>
+                    </Border.Width>
 
                     <StackPanel Orientation="Horizontal"
-                                    Margin="2,10"
-                                        Grid.Row="1"
-                                        HorizontalAlignment="Left">
-                        <TextBlock Text="{Binding Artist.Duration}"
-                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                        <TextBlock Text="{Binding Tracks.Count, StringFormat=- {0}}"
-                                           Margin="5,0"
-                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                        <TextBlock Text="{x:Static lang:Resources.Tracks}"
-                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                    </StackPanel>
-                    <!-- Play Buttons -->
-                    <StackPanel Grid.Row="2"
-                                    Grid.ColumnSpan="2"
-                                    Style="{DynamicResource ArtistLargePlayBtnStackPanel}"
-                                    Orientation="Horizontal">
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right">
                         <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
-                                                Style="{DynamicResource LargePlayButton}"/>
+                                                                        Style="{DynamicResource LargePlayButton}"
+                                                Width="{Binding Width, ElementName=BorderButtonWidthValue}">
+                        </iconbtn:IconButton>
 
                         <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
-                                                                    Style="{DynamicResource LargePlayShuffleButton}"/>
+                                                                        Style="{DynamicResource LargePlayShuffleButton}"
+                                                 Width="{Binding Width, ElementName=BorderButtonWidthValue}">
+                        </iconbtn:IconButton>
 
                         <!-- More Option Button -->
                         <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                               IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
-                                                    Command="{Binding OpenArtistPopupCommand}"/>
+                                                    IconHeight="5"
+                                                    IconWidth="28"
+                                                        Icon="{DynamicResource MoreOptionIcon}"
+                                                        Margin="6,0"
+                                                        Command="{Binding OpenArtistPopupCommand}"
+                                                    CommandParameter="{Binding Artist}"/>
                     </StackPanel>
-
-                </Grid>
-
-                <!-- Small Play Buttons -->
-                <StackPanel Grid.Column="2"
-                                Grid.RowSpan="2"
-                                Style="{DynamicResource ArtistSmallPlayBtnStackPanel}"
-                                Orientation="Horizontal">
-                    <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
-                                            Style="{DynamicResource SmallPlayButton}"/>
-
-                    <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
-                                            Style="{DynamicResource SmallPlayShuffleButton}"/>
-
-
-                    <!-- More Option Button -->
-                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
-                                                    Command="{Binding OpenArtistPopupCommand}"/>
-                </StackPanel>
+                </Border>
             </Grid>
         </Grid>
 
         <ScrollViewer x:Name="ArtistScroll"
                       VerticalScrollBarVisibility="Hidden"
                       Grid.Row="1">
-            <Grid Margin="10,0">
+            <Grid Margin="10,0"
+                  x:Name="ContentGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -154,10 +151,58 @@
                                         VerticalAlignment="Center"
                                        HorizontalAlignment="Center"/>
 
-                <templates:TextPreviewTemplate Text="{Binding Biography}"
-                                               Visibility="{Binding Biography, Converter={StaticResource EmptyTextToVisibilityConverter}}"
-                                                 Grid.Row="1"
-                                                Margin="50, 15"/>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" >
+                        </ColumnDefinition>
+                        <ColumnDefinition MinWidth="250" Width="0.2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <templates:TextPreviewTemplate Text="{Binding Biography}"
+                                                   Visibility="{Binding Biography, Converter={StaticResource EmptyTextToVisibilityConverter}}"
+                                                    Margin="25, 15">
+                        <templates:TextPreviewTemplate.Width>
+                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="a - 320">
+                                <Binding ElementName="ContentGrid" Path="ActualWidth"/>
+                            </MultiBinding>
+                        </templates:TextPreviewTemplate.Width>
+                    </templates:TextPreviewTemplate>
+
+
+                    <Grid Margin="2,10, 25, 10"
+                          HorizontalAlignment="Center"
+                            Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" MinHeight="28"/>
+                            <RowDefinition Height="auto" MinHeight="28"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Track count"
+                                    FontWeight="SemiBold"
+                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+                        <TextBlock Text="{Binding Tracks.Count}"
+                                   Grid.Column="1"
+                                    Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+
+                        <TextBlock Text="Length"
+                                   Grid.Row="1"
+                                    FontWeight="SemiBold"
+                                    Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+                        <TextBlock Text="{Binding Artist.Duration}"
+                                   Grid.Row="1"
+                                    Grid.Column="1"
+                                    Style="{DynamicResource NLargeSecondaryStyle}"/>
+                    </Grid>
+                </Grid>
+
 
                 <!-- Albums -->
                 <StackPanel Grid.Row="2">

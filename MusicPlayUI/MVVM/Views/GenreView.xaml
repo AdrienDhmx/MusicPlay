@@ -122,9 +122,11 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Center">
                     <iconbtn:IconButton Style="{DynamicResource LargePlayButton}"
+                                        Width="100"
                                         Command="{Binding PlayGenreCommand}"
                                         CommandParameter="0"/>
                     <iconbtn:IconButton Style="{DynamicResource LargePlayShuffleButton}"
+                                        Width="100"
                                         Command="{Binding PlayGenreCommand}"
                                         CommandParameter="1"/>
 
@@ -147,9 +149,11 @@
                             HorizontalAlignment="Right"
                             Panel.ZIndex="1">
                     <iconbtn:IconButton Style="{DynamicResource SmallPlayButton}"
+                                        Width="48"
                                                 Command="{Binding PlayGenreCommand}"
                                                 CommandParameter="0"/>
                     <iconbtn:IconButton Style="{DynamicResource SmallPlayShuffleButton}"
+                                            Width="48"
                                                 Command="{Binding PlayGenreCommand}"
                                                 CommandParameter="1"/>
 
