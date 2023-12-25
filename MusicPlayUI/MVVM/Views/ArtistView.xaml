@@ -41,7 +41,7 @@
 
                 <!-- Artist Cover -->
                 <Border Grid.RowSpan="2"
-                            Margin="0,0,10,0"
+                            Margin="0,0,18,0"
                             MaxHeight="300"
                             CornerRadius="{Binding ActualWidth, RelativeSource={RelativeSource self}, Converter={StaticResource SizeConverter}, ConverterParameter='2'}"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
@@ -260,9 +260,9 @@
                                                   PlayCommand="{Binding PlayComposedTracksCommand}"
                                                   PlayShuffledCommand="{Binding PlayComposedTracksCommand}"/>
 
-                    <listview:TrackListView TrackModels="{Binding ComposedTracks}"
+                    <!--<listview:TrackListView TrackModels="{Binding ComposedTracks}"
                                             Visibility="{Binding ComposedTracksVisibility}"
-                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>
+                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
                 </StackPanel>
                 
                 <!-- Performed Tracks -->
@@ -285,9 +285,9 @@
                                                   PlayCommand="{Binding PlayPerformedTracksCommand}"
                                                   PlayShuffledCommand="{Binding PlayPerformedTracksCommand}"/>
 
-                    <listview:TrackListView TrackModels="{Binding PerformedInTracks}"
+                    <!--<listview:TrackListView TrackModels="{Binding PerformedInTracks}"
                                             Visibility="{Binding PerformedTracksVisibility}"
-                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>
+                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
                 </StackPanel>
 
                 <!-- Lyricist of Tracks -->
@@ -310,9 +310,9 @@
                                                   PlayCommand="{Binding PlayLyricistOfTracksCommand}"
                                                   PlayShuffledCommand="{Binding PlayLyricistOfTracksCommand}"/>
 
-                    <listview:TrackListView TrackModels="{Binding LyricistOfTracks}"
+                    <!--<listview:TrackListView TrackModels="{Binding LyricistOfTracks}"
                                             Visibility="{Binding LyricistTracksVisiblity}"
-                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>
+                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
                 </StackPanel>
             </Grid>
         </ScrollViewer>

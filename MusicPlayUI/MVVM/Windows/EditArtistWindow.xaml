@@ -1,0 +1,221 @@
+﻿<Window x:Class="MusicPlayUI.MVVM.Windows.EditArtistWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MusicPlayUI.MVVM.Windows" 
+        xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels" xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+        d:DataContext="{d:DesignInstance Type=viewmodels:EditArtistViewModel}"
+        mc:Ignorable="d"
+        xmlns:customTextBox="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox" xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+        Title="{Binding Artist.Name}"
+        WindowStartupLocation="CenterOwner"
+        WindowState="Normal"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        Topmost="True"
+        Background="Transparent"
+        Foreground="{DynamicResource OnBackground}"
+        AllowsTransparency="True"
+        x:Name="EditArtistWindowRoot"
+        MinHeight="450"
+        MinWidth="650"
+        Height="600" Width="900">
+    <Border CornerRadius="8"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource Outline}"
+            Background="{DynamicResource Background}"
+            Margin="4,4,5,5"
+            x:Name="MainBorder"
+            Focusable="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Window Bar -->
+            <Border CornerRadius="10,10,0,0"
+                    MouseDown="Border_MouseDown"
+                    Background="Transparent"
+                    BorderBrush="{DynamicResource SurfaceVariant}"
+                    BorderThickness="0,0,0,1">
+                <Grid Margin="4,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Info Icon -->
+                    <Path Data="{DynamicResource mic}"
+                          Fill="{DynamicResource Primary}"
+                          Height="15"
+                          Stretch="Uniform"/>
+
+                    <!-- Track Name -->
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Artist.Name}"
+                               FontSize="16"
+                               FontWeight="DemiBold"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Margin="10,0"/>
+
+                    <!-- Minimize -->
+                    <iconbtn:IconButton Style="{DynamicResource MinimizeBtn}"
+                                        Grid.Column="2"
+                                        x:Name="MinimizeBtn"
+                                        Command="{Binding MinimizeWindowCommand}"/>
+
+                    <!-- Maximize -->
+                    <iconbtn:IconButton Style="{DynamicResource MaximizeBtn}"
+                                        Grid.Column="3"
+                                        x:Name="MaximizeBtn"
+                                        Command="{Binding MaximizeWindowCommand}"/>
+
+                    <!-- Close -->
+                    <iconbtn:IconButton Style="{DynamicResource CloseBtn}"
+                                        Grid.Column="4"
+                                        x:Name="CloseBtn"
+                                        Command="{Binding CloseWindowCommand}"/>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.35*"/>
+                    <ColumnDefinition Width="0.65*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Border Style="{DynamicResource PageHeaderBackground}"
+                            Grid.RowSpan="3"/>
+
+                    <Border Margin="10"
+                            Width="180"
+                            Height="180"
+                            CornerRadius="90"
+                            Style="{DynamicResource MouseOverBorderDropShadow}"
+                            Cursor="Hand">
+                        <Border.Background>
+                            <ImageBrush ImageSource="{Binding Artist.Cover, Converter={StaticResource MNullImageConverter}, ConverterParameter=1}"
+                                                    Stretch="UniformToFill"/>
+                        </Border.Background>
+                        <Border.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding ChangeCover}"/>
+                        </Border.InputBindings>
+                    </Border>
+
+                    <customTextBox:PlaceholderTextBox  Grid.Row="1"
+                                                        Text="{Binding ArtistName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        Placeholder="Artist Name"
+                                                       MaxLength="255">
+                        <customTextBox:PlaceholderTextBox.Style>
+                            <Style TargetType="customTextBox:PlaceholderTextBox"
+                                   BasedOn="{StaticResource TextFieldStyle}">
+                                <Setter Property="BorderBrush" Value="{DynamicResource OnBackground}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.Error, ElementName=EditArtistWindowRoot, UpdateSourceTrigger=PropertyChanged}"
+                                                 Value="True">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Error}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </customTextBox:PlaceholderTextBox.Style>
+                    </customTextBox:PlaceholderTextBox>
+                    
+                    <StackPanel Grid.Row="2"
+                                Margin="12, 8">
+
+                        <WrapPanel Grid.Row="2"
+                               Margin="0, 8"
+                               HorizontalAlignment="Left">
+                            <CheckBox Style="{DynamicResource SettingsCheckBox}"
+                                IsChecked="{Binding Artist.IsAlbumArtist}"
+                                  IsEnabled="False"
+                               Margin="10, 4">
+                                <TextBlock Text="Album Artist"
+                                    Style="{DynamicResource NTrackDataStyle}"/>
+                            </CheckBox>
+
+                            <CheckBox Style="{DynamicResource SettingsCheckBox}"
+                                IsChecked="{Binding Artist.IsPerformer}"
+                                  IsEnabled="False"
+                               Margin="10, 4">
+                                <TextBlock Text="Performer"
+                                    Style="{DynamicResource NTrackDataStyle}"/>
+                            </CheckBox>
+
+                            <CheckBox Style="{DynamicResource SettingsCheckBox}"
+                                IsChecked="{Binding Artist.IsComposer}"
+                                  IsEnabled="False"
+                               Margin="10, 4">
+                                <TextBlock Text="Composer"
+                                        Style="{DynamicResource NTrackDataStyle}"/>
+                            </CheckBox>
+
+                            <CheckBox Style="{DynamicResource SettingsCheckBox}"
+                                    IsChecked="{Binding Artist.IsLyricist}"
+                                  IsEnabled="False"
+                                   Margin="10, 4">
+                                <TextBlock Text="Lyricist"
+                                        Style="{DynamicResource NTrackDataStyle}"/>
+                            </CheckBox>
+                        </WrapPanel>
+
+                        <TextBlock Text="{Binding Artist.LastPlayed, Converter={StaticResource AddTextConverter}, ConverterParameter='Last played: ', Mode=OneWay}"
+                                   Style="{DynamicResource NTrackDataStyle}"/>
+
+                        <TextBlock Text="{Binding Artist.PlayCount, Converter={StaticResource AddTextConverter}, ConverterParameter='Play count: ', Mode=OneWay}"
+                                   Style="{DynamicResource NTrackDataStyle}"/>
+
+                        <listview:ChipListView Genres="{Binding Artist.Tags}"
+                                               NavigateToGenreCommand="{Binding NavigateToTagCommand}"
+                                                Margin="0,10,0,0"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Column="1"
+                      Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Biography"
+                               Margin="8, 4, 8, 8"
+                               Style="{DynamicResource SlistInfoStyle}"/>
+
+                    <customTextBox:PlaceholderTextBox Style="{DynamicResource MultiLineTextFieldStyle}"
+                                                      Grid.Row="1"
+                                                      Grid.ColumnSpan="2"
+                                                      VerticalAlignment="Top"
+                                                      Text="{Binding Artist.Biography, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      Placeholder="Artist Biography"/>
+
+                    <textbtn:TextButton Style="{DynamicResource EditBtn}"
+                                        Command="{Binding EditCommand}"
+                                        HorizontalAlignment="Center"
+                                        Margin="0, 8"
+                                        Grid.Row="3"/>
+                </Grid>
+
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

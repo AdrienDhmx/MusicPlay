@@ -134,7 +134,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private Visibility _composedTracksVisibility = Visibility.Collapsed;
+        private Visibility _composedTracksVisibility = Visibility.Visible;
         public Visibility ComposedTracksVisibility
         {
             get { return _composedTracksVisibility; }
@@ -146,7 +146,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         }
 
 
-        private Visibility _performedTracksVisibility = Visibility.Collapsed;
+        private Visibility _performedTracksVisibility = Visibility.Visible;
         public Visibility PerformedTracksVisibility
         {
             get { return _performedTracksVisibility; }
@@ -157,7 +157,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private Visibility _lyricistTracksVisibility = Visibility.Collapsed;
+        private Visibility _lyricistTracksVisibility = Visibility.Visible;
         public Visibility LyricistTracksVisiblity
         {
             get { return _lyricistTracksVisibility; }
@@ -211,8 +211,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<UIOrderedTrackModel> _tracks;
-        public List<UIOrderedTrackModel> Tracks
+        private List<TrackModel> _tracks;
+        public List<TrackModel> Tracks
         {
             get { return _tracks; }
             set
@@ -428,6 +428,8 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public async override void Update(BaseModel baseModel = null)
         {
+
+
             if(baseModel is null || baseModel is not ArtistModel)
             {
                 Artist = (ArtistModel)_navigationService.CurrentViewParameter;
@@ -439,11 +441,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             Genres = await DataAccess.Connection.GetArtistTag(Artist.Id);
             Artist.Tags = Genres;
-
-            Tracks = (await (await ArtistServices.GetArtistTracks(Artist.Id))
-                            .GetAlbumTrackProperties())
-                            .ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover);
-            Artist.Duration = Tracks.GetTotalLength(out int _);
+            List<TrackModel> tracks = new();
 
             {
                 // Get all the albums the artist made
@@ -452,6 +450,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 List<AlbumModel> mainAlbums = new();
                 List<AlbumModel> singlesAndEP = new();
                 List<AlbumModel> featuredInAlbum = new();
+
                 foreach (AlbumModel album in albums.OrderByDescending(a => a.Year))
                 {
                     bool isAlbumArtist = album.IsAlbumArtist(Artist.Id);
@@ -460,6 +459,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
                     if (isAlbumArtist)
                     {
+                        tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
                         if (isAlbum)
                         {
                             mainAlbums.Add(album);
@@ -484,11 +484,16 @@ namespace MusicPlayUI.MVVM.ViewModels
             SinglesAndEPHeader = $"Singles & EP: {SinglesAndEP.Count}";
             FeaturedInHeader = $"Featured in {FeaturedInAlbum.Count} {(FeaturedInAlbum.Count == 1 ? Resources.Album : Resources.Albums_View)}";
 
-            {                    
+            {
+                IOrderedEnumerable<TrackModel> tempTracks = (await DataAccess.Connection.GetTracksFromArtist(Artist.Id)).OrderBy(t => t.AlbumId);
+                tracks.AddRange(tempTracks);
+                Tracks = await tracks.DistinctBy(t => t.Id).ToList().GetAlbumTrackProperties();
                 List<UIOrderedTrackModel> composedTracks = new();
                 List<UIOrderedTrackModel> performedTracks = new();
                 List<UIOrderedTrackModel> lyricistTracks = new();
-                foreach (UIOrderedTrackModel track in Tracks.OrderBy(t => t.AlbumId))
+                bool albumCover = QueueService.AlbumCoverOnly;
+                bool autoCover = QueueService.AutoCover;
+                foreach (TrackModel track in Tracks)
                 {
                     bool isComposer = track.IsComposer(Artist.Id, true);
                     bool isPerformer = track.IsPerformer(Artist.Id, true);
@@ -496,15 +501,15 @@ namespace MusicPlayUI.MVVM.ViewModels
 
                     if (isComposer)
                     {
-                        composedTracks.Add(track);
+                        composedTracks.Add(new UIOrderedTrackModel(track, composedTracks.Count + 1, albumCover, autoCover));
                     }
                     else if(isPerformer)
                     {
-                        performedTracks.Add(track);
+                        performedTracks.Add(new UIOrderedTrackModel(track, performedTracks.Count + 1, albumCover, autoCover));
                     }
                     else if(isLyricist)
                     {
-                        lyricistTracks.Add(track);
+                        lyricistTracks.Add(new UIOrderedTrackModel(track, lyricistTracks.Count + 1, albumCover, autoCover));
                     }
                 }
 
@@ -513,7 +518,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 LyricistOfTracks = new(lyricistTracks);
             }
 
-
+            Artist.Duration = Tracks.GetTotalLength(out int _);
             ComposerOfHeader = $"Composer of {ComposedTracks.Count} {(ComposedTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
             PerformedInHeader = $"Performed in {PerformedInTracks.Count} {(PerformedInTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
             LyricistOfHeader = $"Lyricist of {LyricistOfTracks.Count} {(LyricistOfTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";

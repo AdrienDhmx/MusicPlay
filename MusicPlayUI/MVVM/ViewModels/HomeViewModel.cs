@@ -221,6 +221,12 @@ namespace MusicPlayUI.MVVM.ViewModels
         private async void GetRecentData(int totalTrackNumber)
         {
             BindedAlbums = new(await DataAccess.Connection.GetLastPlayedAlbums(TopLastPlayedAlbums));
+
+            foreach (AlbumModel album in BindedAlbums)
+            {
+                album.Artists = album.Artists.Order();
+            }
+
             BindedArtists = new(await DataAccess.Connection.GetLastPlayedArtists(TopLastPlayedArtists));
         }
 

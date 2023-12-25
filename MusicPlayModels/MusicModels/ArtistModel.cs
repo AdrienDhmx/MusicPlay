@@ -10,11 +10,17 @@ namespace MusicPlayModels.MusicModels
     {
         private string _cover = "";
         private string _duration = "";
+        private string _name = "";
+        private string _biography = "";
 
         /// <summary>
-        /// Thge artist name
+        /// The artist name
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name
+        {
+            get => _name;
+            set => SetField(ref _name, value);
+        }
 
         /// <summary>
         /// The artist cover
@@ -40,25 +46,20 @@ namespace MusicPlayModels.MusicModels
                 SetField(ref _duration, value);
             }
         }
-        public string Biography { get; set; } = "";
+
+        public string Biography
+        {
+            get => _biography;
+            set => SetField(ref _biography, value);
+        }
 
         public List<TagModel> Tags { get; set; }
 
         public int PlayCount { get; set; } = 0;
         public DateTime LastPlayed { get; set; } = DateTime.MinValue;
 
-        /// <summary>
-        /// Wether the artist only appear as the main artist of 1 or more albums
-        /// -- Allows to avoid database query when the artist has no individual tracks (performer) --
-        /// </summary>
         public bool IsAlbumArtist { get; set; }
 
-        /// <summary>
-        /// Wether the artist is the main artist of an album or only appear on tracks as a performer
-        /// true = no albums has the artist id in its table, only 1 or more tracks has.
-        /// false = the artist has albums (his id is in the table of 1 or more albums).
-        /// -- Allows to avoid database query when the artist has no album --
-        /// </summary>
         public bool IsPerformer { get; set; }
 
         public bool IsComposer { get; set; }

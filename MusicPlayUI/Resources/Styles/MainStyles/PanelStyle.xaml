@@ -3,6 +3,19 @@
                     xmlns:converter="clr-namespace:MusicPlayUI.Converters">
     <converter:LowerThanConverter x:Key="LowerThanConverter"/>
 
+    <Storyboard x:Key="GlowOn">
+        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" 
+                    Storyboard.TargetProperty="(Effect).Opacity">
+            <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="0.5"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+    <Storyboard x:Key="GlowOff">
+        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" 
+                          Storyboard.TargetProperty="(Effect).Opacity">
+            <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+
     <DropShadowEffect x:Key="PageHeaderDropShadow" 
                     BlurRadius="12" ShadowDepth="2" Color="#101010"
                     Direction="-20"
@@ -14,6 +27,31 @@
                     ShadowDepth="2"
                     Opacity="0.6"
                     Direction="-80"/>
+
+    <DropShadowEffect x:Key="MouseOverDropShadow" 
+                    Color="#101010"
+                    BlurRadius="16"
+                    ShadowDepth="2"
+                    Opacity="0"
+                    Direction="-80"/>
+
+    <Style x:Key="MouseOverBorderDropShadow" TargetType="FrameworkElement">
+        <Setter Property="Effect" Value="{DynamicResource MouseOverDropShadow}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard
+                              Storyboard="{StaticResource GlowOn}"/>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+                    <BeginStoryboard
+                              Storyboard="{StaticResource GlowOff}"/>
+                </Trigger.ExitActions>
+
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
     <Style x:Key="PageHeaderBackground" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>

@@ -4,7 +4,20 @@
                     xmlns:cardcontrol="clr-namespace:CustomCardControl;assembly=CustomCardControl"
                     xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
                     xmlns:IconButton="clr-namespace:IconButton;assembly=IconButton">
-    
+
+    <Storyboard x:Key="GlowOn">
+        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" 
+                    Storyboard.TargetProperty="(Effect).Opacity">
+            <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="0.5"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+    <Storyboard x:Key="GlowOff">
+        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" 
+                          Storyboard.TargetProperty="(Effect).Opacity">
+            <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+
     <CornerRadius x:Key="PrimaryCornerRadius" 
                   TopLeft="4" TopRight="4"
                   BottomRight="4" BottomLeft="4"/>
@@ -278,24 +291,37 @@
         <Setter Property="IconHeight" Value="30"/>
         <Setter Property="IconWidth" Value="28"/>
         <Setter Property="Margin" Value="0,0,10,0"/>
+        <Setter Property="FillColor" Value="{DynamicResource OnPrimary}"/>
+        <Setter Property="Background" Value="{DynamicResource Primary}"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource SecondaryCornerRadius}"/>
+        <Setter Property="Effect" Value="{DynamicResource MouseOverDropShadow}"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard
+                      Storyboard="{StaticResource GlowOn}"/>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+                    <BeginStoryboard
+                      Storyboard="{StaticResource GlowOff}"/>
+                </Trigger.ExitActions>
+
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="LargePlayButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource LargeBtn}">
         <Setter Property="Icon" Value="{StaticResource PlayIcon}"/>
-        <Setter Property="FillColor" Value="{DynamicResource OnPrimary}"/>
-        <Setter Property="Background" Value="{DynamicResource Primary}"/>
-        <Setter Property="CornerRadius" Value="{DynamicResource SecondaryCornerRadius}"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
     </Style>
 
     <Style x:Key="LargePlayShuffleButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource LargeBtn}">
         <Setter Property="Icon" Value="{StaticResource ShuffleIcon}"/>
-        <Setter Property="FillColor" Value="{DynamicResource OnPrimary}"/>
-        <Setter Property="Background" Value="{DynamicResource Primary}"/>
-        <Setter Property="CornerRadius" Value="{DynamicResource SecondaryCornerRadius}"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
     </Style>
 
     <Style x:Key="SmallBtn" TargetType="IconButton:IconButton"
@@ -308,10 +334,22 @@
         <Setter Property="FillColor" Value="{DynamicResource OnPrimary}"/>
         <Setter Property="Background" Value="{DynamicResource Primary}"/>
         <Setter Property="CornerRadius" Value="{DynamicResource SecondaryCornerRadius}"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
+        <Setter Property="Effect" Value="{DynamicResource MouseOverDropShadow}"/>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.4"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard
+                      Storyboard="{StaticResource GlowOn}"/>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+                    <BeginStoryboard
+                      Storyboard="{StaticResource GlowOff}"/>
+                </Trigger.ExitActions>
+
             </Trigger>
         </Style.Triggers>
     </Style>

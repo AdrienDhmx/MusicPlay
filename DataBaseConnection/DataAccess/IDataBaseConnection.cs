@@ -170,7 +170,7 @@ namespace DataBaseConnection.DataAccess
         public Task UpdateArtistBiography(ArtistModel artist);
 
         /// <summary>
-        /// Update the artist data (only the IsAlbumArtist and IsPerformer)
+        /// Update the artist data (name, Role Booleans and biography)
         /// </summary>
         /// <param name="artist"></param>
         /// <returns></returns>

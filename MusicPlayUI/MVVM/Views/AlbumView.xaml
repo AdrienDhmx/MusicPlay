@@ -43,7 +43,7 @@
 
                 <!-- Album Cover -->
                 <Border Grid.RowSpan="2"
-                            Margin="0,0,10,0"
+                            Margin="0,0,18,0"
                             MaxHeight="280"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
@@ -57,7 +57,7 @@
                 <Grid VerticalAlignment="Stretch"
                           HorizontalAlignment="Stretch"
                           MaxHeight="280"
-                          Margin="0,4, 0, 0"
+                          Margin="0, 4, 0, 0"
                             Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>

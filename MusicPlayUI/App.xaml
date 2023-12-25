@@ -12,7 +12,7 @@
              xmlns:playerviews="clr-namespace:MusicPlayUI.MVVM.Views.PlayerControlViews"
              xmlns:playerviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels"
              xmlns:settingsviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels"
-    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
+    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:windows="clr-namespace:MusicPlayUI.MVVM.Windows">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -37,6 +37,11 @@
                     </ResourceDictionary.MergedDictionaries>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+
+
+            <DataTemplate DataType="{x:Type viewmodels:EditArtistViewModel}">
+                <windows:EditArtistWindow/>
+            </DataTemplate>
 
             <DataTemplate DataType="{x:Type modalviewmodel:CreatePlaylistViewModel}">
                 <modalview:CreatePlaylistView/>

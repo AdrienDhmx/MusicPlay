@@ -325,7 +325,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
                 // not too visible
                 offsets.Add(new GradientStop(Color.FromArgb((byte)(200 - modifier), 0, 0, 0), 0));
-                offsets.Add(new GradientStop(Color.FromArgb((byte)(220 - modifier), 0, 0, 0), 0.2));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(210 - modifier), 0, 0, 0), 0.2));
                 offsets.Add(new GradientStop(Color.FromArgb((byte)(230 - modifier), 0, 0, 0), 0.4));
                 offsets.Add(new GradientStop(Color.FromArgb((byte)(240 - modifier), 0, 0, 0), 0.6));
                 offsets.Add(new GradientStop(Color.FromArgb((byte)(250 - modifier), 0, 0, 0), 0.8));
@@ -346,9 +346,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
                 }
 
                 // make more visible
-                offsets.Add(new GradientStop(Color.FromArgb((byte)(190 + modifier), 0, 0, 0), 0));
-                offsets.Add(new GradientStop(Color.FromArgb((byte)(200 + modifier), 0, 0, 0), 0.2));
-                offsets.Add(new GradientStop(Color.FromArgb((byte)(210 + modifier), 0, 0, 0), 0.4));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(185 + modifier), 0, 0, 0), 0));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(195 + modifier), 0, 0, 0), 0.2));
+                offsets.Add(new GradientStop(Color.FromArgb((byte)(205 + modifier), 0, 0, 0), 0.4));
                 offsets.Add(new GradientStop(Color.FromArgb((byte)(220 + modifier), 0, 0, 0), 0.6));
                 offsets.Add(new GradientStop(Color.FromArgb((byte)(240 + modifier / 2), 0, 0, 0), 0.8));
                 offsets.Add(new GradientStop(Color.FromArgb((byte)(250 + modifier / 2), 0, 0, 0), 1));

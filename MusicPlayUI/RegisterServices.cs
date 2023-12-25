@@ -18,6 +18,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Commands;
+using MusicPlayUI.MVVM.Windows;
 
 namespace MusicPlayUI
 {
@@ -165,10 +166,16 @@ namespace MusicPlayUI
 
                 services.AddTransient<VisualizerParametersWindow>(services => new VisualizerParametersWindow()
                 {
-                    DataContext = services.GetRequiredService<VisualizerSettingViewModel>()
+                    DataContext = services.GetRequiredService<VisualizerSettingViewModel>() // this view models also has setting view
                 });
 
-                
+                services.AddTransient<EditArtistViewModel>();
+                services.AddTransient<EditArtistWindow>(services => new EditArtistWindow()
+                {
+                    DataContext = services.GetRequiredService<EditArtistViewModel>()
+                });
+
+
                 service = services.BuildServiceProvider();
             });
         }

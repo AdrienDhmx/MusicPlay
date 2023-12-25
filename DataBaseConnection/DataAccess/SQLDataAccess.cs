@@ -258,7 +258,7 @@ namespace DataBaseConnection.DataAccess
 
             public static Dictionary<string, object> CreateUpdateTable(ArtistModel artist)
             {
-                Dictionary<string, object> keyValues = new Dictionary<string, object>
+                Dictionary<string, object> keyValues = new()
                 {
                     { Columns.IsAlbumArtist, artist.IsAlbumArtist ? 1 : 0 },
                     { Columns.IsPerformer, artist.IsPerformer ? 1 : 0 },
@@ -266,6 +266,7 @@ namespace DataBaseConnection.DataAccess
                     { Columns.IsLyricist, artist.IsLyricist ? 1 : 0 },
                     { Columns.IsFeatured, artist.IsFeatured ? 1 : 0 },
                     { Columns.Biography, artist.Biography },
+                    { Columns.Name, artist.Name },
                 };
 
                 return keyValues;

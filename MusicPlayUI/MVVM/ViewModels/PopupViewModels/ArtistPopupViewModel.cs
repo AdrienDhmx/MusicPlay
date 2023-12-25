@@ -23,7 +23,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
     {
         private readonly IQueueService _queueService;
         private readonly IPlaylistService _playlistService;
-
+        private readonly IWindowService _windowService;
         private ArtistModel _artist;
         public ArtistModel Artist
         {
@@ -53,12 +53,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand ChangeCoverCommand { get; }
         public ICommand CreatePlaylistCommand { get; }
         public ICommand RemoveArtistGenreCommand { get; }
+        public ICommand OpenEditArtistWindow { get; }
         public ICommand CreateTagCommand { get; }
-        public ArtistPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService) : base(navigationService, modalService)
+        public ArtistPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService, IWindowService windowService) : base(navigationService, modalService)
         {
             _queueService = queueService;
             _playlistService = playlistService;
-
+            _windowService = windowService;
             LoadData();
 
             PlayNextCommand = new RelayCommand(() => PlayNext());
@@ -68,6 +69,10 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             CreatePlaylistCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.CreatePlaylist, OnCreatePlaylistClosed));
             AddToTagCommand = new RelayCommand<TagModel>((tag) => AddToTag(tag, Artist));
             CreateTagCommand = new RelayCommand(() => CreateTag(Artist));
+            OpenEditArtistWindow = new RelayCommand(() => {
+                _navigationService.ClosePopup();
+                _windowService.OpenWindow(ViewNameEnum.ArtistProperties, Artist);
+            });
         }
 
         private async void PlayNext(bool end = false)

@@ -44,8 +44,8 @@ namespace MusicPlayUI.Core.Commands
             if (e.Key == Key.System)
             {
                 modifier = e.SystemKey.ToModifier();
-
             }
+
             if (modifier == ModifierKeys.None)
             {
                 LastKeyDown = Key.None;
@@ -60,9 +60,8 @@ namespace MusicPlayUI.Core.Commands
         {
             IInputElement element = Keyboard.FocusedElement;
 
-            if (NextIsChangeOfKey)
-            {
-                
+            if (NextIsChangeOfKey) // the user is changing a shortcut keys
+            {              
                 ModifierKeys modifier = e.Key.ToModifier();
                 Key keyDown = e.Key;
                 if(e.Key == Key.System)
@@ -71,13 +70,13 @@ namespace MusicPlayUI.Core.Commands
                     keyDown = e.SystemKey;
                 }
 
-                if (modifier != ModifierKeys.None)
+                if (modifier != ModifierKeys.None) // modifier are not allowed (chosen with UI)
                 {
                     KeyDown?.Invoke(Key.None);
                 } 
                 else
                 {
-                    KeyDown?.Invoke(keyDown);
+                    KeyDown?.Invoke(keyDown); // will notify the listener (view model linked to UI to change keys of a command)
                 }
                 e.Handled = true;
             }
@@ -219,7 +218,7 @@ namespace MusicPlayUI.Core.Commands
                 CommandEnums.EscapeFullScreen => new(Key.Escape, _commandsManager.EscapeFullScreenCommand, CommandEnums.EscapeFullScreen),
                 CommandEnums.ToggleFullScreen => new(Key.F, ModifierKeys.Control, _commandsManager.ToggleFullScreenCommand, CommandEnums.ToggleFullScreen),
                 CommandEnums.ToggleQueueDrawer => new(Key.Q, ModifierKeys.Control, _commandsManager.ToggleQueueDrawerCommand, CommandEnums.ToggleQueueDrawer),
-                CommandEnums.ToggleTheme => new(Key.L, ModifierKeys.Alt, _commandsManager.ToggleThemeCommand, CommandEnums.ToggleTheme),
+                CommandEnums.ToggleTheme => new(Key.L, ModifierKeys.Control, _commandsManager.ToggleThemeCommand, CommandEnums.ToggleTheme),
                 _ => null,
             };
         }

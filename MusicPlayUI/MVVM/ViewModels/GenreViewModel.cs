@@ -303,6 +303,12 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             Artists = new(Genre.Artists);
             Albums = new(Genre.Albums);
+
+            foreach (AlbumModel album in Albums)
+            {
+                album.Artists = album.Artists.Order();
+            }
+
             BindedPlaylists = new(Genre.Playlists);
 
             Tracks = new(Genre.Tracks.ToUIOrderedTrackModel(_queueService.AlbumCoverOnly, _queueService.AutoCover));

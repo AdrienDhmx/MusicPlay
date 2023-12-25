@@ -83,9 +83,9 @@
                             <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource OnBackground}" />
                         </Trigger>-->
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SurfaceVariant}" />
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource SurfaceVariant}" />
-                            <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SecondaryContainer}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource SecondaryContainer}" />
+                            <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainer}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

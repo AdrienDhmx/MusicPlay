@@ -88,11 +88,11 @@
                                 x:Name="RemomveFromGenreBorder"
                                 Style="{DynamicResource PopupBtn}"/>
 
-                <textbtn:TextButton Text="{x:Static lang:Resources.Change_Cover}"
+                <textbtn:TextButton Text="{x:Static lang:Resources.Edit}"
                                     Grid.Row="5"
                                     CornerRadius="0,0,4,4"
                                    Style="{DynamicResource PopupBtn}"
-                                    Command="{Binding ChangeCoverCommand}"/>
+                                    Command="{Binding OpenEditArtistWindow}"/>
             </Grid>
             <!-- Playlists Popup -->
             <Popup AllowsTransparency="True"

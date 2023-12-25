@@ -48,7 +48,7 @@ namespace MusicPlayUI.Core.Enums
         ConfirmAction = 42,
         TrackProperties = 43,
         AlbumProperties = 44,
-        Artistproperties = 45,
+        ArtistProperties = 45,
         GenreProperties = 46,
         UpdateShortcut = 47,
         CreateTag = 48,

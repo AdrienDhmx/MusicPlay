@@ -317,13 +317,34 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1.2"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="BorderBrush" Value="{DynamicResource OnBackground}"/>
         <Style.Triggers>
             <Trigger Property="IsFocused" Value="true">
                 <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
-                <Setter Property="BorderThickness" Value="0,0,0,1.2"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="MultiLineTextFieldStyle" TargetType="searchBar:PlaceholderTextBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
+        <Setter Property="Padding" Value="8, 6"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Outline}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource OnSurfaceVariant}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="BorderThickness" Value="1.4"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="true">
+                <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
             </Trigger>
         </Style.Triggers>
     </Style>

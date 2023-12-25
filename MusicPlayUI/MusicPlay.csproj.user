@@ -171,6 +171,9 @@
     <Compile Update="MVVM\Views\PopupViews\TrackPopupView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Windows\EditArtistWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Windows\VisualizerParametersWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -249,6 +252,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\Templates\TextPreviewTemplate.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Windows\EditArtistWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Windows\MainWindow.xaml">
