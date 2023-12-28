@@ -12,75 +12,42 @@
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
+
+    <Grid Margin="10,0"
+                   Grid.Row="1">
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid 
-              x:Name="StickyGrid"
-              MaxHeight="150"
-              Height="150"
-              MinHeight="100"
-                Panel.ZIndex="10">
-            
-            <Border Background="{DynamicResource PrimaryContainer}"
-                    Effect="{DynamicResource PageHeaderDropShadow}"/>
-            
-            <StackPanel Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                        Margin="0,8">
-                <TextBlock Text="{x:Static lang:Resources.Themes_Setting}"
-                       Style="{DynamicResource BStyle}"
-                       HorizontalAlignment="Center"/>
-
-                <TextBlock Text="{Binding AppliedTheme}"
-                           HorizontalAlignment="Center"
-                           Style="{DynamicResource SListItemNameStyle}"/>
-            </StackPanel>
-        </Grid>
-
-
-        <ScrollViewer Grid.Row="1"
-                      x:Name="SettingScroll">
-            <Grid Margin="10,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Grid HorizontalAlignment="Center"
+        <Grid HorizontalAlignment="Center"
                       Margin="0,40, 0, 20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
-                    <CheckBox IsChecked="{Binding LightTheme, Converter={StaticResource InverseBoolConverter}}"
+            <CheckBox IsChecked="{Binding LightTheme, Converter={StaticResource InverseBoolConverter}}"
                               Style="{DynamicResource SettingsCheckBox}"
                               Content=" Dark theme"/>
-                    
-                    <CheckBox IsChecked="{Binding SunsetSunrise}"
+
+            <CheckBox IsChecked="{Binding SunsetSunrise}"
                               Style="{DynamicResource SettingsCheckBox}"
                               Content=" Sunset / Sunrise"
                               Margin="20,0"
                               ToolTip="Switch based on time of day."
                               Grid.Column="1"/>
-                    
-                    <CheckBox IsChecked="{Binding SystemSync}"
+
+            <CheckBox IsChecked="{Binding SystemSync}"
                               Style="{DynamicResource SettingsCheckBox}"
                               Content=" System Sync"
                               Grid.Column="2"/>
-                </Grid>
+        </Grid>
 
-                <CheckBox IsChecked="{Binding ColorfulPlayerControl}"
+        <CheckBox IsChecked="{Binding ColorfulPlayerControl}"
                       Style="{DynamicResource SettingsCheckBox}"
                       Content=" Colorful player control"
                           HorizontalAlignment="Center"
@@ -88,29 +55,29 @@
                           Grid.Row="1"
                       Grid.Column="2"/>
 
-                <Border Margin="40,10,40,0"
+        <Border Margin="40,10,40,0"
                         Grid.Row="2"
                         BorderBrush="{DynamicResource Primary}"
                         BorderThickness="0,0,0,1"
                         Background="Transparent">
-                    <TextBlock Text="Accent Colors"
+            <TextBlock Text="Accent Colors"
                                HorizontalAlignment="Center"
                                Style="{DynamicResource SlistInfoStyle}"/>
-                </Border>
-                
-                <Border Grid.Row="3"
+        </Border>
+
+        <Border Grid.Row="3"
                         Margin="20,10"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top">
-                    <ItemsControl ItemsSource="{Binding Themes}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="Transparent"
+            <ItemsControl ItemsSource="{Binding Themes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="Transparent"
                                         Width="80"
                                         Height="80"
                                         Padding="2"
@@ -119,35 +86,33 @@
                                         BorderBrush="{Binding AccentColor}"
                                         ToolTip="{Binding Description}"
                                         x:Name="ItemBorder">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Opacity" Value="1"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Opacity" Value="0.9"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <Border.InputBindings>
-                                        <MouseBinding Gesture="leftClick" 
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Opacity" Value="1"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.9"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Border.InputBindings>
+                                <MouseBinding Gesture="leftClick" 
                                                       Command="{Binding DataContext.SetThemeCommand, ElementName=RootView}"
                                                       CommandParameter="{Binding .}"/>
-                                    </Border.InputBindings>
+                            </Border.InputBindings>
 
-                                    <Border Background="{Binding AccentColor}"
+                            <Border Background="{Binding AccentColor}"
                                             CornerRadius="{Binding CornerRadius, ElementName=ItemBorder}"/>
-                                </Border>
-                                <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                                        <Setter Property="BorderThickness" Value="2" TargetName="ItemBorder"/>
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-            </Grid>
-        </ScrollViewer>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                <Setter Property="BorderThickness" Value="2" TargetName="ItemBorder"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
     </Grid>
 </UserControl>

@@ -16,7 +16,7 @@ namespace MusicPlayUI.Core.Factories
 {
     public static class SortFactory
     {
-        public static ObservableCollection<SortModel> GetSortMenu<T>() where T : DatedModel
+        public static ObservableCollection<SortModel> GetSortMenu<T>() where T : PlayableModel
         {
             if(typeof(T) == typeof(AlbumModel))
             {

@@ -220,7 +220,7 @@ namespace AudioHandler
                     MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: you do not have EAX (Environmental Audio Extensions) support."));
                     break;
                 case Errors.NotPlaying:
-                    if(!Init(AudioOutput.GetDefaultdevice().Index, Frequency))
+                    if(!Init(AudioOutput.GetDefaultDevice().Index, Frequency))
                     {
                         MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, the audio device could not be initialized correctly."));
                     }
@@ -264,7 +264,7 @@ namespace AudioHandler
 
         private void DeviceTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            DeviceModel device = AudioOutput.GetDefaultdevice();
+            DeviceModel device = AudioOutput.GetDefaultDevice();
             // the user has not choosen a device manually
             // and new default device or the current device isn't available anymore
             if (_deviceChoosenByUser == -1 && (device.Index != Device.Index || !AudioOutput.GetAllDevices().Any(d => d.Index == Device.Index)))
@@ -416,7 +416,7 @@ namespace AudioHandler
         public void Init()
         {
             _volume = GetCurrentVolume();
-            Device = AudioOutput.GetDefaultdevice();
+            Device = AudioOutput.GetDefaultDevice();
             if(!Bass.Init(Device.Index, Frequency, DeviceInitFlags.Default))
             {
                 ErrorHandler();

@@ -68,6 +68,7 @@
     <Style x:Key="NTrackDataStyle" TargetType="TextBlock"
            BasedOn="{StaticResource NStyle}">
         <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Left"/>
     </Style>
 

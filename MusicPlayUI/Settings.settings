@@ -137,9 +137,6 @@
     <Setting Name="NavPlaylistsShortcut" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="NavImportShortcut" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="NavSettingsShortcut" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>

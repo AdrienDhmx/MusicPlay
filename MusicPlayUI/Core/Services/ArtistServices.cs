@@ -112,17 +112,13 @@ namespace MusicPlayUI.Core.Services
         }
 
         /// <summary>
-        /// Insert the artist in the database and publish the corresponding message
+        /// Insert the artist in the database
         /// </summary>
         /// <param name="artist"></param>
         /// <returns>the artist id</returns>
-        public static async Task<int> InsertNewArtistInDataBase(this ArtistModel artist, bool performer = true)
+        public static int InsertNewArtistInDataBase(this ArtistModel artist, bool performer = true)
         {
-            string artistType = performer ? Resources.Performer : Resources.Album_Artist;
-
-            int id = await DataAccess.Connection.InsertArtist(artist);
-            //MessageHelper.PublishMessage(DefaultMessageFactory.DataCreated(artist.Name, artistType));
-            return id;
+            return  DataAccess.Connection.InsertArtist(artist);
         }
     }
 }

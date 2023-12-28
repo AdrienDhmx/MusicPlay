@@ -46,7 +46,7 @@
                 </Border.Opacity>
             </Border>
             
-            <Grid  Margin="20, 10"
+            <Grid Margin="14"
                 HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -56,7 +56,7 @@
 
                 <!-- Playlist Cover -->
                 <Border Grid.RowSpan="2"
-                        Margin="0,0,10,0"
+                        Margin="0,0,14,0"
                         CornerRadius="{DynamicResource PrimaryCornerRadius}"
                         Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
@@ -68,7 +68,7 @@
                 <!--  Auto playlist Cover-->
                 <Border Grid.RowSpan="2"
                             CornerRadius="{DynamicResource SecondaryCornerRadius}"
-                            Margin="0,0,10,0"
+                            Margin="0,0,14,0"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"
                             Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Path Data="{Binding PathCover}"
@@ -83,27 +83,49 @@
                       x:Name="PlaylistInfoGrid"
                         Grid.Column="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
+
+                    <Grid.Height>
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 30 * b) * 0.65">
+                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
+                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                        </MultiBinding>
+                    </Grid.Height>
+                    
                     <!--  Artist Name -->
                     <TextBlock Text="{Binding Playlist.Name}"
                                 Style="{DynamicResource SLargeHeaderStyle}"
-                                HorizontalAlignment="Stretch"
+                                HorizontalAlignment="Left"
+                               VerticalAlignment="Bottom"
                                 MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
                                 TextWrapping="NoWrap"
-                                Margin="0,0,0,4"/>
+                                Margin="0,0,0,4">
+                        <TextBlock.MaxWidth>
+                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - (1-b) * 182)">
+                                <Binding ElementName="PlaylistInfoGrid" Path="ActualWidth"/>
+                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                            </MultiBinding>
+                        </TextBlock.MaxWidth>
+                    </TextBlock>
 
                     <TextBlock Text="{Binding Playlist.Description}"
-                                        Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
-                                    Style="{DynamicResource SSubDataStyle}"
-                                        HorizontalAlignment="Left"
+                                Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
+                            Style="{DynamicResource SSubDataStyle}"
+                                HorizontalAlignment="Left"
                                Grid.Row="1"
-                                        MaxWidth="650"
+                               MaxWidth="680"
                                x:Name="description"
-                                   Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}"
-                                        TextTrimming="CharacterEllipsis">
+                                Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}"
+                                TextTrimming="CharacterEllipsis">
+                        <TextBlock.Height>
+                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="60 &lt; (a * b)">
+                                <Binding Path="DesiredSize.Height" RelativeSource="{RelativeSource self}"/>
+                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                            </MultiBinding>
+                        </TextBlock.Height>
                     </TextBlock>
 
                     <StackPanel Orientation="Horizontal"
@@ -151,6 +173,13 @@
                         </MultiBinding>
                     </Border.Width>
 
+                    <Border.Height>
+                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="48 + b / (a + 2.5) * (1-a)">
+                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
+                        </MultiBinding>
+                    </Border.Height>
+
                     <StackPanel Orientation="Horizontal"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Right">
@@ -169,7 +198,6 @@
                                                     IconHeight="5"
                                                     IconWidth="28"
                                                         Icon="{DynamicResource MoreOptionIcon}"
-                                                        Margin="6,0"
                                                         Command="{Binding OpenPlaylistPopupCommand}"
                                                     CommandParameter="{Binding Playlist}"/>
                     </StackPanel>

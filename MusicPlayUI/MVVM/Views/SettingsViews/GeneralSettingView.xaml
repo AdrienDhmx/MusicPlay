@@ -14,60 +14,35 @@
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="1200" d:DesignWidth="800">
-    <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
 
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                x:Name="SettingScroll">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
 
-        <Grid Background="{DynamicResource PrimaryContainer}"
-              x:Name="StickyGrid"
-              MaxHeight="150"
-              Height="150"
-              MinHeight="80"
-           Panel.ZIndex="10">
-
-            <Border Background="{DynamicResource PrimaryContainer}"
-                    Effect="{DynamicResource PageHeaderDropShadow}"/>
-
-            <TextBlock Text="{x:Static lang:Resources.General_Setting}"
-                       Style="{DynamicResource BStyle}"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
-        </Grid>
-
-        <ScrollViewer Grid.Row="1"
-                      VerticalScrollBarVisibility="Hidden"
-                      x:Name="SettingScroll">
-            <Grid Margin="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-
-                <!-- Name -->
-                <StackPanel Grid.Row="0"
+            <!-- Name -->
+            <StackPanel Grid.Row="0"
                             VerticalAlignment="Top"
                             HorizontalAlignment="Center"
                             Orientation="Horizontal"
                             Margin="20">
-                    <TextBlock Text="Your name is "
+                <TextBlock Text="Your name is "
                                Style="{DynamicResource SStyle}"
                                Foreground="{DynamicResource OnBackground}"/>
 
-                    <placeholdertextbox:PlaceholderTextBox Style="{DynamicResource TextFieldStyle}"
+                <placeholdertextbox:PlaceholderTextBox Style="{DynamicResource TextFieldStyle}"
                                                            Placeholder="Name"
                                                            MinWidth="150"
                                                            Text="{Binding UserName}"/>
-                </StackPanel>
-                
-                <!-- Starting View -->
-                <cardExpender:CardDropDown Icon="{DynamicResource ViewIcon}"
+            </StackPanel>
+
+            <!-- Starting View -->
+            <cardExpender:CardDropDown Icon="{DynamicResource ViewIcon}"
                                            Grid.Row="1"
                                            IconWidth="30"
                                            Foreground="{DynamicResource OnBackground}"
@@ -81,54 +56,54 @@
                                            BorderBrush="{DynamicResource Primary}"
                                            BorderThickness="2"
                                            HeaderHeight="100">
-                    <Border Margin="20,0">
-                        <ItemsControl ItemsSource="{Binding StartingViews}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="Transparent"
+                <Border Margin="20,0">
+                    <ItemsControl ItemsSource="{Binding StartingViews}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="Transparent"
                                             x:Name="ItemBorder"
                                             Height="35">
-                                        <Border.InputBindings>
-                                            <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.SetSelectedStartingViewCommand, Source={x:Reference RootView}}"
+                                    <Border.InputBindings>
+                                        <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.SetSelectedStartingViewCommand, Source={x:Reference RootView}}"
                                                   CommandParameter="{Binding .}"/>
-                                        </Border.InputBindings>
-                                        <Grid Margin="5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="25"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="IsSelectedCheckBox"
+                                    </Border.InputBindings>
+                                    <Grid Margin="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox x:Name="IsSelectedCheckBox"
                                                       IsHitTestVisible="False"
                                                       Style="{DynamicResource SettingsCheckBox}"
                                                      IsChecked="{Binding IsSelected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                            <StackPanel Grid.Column="1" Margin="5,0"
+                                        <StackPanel Grid.Column="1" Margin="5,0"
                                                         VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Name}"
+                                            <TextBlock Text="{Binding Name}"
                                                             x:Name="SettingName">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock"
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock"
                                                                BasedOn="{StaticResource SStyle}">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsChecked, ElementName=IsSelectedCheckBox, UpdateSourceTrigger=PropertyChanged}"
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsChecked, ElementName=IsSelectedCheckBox, UpdateSourceTrigger=PropertyChanged}"
                                                                             Value="true">
-                                                                    <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
-                                            </StackPanel>
+                                                                <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
 
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                </cardExpender:CardDropDown>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </cardExpender:CardDropDown>
 
-                <!-- Covers to display (album, artwork, auto) -->
-                <cardExpender:CardDropDown Icon="{DynamicResource ImageIcon}"
+            <!-- Covers to display (album, artwork, auto) -->
+            <cardExpender:CardDropDown Icon="{DynamicResource ImageIcon}"
                                            Grid.Row="2"
                                            Foreground="{DynamicResource OnBackground}"
                                            Header="Cover display"
@@ -142,50 +117,49 @@
                                            BorderBrush="{DynamicResource Primary}"
                                            BorderThickness="2"
                                            HeaderHeight="100">
-                    <Border Margin="20,0">
-                        <ItemsControl ItemsSource="{Binding QueueCovers}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="Transparent"
+                <Border Margin="20,0">
+                    <ItemsControl ItemsSource="{Binding QueueCovers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="Transparent"
                                             x:Name="ItemBorder"
                                             Height="40">
-                                        <Border.InputBindings>
-                                            <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.SetSelectedQueueCoverCommand, Source={x:Reference RootView}}"
+                                    <Border.InputBindings>
+                                        <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.SetSelectedQueueCoverCommand, Source={x:Reference RootView}}"
                                                   CommandParameter="{Binding .}"/>
-                                        </Border.InputBindings>
-                                        <Grid Margin="5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="25"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <CheckBox x:Name="IsSelectedCheckBox"
+                                    </Border.InputBindings>
+                                    <Grid Margin="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox x:Name="IsSelectedCheckBox"
                                                       IsHitTestVisible="False"
                                                       Style="{DynamicResource SettingsCheckBox}"
                                                      IsChecked="{Binding IsSelected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                            <TextBlock Text="{Binding Name}"
+                                        <TextBlock Text="{Binding Name}"
                                                        Grid.Column="1"
                                                        x:Name="SettingName">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock"
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock"
                                                            BasedOn="{StaticResource SStyle}">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsChecked, ElementName=IsSelectedCheckBox, UpdateSourceTrigger=PropertyChanged}"
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsChecked, ElementName=IsSelectedCheckBox, UpdateSourceTrigger=PropertyChanged}"
                                                                  Value="true">
-                                                                <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
+                                                            <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
 
-                </cardExpender:CardDropDown>
-            </Grid>
-        </ScrollViewer>
-    </Grid>
+            </cardExpender:CardDropDown>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

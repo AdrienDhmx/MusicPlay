@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MusicPlayUI.MVVM.Views
+namespace MusicPlayUI.MVVM.Views.SettingsViews
 {
     /// <summary>
-    /// Logique d'interaction pour ImportLibraryView.xaml
+    /// Interaction logic for StorageSettingsView.xaml
     /// </summary>
-    public partial class ImportLibraryView : UserControl
+    public partial class StorageSettingsView : UserControl
     {
-        public ImportLibraryView()
+        public StorageSettingsView()
         {
             InitializeComponent();
         }

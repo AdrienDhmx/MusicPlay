@@ -89,7 +89,7 @@ namespace DataBaseConnection.DataAccess
                     { Columns.Path, track.Path },
                     { Columns.Length, track.Length },
                     { Columns.Duration, track.Duration },
-                    { Columns.TrackNumber, track.Tracknumber },
+                    { Columns.TrackNumber, track.TrackNumber },
                     { Columns.DiscNumber, track.DiscNumber },
                     { Columns.LastPlayed, DateTime.MinValue.DateTimeToString() },
                     { Columns.PlayCount, track.PlayCount },
@@ -454,24 +454,24 @@ namespace DataBaseConnection.DataAccess
             return album;
         }
 
-        public async Task<int> InsertAlbum(AlbumModel album)
+        public int InsertAlbum(AlbumModel album)
         {
             Query query = new Query(Tables.TAlbum).AsInsert(Tables.CreateTable(album));
-            int id = await query.InsertAsync();
+            int id = query.InsertAsync();
             InsertAlbumArtists(album.Artists, id);
             return id;
         }
 
-        public Task InsertAlbumTag(int albumId, int genreId)
+        public void InsertAlbumTag(int albumId, int genreId)
         {
             Query query = new Query(Tables.TAlbumGenres).AsInsert(Tables.CreateAlbumGenresTable(albumId, genreId));
-            return query.InsertAsync(false);
+            query.InsertAsync(false);
         }
 
-        public async Task<int> InsertArtist(ArtistModel artist)
+        public int InsertArtist(ArtistModel artist)
         {
             Query query =  new Query(Tables.TArtist).AsInsert(Tables.CreateTable(artist));
-            int id = await query.InsertAsync();
+            int id = query.InsertAsync();
 
             foreach (TagModel genre in artist.Tags)
             {
@@ -482,13 +482,13 @@ namespace DataBaseConnection.DataAccess
             return id;
         }
 
-        public Task InsertArtistTag(int artistId, int genreId)
+        public void InsertArtistTag(int artistId, int genreId)
         {
             Query query = new Query(Tables.TArtistGenres).AsInsert(Tables.CreateArtistGenresTable(artistId, genreId));
-            return query.InsertAsync(false);
+            query.InsertAsync(false);
         }
 
-        public Task<int> InserTag(TagModel genre)
+        public int InsertTag(TagModel genre)
         {
             Query query =  new Query(Tables.TGenre).AsInsert(Tables.CreateTable(genre));
             return query.InsertAsync();
@@ -501,20 +501,20 @@ namespace DataBaseConnection.DataAccess
             return historyModel;
         }
 
-        public Task<int> InsertPlaylist(PlaylistModel playlist)
+        public int InsertPlaylist(PlaylistModel playlist)
         {
             Query query = new Query(Tables.TPlaylist).AsInsert(Tables.CreateTable(playlist));
             return query.InsertAsync();
         }
 
-        public async Task InsertQueue(QueueModel queue)
+        public void InsertQueue(QueueModel queue)
         {
             new Query(Tables.TQueueTracks).AsDelete().Delete(); // delete tracks of last queue
             new Query(Tables.TQueue).AsDelete().Delete(); // delete last queue
 
             Query query = new Query(Tables.TQueue).AsInsert(Tables.CreateTable(queue));
 
-            int id = await query.InsertAsync();
+            int id = query.InsertAsync();
 
             List<Query> queries = new();
             foreach (OrderedTrackModel t in queue.Tracks)
@@ -524,22 +524,22 @@ namespace DataBaseConnection.DataAccess
             queries.Insert();
         }
 
-        public async Task<int> InsertTrack(TrackModel track)
+        public int InsertTrack(TrackModel track)
         {
             Query query = new Query(Tables.TTrack).AsInsert(Tables.CreateTable(track));
-            int id = await  query.InsertAsync();
+            int id = query.InsertAsync();
 
             InsertTrackArtists(track.Artists, id);
 
             return id;
         }
 
-        public Task AddTrackToPlaylist(PlaylistModel playlist, TrackModel track, int trackIndex)
+        public void AddTrackToPlaylist(PlaylistModel playlist, TrackModel track, int trackIndex)
         {
             if (trackIndex < 0)
                 trackIndex = 0;
 
-            return new Query(Tables.TPlaylistTracks).AsInsert(Tables.CreateTable(playlist.Id, track.Id, trackIndex)).InsertAsync(false);
+            new Query(Tables.TPlaylistTracks).AsInsert(Tables.CreateTable(playlist.Id, track.Id, trackIndex)).InsertAsync(false);
         }
 
         public async Task AddTrackToPlaylist(PlaylistModel playlist, List<OrderedTrackModel> tracks)
@@ -1025,21 +1025,21 @@ namespace DataBaseConnection.DataAccess
 
             foreach (int artistType in artistTypes)
             {
-                switch ((ArtistTypeEnum)artistType)
+                switch ((ArtistRoleEnum)artistType)
                 {
-                    case ArtistTypeEnum.AlbumArtist:
+                    case ArtistRoleEnum.AlbumArtist:
                         isAlbumArtist = true;
                         break;
-                    case ArtistTypeEnum.Composer:
+                    case ArtistRoleEnum.Composer:
                         isComposer = true;
                         break;
-                    case ArtistTypeEnum.Performer:
+                    case ArtistRoleEnum.Performer:
                         isPerformer = true;
                         break;
-                    case ArtistTypeEnum.Lyricist:
+                    case ArtistRoleEnum.Lyricist:
                         isLyricist = true;
                         break;
-                    case ArtistTypeEnum.Featured:
+                    case ArtistRoleEnum.Featured:
                         isFeatured = true;
                         break;
                 }
@@ -1240,16 +1240,16 @@ namespace DataBaseConnection.DataAccess
             }).Execute();
         }
 
-        public Task<int> InsertPlaylistTag(int playlistId, int tagId)
+        public int InsertPlaylistTag(int playlistId, int tagId)
         {
             Query query = new Query(Tables.TPlaylistGenres).AsInsert(Tables.CreatePlaylistGenresTable(playlistId, tagId));
             return query.InsertAsync(false);
         }
 
-        public Task InsertTrackTag(int trackId, int tagId)
+        public void InsertTrackTag(int trackId, int tagId)
         {
             Query query = new Query(Tables.TTrackGenres).AsInsert(Tables.CreateTrackGenresTable(trackId, tagId));
-            return query.InsertAsync(false);
+            query.InsertAsync(false);
         }
 
         public Task UpdateTag(TagModel tag)

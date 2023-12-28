@@ -3,15 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicPlayModels.Interfaces;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class ArtistModel : DatedModel
+    public class ArtistModel : PlayableModel, ITaggable
     {
         private string _cover = "";
-        private string _duration = "";
         private string _name = "";
         private string _biography = "";
+
+        private int _birthDate = 0;
+        private int _deathDate = 0;
+
+        private string _country = "";
+        private bool _isGroup = false;
+        private List<ArtistModel> _groupMembers = new();
+
+        private List<ArtistRoleModel> _roles = new List<ArtistRoleModel>();
+        private List<AlbumModel> _albums = new List<AlbumModel>();
+        private List<TrackModel> _tracks = new List<TrackModel>();
+        private List<TagModel> _tags = new List<TagModel>();
 
         /// <summary>
         /// The artist name
@@ -35,47 +47,92 @@ namespace MusicPlayModels.MusicModels
             }
         }
 
-        /// <summary>
-        /// The total duration of all the tracks the artist made and contributed to.
-        /// </summary>
-        public string Duration 
-        {
-            get => _duration;
-            set
-            {
-                SetField(ref _duration, value);
-            }
-        }
-
         public string Biography
         {
             get => _biography;
             set => SetField(ref _biography, value);
         }
 
-        public List<TagModel> Tags { get; set; }
+        public string Country
+        {
+            get => _country;
+            set => SetField(ref _country, value);
+        }
 
-        public int PlayCount { get; set; } = 0;
-        public DateTime LastPlayed { get; set; } = DateTime.MinValue;
+        public int BirthDate
+        {
+            get => _birthDate;
+            set 
+            { 
+                SetField(ref _birthDate, value);
+                OnPropertyChanged(nameof(Birth));
+            }
+        }
 
-        public bool IsAlbumArtist { get; set; }
+        public int DeathDate
+        {
+            get => _deathDate;
+            set
+            {
+                SetField(ref _deathDate, value);
+                OnPropertyChanged(nameof(Death));
+            }
+        }
 
-        public bool IsPerformer { get; set; }
+        public bool IsGroup
+        {
+            get => _isGroup;
+            set => SetField(ref _isGroup, value);
+        }
 
-        public bool IsComposer { get; set; }
+        public List<ArtistModel> GroupMembers
+        {
+            get => _groupMembers;
+            set => SetField(ref _groupMembers, value);
+        }
 
-        public bool IsFeatured { get; set; }
+        public List<ArtistRoleModel> Roles
+        {
+            get => _roles;
+            set => SetField(ref _roles, value);
+        }
 
-        public bool IsLyricist { get; set; }
+        // All the albums the artist is credited as the Primary Artist
+        public List<AlbumModel> Albums
+        {
+            get => _albums;
+            set => SetField(ref _albums, value);
+        }
 
-        public ArtistModel(int id, string name, string cover, string duration, bool isAlbumArtistOnly, bool isPerformerOnly)
+        // All the tracks the artists is credited on
+        public List<TrackModel> Tracks
+        {
+            get => _tracks;
+            set => SetField(ref _tracks, value);
+        }
+
+        public List<TagModel> Tags
+        {
+            get => _tags;
+            set => SetField(ref _tags, value);
+        }
+
+        public string Birth
+        {
+            get => TimestampToDateString(_birthDate);
+        }
+
+        public string Death
+        {
+            get => TimestampToDateString(_deathDate);
+        }
+
+        public ArtistModel(int id, string name, string cover, string duration)
         {
             Id = id;
             Name = name;
             Cover = cover;
             Duration = duration;
-            IsAlbumArtist = isAlbumArtistOnly;
-            IsPerformer = isPerformerOnly;
         }
 
         public ArtistModel(string name)
@@ -83,8 +140,6 @@ namespace MusicPlayModels.MusicModels
             Name = name;
             Cover = "";
             Duration = "";
-            IsAlbumArtist = false;
-            IsPerformer = false;
         }
 
         public ArtistModel()

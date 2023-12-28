@@ -77,13 +77,13 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             CreateGenreCommand = new RelayCommand(() =>
             {
-                Action<string> createTag = async (string newName) =>
+                void CreateTag(string newName)
                 {
                     TagModel tag = new();
                     tag.Name = newName;
-                    await DataAccess.Connection.InserTag(tag);
-                };
-                CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, createTag, null);
+                    DataAccess.Connection.InsertTag(tag);
+                }
+                CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, CreateTag, null);
                 _modalService.OpenModal(ViewNameEnum.CreateTag, (canceled) =>
                 {
                     if (!canceled)

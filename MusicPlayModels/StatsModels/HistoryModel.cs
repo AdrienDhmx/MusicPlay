@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicPlayModels.MusicModels;
 
 namespace MusicPlayModels.StatsModels
 {
@@ -11,11 +12,7 @@ namespace MusicPlayModels.StatsModels
         private DateTime _date = DateTime.Today;
         private int _listenTime = 0;
         private int _playCount = 0;
-
-        /// <summary>
-        /// The model identifier
-        /// </summary>
-        public int Id { get; set; } = -1;
+        private List<HistoryEntryModel> _entries = new List<HistoryEntryModel>();
 
         /// <summary>
         /// The total number of playbacks
@@ -54,6 +51,12 @@ namespace MusicPlayModels.StatsModels
                 _date = value;
                 OnPropertyChanged(nameof(Date));
             }
+        }
+
+        public List<HistoryEntryModel> Entries
+        {
+            get => _entries;
+            set => SetField(ref _entries, value);
         }
 
         public HistoryModel()

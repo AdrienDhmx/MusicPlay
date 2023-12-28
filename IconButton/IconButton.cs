@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace IconButton
 {
-    public class IconButton : Control
+    public class IconButton : Button
     {
         public Geometry Icon
         {
@@ -69,24 +69,6 @@ namespace IconButton
             set { SetValue(MouseOverBackgroundProperty, value); }
         }
 
-        public ICommand Command
-        {
-            get { return (ICommand)GetValue(CommandProperty); }
-            set { SetValue(CommandProperty, value); }
-        }
-
-        public static readonly DependencyProperty CommandProperty =
-            DependencyProperty.Register("Command", typeof(ICommand), typeof(IconButton), new PropertyMetadata(null));
-
-        public object CommandParameter
-        {
-            get { return (object)GetValue(CommandParameterProperty); }
-            set { SetValue(CommandParameterProperty, value); }
-        }
-
-        public static readonly DependencyProperty CommandParameterProperty =
-            DependencyProperty.Register("CommandParameter", typeof(object), typeof(IconButton), new PropertyMetadata(null));
-
         public static readonly DependencyProperty MouseOverBackgroundProperty =
             DependencyProperty.Register("MouseOverBackground", typeof(Brush), typeof(IconButton), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 90, 90, 90))));
 
@@ -127,28 +109,16 @@ namespace IconButton
             base.EndInit();
 
             if (IconWidth < 0) IconWidth = 0;
-            if (IconHeight <0) IconHeight = 0;
+            if (IconHeight < 0) IconHeight = 0;
         }
 
         public IconButton()
         {
-            PreviewMouseLeftButtonDown += MouseLeftButtonDownCommand;
-            PreviewMouseLeftButtonUp += IconButton_PreviewMouseLeftButtonUp;
         }
 
-        private void IconButton_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        protected override void OnClick()
         {
-            e.Handled = true;
+            Command?.Execute(CommandParameter);
         }
-
-        private void MouseLeftButtonDownCommand(object sender, MouseButtonEventArgs e)
-        {
-            if(Command is not null)
-            {
-                e.Handled= true;
-                Command.Execute(CommandParameter);
-            }
-        }
-
     }
 }

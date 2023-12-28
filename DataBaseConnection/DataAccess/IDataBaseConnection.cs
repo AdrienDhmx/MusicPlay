@@ -48,32 +48,32 @@ namespace DataBaseConnection.DataAccess
         /// </summary>
         /// <param name="track"></param>
         /// <returns></returns>
-        public Task<int> InsertTrack(TrackModel track);
+        public int InsertTrack(TrackModel track);
         /// <summary>
         /// Insert an album in the database
         /// </summary>
         /// <param name="album"></param>
         /// <returns></returns>
-        public Task<int> InsertAlbum(AlbumModel album);
+        public int InsertAlbum(AlbumModel album);
         /// <summary>
         /// Insert an artist in the database
         /// </summary>
         /// <param name="artist"></param>
         /// <returns></returns>
-        public Task<int> InsertArtist(ArtistModel artist);
+        public int InsertArtist(ArtistModel artist);
         /// <summary>
         /// Insert a tag in the database
         /// </summary>
         /// <param name="tag"></param>
         /// <returns></returns>
-        public Task<int> InserTag(TagModel tag);
+        public int InsertTag(TagModel tag);
         /// <summary>
         /// Insert a relation between an album and a tag in the database
         /// </summary>
         /// <param name="albumId"></param>
         /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task InsertAlbumTag(int albumId, int tagId);
+        public void InsertAlbumTag(int albumId, int tagId);
 
         /// <summary>
         /// Insert a relation between an artist and a tag in the database
@@ -81,7 +81,7 @@ namespace DataBaseConnection.DataAccess
         /// <param name="artistId"></param>
         /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task InsertArtistTag(int artistId, int tagId);
+        public void InsertArtistTag(int artistId, int tagId);
 
         /// <summary>
         /// Insert a relation between a playlist and a tag in the database
@@ -89,7 +89,7 @@ namespace DataBaseConnection.DataAccess
         /// <param name="playlistId"></param>
         /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task<int> InsertPlaylistTag(int playlistId, int tagId);
+        public int InsertPlaylistTag(int playlistId, int tagId);
 
         /// <summary>
         /// Insert a relation between a track and a tag in the database
@@ -97,14 +97,14 @@ namespace DataBaseConnection.DataAccess
         /// <param name="trackId"></param>
         /// <param name="tagId"></param>
         /// <returns></returns>
-        public Task InsertTrackTag(int trackId, int tagId);
+        public void InsertTrackTag(int trackId, int tagId);
 
         /// <summary>
         /// Insert a queue in the database
         /// </summary>
         /// <param name="queue"></param>
         /// <returns></returns>
-        public Task InsertQueue(QueueModel queue);
+        public void InsertQueue(QueueModel queue);
 
         /// <summary>
         /// Query the database to find the albums corresping to the criterias and sort the result
@@ -203,7 +203,7 @@ namespace DataBaseConnection.DataAccess
         /// </summary>
         /// <param name="playlist"></param>
         /// <returns></returns>
-        public Task<int> InsertPlaylist(PlaylistModel playlist);
+        public int InsertPlaylist(PlaylistModel playlist);
         /// <summary>
         /// Delete a playlist from the database (no undo)
         /// </summary>
@@ -216,7 +216,7 @@ namespace DataBaseConnection.DataAccess
         /// <param name="playlist"></param>
         /// <param name="track"></param>
         /// <returns></returns>
-        public Task AddTrackToPlaylist(PlaylistModel playlist, TrackModel track, int trackIndex);
+        public void AddTrackToPlaylist(PlaylistModel playlist, TrackModel track, int trackIndex);
         /// <summary>
         /// Add relations btw a playlist a multiple tracks
         /// </summary>

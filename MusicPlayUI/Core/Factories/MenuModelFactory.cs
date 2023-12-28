@@ -22,7 +22,6 @@ namespace MusicPlayUI.Core.Factories
                 new() { Icon = (PathGeometry)App.IconDic["PlaylistLibrary"], Name = MusicPlay.Language.Resources.Playlists_View, Enum = ViewNameEnum.Playlists, IsSelected = false },
                 new() { Icon = (PathGeometry)App.IconDic["Tags"], Name = MusicPlay.Language.Resources.Genre, Enum = ViewNameEnum.Genres, IsSelected = false },
                 new() { Icon = (PathGeometry)App.IconDic["_music_icon"], Name = MusicPlay.Language.Resources.Now_Playing_View, Enum = ViewNameEnum.NowPlaying, IsSelected = false },
-                new() { Icon = (PathGeometry)App.IconDic["DownloadsIcon"], Name = MusicPlay.Language.Resources.Import_Library_View, Enum = ViewNameEnum.Import, IsSelected = false },
                 new() { Icon = (PathGeometry)App.IconDic["Settings"], Name = MusicPlay.Language.Resources.Settings_View, Enum = ViewNameEnum.Settings, IsSelected = false }
             };
             return menuList;

@@ -6,19 +6,12 @@ using System.Threading.Tasks;
 
 namespace MusicPlayModels.Enums
 {
-    public enum ArtistTypeEnum
+    public enum ArtistRoleEnum
     {
-        AlbumArtist = 0,
+        PrimaryArtist = 0,
         Performer = 1,
         Composer = 2,
         Lyricist = 3,
         Featured = 4,
-    }
-
-    public enum AlbumTypeEnum
-    {
-        Single = 0,
-        EP = 1,
-        Compilation = 3,
     }
 }

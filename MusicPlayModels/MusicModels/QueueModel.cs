@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class QueueModel : BaseModel
+    public class QueueModel : PlayableModel
     {
-        private List<OrderedTrackModel> _tracks = new();
-        private TrackModel _playingTrack = new();
         private bool _isShuffled = false;
         private bool _isOnRepeat = false;
         private string _playingFrom = "";
         private string _cover = "";
+        private ModelTypeEnum _playingFromModelType = ModelTypeEnum.UNKNOWN;
         private int _playingFromId = -1;
+        private List<OrderedTrackModel> _tracks = new();
+        private TrackModel _playingTrack = new();
 
         public bool IsShuffled
         {
             get { return _isShuffled; }
             set
             {
-                _isShuffled = value;
-                OnPropertyChanged(nameof(IsShuffled));
+                SetField(ref _isShuffled, value);
             }
         }
         public bool IsOnRepeat
@@ -31,12 +31,10 @@ namespace MusicPlayModels.MusicModels
             get { return _isOnRepeat; }
             set
             {
-                _isOnRepeat = value;
-                OnPropertyChanged(nameof(IsOnRepeat));
+                SetField(ref _isOnRepeat, value);
             }
         }
-        public int Length { get; set; } = 0;
-        public string Duration { get; set; } = "";
+
         public string PlayingFrom
         {
             get { return _playingFrom; }
@@ -61,20 +59,16 @@ namespace MusicPlayModels.MusicModels
             get { return _cover; }
             set
             {
-                _cover = value;
-                OnPropertyChanged(nameof(Cover));
+                SetField(ref _cover, value);
             }
         }
-
-        public int PlayingTrackId { get; set; }
 
         public TrackModel PlayingTrack
         {
             get => _playingTrack;
             set
             {
-                _playingTrack = value;
-                OnPropertyChanged(nameof(PlayingTrack));
+                SetField(ref _playingTrack, value);
             }
         }
 
@@ -83,12 +77,17 @@ namespace MusicPlayModels.MusicModels
             get => _tracks;
             set
             {
-                _tracks = value;
-                OnPropertyChanged(nameof(Tracks));
+                SetField(ref _tracks, value);
             }
         }
 
-        public ModelTypeEnum ModelType { get; set; }
+        public int PlayingTrackId { get; set; }
+
+        public ModelTypeEnum ModelType
+        {
+            get => _playingFromModelType;
+            set => SetField(ref _playingFromModelType, value);
+        }
 
         public QueueModel(int id, bool isShuffled, bool isOnRepeat, int length, string duration, int playingTrackId, string from, string cover)
         {

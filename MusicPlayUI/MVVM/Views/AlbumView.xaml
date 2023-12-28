@@ -33,7 +33,7 @@
             <Border Style="{DynamicResource PageHeaderBackground}"/>
             
             <Grid Grid.Column="1"
-                    Margin="20, 10"
+                    Margin="14"
                     HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -52,7 +52,6 @@
 
                 <!-- Album Cover -->
                 <Border Grid.RowSpan="2"
-                            Margin="0,0,18,0"
                             MaxHeight="280"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
@@ -65,7 +64,7 @@
                 <!-- Album & Artist Name + Duration + More Opt Btn -->
                 <Grid VerticalAlignment="Stretch"
                           HorizontalAlignment="Stretch"
-                            Margin="0, 4"
+                            Margin="14, 4, 0, 4"
                           MaxHeight="280"
                           x:Name="AlbumInfoGrid"
                             Grid.Column="1">
@@ -96,7 +95,7 @@
                                         MaxHeight="140"
                                        Style="{DynamicResource SLargeHeaderStyle}">
                             <TextBlock.MaxWidth>
-                                <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="640 + (1-b) * a">
+                                <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(50 * (1.5 - b) ^ 2) &lt; (a - (1-b) * 182)">
                                     <Binding ElementName="AlbumInfoGrid" Path="ActualWidth"/>
                                     <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
                                 </MultiBinding>
@@ -163,6 +162,13 @@
                             </MultiBinding>
                         </Border.Width>
 
+                        <Border.Height>
+                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="48 + b / (a + 3) * (1-a)">
+                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
+                                <Binding ElementName="StickyPart" Path="ActualHeight"/>
+                            </MultiBinding>
+                        </Border.Height>
+
                         <StackPanel Orientation="Horizontal"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Right">
@@ -181,7 +187,6 @@
                                                     IconHeight="5"
                                                     IconWidth="28"
                                                         Icon="{DynamicResource MoreOptionIcon}"
-                                                        Margin="6,0"
                                                         Command="{Binding OpenAlbumPopupCommand}"
                                                     CommandParameter="{Binding Album}"/>
                         </StackPanel>

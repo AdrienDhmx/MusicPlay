@@ -25,6 +25,7 @@ using MusicPlayUI.Core.Commands;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using System.Windows.Input;
+using FilesProcessor;
 
 namespace MusicPlayUI
 {
@@ -67,7 +68,7 @@ namespace MusicPlayUI
                 MainWindow window = _services.GetRequiredService<MainWindow>();
                 window.Show();
 
-                // init shortcuts services and apply 
+                // init shortcuts services
                 ShortcutsManager = new(_services.GetRequiredService<ICommandsManager>(), window);
 
                 // check for missing tracks
@@ -77,11 +78,12 @@ namespace MusicPlayUI
                     MessageHelper.PublishMessage(MessageFactory.TrackDeleted(deletedTracks));
                 }
 
+                // init playback service
                 IAudioPlayback audioPlayback = _services.GetService<IAudioPlayback>();
 
+                // init Equalizer and apply preset if enabled
                 audioPlayback.EQManager.Enabled = ConfigurationService.GetPreference(SettingsEnum.EqualizerEnabled) == 1;
                 int presetId = ConfigurationService.GetPreference(SettingsEnum.EqualizerPreset);
-
                 if(presetId >= 0) 
                 {
                     audioPlayback.EQManager.ApplyPreset(await DataAccess.Connection.GetEQPreset(presetId));
@@ -93,11 +95,33 @@ namespace MusicPlayUI
 
                 // init queue services
                 _queueService = _services.GetRequiredService<IQueueService>();
+
+                // init the storage settings and scan for new tracks
+                StorageService.Instance.FileImported += TrackImported;
+                await Task.Run(() => StorageService.Instance.ScanFolders(true));
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Error in getting/showing MainWindow: " + ex);
                 throw;
+            }
+        }
+
+        private void TrackImported(int newTrackCount)
+        {
+            if (newTrackCount > 0)
+            {
+                Current.Dispatcher.Invoke(() =>
+                {
+                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateSuccessMessage($"{newTrackCount} new track(s) imported !"));
+                });
+            }
+            else
+            {
+                Current.Dispatcher.Invoke(() =>
+                {
+                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateWarningMessage($"No new track found."));
+                });
             }
         }
 

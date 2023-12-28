@@ -16,36 +16,42 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Text;
 using System.Net.WebSockets;
+using MusicPlayModels.Enums;
 
 namespace MusicFilesProcessor
 {
     public class ImportMusicLibrary
     {
         private readonly string _folder;
-
-        public static readonly List<string> FilesExtensions = new() 
-        { 
+        public static readonly List<string> FilesExtensions = new()
+        {
             ".aac",
-            ".aiff", 
-            ".alac", 
-            ".flac", 
-            ".mp3", 
-            ".m4a", 
-            ".ogg", 
-            ".wma", 
-            ".wav", 
+            ".aiff",
+            ".alac",
+            ".flac",
+            ".mp3",
+            ".m4a",
+            ".ogg",
+            ".wma",
+            ".wav",
         };
+
         private readonly string UNKNOWN = "UNKNOWN";
         private readonly string VARIOUSARTIST = "Various Artists";
-        private List<string> files = new();
-        private List<string> importedFiles = new();
-        private List<ArtistModel> importedArtists = new();
 
-        private List<TrackModel> AllTracksModel { get; set; } = new();
+        private readonly string PrimaryArtistString = "Primary Artist";
+
+
+        private List<string> files = new();
+        private readonly List<string> importedFiles = new();
+
+        private List<ArtistModel> AllArtistsModel { get; set; } = new();
         private List<AlbumModel> AllAlbumsModel { get; set; } = new();
-        private List<TagModel> AllGenres { get; set; } = new();
+        private List<TrackModel> AllTracksModel { get; set; } = new();
+        private List<TagModel> AllTagsModel { get; set; } = new();
+
         private Dictionary<int, Dictionary<string, List<bool>>> FileArtists = new();
-        private Dictionary<string, string> CoverDictionary = new();
+        private readonly Dictionary<string, string> CoverDictionary = new();
 
         public int FileNumber { get; private set; }
         public int TotalProgress { get; private set; }
@@ -65,6 +71,13 @@ namespace MusicFilesProcessor
             {
                 _currentFile = value;
             }
+        }
+
+        private int _fileImportedCount = 0;
+        public int FileImportedCount
+        {
+            get => _fileImportedCount;
+            private set => _fileImportedCount = value;
         }
 
         private int _progress;
@@ -107,37 +120,37 @@ namespace MusicFilesProcessor
                     await DataAccess.Connection.DeleteTrack(track.Id);
                     CoverProcessor.DeleteCover(track.Artwork); // try to delete artwork if there is one
 
-                    var albumTracks = await DataAccess.Connection.GetTracksFromAlbum(track.AlbumId);
+                    var albumTracks = await DataAccess.Connection.GetTracksFromAlbum(track.Album.Id);
                     if (albumTracks.Count == 0)
                     {
-                        await DataAccess.Connection.DeleteAlbum(track.AlbumId);
+                        await DataAccess.Connection.DeleteAlbum(track.Album.Id);
                     }
 
-                    foreach (ArtistDataRelation relation in track.Artists)
+                    foreach (TrackArtistsRoleModel relation in track.Artists)
                     {
-                        var albums = await DataAccess.Connection.GetAlbumsFromArtist(relation.ArtistId);
-                        var artistTracks = await DataAccess.Connection.GetTracksFromArtist(relation.ArtistId);
+                        var albums = await DataAccess.Connection.GetAlbumsFromArtist(relation.Artist.Id);
+                        var artistTracks = await DataAccess.Connection.GetTracksFromArtist(relation.Artist.Id);
 
-                        ArtistModel artist = await DataAccess.Connection.GetArtist(relation.ArtistId);
+                        ArtistModel artist = await DataAccess.Connection.GetArtist(relation.Artist.Id);
                     
                         if (albums.Count == 0 && artistTracks.Count == 0) // delete artist
                         {
-                            await DataAccess.Connection.DeleteArtist(relation.ArtistId);
+                            await DataAccess.Connection.DeleteArtist(relation.Artist.Id);
 
                             CoverProcessor.DeleteCover(artist.Cover);
                         }
                         else if (albums.Count == 0) // artist is not an albumArtist
                         {
-                            if (artist.IsAlbumArtist)
-                            {
-                                artist.IsAlbumArtist = false;
-                                await DataAccess.Connection.UpdateArtist(artist); // try to delete the artist cover
-                            }
+                            //if (artist.IsAlbumArtist)
+                            //{
+                            //    artist.IsAlbumArtist = false;
+                            //    await DataAccess.Connection.UpdateArtist(artist); // try to delete the artist cover
+                            //}
                         }
                         else if(artistTracks.Count == 0) // artist is not a Performer anymore
                         {
-                            artist.IsPerformer = false;
-                            await DataAccess.Connection.UpdateArtist(artist);
+                            //artist.IsPerformer = false;
+                            //await DataAccess.Connection.UpdateArtist(artist);
                         }
                     }
 
@@ -152,7 +165,7 @@ namespace MusicFilesProcessor
             _folder = folder;
             GetImportedFiles();
             FileNumber = GetFiles();
-            TotalProgress = FileNumber * 2; // scan all files twice and then update all artists1
+            TotalProgress = FileNumber * 2; // scan all files twice and then update all artists
         }
 
         /// <summary>
@@ -161,15 +174,7 @@ namespace MusicFilesProcessor
         public void Import()
         {
             Progress = 0;
-            CurrentStep = "Looking for artists...";
-            ImportArtists();
-
-            CurrentStep = "Importing albums and tracks...";
-            ImportAlbumsAndTracks();
-
-            CurrentFile = "";
-            CurrentStep = "Import Done! Now updating artists data...";
-            UpdateArtistData();
+            ScanFiles();
 
             Progress = TotalProgress;
             CurrentStep = "Done!";
@@ -177,12 +182,12 @@ namespace MusicFilesProcessor
 
         private async void GetImportedFiles() 
         {
-            List<TrackModel> tracks = await DataAccess.Connection.GetAllTracks();
-            foreach(var track in tracks)
+            AllTracksModel = await DataAccess.Connection.GetAllTracks();
+            foreach(TrackModel track in AllTracksModel)
             {
                 importedFiles.Add(track.Path);
             }
-            importedArtists = await DataAccess.Connection.GetAllArtists();
+            AllArtistsModel = await DataAccess.Connection.GetAllArtists();
         } 
 
         private int GetFiles()
@@ -192,468 +197,375 @@ namespace MusicFilesProcessor
             return files.Count;
         }
 
-        /// <summary>
-        /// scan all files once to find all artists1 and add them to the database
-        /// </summary>
-        /// <returns></returns>
-        private async void ImportArtists()
+        private async void ScanFiles()
         {
-            int i = 0;
-            foreach (string file in files)
+            // get all the existing data (the artists and tracks were already fetch in GetImportedFiles())
+            AllAlbumsModel = await DataAccess.Connection.GetAllAlbums();
+            AllTagsModel = await DataAccess.Connection.GetAllTags();
+
+            bool unknownArtistNotInDb = false;
+            bool variousArtistNotInDb = false;
+            // find if exist or create an Unknown Artists model in case a primary artist does not exist for an album
+            ArtistModel UnknownArtistModel = AllArtistsModel.Find(a => a.Name == UNKNOWN);
+            if(UnknownArtistModel == null)
             {
-                File fileInfo = File.Create(file);
-
-                // artistName => { IsAlbumArtist, IsComposer, IsPerformer, IsFeatured, IsLyricist }
-                Dictionary<string, List<bool>> artists = GetArtists(fileInfo, file);
-                FileArtists.Add(i, artists); // avoid getting the artists afterward
-                i++;
-
-                if(artists.Count > 0)
-                    CurrentFile = artists.Keys.ToList()[0];
-                Progress++;
-
-                foreach (var kvp in artists)
+                unknownArtistNotInDb = true;
+                UnknownArtistModel = new ArtistModel()
                 {
-                    string artist = kvp.Key;
-
-                    // ignore accent and case
-                    ArtistModel importedArtist = importedArtists.Find(a => a.Name.ToLower() == artist.ToLower());
-
-                    // artist not in imported yet
-                    if (importedArtist is null || importedArtist.Name == "")
-                    {
-                        ArtistModel artistModel = new(artist);
-
-                        if (kvp.Value[0]) // album artist
-                        {
-                            artistModel.IsAlbumArtist = true;
-                        }
-
-                        if (kvp.Value[1]) // composer
-                        {
-                            artistModel.IsComposer = true;
-                        }
-
-                        if (kvp.Value[2]) // performer
-                        {
-                            artistModel.IsPerformer = true;
-                        }
-
-                        if (kvp.Value[3]) // featured 
-                        {
-                            artistModel.IsFeatured = true;
-                        }
-
-                        if (kvp.Value[4]) // lyricist
-                        {
-                            artistModel.IsLyricist = true;
-                        }
-
-                        artistModel.Tags = new();
-                        artistModel.Id = await DataAccess.Connection.InsertArtist(artistModel);
-
-                        importedArtists.Add(artistModel);
-                    }
-                    else // artist already in the list, update it
-                    {
-                        int index = importedArtists.IndexOf(importedArtist);
-                        bool updated = await CheckArtistBool(importedArtist, kvp.Value);
-
-                        if (updated)
-                        {
-                            importedArtists.RemoveAt(index);
-                            importedArtists.Add(importedArtist);
-                        }
-                    }
-                }
-            }
-        }
-
-        private async void ImportAlbumsAndTracks()
-        {
-            // get already imported genres
-            AllGenres = await DataAccess.Connection.GetAllTags();
-
-            List<TrackModel> AlbumTracks = new(); // store tracks of each albums
-            AlbumModel album = new(); // album
-            List<ArtistDataRelation> ArtistDataRelations = new(); // store artists1 of each albums
-
-            string previousAlbum = ""; // previous album name, used to compare with current one to know if the album has changed
-            List<string> previousArtist = new(); // 
-            string previousFile = ""; // 
-
-            List<string> albumGenres = new(); // genres of the album
-            int albumLength = 0; // nb of ms for the current album
-            int artistCount = 0; // nb of artist
-            int i = 0;
-            foreach (string file in files)
-            {
-                CurrentFile = file;
-                Progress++;
-
-                File tag = File.Create(file); // file metadata
-
-                string title = tag.Tag.Title;
-                if (string.IsNullOrWhiteSpace(title))
-                {
-                    title = Path.GetFileNameWithoutExtension(file); // use the file name as the title of the track
-                }
-                string albumTitle = tag.Tag.Album;
-                if (string.IsNullOrWhiteSpace(albumTitle))
-                {
-                    albumTitle = DirectoryHelper.GetFolderName(file); // use the folder name containing the file as the album name
-                }
-
-                // artistName => { IsAlbumArtist, IsComposer, IsPerformer, IsFeatured, IsLyricist }
-                Dictionary<string, List<bool>> artists = FileArtists[i];
-                string albumArtist = TagHelper.GetArtist(artists, 0);
-                i++;
-
-                string[] genres = tag.Tag.Genres;
-                string copyright = tag.Tag.Copyright;
-                string duration = TagHelper.ToFormattedString(tag.Properties.Duration);
-                int length = (int)tag.Properties.Duration.TotalMilliseconds;
-                int discNumber = (int)tag.Tag.Disc;
-                int trackNumber = (int)tag.Tag.Track;
-                int year = (int)tag.Tag.Year;
-
-                // the album has changed
-                if (albumTitle != album.Name && file.GetDirectory() != previousFile.GetDirectory())
-                {
-                    InsertAlbum(album, albumGenres, AlbumTracks, ArtistDataRelations);
-
-                    // Create a new album 
-                    album = new()
-                    {
-                        Name = albumTitle,
-                        Year = year,
-                        Copyright = copyright,
-                        AlbumCover = GetAlbumCover(tag, file, albumTitle)
-                    };                   
-
-                    // Reinitialise the data used for the previous album
-                    AlbumTracks = new();
-                    previousArtist = new();
-                    ArtistDataRelations = new();
-                    albumGenres = new();
-                    artistCount = 0;
-                    albumLength = 0;
-                    previousAlbum = albumTitle;
-                }
-                else
-                {
-                    // Check if the album features multiple artist (>=2)
-                    if (!previousArtist.Contains(albumArtist))
-                    {
-                        previousArtist.Add(albumArtist);
-                        artistCount++;
-                        if (artistCount == 2) // at least 3 artists needed to be categorized as Various Artists
-                        {
-                            album.VariousArtists = true;
-                        }
-                    }
-                }
-
-                List<ArtistDataRelation> relationList = new List<ArtistDataRelation>(); // artists track and their relation to the current track
-                foreach (var kvp in artists)
-                {
-                    ArtistModel ArtistModel = importedArtists.Find(a => a.Name.ToLower() == kvp.Key.ToLower());
-
-                    if(ArtistModel != null)
-                    {
-                        ArtistDataRelation artistTrack = new();
-                        ArtistDataRelation artistAlbum = new();
-                        artistTrack.ArtistId = ArtistModel.Id;
-                        artistTrack.Name = ArtistModel.Name;
-                        artistAlbum.ArtistId = ArtistModel.Id;
-                        artistAlbum.Name = ArtistModel.Name;
-
-                        if (kvp.Key == albumArtist) // album artist
-                        {
-                            artistAlbum.IsAlbumArtist = true;
-                            artistTrack.IsAlbumArtist = true;
-                        }
-
-                        if (kvp.Value[1]) // composer
-                        {
-                            artistAlbum.IsComposer = true;
-                            artistTrack.IsComposer = true;
-                        }
-
-                        if (kvp.Value[2]) // performer
-                        {
-                            artistAlbum.IsPerformer = true;
-                            artistTrack.IsPerformer = true;
-                        }
-
-                        if (kvp.Value[3] && !artistAlbum.IsAlbumArtist) // featured
-                        {
-                            artistAlbum.IsFeatured = true;
-                            artistTrack.IsFeatured = true;
-                        }
-
-                        if (kvp.Value[4]) // lyricist
-                        {
-                            artistAlbum.IsLyricist = true;
-                            artistTrack.IsLyricist = true;
-                        }
-
-                        if(!relationList.Select(a => a.ArtistId).Contains(artistTrack.ArtistId))
-                            relationList.Add(artistTrack);
-
-                        ArtistDataRelation ArtistDataRelation = ArtistDataRelations.Find(a => a.ArtistId == artistAlbum.ArtistId);
-                        if (ArtistDataRelation is null || ArtistDataRelation.ArtistId == -1)
-                        {
-                            if(!ArtistDataRelations.Any(a => a.IsAlbumArtist && a.ArtistId == artistAlbum.ArtistId))
-                                ArtistDataRelations.Add(artistAlbum);
-                        }
-                        else
-                        {
-                            ArtistDataRelations.Remove(ArtistDataRelation);
-                            ArtistDataRelations.Add(ArtistDataRelation.Update(artistAlbum));
-                        }
-                    }
-                }
-
-                string artwork = ImageHelper.GetTrackCoverFromDirectory(DirectoryHelper.GetDirectory(file), title, albumTitle);
-
-                TrackModel Track = new()
-                {
-                    Path = file,
-                    Title = title,
-                    Duration = duration,
-                    Artists = relationList,
-                    Length = length,
-                    DiscNumber = discNumber == 0 ? 1 : discNumber,
-                    Tracknumber = trackNumber,
-                    PlayCount = 0,
-                    Rating = 0,
-                    Artwork = artwork,
-                    LastPlayed = DateTime.MinValue,
-                    IsFavorite = false,
+                    Name = UNKNOWN,
+                    Roles = new() { new(PrimaryArtistString) }
                 };
-
-                AlbumTracks.Add(Track);
-                albumLength += length;
-                previousFile = file;
-
-                foreach (string genre in genres)
-                {
-                    if(!albumGenres.Any(g => g.ToLower() == genre.ToLower()))
-                    {
-                        albumGenres.Add(genre);
-                    }
-                }
             }
 
-            // Get the last album (last file done but its album hasn't been inserted in database
-            InsertAlbum(album, albumGenres, AlbumTracks, ArtistDataRelations);
-        }       
-
-        /// <summary>
-        /// Update the artists1 data that may have changed with the added tracks and albums
-        /// </summary>
-        /// <returns></returns>
-        private async void UpdateArtistData()
-        {
-            TotalProgress = importedArtists.Count; // start a new progress
-            Progress = 0;
-            foreach (ArtistModel artist in importedArtists)
+            // find if exist or create a Various Artists model in case an album has multiple primary artists
+            ArtistModel VariousArtistModel = AllArtistsModel.Find(a => a.Name == VARIOUSARTIST);
+            if (VariousArtistModel == null)
             {
+                variousArtistNotInDb = true;
+                VariousArtistModel ??= new ArtistModel()
+                {
+                    Name = VARIOUSARTIST,
+                    Roles = new() { new(PrimaryArtistString) }
+                };
+            }
+
+            // variables to store the currently scanned album data
+            // it supposed that the each album has its own folder that contains the tracks within it
+            AlbumModel CurrentAlbum = new();
+            int CurrentAlbumIndexInAllAlbums = -1;
+            List<TagModel> CurrentAlbumNewTags = new();
+            List<TrackModel> CurrentAlbumNewTracks = new();
+
+            int primaryArtistInAlbumCount = 0;
+            string previousFile = "";
+            for (int i = 0; i < files.Count; i++)
+            {
+                CurrentFile = files[i];
                 Progress++;
 
-                if (string.IsNullOrWhiteSpace(artist.Cover))
+                // get the metadata
+                File fileMetadata = File.Create(CurrentFile);
+
+                // STEP 1: Handle Artists metadata
+                //  - Find all the artists credited and their role
+                //  - create or update the artists
+
+                // get the artists and their role
+                Dictionary<string, List<string>> artistsCreditedDic = GetArtists(fileMetadata);
+
+                // keep track of all the artist credited in this track with their specific role
+                List<TrackArtistsRoleModel> artistsCreditedInTrack = new();
+                ArtistModel primaryArtist = null;
+
+                // loop through all found artists to create or update them
+                foreach (KeyValuePair<string, List<string>> kvp in artistsCreditedDic)
                 {
-                    string cover = "";
-                    string artistFolder = DirectoryHelper.TryGetArtistDirectory(artist.Name, _folder);
-                    if (!string.IsNullOrWhiteSpace(artistFolder))
+                    ArtistModel foundArtist = AllArtistsModel.Find(a => a.Name.ToLower() == kvp.Key.ToLower());
+                    bool isPrimaryArtist = false;
+                    bool needUpdate = false;
+                    List<ArtistRoleModel> artistRoles = new List<ArtistRoleModel>();
+
+                    // new artist => create it and insert it in the db
+                    if (foundArtist == null)
                     {
-                        cover = ImageHelper.GetArtistCoverFromDirectory(artistFolder, artist.Name);
+                        foundArtist = new ArtistModel();
+                        foundArtist.Name = kvp.Key;
+                        foundArtist.Id = DataAccess.Connection.InsertArtist(foundArtist);
+                        AllArtistsModel.Add(foundArtist);
                     }
-                    artist.Cover = cover;
-                }
 
-                List<TrackModel> AllTracks = await GetArtistTracksNotInAlbums(artist.Id);
-                List<AlbumModel> AllAlbums = await DataAccess.Connection.GetAlbumsFromArtist(artist.Id);
-
-                List<AlbumModel> albums = AllAlbumsModel.Where(a => a.ContainsArtist(artist.Id)).ToList();
-
-                string coverPath = ImageHelper.CreateCoverPath(ImageHelper.CreateCoverFilename());
-                if (albums?.Count > 0)
-                {
-                    bool coverFound = true;
-
-                    albums = albums.OrderByDescending(a => a.Year).ToList(); // recent albums first
-                    if (string.IsNullOrWhiteSpace(artist.Cover) & albums.Count >= 4)
+                    // add the new roles if any
+                    foreach (string role in kvp.Value)
                     {
-                        coverFound = ImageProcessor.Merge4ImagesInOne(albums[0].AlbumCover, albums[1].AlbumCover, albums[2].AlbumCover, albums[3].AlbumCover, coverPath);
-                        if (coverFound)
+                        artistRoles.Add(new ArtistRoleModel(role));
+                        if (role == PrimaryArtistString)
                         {
-                            artist.Cover = coverPath;
+                            isPrimaryArtist = true;
+                        }
+
+                        if (!foundArtist.Roles.Any(a => a.Role.ToLower() == role.ToLower()))
+                        {
+                            needUpdate = true;
+                            foundArtist.Roles.Add(new(role));
                         }
                     }
+                    artistsCreditedInTrack.Add(new(foundArtist, artistRoles));
 
-                    if (string.IsNullOrWhiteSpace(artist.Cover))
+                    // new roles added
+                    if (needUpdate)
                     {
-                        string validAlbumCover = "";
-                        for (int i = 0; i < albums.Count; i++)
+                        // TODO changing the update artist to update the roles instead
+                        await DataAccess.Connection.UpdateArtist(foundArtist);
+                    }
+
+                    // Keep track of the primary artists to later compare it with
+                    // the primary artist of the CurrentAlbum
+                    if(isPrimaryArtist)
+                    {
+                        primaryArtist = foundArtist;
+                    }
+                }
+                // primary artist not found
+                primaryArtist ??= UnknownArtistModel;
+
+                // STEP 2: Handle Album metadata
+                //  - Find if the album has changed
+                //  -> changed
+                //      - Create or update the CurrentAlbum in the db
+                //      - Insert all the tracks from this album in the db
+                //      - Create the new Album model
+                //          -> get the main info (title, release date, copyright)
+                //          -> try to get the cover embedded or in the folder
+                //  -> NOT changed
+                //      - update the CurrentAlbum primary artists if needed
+                //  - update the CurrentAlbum data if new information is found
+
+                string albumName = fileMetadata.Tag.Album;
+                if (string.IsNullOrWhiteSpace(albumName))
+                {   // use the folder name containing the file as the album name
+                    albumName = DirectoryHelper.GetFolderName(CurrentFile); 
+                }
+
+                int year = (int)fileMetadata.Tag.Year;
+                string copyright = fileMetadata.Tag.Copyright;
+
+                // The Album has changed
+                if(CurrentAlbum.Name != albumName && CurrentFile.GetDirectory() != previousFile.GetDirectory())
+                {
+                    // make sure the UNKNOWN and VARIOUS ARTISTS artists models are inserted in the db if used
+                    if(CurrentAlbum.PrimaryArtist.Name == UNKNOWN && unknownArtistNotInDb)
+                    {
+                        CurrentAlbum.PrimaryArtist.Id = DataAccess.Connection.InsertArtist(CurrentAlbum.PrimaryArtist);
+                        UnknownArtistModel.Id = CurrentAlbum.PrimaryArtist.Id;
+                        unknownArtistNotInDb = false;
+                    }
+                    else if (CurrentAlbum.PrimaryArtist.Name == VARIOUSARTIST && variousArtistNotInDb)
+                    {
+                        CurrentAlbum.PrimaryArtist.Id = DataAccess.Connection.InsertArtist(CurrentAlbum.PrimaryArtist);
+                        VariousArtistModel.Id = CurrentAlbum.PrimaryArtist.Id;
+                        variousArtistNotInDb = false;
+                    }
+
+                    // insert or update the album
+                    InsertAlbum(CurrentAlbum, CurrentAlbumNewTracks, CurrentAlbumNewTags);
+                    AllAlbumsModel.Add(CurrentAlbum);
+
+                    // reset some variables for the new album
+                    CurrentAlbumNewTags = new();
+                    CurrentAlbumNewTracks = new();
+                    primaryArtistInAlbumCount = 0;
+
+
+                    // try to find if the new currently scanned album is already in the db
+                    CurrentAlbumIndexInAllAlbums = AllAlbumsModel.FindIndex(a => 
+                            a.Name.ToLower() == albumName && 
+                            a.PrimaryArtist.Name.ToLower() == primaryArtist.Name.ToLower()
+                        );
+                    if(CurrentAlbumIndexInAllAlbums == -1)
+                    {
+                        // not found, Create a new album 
+                        CurrentAlbum = CurrentAlbum = new()
                         {
-                            if (!string.IsNullOrWhiteSpace(albums[i].AlbumCover))
+                            Name = albumName,
+                            ReleaseDate = year,
+                            Copyright = copyright,
+                            AlbumCover = GetAlbumCover(fileMetadata, CurrentFile, albumName),
+                            PrimaryArtist = primaryArtist,
+                        };
+                    }
+                    else
+                    {
+                        // found, take its data
+                        CurrentAlbum = AllAlbumsModel[CurrentAlbumIndexInAllAlbums];
+                    }
+
+                }
+                // the album didn't have a known primary artist but now has
+                else if(CurrentAlbum.PrimaryArtist.Name == PrimaryArtistString && primaryArtist.Name != PrimaryArtistString)
+                {
+                    CurrentAlbum.PrimaryArtist = primaryArtist;
+                }
+                // the album has a different primary artists from the current one => may be a "various artist" album
+                else if (primaryArtist.Name != PrimaryArtistString && CurrentAlbum.PrimaryArtist.Name.ToLower() != primaryArtist.Name.ToLower())
+                {
+                    primaryArtistInAlbumCount++;
+                    if (primaryArtistInAlbumCount == 3) // at least 3 artists needed to be categorized as Various Artists
+                    {
+                        CurrentAlbum.VariousArtists = true;
+                        CurrentAlbum.PrimaryArtist = VariousArtistModel;
+                    }
+                }
+
+                // update any new data for the album
+                if (CurrentAlbum.ReleaseDate == 0)
+                {
+                    CurrentAlbum.ReleaseDate = year;
+                }
+                if (string.IsNullOrWhiteSpace(CurrentAlbum.Copyright))
+                {
+                    CurrentAlbum.Copyright = copyright;
+                }
+                if (string.IsNullOrWhiteSpace(CurrentAlbum.AlbumCover))
+                {
+                    CurrentAlbum.AlbumCover = GetAlbumCover(fileMetadata, CurrentFile, albumName);
+                }
+
+
+                // STEP 3: Handle Track related metadata
+                //  - Create the new track model
+                //      -> Try to find an artwork specific for this track in the folder
+                //      -> Try to get the lyrics embedded in the track
+                //  - Add the track to the lists and update the CurrentAlbum Length
+
+                TrackModel currentTrack = CreateTrackModel(fileMetadata);
+                currentTrack.Artists = artistsCreditedInTrack;
+                currentTrack.Artwork = ImageHelper.GetTrackCoverFromDirectory(DirectoryHelper.GetDirectory(CurrentFile), currentTrack.Title, CurrentAlbum.Name);
+                string lyrics = fileMetadata.Tag.Lyrics;
+                if(!string.IsNullOrWhiteSpace(lyrics))
+                {
+                    LyricsModel lyricsModel = new()
+                    {
+                        Lyrics = lyrics,
+                        IsFromUser = true,
+                        IsSaved = true,
+                        IsTimed = false,
+                    };
+                    currentTrack.Lyrics = lyricsModel;
+                }
+
+                CurrentAlbumNewTracks.Add(currentTrack);
+                CurrentAlbum.Tracks.Add(currentTrack);
+                CurrentAlbum.Length += currentTrack.Length;
+
+                // STEP 4 : Handle Genres / Tags
+                //  - create new tags if they are not in the db
+                //  - add the new tags to the album tags
+
+                string[] tags = fileMetadata.Tag.Genres;
+                foreach (string tag in tags)
+                {
+                    string formattedTag = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(tag.Trim().FormatTag());
+
+                    if (!CurrentAlbum.Tags.Any(t => t.Name.ToLower() == formattedTag.ToLower()))
+                    {
+                        TagModel foundTag = AllTagsModel.Find(t => t.Name.ToLower() == formattedTag.ToLower());
+                        if(foundTag == null)
+                        {
+                            foundTag = new()
                             {
-                                validAlbumCover = albums[i].AlbumCover;
-                                break;
-                            }
+                                Name = formattedTag,
+                            };
+                            foundTag.Id = DataAccess.Connection.InsertTag(foundTag);
                         }
-                        if (!string.IsNullOrWhiteSpace(validAlbumCover))
-                        {
-                            artist.Cover = validAlbumCover;
-                        }
-                        else
-                        {
-                            artist.Cover = "";
-                        }
+
+                        CurrentAlbum.Tags.Add(foundTag);
+                        CurrentAlbumNewTags.Add(foundTag);
                     }
                 }
-                else if (AllTracks.Count > 0)
-                {
-                    AlbumModel album = await DataAccess.Connection.GetAlbum(AllTracks[0].AlbumId);
-                    artist.Cover = album.AlbumCover;
-                }
 
-                if (!artist.IsPerformer && !artist.IsAlbumArtist && !artist.IsComposer && !artist.IsFeatured && !artist.IsLyricist)
-                {
-                    // artist has no data, there may have been an error
-                    //Debug.WriteLine($"Artist has no data and is removed from database: {artist.Name}");
-                    await DataAccess.Connection.DeleteArtist(artist.Id);
-                }
-                else
-                {
-                    await DataAccess.Connection.UpdateArtistCover(artist);
-                    await DataAccess.Connection.UpdateArtist(artist);
-                }
+                _fileImportedCount++;
+                previousFile = CurrentFile;
             }
+
+            // for the last album (it ends the loop without being inserter/updated)
+            InsertAlbum(CurrentAlbum, CurrentAlbumNewTracks, CurrentAlbumNewTags);
         }
 
-        private async void InsertAlbum(AlbumModel album, List<string> genres, List<TrackModel> tracks, List<ArtistDataRelation> ArtistDataRelations)
+        private TrackModel CreateTrackModel(File fileMetadata)
         {
-            if (!string.IsNullOrWhiteSpace(album.Name)) // valid album name
+            string title = fileMetadata.Tag.Title;
+            if (string.IsNullOrWhiteSpace(title))
             {
-                album.Artists = ArtistDataRelations;
-
-                tracks.GetTotalLength(out int length);
-                if(tracks.Count < 4 && length < 11 * 60 * 1000) // less than 11 minutes
-                {
-                    album.IsSingle = true;
-                }
-                else if(tracks.Count > 4 && tracks.Count < 8 && length < 30 * 60 * 1000) // less than 30 minutes
-                {
-                    album.IsEP = true;
-                }
-
-                // insert the model in the database and get its id
-                album.Id = await DataAccess.Connection.InsertAlbum(album);
-
-                // insert all genres 
-                // if new genre found it's inserted in the database
-                if (genres != null && genres.Count > 0)
-                {
-                    foreach (string g in genres)
-                    {
-                        if (!string.IsNullOrWhiteSpace(g))
-                        {
-                            string curGenre = g.ToLower();
-                            if (!AllGenres.Any(ag => ag.Name.ToLower() == curGenre)) // not in the database
-                            {
-                                TagModel genreModel = new() { Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(curGenre) };
-                                genreModel.Id = await DataAccess.Connection.InserTag(genreModel);
-                                AllGenres.Add(genreModel);
-
-                                // insert the album genres
-                                await DataAccess.Connection.InsertAlbumTag(album.Id, genreModel.Id);
-
-                            }
-                            else
-                            {
-                                // Find and insert the album genres
-                                await DataAccess.Connection.InsertAlbumTag(album.Id, AllGenres.Find(ag => ag.Name.ToLower() == curGenre).Id);
-                            }
-                        }
-                    }
-                }
-
-                // Update all the tracks in the album with the albumId and insert them in the database and add to the list
-                foreach (TrackModel t in tracks)
-                {
-                    t.AlbumId = album.Id;
-                    t.Id = await DataAccess.Connection.InsertTrack(t);
-                    AllTracksModel.Add(t);
-                }
-
-                // Add the model with the id in the list
-                AllAlbumsModel.Add(album);
-            }
-        }
-
-        private static async Task<bool> CheckArtistBool(ArtistModel artist, List<bool> booleans)
-        {
-            bool updated = false;
-            if (booleans[0] && !artist.IsAlbumArtist) // album artist
-            {
-                artist.IsAlbumArtist = true;
-                updated = true;
+                title = Path.GetFileNameWithoutExtension(CurrentFile); // use the file name as the title of the track
             }
 
-            if (booleans[1] && !artist.IsComposer) // composer
+            string duration = TagHelper.ToFormattedString(fileMetadata.Properties.Duration);
+            int length = (int)fileMetadata.Properties.Duration.TotalMilliseconds;
+            int discNumber = (int)fileMetadata.Tag.Disc;
+            int trackNumber = (int)fileMetadata.Tag.Track;
+
+            return new()
             {
-                artist.IsComposer = true;
-                updated = true;
-            }
-
-            if (booleans[2] && !artist.IsPerformer) // performer
-            {
-                artist.IsPerformer = true;
-                updated = true;
-            }
-
-            if (booleans[3] && !artist.IsFeatured) // featured 
-            {
-                artist.IsFeatured = true;
-                updated = true;
-            }
-
-            if (booleans[4] && !artist.IsLyricist) // lyricist
-            {
-                artist.IsLyricist = true;
-                updated = true;
-            }
-
-            if (updated)
-            {
-                await DataAccess.Connection.UpdateArtist(artist);
-            }
-            return updated;
-        }
-
-        private Dictionary<string, List<bool>> GetArtists(File audioTags, string filePath)
-        {
-            Dictionary<string, List<bool>> AlbumArtist = CreateArtistDic(audioTags.Tag.AlbumArtists.ToList(), new List<bool>() { true, false, false, false, false});
-            Dictionary<string, List<bool>> Composer = CreateArtistDic(audioTags.Tag.Composers.ToList(), new List<bool>() { false, true, false, false, false });
-            Dictionary<string, List<bool>> Performer = CreateArtistDic(audioTags.Tag.Performers.ToList(), new List<bool>() { false, false, true, false, false });
-            // featured
-            // lyricist
-
-            Dictionary<string, List<bool>> description = TagHelper.ReadDescription(audioTags.Tag.Description);
-
-            List<Dictionary<string, List<bool>>> ArtistsDic = new()
-            {
-                AlbumArtist,
-                Composer,
-                Performer,
-                description,
+                Path = CurrentFile,
+                Title = title,
+                Duration = duration,
+                Length = length,
+                DiscNumber = discNumber == 0 ? 1 : discNumber,
+                TrackNumber = trackNumber,
+                PlayCount = 0,
+                Rating = 0,
+                LastPlayed = DateTime.MinValue,
+                IsFavorite = false,
             };
+        }
 
-            // get all artists formatted with their correct bool values
-            return FormatArtistsDictionary(audioTags, ArtistsDic);
+        /// <summary>
+        /// Insert or update the album, insert the new tracks and new tags relation
+        /// </summary>
+        /// <param name="album"></param>
+        /// <param name="newTracks"></param>
+        /// <param name="newTags"></param>
+        private void InsertAlbum(AlbumModel album, List<TrackModel> newTracks, List<TagModel> newTags)
+        {
+            if (string.IsNullOrWhiteSpace(album.Name))
+                return; // invalid album name
+
+            if (album.Tracks.Count < 4 && album.Length < 11 * 60 * 1000) // less than 11 minutes
+            {
+                album.Type = AlbumType.Single; // max 3 tracks for a single because there may be multiple versions => instrumental, remix...
+            }
+            else if (album.Tracks.Count > 4 && album.Tracks.Count < 8 && album.Length < 30 * 60 * 1000) // less than 30 minutes
+            {
+                album.Type = AlbumType.EP;
+            }
+            else
+            {
+                album.Type = AlbumType.Main;
+            }
+
+            // new Album
+            if(album.Id == -1)
+            {
+                // insert the model in the database and get its id
+                album.Id = DataAccess.Connection.InsertAlbum(album);
+            }
+            else
+            {
+                // the fact that this method is called means that there are new tracks and consequently the album needs to be updated
+                DataAccess.Connection.UpdateAlbum(album);
+            }
+
+            // insert new tracks to db
+            foreach (TrackModel track in newTracks)
+            {
+                track.Album = album;
+                track.Id = DataAccess.Connection.InsertTrack(track);
+                AllTracksModel.Add(track);
+            }
+
+            foreach (TagModel tag in newTags)
+            {
+                DataAccess.Connection.InsertAlbumTag(album.Id, tag.Id);
+            }
+        }
+
+        private static Dictionary<string, List<string>> GetArtists(File audioTags)
+        {
+            // artists Name => artists roles (primary Artist, Performer, producer, mixer, Arranger...)
+            Dictionary<string, List<string>> artists = new Dictionary<string, List<string>>();
+
+            TagHelper.AddArtistsToDic(audioTags.Tag.AlbumArtists.ToList(), artists, "Primary Artist");
+            TagHelper.AddArtistsToDic(audioTags.Tag.Composers.ToList(), artists, "Composer");
+            TagHelper.AddArtistsToDic(audioTags.Tag.Performers.ToList(), artists, "Performer");
+            
+            TagHelper.AddArtistsToDic(new List<string>() { audioTags.Tag.Conductor }, artists, "Conductor");
+            TagHelper.AddArtistsToDic(new List<string>() { audioTags.Tag.RemixedBy }, artists, "Remixer");
+
+            TagHelper.ReadDescription(audioTags.Properties.Description, artists);
+            TagHelper.ReadDescription(audioTags.Tag.Description, artists);
+            TagHelper.ReadDescription(audioTags.Tag.Comment, artists);
+
+            return artists;
         }
 
         private static Dictionary<string, List<bool>> CreateArtistDic(List<string> artists, List<bool> values)
@@ -669,101 +581,6 @@ namespace MusicFilesProcessor
             }
 
             return output;
-        }
-
-        private Dictionary<string, List<bool>> FormatArtistsDictionary(File audioTags, List<Dictionary<string, List<bool>>> artists)
-        {
-            Dictionary<string, List<bool>> output = new();
-            for (int i = 0; i < artists.Count; i++)
-            {
-                foreach (KeyValuePair<string, List<bool>> kvp in artists[i])
-                {
-                    string artistName = RemoveDiacritics(kvp.Key.Trim());
-                    if (string.IsNullOrWhiteSpace(kvp.Key))
-                    {
-                        artistName = audioTags.Tag.Publisher;
-                        if (string.IsNullOrWhiteSpace(artistName))
-                        {
-                            artistName = UNKNOWN;
-                        }
-                        artistName.Trim();
-                    }
-
-                    if (artistName.Contains('&'))
-                    {
-                        List<string> splittedArtists = artistName.Split("&").ToList();
-
-                        artistName = splittedArtists[0].Trim();
-
-                        string secondArtist = splittedArtists[1].Trim();
-                        secondArtist = TagHelper.FormatTag(secondArtist);
-
-                        if (!secondArtist.Contains("..."))
-                        {
-                            if (artistName == VARIOUSARTIST && !kvp.Value[0])
-                                continue;
-
-                            InsertArtistInDic(ref output, secondArtist, kvp.Value);
-                        }
-                    }
-
-                    artistName = TagHelper.FormatTag(artistName);
-
-                    if (!artistName.Contains("..."))
-                    {
-                        if (artistName == VARIOUSARTIST && !kvp.Value[0])
-                            continue;
-
-                        InsertArtistInDic(ref output, artistName, kvp.Value);
-                    }
-                }
-            }
-            return output;
-        }
-
-        private static void InsertArtistInDic(ref Dictionary<string, List<bool>> dic, string key, List<bool> values)
-        {
-            if (!dic.Any(a => a.Key.ToLower() == key.ToLower()))
-            {
-                // not in the dictionnay insert it
-                dic.Add(key, values);
-            }
-            else // update
-            {
-                string realKey = key;
-                if (!dic.ContainsKey(key))
-                {
-                    realKey = dic.Where(a => a.Key.ToLower() == key.ToLower()).ToList()[0].Key;
-                }
-
-                List<bool> Ovalues = dic[realKey];
-                for (int y = 0; y < 5; y++)
-                {
-                    Ovalues[y] = Ovalues[y] || values[y]; // keep true value only
-                }
-
-                dic[key] = Ovalues;
-            }
-        }
-
-        private static string RemoveDiacritics(string text)
-        {
-            string normalizedString = text.Normalize(NormalizationForm.FormD);
-            StringBuilder stringBuilder = new StringBuilder(capacity: normalizedString.Length);
-
-            for (int i = 0; i < normalizedString.Length; i++)
-            {
-                char c = normalizedString[i];
-                UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
-                {
-                    stringBuilder.Append(c);
-                }
-            }
-
-            return stringBuilder
-                .ToString()
-                .Normalize(NormalizationForm.FormC);
         }
 
         private string GetAlbumCover(File audioTags, string file, string album)
@@ -823,28 +640,6 @@ namespace MusicFilesProcessor
                 }
             }
             return "";
-        }
-
-        public static async Task<List<TrackModel>> GetArtistTracksNotInAlbums(int artistId)
-        {
-            var Albums = await DataAccess.Connection.GetAlbumsFromArtist(artistId);
-            var Tracks = await DataAccess.Connection.GetTracksFromArtist(artistId);
-            //Tracks.ForEach(t => t.ArtistId = artistId);
-            Tracks = Tracks.Where(t => !Albums.Any(a => a.Id == t.AlbumId)).ToList();
-            List<TrackModel> albumsId = Tracks.DistinctBy(t => t.AlbumId).ToList();
-            foreach (TrackModel track in albumsId)
-            {
-                AlbumModel album = await DataAccess.Connection.GetAlbum(track.AlbumId);
-                foreach (TrackModel t in Tracks)
-                {
-                    if (t.AlbumId == album.Id)
-                    {
-                        t.AlbumCover = album.AlbumCover;
-                        t.AlbumName = album.Name;
-                    }
-                }
-            }
-            return Tracks;
         }
     }
 }

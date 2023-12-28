@@ -127,7 +127,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             {
                 if (IsCreate)
                 {
-                    int id = await PlaylistsFactory.CreatePlaylist(PlaylistName, PlaylistDescription.Trim(), PlaylistCover);
+                    int id = PlaylistsFactory.CreatePlaylist(PlaylistName, PlaylistDescription.Trim(), PlaylistCover);
                     MessageHelper.PublishMessage(PlaylistName.PlaylistCreatedWithAction(async (bool confirm) =>
                     {
                         if(confirm)

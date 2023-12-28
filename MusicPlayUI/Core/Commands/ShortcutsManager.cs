@@ -15,7 +15,7 @@ namespace MusicPlayUI.Core.Commands
     public class ShortcutsManager
     {
         public static readonly int SettingsEnumStartCommandEnum = 100;
-        public static readonly int ShortcutQuantity = 27;
+        public static readonly int ShortcutQuantity = 26;
         private readonly ICommandsManager _commandsManager; // command manager that define all the commands
         private readonly Window _window; // window to listen to the key down event from
 
@@ -212,7 +212,6 @@ namespace MusicPlayUI.Core.Commands
                 CommandEnums.Artists => new(Key.A, _commandsManager.NavigateCommand, (int)ViewNameEnum.Artists, CommandEnums.Artists),
                 CommandEnums.Playlists => new(Key.P, _commandsManager.NavigateCommand, (int)ViewNameEnum.Playlists, CommandEnums.Playlists),
                 CommandEnums.NowPlaying => new(Key.N, _commandsManager.NavigateCommand, (int)ViewNameEnum.NowPlaying, CommandEnums.NowPlaying),
-                CommandEnums.Import => new(Key.I, _commandsManager.NavigateCommand, (int)ViewNameEnum.Import, CommandEnums.Import),
                 CommandEnums.Settings => new(Key.S, ModifierKeys.Alt, _commandsManager.NavigateCommand, (int)ViewNameEnum.Settings, CommandEnums.Settings),
                 CommandEnums.NavigateBack => new(Key.B, _commandsManager.NavigateBackCommand, CommandEnums.NavigateBack),
                 CommandEnums.EscapeFullScreen => new(Key.Escape, _commandsManager.EscapeFullScreenCommand, CommandEnums.EscapeFullScreen),

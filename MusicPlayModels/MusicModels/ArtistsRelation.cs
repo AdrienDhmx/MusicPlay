@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MusicPlayModels.MusicModels
 {
-    public abstract class ArtistsRelation : DatedModel
+    public abstract class ArtistsRelation : PlayableModel
     {
         public List<ArtistDataRelation> Artists { get; set; } = new();
 

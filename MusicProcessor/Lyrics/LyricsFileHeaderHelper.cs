@@ -120,10 +120,10 @@ namespace MusicFilesProcessor.Lyrics.Helper
 
         /// <summary>
         /// For every timedLyricsLineModel in the list create its string representation:
-        /// line = LengthInMilliseconds + separator + Lyrics.
+        /// _line = LengthInMilliseconds + separator + Lyrics.
         /// </summary>
         /// <param name="timedLyricsLines"></param>
-        /// <returns> A list of string representing each line of the lyrics with its time in milliseconds. </returns>
+        /// <returns> A list of string representing each _line of the lyrics with its time in milliseconds. </returns>
         public static List<string> ConvertToString(this List<TimedLyricsLineModel> timedLyricsLines)
         {
             List<string> output = new List<string>();

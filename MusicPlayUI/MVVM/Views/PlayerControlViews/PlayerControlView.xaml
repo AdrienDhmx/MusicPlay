@@ -122,13 +122,10 @@
 
                                 <!-- Title -->
                                 <TextBlock Text="{Binding QueueService.PlayingTrack.Title}"
-                                        Style="{DynamicResource SLStyle}"
+                                        Style="{DynamicResource SStyle}"
                                             MaxWidth="{Binding ActualWidth, ElementName=PlayingTrackInfoGrid, Converter={StaticResource SubstractionConverter}, ConverterParameter=40}"
                                             Margin="0,0,5,0"
                                         MaxHeight="30">
-                                    <TextBlock.InputBindings>
-                                        <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToAlbumCommand}"/>
-                                    </TextBlock.InputBindings>
                                 </TextBlock>
 
                                 <!-- Favorite -->
@@ -382,11 +379,12 @@
                                                     Margin="0,0,0,5"
                                                 IconWidth="25"
                                                 IconHeight="25"
+                                                Width="28"
                                                     FillColor="{DynamicResource OnPrimaryContainer}"
                                                     Command="{Binding MuteCommand}">
                                 <iconbtn:IconButton.Style>
                                     <Style TargetType="iconbtn:IconButton"
-                                            BasedOn="{StaticResource BaseIconButton}">
+                                            BasedOn="{StaticResource NormalIconBtn}">
                                         <Setter Property="Icon" Value="{DynamicResource VolumeFullIcon}"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding VolumePercentage, Converter={StaticResource LowerThanConverter}, ConverterParameter=60}" Value="true">

@@ -101,9 +101,26 @@
             </ItemsControl>
         </Border>
 
-        <Border Grid.Column="1"
+        <Grid Grid.Column="1"
                 Background="Transparent">
-            <ContentControl Content="{Binding NavigationService.SecondaryViewModel}"/>
-        </Border>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Border Background="{DynamicResource Background}"
+            Effect="{DynamicResource PageHeaderDropShadow}"/>
+
+            <Border Style="{DynamicResource PageHeaderBackgroundLight}"
+                Grid.RowSpan="1"/>
+
+            <TextBlock Text="{Binding SelectedSetting.SettingName}"
+                      Style="{DynamicResource SLargeHeaderStyle}"
+                       HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+            <ContentControl Content="{Binding NavigationService.SecondaryViewModel}"
+                            Grid.Row="1"/>
+        </Grid>
     </Grid>
 </UserControl>

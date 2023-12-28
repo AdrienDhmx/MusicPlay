@@ -79,13 +79,12 @@ namespace MusicPlayUI.Core.Enums
         Artists = 117,
         Playlists = 118,
         NowPlaying = 119,
-        Import = 120,
-        Settings = 121,
-        Back = 122,
-        ToggleQueueDrawer = 123,
-        EscapeFullScreen = 124,
-        ToggleFullScreen = 125,
-        ToggleTheme = 126,
+        Settings = 120,
+        Back = 121,
+        ToggleQueueDrawer = 122,
+        EscapeFullScreen = 123,
+        ToggleFullScreen = 124,
+        ToggleTheme = 125,
 
 
         // DSP settings

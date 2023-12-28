@@ -118,24 +118,24 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        internal async void AddToTag(TagModel tag, BaseModel data)
+        internal void AddToTag(TagModel tag, BaseModel data)
         {
             switch (data)
             {
                 case AlbumModel:
-                    await DataAccess.Connection.InsertAlbumTag(data.Id, tag.Id);
+                    DataAccess.Connection.InsertAlbumTag(data.Id, tag.Id);
                     MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as AlbumModel).Name, tag.Name));
                     break;
                 case ArtistModel:
-                    await DataAccess.Connection.InsertArtistTag(data.Id, tag.Id);
+                    DataAccess.Connection.InsertArtistTag(data.Id, tag.Id);
                     MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as ArtistModel).Name, tag.Name));
                     break;
                 case PlaylistModel:
-                    await DataAccess.Connection.InsertPlaylistTag(data.Id, tag.Id);
+                    DataAccess.Connection.InsertPlaylistTag(data.Id, tag.Id);
                     MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as PlaylistModel).Name, tag.Name));
                     break;
                 case TrackModel:
-                    await DataAccess.Connection.InsertTrackTag(data.Id, tag.Id);
+                    DataAccess.Connection.InsertTrackTag(data.Id, tag.Id);
                     MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as TrackModel).Title, tag.Name));
                     break;
                 default:
@@ -151,13 +151,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         internal void CreateTag(BaseModel dataToAddToNewTag)
         {
-            Action<string> createTag = async (string newName) =>
+            static void CreateTag(string newName)
             {
                 TagModel tag = new();
                 tag.Name = newName;
-                await DataAccess.Connection.InserTag(tag);
-            };
-            CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, createTag, null);
+                DataAccess.Connection.InsertTag(tag);
+            }
+            CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, CreateTag, null);
             _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => OnCreateTagClosed(canceled, dataToAddToNewTag), model);
         }
 

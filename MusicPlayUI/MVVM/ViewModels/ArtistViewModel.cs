@@ -455,7 +455,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 {
                     bool isAlbumArtist = album.IsAlbumArtist(Artist.Id);
                     bool isFeatured = album.IsFeatured(Artist.Id, true);
-                    bool isAlbum = album.IsAlbum();
+                    bool isAlbum = album.IsMainAlbum();
 
                     if (isAlbumArtist)
                     {

@@ -889,15 +889,6 @@ namespace MusicPlay.Language {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Scan Library.
-        /// </summary>
-        public static string Import_Library_View {
-            get {
-                return ResourceManager.GetString("Import_Library_View", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Looking for Artists....
         /// </summary>
         public static string ImportMsg1 {
@@ -1636,7 +1627,7 @@ namespace MusicPlay.Language {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Scan Folder.
+        ///   Looks up a localized string similar to Scan all Folders.
         /// </summary>
         public static string ScanFolder {
             get {
@@ -1740,6 +1731,15 @@ namespace MusicPlay.Language {
         public static string Starting_View_Setting_Dscpt {
             get {
                 return ResourceManager.GetString("Starting_View_Setting_Dscpt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Storage.
+        /// </summary>
+        public static string Storage {
+            get {
+                return ResourceManager.GetString("Storage", resourceCulture);
             }
         }
         

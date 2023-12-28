@@ -80,6 +80,9 @@ namespace MusicPlayUI.Core.Services
                 case ViewNameEnum.UpdateShortcut:
                     Modal = _viewFactory.Invoke(typeof(UpdateShortcutViewModel));
                     break;
+                case ViewNameEnum.EditFolder:
+                    Modal = _viewFactory.Invoke(typeof(EditFolderViewModel));
+                    break;
             }
         }
 

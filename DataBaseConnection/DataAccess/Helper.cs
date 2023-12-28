@@ -166,14 +166,17 @@ namespace DataBaseConnection.DataAccess
         /// </summary>
         /// <param name="query"></param>
         /// <returns>the id of the inserted row</returns>
-        public static Task<int> InsertAsync(this Query query, bool getId = true)
+        public static int InsertAsync(this Query query, bool getId = true)
         {
             SqlResult sqlResult = query.Compile();
 
             if(getId)
                 sqlResult.Sql += " RETURNING Id";
 
-            Func<Task<int>> func = () => Connection.ExecuteScalarAsync<int>(sqlResult.Sql, sqlResult.Bindings.CreateDynamicsParameters());
+            Func<int> func = () =>
+            {
+                return Connection.ExecuteScalar<int>(sqlResult.Sql, sqlResult.Bindings.CreateDynamicsParameters());
+            };
 
             return func.ExecuteSafely();
         }

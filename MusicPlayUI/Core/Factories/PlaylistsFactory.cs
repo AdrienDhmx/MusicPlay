@@ -89,7 +89,7 @@ namespace MusicPlayUI.Core.Factories
         /// <param name="description"></param>
         /// <param name="cover"></param>
         /// <returns>in order: valid name, valid cover, valid cover</returns>
-        public static Task<int> CreatePlaylist(this string name, string description, string cover)
+        public static int CreatePlaylist(this string name, string description, string cover)
         {
             if (cover.ValidPath())
             {
@@ -128,7 +128,7 @@ namespace MusicPlayUI.Core.Factories
         /// <param name="description"></param>
         /// <param name="cover"></param>
         /// <returns>in order: valid, idr</returns>
-        public static async Task<int> CreatePlaylist(this string name, string cover)
+        public static int CreatePlaylist(this string name, string cover)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return -1;
@@ -152,7 +152,7 @@ namespace MusicPlayUI.Core.Factories
             playlist.Duration = "00:00";
             playlist.PlaylistType = PlaylistTypeEnum.UserPlaylist;
 
-            return await DataAccess.Connection.InsertPlaylist(playlist);
+            return DataAccess.Connection.InsertPlaylist(playlist);
         }
     }
 }

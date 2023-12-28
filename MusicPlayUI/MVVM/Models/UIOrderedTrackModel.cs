@@ -144,7 +144,7 @@ namespace MusicPlayUI.MVVM.Models
 
             foreach (TrackModel track in tracks)
             {
-                output.Add(new(track, track.Tracknumber, albumCover, autoCover));
+                output.Add(new(track, track.TrackNumber, albumCover, autoCover));
             }
 
             return output;

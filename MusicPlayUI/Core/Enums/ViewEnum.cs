@@ -52,6 +52,7 @@ namespace MusicPlayUI.Core.Enums
         GenreProperties = 46,
         UpdateShortcut = 47,
         CreateTag = 48,
+        EditFolder = 49,
 
         // PopupViewModel Views
         TrackPopup = 50,

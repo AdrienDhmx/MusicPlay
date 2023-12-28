@@ -31,6 +31,7 @@ namespace MusicPlayUI.Core.Factories
         public static void RegisterMessagesStyles()
         {
             DefaultMessageFactory.RegisterErrorMessageStyle(MessageColors.ErrorContainer, MessageColors.OnErrorContainer, MessageColors.ErrorHover, ErrorIcon);
+            DefaultMessageFactory.RegisterWarningMessageStyle(MessageColors.WarningContainer, MessageColors.OnWarningContainer, MessageColors.WarningHover, ErrorIcon);
             DefaultMessageFactory.RegisterSuccessMessageStyle(MessageColors.SuccessContainer, MessageColors.OnSuccessContainer, MessageColors.SuccessHover, SuccessIcon);
         }
 

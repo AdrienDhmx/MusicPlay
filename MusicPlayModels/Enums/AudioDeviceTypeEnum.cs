@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AudioHandler.Enums
+namespace MusicPlayModels.Enums
 {
-    public enum DeviceTypeEnum
+    public enum AudioDeviceTypeEnum
     {
         UNKNOWN = -1,
 

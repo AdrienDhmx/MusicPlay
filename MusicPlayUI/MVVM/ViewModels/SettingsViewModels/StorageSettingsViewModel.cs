@@ -4,6 +4,7 @@ using MessageControl;
 using MusicFilesProcessor;
 using MusicFilesProcessor.Helpers;
 using MusicPlay.Language;
+using MusicPlayModels.StatsModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -11,45 +12,33 @@ using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 
-namespace MusicPlayUI.MVVM.ViewModels
+namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 {
-    public class ImportLibraryViewModel : ViewModel
+    public class StorageSettingsViewModel : SettingsViewModel
     {
         private readonly IAudioPlayback _audioPlayback;
         private readonly IQueueService _queueService;
         private readonly IModalService _modalService;
 
-        public ImportMusicLibrary ImportMusic { get; private set; }
+        private StorageService _storageSettings => StorageService.Instance;
 
-        private string _currentDirectory = DirectoryHelper.MusicFolder;
-        public string CurrentDirectory
+        private ObservableCollection<FolderModel> _folders;
+        public ObservableCollection<FolderModel> Folders
         {
-            get { return _currentDirectory; }
-            set
-            {
-                _currentDirectory = value;
-                OnPropertyChanged(nameof(CurrentDirectory));
-            }
+            get => _folders;
+            set => SetField(ref _folders, value);
         }
 
-        private string _changedDirectory = "";
-        public string ChangedDirectory
-        {
-            get { return _changedDirectory; }
-            set
-            {
-                _changedDirectory = value;
-                OnPropertyChanged(nameof(ChangedDirectory));
-            }
-        }
-
-        private int _importValue = 0;
-        public int ImportValue
+        private double _importValue = 0;
+        public double ImportValue
         {
             get { return _importValue; }
             set
@@ -70,14 +59,14 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private string _currentFile = "";
-        public string CurrentFile
+        private string _currentInfo = "";
+        public string CurrentInfo
         {
-            get { return _currentFile; }
+            get { return _currentInfo; }
             set
             {
-                _currentFile = value;
-                OnPropertyChanged(nameof(CurrentFile));
+                _currentInfo = value;
+                OnPropertyChanged(nameof(CurrentInfo));
             }
         }
 
@@ -103,27 +92,39 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        public ICommand ScanDirectoryCommand { get; }
+        public ICommand AddFolderCommand { get; }
+        public ICommand ScanFolderCommand { get; }
+        public ICommand ScanAllFoldersCommand { get; }
+        public ICommand EditFolderCommand { get; }
+        public ICommand RemoveFolderCommand { get; }
         public ICommand ClearDataBaseCommand { get; }
-        public ICommand ApplyDirectoryCommand { get; }
-        public ImportLibraryViewModel(IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService)
+        public StorageSettingsViewModel(IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService, INavigationService navigationService, IWindowService windowService) : base(navigationService, windowService)
         {
             _audioPlayback = audioPlayback;
             _queueService = queueService;
-            
             _modalService = modalService;
 
-            ScanDirectoryCommand = new RelayCommand(() =>
+            ScanFolderCommand = new RelayCommand<FolderModel>((folder) => Task.Run(() => _storageSettings.ScanFolder(folder)));
+
+            ScanAllFoldersCommand = new RelayCommand(() => Task.Run(() => _storageSettings.ScanFolders()));
+
+            EditFolderCommand = new RelayCommand<FolderModel>((folder) =>
             {
-                  ScanDirectory();
+                _modalService.OpenModal(ViewNameEnum.EditFolder, (canceled) => { }, folder);
+            });
+
+            RemoveFolderCommand = new RelayCommand<FolderModel>((folder) =>
+            {
+                _storageSettings.RemoveFolder(folder);
+                Folders = new(_storageSettings.Folders);
             });
 
             ClearDataBaseCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.ConfirmAction, ClearDataBase, ConfirmActionModelFactory.CreateConfirmClearDataBaseModel()));
 
-            ApplyDirectoryCommand = new RelayCommand(() =>
+            AddFolderCommand = new RelayCommand(() =>
             {
                 FolderDialogue folderDialogue = new();
-                folderDialogue.InputPath = CurrentDirectory;
+                folderDialogue.InputPath = DirectoryHelper.MusicFolder;
                 folderDialogue.Title = "Choose a Folder";
 
                 if (folderDialogue.ShowDialog() == true)
@@ -131,10 +132,18 @@ namespace MusicPlayUI.MVVM.ViewModels
                     string newDir = folderDialogue.ResultPath;
                     if (Directory.Exists(newDir))
                     {
-                        CurrentDirectory = newDir;
+                        FolderModel folderModel = new FolderModel(newDir);
+                        if (!_storageSettings.AddFolder(folderModel))
+                        {
+                            MessageHelper.PublishMessage(DefaultMessageFactory.CreateWarningMessage($"This folder is already monitored !"));
+                        }
+                        Folders = new(_storageSettings.Folders);
                     }
                 }
             });
+
+            _storageSettings.ProgressUpdated += OnProgressChanged;
+            Folders = new(_storageSettings.Folders);
         }
 
         private void ClearDataBase(bool canceled)
@@ -156,49 +165,38 @@ namespace MusicPlayUI.MVVM.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage($"Error while deleting a file: {ex}"));
-                            });
+                            //Application.Current.Dispatcher.Invoke(() =>
+                            //{
+                            //    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage($"Error while deleting a file: {ex}"));
+                            //});
                         }
-                    } 
+                    }
                 }
 
                 // reset filters
                 ConfigurationService.SetPreference(SettingsEnum.AlbumFilter, "", true);
                 ConfigurationService.SetPreference(SettingsEnum.ArtistFilter, "", true);
 
+                foreach (FolderModel folder in _storageSettings.Folders)
+                {
+                    folder.TrackImportedCount = 0;
+                    _storageSettings.UpdateFolder(folder, folder.Monitored);
+                }
 
                 MessageHelper.PublishMessage(MessageFactory.DataBaseCleared());
             }
         }
 
-        private async void ScanDirectory()
+        public override void Dispose()
         {
-            ImportMusic = new(CurrentDirectory);
-            ImportMusic.ProgressChanged += OnProgressChanged;
-            int fileNumber = ImportMusic.FileNumber;
-            MaximumValue = ImportMusic.TotalProgress;
-
-            await Task.Run(ImportMusic.Import);
-
-            OnProgressChanged(); // update one last time the UI
-
-            MessageHelper.PublishMessage(MessageFactory.ScanDone(fileNumber));
-            ImportValue = 0;
+            _storageSettings.ProgressUpdated -= OnProgressChanged;
         }
 
-        private void OnProgressChanged()
+        private void OnProgressChanged(double percentage)
         {
-            if (MaximumValue == 0) return;
-            else if(MaximumValue != ImportMusic.TotalProgress)
-            {
-                MaximumValue = ImportMusic.TotalProgress;
-            }
-
-            ImportValue = ImportMusic.Progress;
-            CurrentFile = ImportMusic.CurrentStep + "\n" + ImportMusic.CurrentFile;
-            Percentage = ImportMusic.ProgressPercentage.ToString() + "%";
+            ImportValue = percentage;
+            CurrentInfo = _storageSettings.CurrentScannedFile;
+            Percentage = ImportValue.ToString() + "%";
         }
     }
 }

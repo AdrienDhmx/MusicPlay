@@ -66,7 +66,7 @@ namespace MusicPlayUI.Core.Services
 
         public async void SaveRadio(PlaylistModel radio, List<OrderedTrackModel> tracks)
         {
-            radio.Id = await DataAccess.Connection.InsertPlaylist(radio);
+            radio.Id = DataAccess.Connection.InsertPlaylist(radio);
             AddToPlaylist(tracks, radio);
 
             if(_navigationService.CurrentViewName == ViewNameEnum.SpecificPlaylist)
@@ -117,7 +117,7 @@ namespace MusicPlayUI.Core.Services
                     TrackModel t = await DataAccess.Connection.GetTrackByPath(musicFiles[0]);
                     AlbumModel album = await DataAccess.Connection.GetAlbum(t.AlbumId);
 
-                    int id  = await PlaylistsFactory.CreatePlaylist(path.GetFolderName(), album.AlbumCover);
+                    int id  = PlaylistsFactory.CreatePlaylist(path.GetFolderName(), album.AlbumCover);
                     if (id >= 0)
                     {
                         PlaylistModel playlist = await DataAccess.Connection.GetPlaylist(id);

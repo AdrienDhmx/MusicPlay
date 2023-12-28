@@ -84,6 +84,7 @@ namespace MusicPlayUI.Core.Factories
             List<SettingModel> settings = new()
             {
                 new(ViewNameEnum.General, Resources.General_Setting, "", true),
+                new(ViewNameEnum.Import, Resources.Storage, "", false),
                 new(ViewNameEnum.AppTheme, Resources.Themes_Setting, ""),
                 new(ViewNameEnum.Language, Resources.Language_Setting, ""),
                 new(ViewNameEnum.DSP, "Equalizer", ""), 

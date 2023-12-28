@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UIModels\" />
+    <Compile Remove="UIModels\**" />
+    <EmbeddedResource Remove="UIModels\**" />
+    <None Remove="UIModels\**" />
   </ItemGroup>
 
   <ItemGroup>

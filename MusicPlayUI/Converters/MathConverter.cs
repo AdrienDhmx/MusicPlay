@@ -139,14 +139,17 @@ namespace MusicPlayUI.Converters
             {
                 _left = left;
                 _right = right;
-                switch (operation)
+                _operation = operation switch
                 {
-                    case '+': _operation = (a, b) => (a + b); break;
-                    case '-': _operation = (a, b) => (a - b); break;
-                    case '*': _operation = (a, b) => (a * b); break;
-                    case '/': _operation = (a, b) => (a / b); break;
-                    default: throw new ArgumentException("Invalid operation " + operation);
-                }
+                    '+' => (a, b) => (a + b),
+                    '-' => (a, b) => (a - b),
+                    '*' => (a, b) => (a * b),
+                    '/' => (a, b) => (a / b),
+                    '^' => (a, b) => ((decimal)Math.Pow((double)a, (int)b)),
+                    '>' => (a, b) => (a > b ? a : b),
+                    '<' => (a, b) => (a < b ? a : b),
+                    _ => throw new ArgumentException("Invalid operation " + operation),
+                };
             }
 
             public decimal Eval(object[] args)
@@ -227,7 +230,7 @@ namespace MusicPlayUI.Converters
 
                     var c = text[pos];
 
-                    if (c == '*' || c == '/')
+                    if (c == '*' || c == '/' || c == '^' || c == '>' || c == '<')
                     {
                         ++pos;
                         IExpression right = ParseFactor();

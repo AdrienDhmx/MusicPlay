@@ -13,6 +13,7 @@ using System.Web;
 using System.Windows;
 using FilesProcessor.Helpers;
 using MessageControl;
+using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.MVVM.Models;
 
 namespace MusicPlayUI.Core.Services
@@ -38,10 +39,15 @@ namespace MusicPlayUI.Core.Services
                 url = wikiAPIUrl + titleParameter;
                 extract = await SendWikiRequest(url);
 
-                if (string.IsNullOrWhiteSpace(extract))
+                if (extract.IsNullOrWhiteSpace())
                 {
                     return "";
                 }
+            }
+            
+            if(extract == null)
+            {
+                return "";
             }
 
             return extract + "\n\n" + "From the Wikipedia article about " + topic;

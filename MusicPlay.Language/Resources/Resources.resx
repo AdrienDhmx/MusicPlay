@@ -402,9 +402,6 @@
   <data name="Import_Directory" xml:space="preserve">
     <value>Scan a folder to import your library or add new tracks to it.</value>
   </data>
-  <data name="Import_Library_View" xml:space="preserve">
-    <value>Scan Library</value>
-  </data>
   <data name="Japanese_Lang" xml:space="preserve">
     <value>Japanese</value>
   </data>
@@ -640,7 +637,7 @@
     <value>Save as Playlist</value>
   </data>
   <data name="ScanFolder" xml:space="preserve">
-    <value>Scan Folder</value>
+    <value>Scan all Folders</value>
   </data>
   <data name="Scan_Done_Msg" xml:space="preserve">
     <value>tracks have been imported.</value>
@@ -677,6 +674,9 @@
   </data>
   <data name="Starting_View_Setting_Dscpt" xml:space="preserve">
     <value>Defines wich view the application shows first.</value>
+  </data>
+  <data name="Storage" xml:space="preserve">
+    <value>Storage</value>
   </data>
   <data name="StrokeThickness" xml:space="preserve">
     <value>Outline Thickness</value>

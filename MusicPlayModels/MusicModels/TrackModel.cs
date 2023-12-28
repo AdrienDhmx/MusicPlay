@@ -3,46 +3,59 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicPlayModels.Interfaces;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class TrackModel : ArtistsRelation
+    public class TrackModel : PlayableModel, ITaggable
     {
         private string _artwork = "";
-        public string Path { get; set; } = "";
-        public string Title { get; set; } = "";
-        public int AlbumId { get; set; }
+        private string _path = "";
+        private string _title = "";
+        private int _trackNumber = 0;
+        private int _discNumber = 1;
+        private bool _isLive = false;
+        private LyricsModel? _lyrics;
+
+        private double _rating = 0;
+        private bool _isFavorite = false;
+
+        private List<TagModel> _tags = new();
+        private AlbumModel _album;
+        private List<TrackArtistsRoleModel> _artists = new();
+
+        public string Path
+        {
+            get => _path;
+            set => SetField(ref _path, value);
+        }
+
+        public string Title
+        {
+            get => _title;
+            set => SetField(ref _title, value);
+        }
 
         public string Artwork
         {
             get => _artwork;
             set
             {
-                _artwork = value;
-                OnPropertyChanged(nameof(Artwork));
+                SetField(ref _artwork, value);
             }
         }
 
-        public List<TagModel> Tags { get; set; } = new();
+        public int TrackNumber
+        {
+            get => _trackNumber;
+            set => SetField(ref _trackNumber, value);
+        }
 
-        public int Tracknumber { get; set; } = 0;
-
-        public int DiscNumber { get; set; } = 1;
-
-        /// <summary>
-        /// The track length in seconds
-        /// </summary>
-        public int Length { get; set; } = 0;
-
-        /// <summary>
-        /// The track duration in the following format: HH:MM:SS
-        /// </summary>
-        public string Duration { get; set; } = "";
-
-        private DateTime _lastPlayed = DateTime.MinValue;
-        private int _playCount = 0;
-        private double _rating = 0;
-        private bool _isFavorite = false;
+        public int DiscNumber
+        {
+            get => _discNumber;
+            set => SetField(ref _discNumber, value);
+        }
 
         public bool IsFavorite
         {
@@ -53,6 +66,7 @@ namespace MusicPlayModels.MusicModels
                 OnPropertyChanged(nameof(IsFavorite));
             }
         }
+
         public double Rating
         {
             get => _rating;
@@ -62,48 +76,61 @@ namespace MusicPlayModels.MusicModels
                 OnPropertyChanged(nameof(Rating));
             }
         }
-        public int PlayCount
+
+        public bool IsLive
         {
-            get => _playCount;
-            set
-            {
-                _playCount = value;
-                OnPropertyChanged(nameof(PlayCount));
-            }
-        }
-        public DateTime LastPlayed
-        {
-            get => _lastPlayed;
-            set
-            {
-                _lastPlayed = value;
-                OnPropertyChanged(nameof(LastPlayed));
-            }
+            get => _isLive;
+            set => SetField(ref _isLive, value);
         }
 
-        public string AlbumName { get; set; } = "";
-        public string AlbumCover { get; set; } = "";
+        public LyricsModel Lyrics
+        {
+            get => _lyrics ?? new();
+            set => SetField(ref _lyrics, value);
+        }
 
-        public TrackModel(int id, string path, string title, int album, List<ArtistDataRelation> artists, string artwork, int tracknumber, int discNumber, int length, string duration) : base(artists)
+        public AlbumModel Album
+        {
+            get => _album;
+            set => SetField(ref _album, value);
+        }
+
+        public List<TrackArtistsRoleModel> Artists
+        {
+            get => _artists;
+            set => SetField(ref _artists, value);
+        }
+
+        public List<TagModel> Tags
+        {
+            get => _tags;
+            set => SetField(ref _tags, value);
+        }
+
+        public bool HasLyrics => _lyrics != null;
+
+        public TrackModel(int id, string path, string title, List<TrackArtistsRoleModel> artists, AlbumModel album, string artwork, int trackNumber, int discNumber, int length, string duration)
         {
             Id = id;
             Path = path;
             Title = title;
-            AlbumId = album;
+            Artists = artists;
             Artwork = artwork;
-            Tracknumber = tracknumber;
+            _album = album;
+            TrackNumber = trackNumber;
             DiscNumber = discNumber;
             Length = length;
             Duration = duration;
         }
 
-        public TrackModel(string path, string title, int album, List<ArtistDataRelation> artists, string artwork, int tracknumber, int discNumber, int length, string duration) : base(artists)
+        public TrackModel(string path, string title, List<TrackArtistsRoleModel> artists, AlbumModel album, string artwork, int trackNumber, int discNumber, int length, string duration)
         {
             Path = path;
             Title = title;
-            AlbumId = album;
             Artwork = artwork;
-            Tracknumber = tracknumber;
+            Artists = artists;
+            _album = album;
+            TrackNumber = trackNumber;
             DiscNumber = discNumber;
             Length = length;
             Duration = duration;
@@ -116,19 +143,21 @@ namespace MusicPlayModels.MusicModels
                 Id = trackModel.Id;
                 Path = trackModel.Path;
                 Title = trackModel.Title;
-                AlbumId = trackModel.AlbumId;
                 Artists = trackModel.Artists;
+                _album = trackModel.Album;
                 Artwork = trackModel.Artwork;
-                Tracknumber = trackModel.Tracknumber;
+                TrackNumber = trackModel.TrackNumber;
                 DiscNumber = trackModel.DiscNumber;
                 Length = trackModel.Length;
                 Duration = trackModel.Duration;
-                AlbumCover = trackModel.AlbumCover;
-                AlbumName = trackModel.AlbumName;
+                Album = trackModel.Album;
                 PlayCount = trackModel.PlayCount;
                 LastPlayed = trackModel.LastPlayed;
                 Rating= trackModel.Rating;
                 IsFavorite= trackModel.IsFavorite;
+                IsLive= trackModel.IsLive;
+                Lyrics = trackModel.Lyrics;
+                Tags = trackModel.Tags;
             }
         }
 
@@ -137,19 +166,21 @@ namespace MusicPlayModels.MusicModels
             Id = playlistTrackModel.Id;
             Path = playlistTrackModel.Path;
             Title = playlistTrackModel.Title;
-            AlbumId = playlistTrackModel.AlbumId;
             Artists = playlistTrackModel.Artists;
+            _album = playlistTrackModel.Album;
             Artwork = playlistTrackModel.Artwork;
-            Tracknumber = playlistTrackModel.Tracknumber;
+            TrackNumber = playlistTrackModel.TrackNumber;
             DiscNumber = playlistTrackModel.DiscNumber;
             Length = playlistTrackModel.Length;
             Duration = playlistTrackModel.Duration;
-            AlbumCover = playlistTrackModel.AlbumCover;
-            AlbumName = playlistTrackModel.AlbumName;
+            Album = playlistTrackModel.Album;
             PlayCount = playlistTrackModel.PlayCount;
             LastPlayed = playlistTrackModel.LastPlayed;
             Rating = playlistTrackModel.Rating;
             IsFavorite = playlistTrackModel.IsFavorite;
+            IsLive = playlistTrackModel.IsLive;
+            Lyrics= playlistTrackModel.Lyrics;
+            Tags = playlistTrackModel.Tags;
         }
 
         public TrackModel()

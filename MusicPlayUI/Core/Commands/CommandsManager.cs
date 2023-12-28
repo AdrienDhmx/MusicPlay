@@ -283,7 +283,6 @@ namespace MusicPlayUI.Core.Commands
                 CommandEnums.NavigateToAlbumById => NavigateToAlbumByIdCommand,
                 CommandEnums.NavigateToArtistById => NavigateToArtistByIdCommand,
                 CommandEnums.NavigateToGenre => NavigateToGenreCommand,
-                CommandEnums.Import => NavigateCommand,
                 CommandEnums.Settings => NavigateCommand,
                 CommandEnums.NavigateBack => NavigateBackCommand,
                 CommandEnums.EscapeFullScreen => EscapeFullScreenCommand,

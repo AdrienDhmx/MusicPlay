@@ -146,12 +146,12 @@ namespace MusicPlayUI.Core.Helpers
 
         public static ObservableCollection<T> OrderTracks<T>(this ObservableCollection<T> queue) where T : TrackModel
         {
-            return new(queue.OrderBy(t => t.AlbumId).ThenBy(t => t.DiscNumber).ThenBy(t => t.Tracknumber));
+            return new(queue.OrderBy(t => t.AlbumId).ThenBy(t => t.DiscNumber).ThenBy(t => t.TrackNumber));
         }
 
         public static List<T> OrderTracks<T>(this List<T> queue) where T : TrackModel
         {
-            return new(queue.OrderBy(t => t.AlbumId).ThenBy(t => t.DiscNumber).ThenBy(t => t.Tracknumber));
+            return new(queue.OrderBy(t => t.AlbumId).ThenBy(t => t.DiscNumber).ThenBy(t => t.TrackNumber));
         }
 
         public static ObservableCollection<UIOrderedTrackModel> OrderTracks(this ObservableCollection<UIOrderedTrackModel> queue)

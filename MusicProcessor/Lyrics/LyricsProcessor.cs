@@ -191,7 +191,7 @@ namespace MusicFilesProcessor.Lyrics
                         continue;
                     TimedLyricsLineModel timedLyrics = new()
                     {
-                        index = count, // Not i since we ignore empty line
+                        index = count, // Not i since we ignore empty _line
                         LengthInMilliseconds = 0,
                         Time = TimeSpan.FromMilliseconds(0).ToFormattedString(),
                         Lyrics = lines[i],

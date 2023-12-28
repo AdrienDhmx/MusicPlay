@@ -16,6 +16,7 @@
                                 VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                 Width="{TemplateBinding Width}"
                                 Height="{TemplateBinding Height}"
+                                Opacity="1"
                                 x:Name="Border">
 
                             <Grid>
@@ -24,14 +25,15 @@
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch"
                                         Opacity="0"
+                                        Panel.ZIndex="2"
                                         x:Name="MouseOverBgcBorder"/>
                             
                                 <Path Data="{TemplateBinding Icon}"
+                                      Panel.ZIndex="2"
                                       Fill="{TemplateBinding FillColor}"
                                       Stroke="{TemplateBinding StrokeColor}"
                                       Margin="{TemplateBinding IconMargin}"
                                       StrokeThickness="{TemplateBinding StrokeWidth}"
-                                      Panel.ZIndex="2"
                                       Width="{TemplateBinding IconWidth}"
                                       Height="{TemplateBinding IconHeight}"
                                       Stretch="{TemplateBinding IconStretch}"

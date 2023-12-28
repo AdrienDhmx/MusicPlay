@@ -165,9 +165,6 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             AppliedTheme = theme.Name;
             // init new theme
             AppThemeService.InitializeAppTheme();
-
-            if(message)
-                MessageHelper.PublishMessage(theme.Name.AppThemeChanged());
         }
 
         private void UpdateSelectedTheme(SettingsValueEnum theme)

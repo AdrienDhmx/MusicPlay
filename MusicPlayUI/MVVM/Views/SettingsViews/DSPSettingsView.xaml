@@ -5,117 +5,71 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.SettingsViews"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
-             xmlns:settingsviewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
-             xmlns:cardExpender="clr-namespace:CardDropDown;assembly=CardDropDown"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:settingsviewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels"
              xmlns:cardbtn="clr-namespace:CustomCardControl;assembly=CustomCardControl"
              xmlns:switch="clr-namespace:ToggleSwitch;assembly=ToggleSwitch"
              xmlns:iconBtn="clr-namespace:IconButton;assembly=IconButton"
-             xmlns:eq="clr-namespace:Equalizer;assembly=Equalizer" xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" d:DataContext="{d:DesignInstance Type=settingsviewmodel:DSPSettingsViewModels}"
+             xmlns:eq="clr-namespace:Equalizer;assembly=Equalizer"
+             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" 
+            xmlns:dynamicscrollviewer="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
+             d:DataContext="{d:DesignInstance Type=settingsviewmodel:DSPSettingsViewModels}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="2000" d:DesignWidth="800">
-    <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
-           PreviewMouseWheel="Grid_PreviewMouseWheel"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <Grid Background="{DynamicResource PrimaryContainer}"
-              x:Name="StickyGrid"
-              MaxHeight="150"
-              Height="150"
-              Panel.ZIndex="10"
-              MinHeight="70">
-            
-            <Border Background="{DynamicResource PrimaryContainer}"
-                    Effect="{DynamicResource PageHeaderDropShadow}"/>
-            
-            <TextBlock Text="DSP and Equalizer"
-                       Style="{DynamicResource BStyle}"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
-        </Grid>
+    <dynamicscrollviewer:DynamicScrollViewer VerticalScrollBarVisibility="Hidden"
+                                             IsInertiaEnabled="True"
+                x:Name="SettingScroll">
 
-        <ScrollViewer Grid.Row="1"
-                      VerticalScrollBarVisibility="Hidden"
-                      x:Name="SettingScroll">
-            
-            <!-- Root actual content -->
-            <Grid Margin="10">
+        <!-- Root actual content -->
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Root Equalizer Settings -->
+            <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Root Equalizer Settings -->
-                <Grid>
+                <!-- Equalizer global action => enable/disable, reset -->
+                <Grid Margin="14, 5"
+                          HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <switch:ToggleSwitch IsChecked="{Binding EqualizerEnabled}"
+                                             UncheckedText="Disabled"
+                                             CheckedText="Enabled"/>
+
+                    <cardbtn:CustomCardControl Icon="{DynamicResource Refresh}"
+                                                Grid.Column="2"
+                                                Style="{DynamicResource BaseCardStyle}"
+                                                Command="{Binding ResetPresetCommand}"
+                                                CardHeader="Reset Preset"/>
+                </Grid>
+
+                <!-- REqualizer presets actions -->
+                <Grid Grid.Row="1"
+                          Margin="20, 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Equalizer global action => enable/disable, reset -->
-                    <Grid Margin="20, 5"
-                          HorizontalAlignment="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <switch:ToggleSwitch HeaderContentPlacement="Left"
-                                             HeaderHorizontalAlignment="Center"
-                                             IsChecked="{Binding EqualizerEnabled}"
-                                             CheckedBackground="{DynamicResource Primary}"
-                                             CheckedBorderBrush="{DynamicResource Primary}"
-                                             CheckedForeground="{DynamicResource OnPrimary}"
-                                             UncheckedBorderBrush="{DynamicResource Secondary}"
-                                             UncheckedForeground="{DynamicResource Secondary}"
-                                             HoverCheckedBackground="{DynamicResource PrimaryHover}"
-                                             UncheckedText="Disabled"
-                                             CheckedText="Enabled"
-                                             SwitchContentPlacement="Right"
-                                             BorderThickness="2"
-                                             SwitchPadding="10 10 0 10"
-                                              Margin="20, 0, 20, 10"
-                                             Foreground="{DynamicResource OnBackground}"
-                                             FontSize="18"
-                                             FontWeight="DemiBold"
-                                             Cursor="Hand"
-                                             SwitchWidth="55">
-                        </switch:ToggleSwitch>
-
-                        <cardbtn:CustomCardControl Icon="{DynamicResource Refresh}"
-                                                   Grid.Column="2"
-                                                    Margin="20, 0, 20, 10"
-                                                   HorizontalAlignment="Right"
-                                                   Style="{DynamicResource SimpleCardStyle}"
-                                                   Command="{Binding ResetPresetCommand}"
-                                                   CardDescriptionVisibility="Collapsed"
-                                                   HorizontalContentAlignment="Center"
-                                                   IconMargin="10"
-                                                   CardHeader="Reset Preset"/>
-                    </Grid>
-
-                    <!-- REqualizer presets actions -->
-                    <Grid Grid.Row="1"
-                          Margin="20, 5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-
-                        <!--Preset Picker button -->
-                        <cardbtn:CustomCardControl CardHeader="{Binding AppliedPresetName}"
+                    <!--Preset Picker button -->
+                    <cardbtn:CustomCardControl CardHeader="{Binding AppliedPresetName}"
                                                    Icon="{DynamicResource EqualizerIcon}"
                                                    FillColor="{DynamicResource Primary}"
                                                    Foreground="{DynamicResource OnBackground}"
@@ -139,57 +93,57 @@
                                                    CardDescriptionVisibility="Collapsed"
                                                    x:Name="PresetPickerBtn"/>
 
-                            <textbtn:TextButton Grid.Column="1" 
+                    <textbtn:TextButton Grid.Column="1" 
                                                 VerticalAlignment="Top"
                                                 HorizontalAlignment="Stretch"
                                              Margin="20, 0, 20, 10"
                                                 Text="{x:Static lang:Resources.Create}"
                                              Style="{DynamicResource Normalbtn}"
                                              Command="{Binding CreatePresetCommand}"/>
-                        
-                        <!-- Current preset actions => create, save changes, edit name, delete -->
-                        <Grid Grid.ColumnSpan="2"
+
+                    <!-- Current preset actions => create, save changes, edit name, delete -->
+                    <Grid Grid.ColumnSpan="2"
                               Grid.Row="1"
                                HorizontalAlignment="Stretch"
                               MaxWidth="900">
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Setter Property="Height" Value="0"/>
-                                    <Setter Property="Opacity" Value="0"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DataContext.CanUpdate, ElementName=RootView}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation  From="0" To="60" Duration="0:0:0.2"
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Height" Value="0"/>
+                                <Setter Property="Opacity" Value="0"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.CanUpdate, ElementName=RootView}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation  From="0" To="60" Duration="0:0:0.2"
                                                                           Storyboard.TargetProperty="Height"/>
-                                                        <DoubleAnimation  From="0" To="1" Duration="0:0:0.1"
+                                                    <DoubleAnimation  From="0" To="1" Duration="0:0:0.1"
                                                                           Storyboard.TargetProperty="Opacity"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.EnterActions>
-                                            <DataTrigger.ExitActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation  From="60" To="0" Duration="0:0:0.2"
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation  From="60" To="0" Duration="0:0:0.2"
                                                                           Storyboard.TargetProperty="Height"/>
-                                                        <DoubleAnimation  From="1" To="0" Duration="0:0:0.1"
+                                                    <DoubleAnimation  From="1" To="0" Duration="0:0:0.1"
                                                                           Storyboard.TargetProperty="Opacity"/>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.ExitActions>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" MinWidth="40"/>
-                                    <ColumnDefinition Width="70"/>
-                                    <ColumnDefinition Width="70"/>
-                                    <ColumnDefinition Width="40"/>
-                                </Grid.ColumnDefinitions>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MinWidth="40"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
 
-                                <textbtn:TextButton VerticalAlignment="Top"
+                        <textbtn:TextButton VerticalAlignment="Top"
                                                     Margin="40, 10, 20, 10"
                                                     Text="Save Changes"
                                                     HorizontalAlignment="Stretch"
@@ -197,24 +151,29 @@
                                                     Style="{DynamicResource Normalbtn}"
                                                     Command="{Binding SavePresetCommand}"/>
 
-                                <iconBtn:IconButton Grid.Column="1"
+                        <iconBtn:IconButton Grid.Column="1"
                                                     Icon="{DynamicResource Edit}"
                                                     Command="{Binding EditPresetNameCommand}"
                                                     Style="{DynamicResource SmallBtn}"/>
 
-                            <iconBtn:IconButton Grid.Column="2"
+                        <iconBtn:IconButton Grid.Column="2"
                                                     Command="{Binding DeletePresetCommand}"
                                                     Style="{DynamicResource SmallDeleteButton}"/>
-                        </Grid>
                     </Grid>
+                </Grid>
 
-                    <!-- Interactive Equalizer Graph -->
-                    <Border Margin="20, 10"
+                <Border Margin="20, 10"
+                            Grid.Row="2"
+                            CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                            Background="{DynamicResource SurfaceVariant}"
+                            Effect="{DynamicResource FilterPanelDropShadow}"/>
+                <!-- Interactive Equalizer Graph -->
+                <Border Margin="20, 10"
                             Grid.Row="2"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             x:Name="EqBorder"
                             Background="{DynamicResource SurfaceVariant}">
-                        <eq:Equalizer HorizontalAlignment="Stretch"
+                    <eq:Equalizer HorizontalAlignment="Stretch"
                                       Height="500"
                                       GraphColor="{DynamicResource Primary}"
                                       PreviewGraphColor="{DynamicResource Primary}"
@@ -222,17 +181,17 @@
                                       Width="{Binding ActualWidth, ElementName=EqBorder}"
                                       EQManager="{Binding EQManager, Mode=Default}"
                                       Foreground="{DynamicResource OnSurfaceVariant}">
-                        </eq:Equalizer>
-                    </Border>
+                    </eq:Equalizer>
+                </Border>
 
-                    <Grid Grid.Row="3"
+                <Grid Grid.Row="3"
                           Margin="20, 5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                        <textbtn:TextButton Style="{DynamicResource Normalbtn}"
+                    <textbtn:TextButton Style="{DynamicResource Normalbtn}"
                                             Text="Add Band"
                                             MaxWidth="400"
                                             Grid.Row="1"
@@ -240,56 +199,60 @@
                                             IsEnabled="{Binding CanAddBand}"
                                             Command="{Binding AddBandCommand}"/>
 
-                        <Border CornerRadius="{DynamicResource SecondaryCornerRadius}"
+                    <Border CornerRadius="{DynamicResource SecondaryCornerRadius}"
                                     Height="80"
                                 MaxWidth="800"
                                 Background="{DynamicResource Background}"
                                 Visibility="{Binding BandSelected, Converter={StaticResource BoolToVisibilityConverter}}"
                                     Margin="10">
-                            <Border.Effect>
-                                <DropShadowEffect Color="{Binding SelectedPresetBand.Brush.Color}"
+                        <Border.Effect>
+                            <DropShadowEffect Color="{Binding SelectedPresetBand.Brush.Color}"
                                                   BlurRadius="20"
                                                   Opacity="0.5"
                                                   Direction="-60"
                                                   ShadowDepth="5"
                                                   />
-                            </Border.Effect>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="auto"/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="auto"/>
-                                </Grid.ColumnDefinitions>
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
 
-                                <Border Height="40" Width="40" 
+                            <Border Height="40" Width="40" 
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         CornerRadius="20"
                                         Opacity="0.9"
                                         Background="{Binding SelectedPresetBand.Brush}"/>
 
-                                <TextBlock Grid.Column="1"
+                            <TextBlock Grid.Column="1"
                                            Text="{Binding SelectedPresetBand.BandName}"
                                            Margin="10, 0"
+                                       VerticalAlignment="Center"
                                            Style="{DynamicResource SStyle}"/>
 
-                                <StackPanel Grid.Column="2"
+                            <StackPanel Grid.Column="2"
                                             MinWidth="100"
                                             HorizontalAlignment="Center"
                                             Orientation="Horizontal">
-                                    <TextBlock Text="{Binding SelectedPresetBand.CenterFrequencyName}"
+                                <TextBlock Text="{Binding SelectedPresetBand.CenterFrequencyName}"
                                                Margin="10, 2"
+                                           VerticalAlignment="Center"
                                                Style="{DynamicResource NLargeStyle}"/>
-                                    <TextBlock Text="{Binding SelectedPresetBand.GainName}"
+                                <TextBlock Text="{Binding SelectedPresetBand.GainName}"
                                                Margin="20, 2"
+                                           VerticalAlignment="Center"
                                                Style="{DynamicResource NLargeStyle}"/>
-                                    <TextBlock Text="{Binding SelectedPresetBand.BandWidthName}"
+                                <TextBlock Text="{Binding SelectedPresetBand.BandWidthName}"
                                                Margin="10, 2"
+                                           VerticalAlignment="Center"
                                                Style="{DynamicResource NLargeStyle}"/>
-                                </StackPanel>
+                            </StackPanel>
 
-                                <iconBtn:IconButton Grid.Column="3"
+                            <iconBtn:IconButton Grid.Column="3"
                                                     Margin="20, 0"
                                                     IconHeight="25"
                                                     IconWidth="25"
@@ -298,45 +261,45 @@
                                                     Icon="{DynamicResource Trash}"
                                                     FillColor="{DynamicResource Error}"
                                                     MouseOverBackground="Transparent"
-                                                    Style="{DynamicResource NormalIconBtn}"
+                                                    Style="{DynamicResource OpacityIconButton}"
                                                     IconStretch="Uniform"/>
-                            </Grid>
-                        </Border>
-                    </Grid>
+                        </Grid>
+                    </Border>
                 </Grid>
-                
-                <!-- Preset Popup -->
-                <Popup AllowsTransparency="True"
+            </Grid>
+
+            <!-- Preset Popup -->
+            <Popup AllowsTransparency="True"
                            x:Name="PresetPopup"
                            PopupAnimation="Slide"
                            IsOpen="{Binding IsPresetPopupOpen, Mode=TwoWay}"
                            StaysOpen="False">
-                    <Popup.Style>
-                        <Style TargetType="Popup">
-                            <Setter Property="PlacementTarget" Value="{Binding ElementName=PresetPickerBtn}"/>
-                            <Setter Property="Placement" Value="Bottom"/>
-                            <Setter Property="IsOpen" Value="false"/>
-                            <Setter Property="VerticalOffset" Value="4"/>
-                        </Style>
-                    </Popup.Style>
-                    <Border Height="auto"
+                <Popup.Style>
+                    <Style TargetType="Popup">
+                        <Setter Property="PlacementTarget" Value="{Binding ElementName=PresetPickerBtn}"/>
+                        <Setter Property="Placement" Value="Bottom"/>
+                        <Setter Property="IsOpen" Value="false"/>
+                        <Setter Property="VerticalOffset" Value="4"/>
+                    </Style>
+                </Popup.Style>
+                <Border Height="auto"
                         MaxHeight="400"
                     Background="{DynamicResource Background}"
                     BorderThickness="1"
                     BorderBrush="{DynamicResource Outline}"
                     Width="{Binding ActualWidth, ElementName=PresetPickerBtn}"
                     CornerRadius="5">
-                        <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden"
                           CanContentScroll="True"
                           x:Name="PresetPopupScroll">
-                            <ItemsControl ItemsSource="{Binding DataContext.Presets, ElementName=RootView}"
+                        <ItemsControl ItemsSource="{Binding DataContext.Presets, ElementName=RootView}"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
                                   Margin="2">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border HorizontalAlignment="Stretch">
-                                            <textbtn:TextButton Text="{Binding Name}"
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border HorizontalAlignment="Stretch">
+                                        <textbtn:TextButton Text="{Binding Name}"
                                                     Padding="20, 4"
                                                     MaxWidth="800"
                                                     HorizontalAlignment="Stretch"
@@ -348,17 +311,14 @@
                                                     Command="{Binding DataContext.ApplyPresetCommand, ElementName=RootView}"
                                                     CommandParameter="{Binding .}">
 
-                                            </textbtn:TextButton>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Border>
-                </Popup>
-            </Grid>
-        </ScrollViewer>
-
-    </Grid>
-
+                                        </textbtn:TextButton>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </Popup>
+        </Grid>
+    </dynamicscrollviewer:DynamicScrollViewer>
 </UserControl>

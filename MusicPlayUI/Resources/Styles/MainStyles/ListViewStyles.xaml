@@ -216,7 +216,7 @@
         <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
         <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
-        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard"/>
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
         <Setter Property="VirtualizingPanel.CacheLengthUnit" Value="Item"/>
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
         <Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
@@ -224,14 +224,15 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="CacheLengthUnit" Value="Item"/>
-        <Setter Property="CacheLength" Value="6"/>
+        <Setter Property="CacheLength" Value="16"/>
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
                     <vcontrol:VirtualizingWrapPanel ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                    VirtualizingPanel.IsVirtualizing="True"
-                                                   VirtualizingPanel.VirtualizationMode="Standard"
+                                                   VirtualizingPanel.VirtualizationMode="Recycling"
                                                    VirtualizingPanel.CacheLengthUnit="Item"
+                                                    VirtualizingPanel.CacheLength="16"
                                                    VirtualizingPanel.IsContainerVirtualizable="True"
                                                    VirtualizingPanel.ScrollUnit="Pixel"
                                                     SpacingMode="StartAndEndOnly"

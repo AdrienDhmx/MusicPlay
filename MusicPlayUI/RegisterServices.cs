@@ -69,9 +69,6 @@ namespace MusicPlayUI
                 services.AddTransient<HomeView>();
                 services.AddTransient<HomeViewModel>();
 
-                services.AddTransient<ImportLibraryView>();
-                services.AddTransient<ImportLibraryViewModel>();
-
                 services.AddTransient<SettingsView>();
                 services.AddTransient<SettingsViewModel>();
 
@@ -125,6 +122,9 @@ namespace MusicPlayUI
                 services.AddTransient<GeneralSettingView>();
                 services.AddTransient<GeneralSettingsViewModel>();
 
+                services.AddTransient<StorageSettingsView>();
+                services.AddTransient<StorageSettingsViewModel>();
+
                 services.AddTransient<AppThemeSettingView>();
                 services.AddTransient<AppThemeSettingViewModel>();
 
@@ -156,6 +156,9 @@ namespace MusicPlayUI
 
                 services.AddTransient<UpdateShortcutView>();
                 services.AddTransient<UpdateShortcutViewModel>();
+
+                services.AddTransient<EditFolderView>();
+                services.AddTransient<EditFolderViewModel>();
 
                 // Windows
                 services.AddSingleton(provider => new MainWindow()

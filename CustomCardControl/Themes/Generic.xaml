@@ -7,7 +7,6 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:CustomCardControl}">
                     <Border x:Name="Border"
-                            Background="Transparent"
                             CornerRadius="{TemplateBinding CornerRadius}"
                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
@@ -24,14 +23,18 @@
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
                                Opacity="0"
+                                Panel.ZIndex="4"
                                x:Name="MouseOverBgcBorder"/>
 
                             <Border Grid.ColumnSpan="2"
+                                    Panel.ZIndex="1"
                                     CornerRadius="{TemplateBinding CornerRadius}"
                                     Background="{TemplateBinding Background}"
-                                    Opacity="{TemplateBinding BackgroundOpacity}"/>
+                                    Opacity="{TemplateBinding BackgroundOpacity}"
+                                    Effect="{TemplateBinding Effect}"/>
 
-                            <Grid Margin="5,2">
+                            <Grid Margin="5,2"
+                                   Panel.ZIndex="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition Width="*"/>

@@ -87,7 +87,6 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.Artists => Settings.Default.NavArtistsShortcut,
                 SettingsEnum.Playlists => Settings.Default.NavPlaylistsShortcut,
                 SettingsEnum.NowPlaying => Settings.Default.NavNowPlayingShortcut,
-                SettingsEnum.Import => Settings.Default.NavImportShortcut,
                 SettingsEnum.Settings => Settings.Default.NavSettingsShortcut,
                 SettingsEnum.Back => Settings.Default.NavBackShortcut,
                 SettingsEnum.ToggleFullScreen => Settings.Default.ToggleFullScreenShortcut,
@@ -288,9 +287,6 @@ namespace MusicPlayUI.Core.Services
                     break;
                 case SettingsEnum.NowPlaying:
                     Settings.Default.NavNowPlayingShortcut = value;
-                    break;
-                case SettingsEnum.Import:
-                    Settings.Default.NavImportShortcut = value;
                     break;
                 case SettingsEnum.Settings:
                     Settings.Default.NavSettingsShortcut = value;

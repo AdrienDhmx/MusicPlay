@@ -12,51 +12,20 @@
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid helper:ScrollViewerHelper.IsStickyEnabled="True"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <Grid Background="{DynamicResource PrimaryContainer}"
-              MinHeight="100"
-              MaxHeight="150"
-              Height="150"
-              x:Name="StickyGrid"
-          Panel.ZIndex="10" >
-
-            <Border Background="{DynamicResource PrimaryContainer}"
-                    Effect="{DynamicResource PageHeaderDropShadow}"/>
-
-            <StackPanel Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                        Margin="0,10"
-                    VerticalAlignment="Center">
-                <TextBlock Text="{x:Static lang:Resources.Language_Setting}"
-                       Style="{DynamicResource BStyle}"
-                       HorizontalAlignment="Center"/>
-                
-                <TextBlock Text="{Binding AppliedLanguage}"
-                            Style="{DynamicResource SListItemNameStyle}"/>
-            </StackPanel>
-        </Grid>
-
-        <ScrollViewer Grid.Row="1"
-                      x:Name="SettingScroll">
-            <Border BorderBrush="{DynamicResource Outline}"
+    <Border BorderBrush="{DynamicResource Outline}"
+                Grid.Row="1"
                 Margin="20,10"
                 BorderThickness="0,0,0,0">
-                <ItemsControl ItemsSource="{Binding Languages}"
+        <ItemsControl ItemsSource="{Binding Languages}"
                               Margin="0,10,0,0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="Transparent"
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="Transparent"
                                             x:Name="ItemBorder"
                                             Height="auto">
 
-                                <CheckBox x:Name="IsSelectedCheckBox"
+                        <CheckBox x:Name="IsSelectedCheckBox"
                                           FontSize="25"
                                           IsHitTestVisible="True"
                                               Style="{DynamicResource SettingsCheckBox}"
@@ -64,11 +33,9 @@
                                                CommandParameter="{Binding .}"
                                               Content="{Binding Name}"
                                                IsChecked="{Binding IsSelected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Border>
-        </ScrollViewer>
-    </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Border>
 </UserControl>

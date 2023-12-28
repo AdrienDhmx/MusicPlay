@@ -59,11 +59,11 @@ namespace MusicPlayUI.Core.Factories
         {
             List<FilterModel> filters = new()
             {
-                new(Resources.Album_Artists, (int)ArtistTypeEnum.AlbumArtist, FilterEnum.ArtistType),
-                new(Resources.Performers, (int)ArtistTypeEnum.Performer, FilterEnum.ArtistType),
-                new(Resources.Composers, (int)ArtistTypeEnum.Composer, FilterEnum.ArtistType),
-                new("Lyricist", (int)ArtistTypeEnum.Lyricist, FilterEnum.ArtistType),
-                new("Featured", (int)ArtistTypeEnum.Featured, FilterEnum.ArtistType),
+                new(Resources.Album_Artists, (int)ArtistRoleEnum.AlbumArtist, FilterEnum.ArtistType),
+                new(Resources.Performers, (int)ArtistRoleEnum.Performer, FilterEnum.ArtistType),
+                new(Resources.Composers, (int)ArtistRoleEnum.Composer, FilterEnum.ArtistType),
+                new("Lyricist", (int)ArtistRoleEnum.Lyricist, FilterEnum.ArtistType),
+                new("Featured", (int)ArtistRoleEnum.Featured, FilterEnum.ArtistType),
             };
 
             return filters;

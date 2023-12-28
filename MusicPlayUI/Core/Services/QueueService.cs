@@ -576,7 +576,7 @@ namespace MusicPlayUI.Core.Services
                 Tracks = QueueTracks.ToList().ToOrderedTrackModel(),
             };
 
-            await DataAccess.Connection.InsertQueue(queue);
+            DataAccess.Connection.InsertQueue(queue);
         }
 
         public async void NavigateToPlayingFrom()

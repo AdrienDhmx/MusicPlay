@@ -1,4 +1,5 @@
 ﻿using MusicPlayModels.Enums;
+using MusicPlayModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,14 @@ using System.Threading.Tasks;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class PlaylistModel : BaseModel
+    public class PlaylistModel : PlayableModel, ITaggable
     {
         private string _name = "";
         private string _description = "";
         private string _cover = "";
+        private PlaylistTypeEnum _playlistType = PlaylistTypeEnum.UserPlaylist;
+        private List<OrderedTrackModel> _tracks = new();
+        private List<TagModel> _tags = new();
 
         public string Name
         {
@@ -31,6 +35,7 @@ namespace MusicPlayModels.MusicModels
                 OnPropertyChanged(nameof(Description));
             }
         }
+
         public string Cover
         {
             get { return _cover; }
@@ -40,14 +45,24 @@ namespace MusicPlayModels.MusicModels
                 OnPropertyChanged(nameof(Cover));
             }
         }
-        public string Duration { get; set; } = "";
-        public DateTime CreationDate { get; set; } = DateTime.Now;
-        public DateTime UpdateDate { get; set; } = DateTime.Now;
-        public PlaylistTypeEnum PlaylistType { get; set; } = PlaylistTypeEnum.UserPlaylist;
 
-        public List<OrderedTrackModel> Tracks { get; set; } = new();
+        public PlaylistTypeEnum PlaylistType
+        {
+            get => _playlistType;
+            set => SetField(ref _playlistType, value);
+        }
 
-        public List<TagModel> Tags { get; set; } = new();
+        public List<OrderedTrackModel> Tracks
+        {
+            get => _tracks;
+            set => SetField(ref _tracks, value);
+        }
+
+        public List<TagModel> Tags
+        {
+            get => _tags;
+            set => SetField(ref _tags, value);
+        }
 
         public PlaylistModel(int id, string name, string description, string cover, string duration)
         {

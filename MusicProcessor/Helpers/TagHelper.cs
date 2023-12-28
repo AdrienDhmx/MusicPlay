@@ -177,69 +177,125 @@ namespace MusicFilesProcessor.Helpers
             return null;
         }
 
-        public static Dictionary<string, List<bool>> ReadDescription(string description)
+        public static string RemoveDiacritics(this string text)
         {
-            if (string.IsNullOrWhiteSpace(description)) return new();
+            string normalizedString = text.Normalize(NormalizationForm.FormD);
+            StringBuilder stringBuilder = new StringBuilder(capacity: normalizedString.Length);
 
-            Dictionary<string, List<bool>> output = new();
+            for (int i = 0; i < normalizedString.Length; i++)
+            {
+                char c = normalizedString[i];
+                UnicodeCategory unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        public static void AddArtistsToDic(List<string> artistsToAdd, Dictionary<string, List<string>> artists, string role)
+        {
+            for (int i = 0; i < artistsToAdd.Count; i++) 
+            {
+                string artist = artistsToAdd.ElementAt(i).Trim();
+                if (string.IsNullOrEmpty(artist))
+                    continue;
+
+                artist = artist.RemoveDiacritics();
+
+                if(artist.Contains('&'))
+                {
+                    string[] splitArtists = artist.Split('&');
+                    artistsToAdd.AddRange(splitArtists);
+                    AddArtistsToDic(artistsToAdd.GetRange(i + 1, artistsToAdd.Count), artists, role);
+                    return;
+                }
+
+                if (artists.ContainsKey(artist))
+                {
+                    if (!artists[artist].Contains(role))
+                    {
+                        artists[artist].Add(role);
+                    }
+                }
+                else
+                {
+                    artists.Add(artist, new() { role });
+                }
+            }
+            return;
+        }
+
+        public static void ReadDescription(string description, Dictionary<string, List<string>> artists)
+        {
+            if (string.IsNullOrWhiteSpace(description)) return;
 
             string[] categories = description.Split(':');
+
+            List<string> rolesToIgnore = new()
+            {
+                "main",
+                "primary",
+                "album",
+                "http",
+                "label",
+                "visit",
+                "purchased",
+                "copyright",
+            };
 
             foreach (string category in categories)
             {
                 string[] keyValues = category.Split("\n");
 
-                if(keyValues.Length > 1)
+                if(keyValues.Length < 2) continue;
+
+                // start at 1 because most of the time the description has a first _line that doesn't contain any information
+                for (int i = 1; i < keyValues.Length; i++)
                 {
-                    bool mainArtist = false;
-                    bool composer = false;
-                    bool performer = false;
-                    bool featured = false;
-                    bool lyricist = false;
+                    // format => artist name, role 1, role 2...
+                    string[] values = keyValues[i].Split(",");
+                    List<string> foundArtists = new();
 
-                    for (int i = 1; i < keyValues.Length; i++)
+                    // there may be multiple artists separated by a '&'
+                    string[] splitArtists = values[0].Split("&");
+                    foreach (string artist in splitArtists)
                     {
-                        string[] values = keyValues[i].ToLower().Split(",");
-                        for (int y = 0; y < values.Length; y++)
+                        if (!string.IsNullOrEmpty(artist) && !artist.Contains("...") && !artist.Contains("label"))
                         {
-                            if (values[y].Contains("associatedperformer") || values[y].Contains("featuredartist"))
-                            {
-                                performer = true;
-
-                                if (values[y].Contains("featuredartist"))
-                                {
-                                    featured = true;
-                                }
-                            }
-
-                            if (values[y].Contains("composerlyricist") || values[y].Contains("lyricist"))
-                            {
-                                lyricist = true;
-                            }
-                        }
-
-                        if (values[0].Contains('&'))
-                        {
-                            string[] artists = values[0].Split("&");
-
-                            foreach (string artist in artists)
-                            {
-                                if (!string.IsNullOrEmpty(artist) && !artist.Contains("...") && !artist.Contains("label"))
-                                {
-                                    output.TryAdd(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(artist.Trim()), new() {mainArtist, composer, performer, featured, lyricist });
-                                }
-                            }
-                        }
-                        else if (!values[0].Contains("...") && !values[0].Contains("label"))
-                        {
-                            output.Add(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(values[0].Trim()), new() {mainArtist, composer, performer, featured, lyricist });
+                            foundArtists.Add(artist);
                         }
                     }
 
+                    // find the roles
+                    for (int y = 0; y < values.Length; y++)
+                    {
+                        string role = values[y];
+
+                        string roleToLower = role.ToLower();
+                        if (rolesToIgnore.Any(r => rolesToIgnore.Contains(r)) || roleToLower == "engineer")
+                            continue;
+
+                        if (roleToLower.Contains("performer"))
+                        {
+                            role = "Performer";
+                        }
+
+                        if(roleToLower.Contains("featured"))
+                        {
+                            role = "Featured";
+                        }
+                        else if (roleToLower.Contains("lyricist"))
+                        {
+                            role = "Lyricist";
+                        }
+
+                        AddArtistsToDic(foundArtists, artists, role);
+                    }
                 }
             }
-
-            return output;
         }
 
         /// <summary>

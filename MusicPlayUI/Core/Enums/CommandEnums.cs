@@ -30,7 +30,6 @@ namespace MusicPlayUI.Core.Enums
         Artists,
         Playlists,
         NowPlaying,
-        Import,
         Settings,
         NavigateBack,
         EscapeFullScreen,
@@ -38,7 +37,7 @@ namespace MusicPlayUI.Core.Enums
         ToggleQueueDrawer,
         ToggleTheme,
 
-        // not shorcuts
+        // not shortcuts
         NavigateToAlbumById,
         NavigateToArtistById,
         NavigateToGenre,
@@ -70,7 +69,6 @@ namespace MusicPlayUI.Core.Enums
                 CommandEnums.Artists => "Navigate " + Resources.Artists_View,
                 CommandEnums.Playlists => "Navigate " + Resources.Playlists_View,
                 CommandEnums.NowPlaying => "Navigate " + Resources.Now_Playing_View,
-                CommandEnums.Import => "Navigate " + Resources.Import_Library_View,
                 CommandEnums.Settings => "Navigate " + Resources.Settings_View,
                 CommandEnums.NavigateBack => "Navigate Back",
                 CommandEnums.EscapeFullScreen => "Escape Full Screen",

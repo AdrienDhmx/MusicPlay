@@ -55,6 +55,9 @@
             <DataTemplate DataType="{x:Type modalviewmodel:UpdateShortcutViewModel}">
                 <modalview:UpdateShortcutView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type modalviewmodel:EditFolderViewModel}">
+                <modalview:EditFolderView/>
+            </DataTemplate>
 
             <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
                 <views:HomeView/>
@@ -70,9 +73,6 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewmodels:GenreLibraryViewModel}">
                 <views:GenreLibraryView/>
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type viewmodels:ImportLibraryViewModel}">
-                <views:ImportLibraryView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
                 <views:SettingsView/>
@@ -126,6 +126,9 @@
             <DataTemplate DataType="{x:Type settingsviewmodels:GeneralSettingsViewModel}">
                 <settingsviews:GeneralSettingView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsviewmodels:StorageSettingsViewModel}">
+                <settingsviews:StorageSettingsView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type settingsviewmodels:DSPSettingsViewModels}">
                 <settingsviews:DSPSettingsView/>
             </DataTemplate>
@@ -135,14 +138,13 @@
             <DataTemplate DataType="{x:Type settingsviewmodels:LanguageSettingViewModel}">
                 <settingsviews:LanguageSettingView/>
             </DataTemplate>
-
+            <DataTemplate DataType="{x:Type settingsviewmodels:ShortcutSettingViewModel}">
+                <settingsviews:ShortcutSettingView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type settingsviewmodels:VisualizerSettingViewModel}">
                 <settingsviews:VisualizerSettingView/>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type settingsviewmodels:ShortcutSettingViewModel}">
-                <settingsviews:ShortcutSettingView/>
-            </DataTemplate>
             
             <!-- Converters -->
             <converter:InverseBoolConverter x:Key="InverseBoolConverter"/>

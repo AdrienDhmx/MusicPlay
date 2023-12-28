@@ -19,6 +19,12 @@ namespace MusicFilesProcessor.Helpers
         /// C:\User\UserName\Music\MusicPlay\
         /// </summary>
         public static readonly string AppFolder = Path.Combine(MusicFolder, "MusicPlay");
+
+        /// <summary>
+        /// C:\User\UserName\Music\MusicPlay\.settings (hidden folder)
+        /// </summary>
+        public static readonly string AppSettingsFolder = Path.Combine(AppFolder, ".settings");
+
         /// <summary>
         /// C:\User\UserName\Music\MusicPlay\Covers\
         /// </summary>
@@ -46,7 +52,7 @@ namespace MusicFilesProcessor.Helpers
         }
 
         /// <summary>
-        /// Check wether the directory exists, if it doesn't create it.
+        /// Check whether the directory exists, if it doesn't create it.
         /// </summary>
         /// <param name="directory"></param>
         public static void CheckDirectory(this string directory)

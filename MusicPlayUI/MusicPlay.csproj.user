@@ -63,6 +63,9 @@
     <Compile Update="MVVM\Views\ModalViews\CreateModelNameModal.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\ModalViews\EditFolderView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -97,9 +100,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\HomeView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="MVVM\Views\ImportLibraryView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\LyricsView.xaml.cs">
@@ -151,6 +151,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\SettingsViews\ShortcutSettingView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\SettingsViews\StorageSettingsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\SettingsViews\VisualizerSettingTemplateView.xaml.cs">
@@ -215,6 +218,9 @@
     <Page Update="MVVM\Views\ModalViews\CreateModelNameModal.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="MVVM\Views\ModalViews\EditFolderView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -240,6 +246,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\SettingsViews\ShortcutSettingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\SettingsViews\StorageSettingsView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\SettingsViews\VisualizerSettingTemplateView.xaml">
@@ -327,9 +336,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\HomeView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="MVVM\Views\ImportLibraryView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\LyricsView.xaml">

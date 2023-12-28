@@ -170,10 +170,6 @@ namespace MusicPlayUI.Core.Services
                     CurrentViewName = viewName;
                     NavigateTo<GenreLibraryViewModel>(saveView: saveView);
                     break;
-                case ViewNameEnum.Import:
-                    CurrentViewName = viewName;
-                    NavigateTo<ImportLibraryViewModel>(saveView: saveView);
-                    break;
                 case ViewNameEnum.Settings:
                     CurrentViewName = viewName;
                     NavigateTo<SettingsViewModel>(saveView: saveView);
@@ -213,6 +209,10 @@ namespace MusicPlayUI.Core.Services
                 case ViewNameEnum.General:
                     ScdViewName = viewName;
                     NavigateToSecondaryView<GeneralSettingsViewModel>();
+                    break;
+                case ViewNameEnum.Import:
+                    CurrentViewName = viewName;
+                    NavigateToSecondaryView<StorageSettingsViewModel>();
                     break;
                 case ViewNameEnum.AppTheme:
                     ScdViewName = viewName;

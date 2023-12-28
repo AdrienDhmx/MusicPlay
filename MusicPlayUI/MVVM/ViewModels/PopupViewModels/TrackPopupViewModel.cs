@@ -155,7 +155,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         private async void AddToPlaylist(PlaylistModel playlist)
         {
             int index = (await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id)).Count + 1;
-            await DataAccess.Connection.AddTrackToPlaylist(playlist, SelectedTrack, index);
+            DataAccess.Connection.AddTrackToPlaylist(playlist, SelectedTrack, index);
             MessageHelper.PublishMessage(SelectedTrack.Title.TrackAddedToPlaylist(playlist.Name));
 
             UserPlaylists.Remove(playlist);
