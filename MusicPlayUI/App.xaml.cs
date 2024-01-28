@@ -3,14 +3,8 @@ using Microsoft.Extensions.Hosting;
 using AudioHandler;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using MusicPlayUI.MVVM.ViewModels;
-using DataBaseConnection.DataAccess;
 using MusicPlayUI.MVVM.Views.Windows;
 using MusicPlayUI.Core.Factories;
 using MusicFilesProcessor;
@@ -26,6 +20,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using System.Windows.Input;
 using FilesProcessor;
+using AudioHandler.Models;
+using MusicPlay.Database.DatabaseAccess;
+using MusicPlay.Database.Helpers;
+using LastFmNamespace.Interfaces;
+using LastFmNamespace;
+using MusicFilesProcessor.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace MusicPlayUI
 {
@@ -39,7 +40,11 @@ namespace MusicPlayUI
         public static readonly string defaultImage = "Resources\\DefaultImage.png";
         public static readonly string defaultArtistImage = "Resources\\DefaultArtistImage.jpg";
 
+        public static IAppState State { get; private set; }
         public static ShortcutsManager ShortcutsManager { get; private set; }
+        public static LastFm LastFm { get; private set; }
+        private const string LastFmApiKey = "5b481c2ba7326b31c2210dcd639bf8ac";
+
         private IServiceProvider _services;
         private IQueueService _queueService;
         protected override async void OnStartup(StartupEventArgs e)
@@ -48,15 +53,22 @@ namespace MusicPlayUI
 
             // register all the services, views, windows and viewmodels
             var builder = new HostBuilder().Register();
-
             var host = builder.Build();
-
             using var scope = host.Services.CreateScope();
-
             _services = scope.ServiceProvider;
+
+            State = _services.GetService<IAppState>();
 
             try
             {
+                { // make sure we have a database and that the foreign keys are enabled
+                    DatabaseContext context = new DatabaseContext();
+                    context.Database.EnsureCreated();
+                    context.Database.ExecuteSqlRaw("PRAGMA foreign_keys = ON");
+                }
+
+                ConfigurationService.Init();
+
                 // init language
                 LanguageService.SetLanguage(((SettingsValueEnum)ConfigurationService.GetPreference(SettingsEnum.Language)).GetLanguageCulture());
 
@@ -70,6 +82,9 @@ namespace MusicPlayUI
 
                 // init shortcuts services
                 ShortcutsManager = new(_services.GetRequiredService<ICommandsManager>(), window);
+
+                // init LastFm Services
+                LastFm = new(LastFmApiKey, "MusicPlay", "3.0.1", ConnectivityHelper.Instance);
 
                 // check for missing tracks
                 int deletedTracks = await ImportMusicLibrary.CheckTrackPaths();
@@ -86,7 +101,7 @@ namespace MusicPlayUI
                 int presetId = ConfigurationService.GetPreference(SettingsEnum.EqualizerPreset);
                 if(presetId >= 0) 
                 {
-                    audioPlayback.EQManager.ApplyPreset(await DataAccess.Connection.GetEQPreset(presetId));
+                    audioPlayback.EQManager.ApplyPreset(EQPreset.Get(presetId));
                 }
                 else
                 {
@@ -127,7 +142,7 @@ namespace MusicPlayUI
 
         protected override async void OnExit(ExitEventArgs e)
         {
-            if (_queueService.QueueTracks is null || _queueService.QueueTracks.Count == 0)
+            if (_queueService.Queue.Tracks.IsNullOrEmpty())
                 return;
 
             try

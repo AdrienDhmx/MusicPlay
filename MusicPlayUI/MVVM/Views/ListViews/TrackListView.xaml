@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" 
              xmlns:dd="urn:gong-wpf-dragdrop"
-             xmlns:model="clr-namespace:MusicPlayModels.MusicModels;assembly=MusicPlayModels"
-             xmlns:uimodel="clr-namespace:MusicPlayUI.MVVM.Models"
+             xmlns:model="clr-namespace:MusicPlay.Database.Models.DataBaseModels;assembly=MusicPlay.Database"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              mc:Ignorable="d" 
              x:Name="RootListview"
@@ -96,7 +95,7 @@
                             Margin="10, 10, 10,20"
                               x:Name="Tracks">
             <dd:DragDrop.EffectMoveAdornerTemplate>
-                <DataTemplate DataType="{x:Type uimodel:UIOrderedTrackModel}">
+                <DataTemplate DataType="{x:Type model:OrderedTrack}">
                     <Border Background="{DynamicResource Background}"
                                     BorderBrush="{DynamicResource Outline}"
                                         BorderThickness="1"
@@ -111,7 +110,7 @@
                                                 Height="50"
                                                 Width="50">
                                 <Border.Background>
-                                    <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource ONullImageConverter}}"/>
+                                    <ImageBrush ImageSource="{Binding ., Converter={StaticResource ONullImageConverter}}"/>
                                 </Border.Background>
                             </Border>
 
@@ -147,7 +146,7 @@
                             <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.PlayTrackCommand, ElementName=RootListview}"
                                                               CommandParameter="{Binding .}"/>
                             <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenTrackPopupCommand, ElementName=RootListview}"
-                                                              CommandParameter="{Binding .}"/>
+                                                              CommandParameter="{Binding Track}"/>
                         </Border.InputBindings>
                         <Grid Margin="10,0">
                             <Grid.ColumnDefinitions>
@@ -168,23 +167,23 @@
                                         Height="50"
                                         Width="50">
                                 <Border.Background>
-                                    <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource ONullImageConverter}}"
+                                    <ImageBrush ImageSource="{Binding Track, Converter={StaticResource ONullImageConverter}}"
                                                     Stretch="UniformToFill"/>
                                 </Border.Background>
                             </Border>
 
-                            <TextBlock Text="{Binding Title}"
+                            <TextBlock Text="{Binding Track.Title}"
                                                     Grid.Column="2"
                                                    Margin="10,0,4,0"
                                                     Style="{DynamicResource NTrackDataStyle}"/>
 
-                            <listview:ArtistsRelationListView Artists="{Binding Artists}"
+                            <listview:ArtistsRelationListView Artists="{Binding Track.TrackArtistRole, UpdateSourceTrigger=PropertyChanged}"
                                                                            Command="{Binding DataContext.NavigateToArtistByIdCommand, ElementName=RootListview}"
                                                                            VerticalAlignment="Center"
                                                                            Grid.Column="3"
                                                                             HorizontalAlignment="Left"/>
 
-                            <TextBlock Text="{Binding AlbumName}"
+                            <TextBlock Text="{Binding Track.Album.Name}"
                                                     Grid.Column="4"
                                            Width="180"
                                            Margin="4,0"
@@ -193,11 +192,11 @@
                                 <TextBlock.InputBindings>
                                     <MouseBinding Gesture="LeftClick" 
                                                       Command="{Binding DataContext.NavigateToAlbumByIdCommand, ElementName=RootListview}"
-                                                      CommandParameter="{Binding AlbumId}"/>
+                                                      CommandParameter="{Binding Track.AlbumId}"/>
                                 </TextBlock.InputBindings>
                             </TextBlock>
 
-                            <TextBlock Text="{Binding Duration}"
+                            <TextBlock Text="{Binding Track.Duration}"
                                                     Grid.Column="5"
                                                    HorizontalAlignment="Center"
                                                     Style="{DynamicResource NTrackDataStyle}"/>

@@ -1,12 +1,8 @@
 ﻿using AudioHandler;
-using MusicPlayModels.MusicModels;
-using Microsoft.Extensions.DependencyInjection;
 using MusicFilesProcessor;
-using MusicPlayUI.Core.Factories;
 using SpectrumVisualizer.Enums;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using MusicPlayUI.Core.Commands;
@@ -14,14 +10,11 @@ using MusicFilesProcessor.Helpers;
 using MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Enums;
-using Windows.System.UserProfile;
 using MusicPlayUI.Core.Services.Interfaces;
 using System.Windows;
 using MessageControl;
-using MusicPlayUI.MVVM.Views;
-using System.Net.NetworkInformation;
-using DataBaseConnection.DataAccess;
-using System.Drawing;
+
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -29,7 +22,7 @@ namespace MusicPlayUI.MVVM.ViewModels
     {
         private readonly IAudioPlayback _audioPlayback;
         private readonly IWindowService _windowService;
-
+        private readonly ICommandsManager _commandsManager;
         private IQueueService _queueService;
         public IQueueService QueueService
         {
@@ -40,11 +33,9 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private INavigationService _navigationService;
-        public INavigationService NavigationService
+        public static IAppState AppState
         {
-            get { return _navigationService; }
-            set { SetField(ref _navigationService, value); }
+            get => App.State;
         }
 
         private IVisualizerParameterStore _visualizerParameterService;
@@ -242,17 +233,17 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand OpenVisualizerSettingCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
-        public NowPlayingViewModel(INavigationService navigationService, IQueueService queueService,  IAudioPlayback audioPlayback, 
-            IVisualizerParameterStore visualizerParameterStore, IWindowService windowService, NowPlayingPlayerControlViewModel nowPlayingPlayerControlViewModel)
+        public NowPlayingViewModel(IQueueService queueService,  IAudioPlayback audioPlayback, IVisualizerParameterStore visualizerParameterStore, 
+            IWindowService windowService, NowPlayingPlayerControlViewModel nowPlayingPlayerControlViewModel, ICommandsManager commandsManager)
         {
-            NavigationService = navigationService;
             QueueService = queueService;
             _audioPlayback = audioPlayback;
             VisualizerParameterService = visualizerParameterStore;
             _windowService = windowService;
             PlayerViewModel = nowPlayingPlayerControlViewModel;
+            _commandsManager = commandsManager;
 
-            NavigationService.IsFullScreenChanged += IsFullScreenChanged;
+            AppState.FullScreenChanged += IsFullScreenChanged;
             _visualizerParameterService.AutoColorChanged += VAutoColorChanged;
             _visualizerParameterService.RepresentationChanged += VRepresentationChanged;
             _audioPlayback.StreamChanged += OnStreamChanged;
@@ -284,7 +275,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 }
             });
 
-            SwitchFullScreenCommand = new RelayCommand(NavigationService.ToggleFullScreen);
+            SwitchFullScreenCommand = new RelayCommand(AppState.ToggleFullScreen);
 
             OpenCloseCoverCommand = new RelayCommand(() =>
             {
@@ -304,12 +295,9 @@ namespace MusicPlayUI.MVVM.ViewModels
                 _windowService.OpenWindow(ViewNameEnum.Visualizer);
             });
 
-            NavigateToArtistCommand = new RelayCommand<int>(async (id) => NavigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id)));
+            NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
 
-            NavigateToAlbumCommand = new RelayCommand(async () =>
-            {
-                NavigationService.NavigateTo(ViewNameEnum.SpecificAlbum, await DataAccess.Connection.GetAlbum(QueueService.PlayingTrack.AlbumId));
-            });
+            NavigateToAlbumCommand = _commandsManager.NavigateToAlbumByIdCommand;
 
             LoadData();
             Stream = _audioPlayback.Stream;
@@ -318,7 +306,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void IsFullScreenChanged()
         {
-            IsFullScreen = NavigationService.IsFullScreen;
+            IsFullScreen = AppState.IsFullScreen;
         }
 
         public override void Dispose()
@@ -327,13 +315,13 @@ namespace MusicPlayUI.MVVM.ViewModels
             _visualizerParameterService.AutoColorChanged -= VAutoColorChanged;
             _visualizerParameterService.RepresentationChanged -= VRepresentationChanged;
             _audioPlayback.StreamChanged -= OnStreamChanged;
-            NavigationService.IsFullScreenChanged -= IsFullScreenChanged;
+            AppState.FullScreenChanged -= IsFullScreenChanged;
             PlayerViewModel.Dispose();
 
             // dispose of the subview if opened
             if (IsSubViewOpen)
             {
-                NavigationService.SecondaryViewModel?.Dispose();
+                AppState.CurrentView.State.ChildViewModel.ViewModel?.Dispose();
             }
 
             GC.SuppressFinalize(this);
@@ -381,13 +369,13 @@ namespace MusicPlayUI.MVVM.ViewModels
             if (selectedView == ViewNameEnum.Empty)
             {
                 IsSubViewOpen = false;
-                NavigationService.NavigateTo(ViewNameEnum.Empty);
+                AppState.CurrentView.State.ChildViewModel = new(new EmptyViewModel(), null);
                 ConfigurationService.SetPreference(SettingsEnum.NowPlayingStartingSubView, "0");
             }
             else
             {
                 IsSubViewOpen = true;
-                NavigationService.NavigateTo(selectedView);
+                //NavigationService.NavigateTo(selectedView);
                 ConfigurationService.SetPreference(SettingsEnum.NowPlayingStartingSubView, view.ToString());
             }
             SetWidthValue();
@@ -454,9 +442,9 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void LoadData()
         {
-            if(_queueService.PlayingTrack is not null)
+            if(_queueService.Queue.PlayingTrack is not null)
             {
-                IsFullScreen = _navigationService.IsFullScreen;
+                IsFullScreen = AppState.IsFullScreen;
                 SetCovers();
                 SetWidthValue();
             }
@@ -467,24 +455,24 @@ namespace MusicPlayUI.MVVM.ViewModels
             List<string> covers = new();
             int selectedCover = SelectedCoverIndex;
 
-            if (_queueService.QueueCover.ValidPath())
+            if (_queueService.Queue.Cover.ValidFilePath())
             {
-                covers.Add(_queueService.QueueCover);
+                covers.Add(_queueService.Queue.Cover);
                 selectedCover = 0;
             }
 
-            if (_queueService.PlayingTrack.AlbumCover.ValidPath() && 
-                _queueService.PlayingTrack.AlbumCover != _queueService.QueueCover)
+            if (_queueService.Queue.PlayingTrack.Album.AlbumCover.ValidFilePath() && 
+                _queueService.Queue.PlayingTrack.Album.AlbumCover != _queueService.Queue.Cover)
             {
-                covers.Add(_queueService.PlayingTrack.AlbumCover);
+                covers.Add(_queueService.Queue.PlayingTrack.Album.AlbumCover);
                 selectedCover = covers.Count - 1;
             }
 
-            if (_queueService.PlayingTrack.Artwork.ValidPath() && 
-                _queueService.PlayingTrack.Artwork != _queueService.PlayingTrack.AlbumCover &&
-                _queueService.PlayingTrack.Artwork != _queueService.QueueCover)
+            if (_queueService.Queue.PlayingTrack.Artwork.ValidFilePath() && 
+                _queueService.Queue.PlayingTrack.Artwork != _queueService.Queue.PlayingTrack.Album.AlbumCover &&
+                _queueService.Queue.PlayingTrack.Artwork != _queueService.Queue.Cover)
             {
-                covers.Add(_queueService.PlayingTrack.Artwork);
+                covers.Add(_queueService.Queue.PlayingTrack.Artwork);
                 selectedCover = covers.Count - 1;
             }
 
@@ -536,7 +524,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         }
         private void GetBlurredCover()
         {
-            if (SelectedCover.ValidPath())
+            if (SelectedCover.ValidFilePath())
             {
                 BlurredCover = SelectedCover.GetBlurredImage(20);
 
@@ -547,7 +535,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void SetSpectrumColor()
         {
-            if (BlurredCover.ValidPath() && VisualizerParameterService.AutoColor)
+            if (BlurredCover.ValidFilePath() && VisualizerParameterService.AutoColor)
             {
                 SolidColorBrush meanColor = ImageProcessor.CalculateMeanColor(BlurredCover);
 

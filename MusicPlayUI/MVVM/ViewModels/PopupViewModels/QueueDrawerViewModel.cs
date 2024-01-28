@@ -4,15 +4,21 @@ using MusicPlayUI.MVVM.Models;
 using System.Linq;
 using System.Windows.Input;
 using MusicPlayUI.Core.Services.Interfaces;
-using DataBaseConnection.DataAccess;
+
+
+using MusicPlay.Database.Models;
+using MusicPlayUI.Core.Services;
+using MusicPlayUI.Core.Helpers;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
     public class QueueDrawerViewModel : ViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IModalService _modalService;
         private readonly IPlaylistService _playlistService;
+        private readonly ICommandsManager _commandsManager;
+
+        public bool AreCoversEnabled { get; } = ConfigurationService.AreCoversEnabled;
 
         private IQueueService _queueService;
         public IQueueService QueueService
@@ -27,24 +33,31 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand OpenTrackPopupCommand { get; }
         public ICommand NavigateToPlayingFromCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
-        public QueueDrawerViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService)
+        public QueueDrawerViewModel(IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
             _modalService = modalService;
             _playlistService = playlistService;
+            _commandsManager = commandsManager;
 
-            RemoveTrackCommand = new RelayCommand<UIOrderedTrackModel>((track) => _queueService.RemoveTrack(track));
-            PlayTrackCommand = new RelayCommand<UIOrderedTrackModel>((track) => _queueService.PlayTrack(track));
-            OpenTrackPopupCommand = new RelayCommand<UIOrderedTrackModel>((track) => _navigationService.OpenPopup(ViewNameEnum.TrackPopup, track));
+            ConfigurationService.QueueCoversChange += () => OnPropertyChanged(nameof(AreCoversEnabled));
+
+            RemoveTrackCommand = new RelayCommand<Track>((track) => _queueService.RemoveTrack(track));
+            PlayTrackCommand = new RelayCommand<Track>((track) => _queueService.PlayTrack(track));
+            OpenTrackPopupCommand = _commandsManager.OpenTrackPopupCommand;
             SaveQueueAsPlaylistCommand = new RelayCommand(() =>_modalService.OpenModal(ViewNameEnum.CreatePlaylist, OnCreatePlaylistClosed));
-            NavigateToPlayingFromCommand = new RelayCommand(_queueService.NavigateToPlayingFrom);
-            NavigateToArtistCommand = new RelayCommand<int>(async (id) => _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id)));
+            NavigateToPlayingFromCommand = new RelayCommand(async () => await _queueService.NavigateToPlayingFrom());
+            NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
+        }
+
+        public override void Dispose()
+        {
+            ConfigurationService.QueueCoversChange -= () => OnPropertyChanged(nameof(AreCoversEnabled));
         }
 
         private void OnCreatePlaylistClosed(bool isCanceled)
         {
-            _playlistService.OnCreatePlaylistClosed(isCanceled, _queueService.QueueTracks.ToList().ToTrackModel());
+            _playlistService.OnCreatePlaylistClosed(isCanceled, _queueService.Queue.Tracks.ToList().ToTrack());
         }
     }
 }

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MusicPlayUI.Core.Enums;
 using System.Windows.Input;
 using MusicPlayUI.Core.Commands;
-using MusicPlayModels;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Models
 {

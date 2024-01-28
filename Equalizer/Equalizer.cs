@@ -64,8 +64,8 @@ namespace Equalizer
 
 
         private static event Action PresetChanged;
-        private static EQPresetModel preset = new();
-        private static List<EQEffectModel> effects => preset.Effects;
+        private static EQPreset preset = new();
+        private static List<EQBand> effects => preset.Effects;
 
         private const int fontSize = 16;
         private const double PointDiameter = 16;
@@ -183,7 +183,7 @@ namespace Equalizer
                 if (Math.Abs(MovingPointPos.Y - clickPosition.Y) > PointDiameter / 4 || Math.Abs(MovingPointPos.X - clickPosition.X) > PointDiameter / 4)
                 {
                     // we don't want to modify the preset object directly
-                    EQEffectModel effect = (EQEffectModel)effects[effectIndex].Clone();
+                    EQBand effect = (EQBand)effects[effectIndex].Clone();
 
                     effect.Gain = (Height - MovingPointPos.Y - GraphYStart) / YTickStep + YStartValue; // db can be negative (30 total => -15db ... +15db)
                     effect.CenterFrequency = GraphCoorToHz(ToGraphCoor(MovingPointPos).X);
@@ -227,7 +227,7 @@ namespace Equalizer
                     double newBandwidth = Math.Clamp(xChange / 100, MinBandwidth, MaxBandwidth);
 
                     // update the graph
-                    EQEffectModel effect = (EQEffectModel)effects[MovingEffectIndex].Clone();
+                    EQBand effect = (EQBand)effects[MovingEffectIndex].Clone();
                     effect.BandWidth = newBandwidth;
                     SelectedEQBand.BandWidth = newBandwidth;
                     effects[MovingEffectIndex] = effect;
@@ -254,7 +254,7 @@ namespace Equalizer
                     MovingPoint.RenderTransform = new TranslateTransform(transform.X, transform.Y);
 
                     // update the graph
-                    EQEffectModel effect = (EQEffectModel)effects[MovingEffectIndex].Clone();
+                    EQBand effect = (EQBand)effects[MovingEffectIndex].Clone();
                     effect.Gain = (Height - MovingPointPos.Y - GraphYStart) / YTickStep + YStartValue; // db can be negative
                     effect.CenterFrequency = GraphCoorToHz(ToGraphCoor(MovingPointPos).X);
                     SelectedEQBand.Gain = effect.Gain;
@@ -279,7 +279,7 @@ namespace Equalizer
                     double newBandwidth = Math.Clamp(xChange / 100, MinBandwidth, MaxBandwidth);
 
                     // update the graph
-                    EQEffectModel effect = (EQEffectModel)effects[MovingEffectIndex].Clone();
+                    EQBand effect = (EQBand)effects[MovingEffectIndex].Clone();
                     effect.BandWidth = newBandwidth;
                     effects[MovingEffectIndex] = effect;
 
@@ -393,7 +393,7 @@ namespace Equalizer
 
         private void DrawPreset(bool preview = false)
         {
-            List<EQEffectModel> _effects = new List<EQEffectModel>();
+            List<EQBand> _effects = new List<EQBand>();
             if(preview)
             {
                 _effects = effects;
@@ -419,7 +419,7 @@ namespace Equalizer
             List<List<Point>> AllBandsPlotedPoints = new List<List<Point>>();
 
             int pointIndex = 1;
-            foreach (EQEffectModel effect in _effects)
+            foreach (EQBand effect in _effects)
             {
                 double yCenter = GainToGraphCoor(effect.Gain);
                 double xCenter = HzToGraphCoor(effect.CenterFrequency);
@@ -562,7 +562,7 @@ namespace Equalizer
             DrawBezierCurve(cumulatedPoints, color, preview ? PreviewGraphOpacity : CumulatedGraphOpacity, 5, preview ? CumulatedGraphUpdatePreview : "");
         }
 
-        private List<Point> PlotBandCurve(EQEffectModel eqBand)
+        private List<Point> PlotBandCurve(EQBand eqBand)
         {
             double spaceBetweenPoints = GraphWidth / pointToPlot;
             bool centerFreqAdded = false;
@@ -593,7 +593,7 @@ namespace Equalizer
         /// <param name="eqBand">The band to calculate the coordinates from, used to get the y</param>
         /// <param name="f">The frequency at wich to calculate the coordinates, used to get the x</param>
         /// <returns></returns>
-        private Point CalculateBandCoor(EQEffectModel eqBand, double f)
+        private Point CalculateBandCoor(EQBand eqBand, double f)
         {
             double gain = CalculateGain(eqBand.Gain, f, eqBand.CenterFrequency, eqBand.Q);
             double x = HzToGraphCoor(f);

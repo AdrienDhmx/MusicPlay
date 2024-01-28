@@ -35,7 +35,7 @@ namespace MusicPlayUI
                 services.AddSingleton<Func<Type, Window>>(servicesProvider => window => (Window)servicesProvider.GetRequiredService(window));
 
                 // Services
-                services.AddSingleton<INavigationService, NavigationService>();
+                services.AddSingleton<IAppState, AppState>();
                 services.AddSingleton<IQueueService, QueueService>();
                 services.AddSingleton<IHistoryServices, HistoryServices>();
                 services.AddSingleton<IRadioStationsService, RadioStationsService>();

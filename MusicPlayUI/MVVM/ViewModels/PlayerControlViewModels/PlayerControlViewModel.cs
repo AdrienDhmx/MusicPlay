@@ -1,11 +1,7 @@
 ﻿using AudioHandler;
-using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using MusicFilesProcessor.Helpers;
 using System;
 using System.Timers;
 using System.Windows.Input;
-using Timer = System.Timers.Timer;
 using System.Collections.ObjectModel;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Services;
@@ -17,13 +13,17 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using MusicFilesProcessor;
 using System.Windows.Documents;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.AudioModels;
+using MusicPlayUI.Converters;
+using MusicPlayUI.Core.Helpers;
+using MusicPlayUI.MVVM.ViewModels.PopupViewModels;
+
 
 namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 {
     public class PlayerControlViewModel : ViewModel
     {
-        private readonly INavigationService _navigationService;
-
         private IAudioTimeService _audioService;
         public IAudioTimeService AudioService
         {
@@ -125,7 +125,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
         public Geometry CurrentDeviceIcon => CurrentDevice.Icon;
 
-
         private ObservableCollection<FullDeviceModel> _allDevices = new(AudioOutput.GetAllDevices().CreateDeviceModel());
         public ObservableCollection<FullDeviceModel> AllDevices
         {
@@ -151,8 +150,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         {
             get
             {
-                if (QueueService.PlayingTrack != null)
-                    return (int)QueueService.PlayingTrack.Rating;
+                if (QueueService.Queue.PlayingTrack != null)
+                    return (int)QueueService.Queue.PlayingTrack.Rating;
                 else
                     return 0;
             }
@@ -163,6 +162,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         }
 
         private bool _isFavorite;
+        private readonly ICommandsManager _commandsManager;
+
         public bool IsFavorite
         {
             get { return _isFavorite; }
@@ -188,12 +189,12 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         public ICommand MuteCommand { get; }
         public ICommand OpenCloseQueuePopupCommand { get; }
         public ICommand NavigateToPlayingFromCommand { get; }
-        public PlayerControlViewModel(INavigationService navigationService, IAudioTimeService audioService, IAudioPlayback audioPlayback, IQueueService queueService)
+        public PlayerControlViewModel(IAudioTimeService audioService, IAudioPlayback audioPlayback, IQueueService queueService, ICommandsManager commandsManager)
         {
-            _navigationService = navigationService;
             AudioService = audioService;
             AudioPlayback = audioPlayback;
             QueueService = queueService;
+            _commandsManager = commandsManager;
 
             // same prop to update in both cases
             QueueService.PlayingTrackChanged += OnPlayingTrackChanged;
@@ -224,13 +225,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             RepeatCommand = new RelayCommand(() =>
             {
-                if (_audioService.IsLooping)
+                if (_audioPlayback.IsLooping)
                 {
                     _audioService.Loop(); // Remove the loop
                 }
                 else
                 {
-                    if (QueueService.IsOnRepeat)
+                    if (QueueService.Queue.IsOnRepeat)
                     {
                         _audioService.Loop(); // set the loop
                     }
@@ -238,27 +239,17 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
                 }
             });
 
-            NavigateToAlbumCommand = new RelayCommand(async () =>
-            {
-                AlbumModel Album = await DataAccess.Connection.GetAlbum(QueueService.PlayingTrack.AlbumId);
-                _navigationService.NavigateTo(ViewNameEnum.SpecificAlbum, Album);
-            });
+            NavigateToAlbumCommand = _commandsManager.NavigateToAlbumByIdCommand;
 
-            NavigateToArtistCommand = new RelayCommand<int>(async (id) =>
-            {
-                ArtistModel Performer = await DataAccess.Connection.GetArtist(id);
-
-                _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, Performer);
-            });
+            NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
 
             NavigateToNowPlayingCommand = new RelayCommand(() =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.NowPlaying);
+                App.State.NavigateTo<NowPlayingViewModel>();
             });
 
             IsFavoriteCommand = new RelayCommand(async () =>
             {
-                IsFavorite = !IsFavorite;
                 await _queueService.UpdateFavorite(IsFavorite);
             });
 
@@ -284,12 +275,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             MuteCommand = new RelayCommand(_audioPlayback.Mute);
 
-            OpenCloseQueuePopupCommand = new RelayCommand(() =>
-            {
-                _navigationService.ToggleQueueDrawer();
-            });
+            OpenCloseQueuePopupCommand = new RelayCommand(App.State.ToggleQueueDrawer);
 
-            NavigateToPlayingFromCommand = new RelayCommand(_queueService.NavigateToPlayingFrom);
+            NavigateToPlayingFromCommand = new RelayCommand(async () => await _queueService.NavigateToPlayingFrom());
 
             UpdateBlurredCover();
         }
@@ -360,9 +348,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
         private void UpdateBlurredCover()
         {
-            if (QueueService.PlayingTrack != null && ColorfulPlayerControl)
+            if (QueueService.Queue.PlayingTrack != null && ColorfulPlayerControl)
             {
-                BlurredCover = QueueService.PlayingTrack.Cover.GetBlurredImage(20);
+                BlurredCover = QueueService.Queue.PlayingTrack.GetCover().GetBlurredImage(20);
                 UpdateRadialGradient();
             }
         }
@@ -395,14 +383,10 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
         private void OpenTrackPopup()
         {
-            if (!_navigationService.IsPopupOpen)
-            {
-                _navigationService.OpenPopup(ViewNameEnum.TrackPopup, QueueService.PlayingTrack);
-            }
+            if (!App.State.IsPopupOpen)
+                App.State.OpenPopup<TrackPopupViewModel>(QueueService.Queue.PlayingTrack);
             else
-            {
-                _navigationService.ClosePopup();
-            }
+                App.State.ClosePopup();
         }
 
         private void VolumeIsChanging(int volume)
@@ -426,9 +410,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
         private void OnPlayingTrackChanged()
         {
-            if (QueueService.PlayingTrack is not null) 
+            if (QueueService.Queue.PlayingTrack is not null) 
             {
-                IsFavorite = QueueService.PlayingTrack.IsFavorite;
+                IsFavorite = QueueService.Queue.PlayingTrack.IsFavorite;
                 OnPropertyChanged(nameof(Rating));
                 UpdateBlurredCover();
             }

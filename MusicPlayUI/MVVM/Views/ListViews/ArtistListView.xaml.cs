@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {
@@ -27,15 +27,15 @@ namespace MusicPlayUI.MVVM.Views.ListViews
             InitializeComponent();
         }
 
-        public ObservableCollection<ArtistModel> Artists
+        public ObservableCollection<Artist> Artists
         {
-            get { return (ObservableCollection<ArtistModel>)GetValue(ArtistsProperty); }
+            get { return (ObservableCollection<Artist>)GetValue(ArtistsProperty); }
             set { SetValue(ArtistsProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Artists.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for TrackArtistRole.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ArtistsProperty =
-            DependencyProperty.Register("Artists", typeof(ObservableCollection<ArtistModel>), typeof(ArtistListView), new PropertyMetadata(new ObservableCollection<ArtistModel>()));
+            DependencyProperty.Register("Artists", typeof(ObservableCollection<Artist>), typeof(ArtistListView), new PropertyMetadata(new ObservableCollection<Artist>()));
 
     }
 

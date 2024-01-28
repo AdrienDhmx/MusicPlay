@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using AudioHandler;
-using DataBaseConnection.DataAccess;
 using MessageControl;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
+using MusicPlayUI.MVVM.ViewModels;
+using MusicPlayUI.MVVM.ViewModels.PopupViewModels;
 
 namespace MusicPlayUI.Core.Commands
 {
@@ -21,7 +18,6 @@ namespace MusicPlayUI.Core.Commands
     {
         private readonly IAudioPlayback _audioPlayback;
         private readonly IQueueService _queueService;
-        private readonly INavigationService _navigationService;
         private readonly IAudioTimeService _audioTimeService;
 
         // audio
@@ -70,11 +66,10 @@ namespace MusicPlayUI.Core.Commands
         public ICommand MaximizeCommand { get; }
         public ICommand LeaveCommand { get; }
 
-        public CommandsManager(IAudioPlayback audioPlayback, IQueueService queueService, INavigationService navigationService, IAudioTimeService audioTimeService)
+        public CommandsManager(IAudioPlayback audioPlayback, IQueueService queueService, IAudioTimeService audioTimeService)
         {
             _audioPlayback = audioPlayback;
             _queueService = queueService;
-            _navigationService = navigationService;
             _audioTimeService = audioTimeService;
 
             PlayPauseCommand = new RelayCommand(_audioTimeService.PlayPause);
@@ -102,13 +97,13 @@ namespace MusicPlayUI.Core.Commands
 
             RepeatCommand = new RelayCommand(() =>
             {
-                if (_audioTimeService.IsLooping)
+                if (_audioPlayback.IsLooping)
                 {
                     _audioTimeService.Loop(); // unloop
                 }
                 else
                 {
-                    if (queueService.IsOnRepeat)
+                    if (queueService.Queue.IsOnRepeat)
                     {
                         _audioTimeService.Loop(); // loop
                     }
@@ -118,7 +113,7 @@ namespace MusicPlayUI.Core.Commands
 
             FavoriteCommand = new RelayCommand(() =>
             {
-                queueService.UpdateFavorite(!_queueService.PlayingTrack.IsFavorite);
+                queueService.UpdateFavorite(!_queueService.Queue.PlayingTrack.IsFavorite);
             });
 
             RatingCommand = new RelayCommand<string>((value) =>
@@ -127,70 +122,61 @@ namespace MusicPlayUI.Core.Commands
                     queueService.UpdateRating(rating);
             });
 
-            NavigateCommand = new RelayCommand<ViewNameEnum>((view) =>
-            {
-                _navigationService.NavigateTo(view);
-            });
-
-            NavigateBackCommand = new RelayCommand(_navigationService.NavigateBack);
+            NavigateBackCommand = new RelayCommand(App.State.NavigateBack);
 
             NavigateToAlbumByIdCommand = new RelayCommand<int>(async (int id) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificAlbum, await DataAccess.Connection.GetAlbum(id));
+                App.State.NavigateTo<AlbumViewModel>(await Album.Get(id));
             });
 
             NavigateToArtistByIdCommand = new RelayCommand<int>(async (int id) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id));
+                App.State.NavigateTo<ArtistViewModel>(await Artist.Get(id));
             });
 
-            NavigateToGenreCommand = new RelayCommand<TagModel>((genre) =>
+            NavigateToGenreCommand = new RelayCommand<Tag>((genre) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificGenre, genre);
+                App.State.NavigateTo<GenreViewModel>(genre);
             });
 
-            NavigateToAlbumCommand = new RelayCommand<AlbumModel>((album) =>
+            NavigateToAlbumCommand = new RelayCommand<Album>((album) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificAlbum, album);
+                App.State.NavigateTo<AlbumViewModel>(album);
             });
 
-            NavigateToArtistCommand = new RelayCommand<ArtistModel>((artist) =>
+            NavigateToArtistCommand = new RelayCommand<Artist>((artist) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, artist);
+                App.State.NavigateTo<ArtistViewModel>(artist);
             });
 
-            NavigateToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) =>
+            NavigateToPlaylistCommand = new RelayCommand<Playlist>((playlist) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificPlaylist, playlist);
+                App.State.NavigateTo<PlaylistViewModel>(playlist);
             });
 
-            OpenAlbumPopupCommand = new RelayCommand<AlbumModel>((album) => _navigationService.OpenPopup(ViewNameEnum.AlbumPopup, album));
-            OpenTrackPopupCommand = new RelayCommand<UIOrderedTrackModel>((track) => _navigationService.OpenPopup(ViewNameEnum.TrackPopup, track));
-            OpenArtistPopupCommand = new RelayCommand<ArtistModel>((artist) => _navigationService.OpenPopup(ViewNameEnum.ArtistPopup, artist));
-            OpenPlaylistPopupCommand = new RelayCommand<PlaylistModel>((playlist) => _navigationService.OpenPopup(ViewNameEnum.PlaylistPopup, playlist));
-            OpenTagPopupCommand = new RelayCommand<UITagModel>((tag) => _navigationService.OpenPopup(ViewNameEnum.TagPopup, tag));
+            OpenAlbumPopupCommand = new RelayCommand<Album>(App.State.OpenPopup<AlbumPopupViewModel>);
+            OpenTrackPopupCommand = new RelayCommand<Track>(App.State.OpenPopup<TrackPopupViewModel>);
+            OpenArtistPopupCommand = new RelayCommand<Artist>(App.State.OpenPopup<ArtistPopupViewModel>);
+            OpenPlaylistPopupCommand = new RelayCommand<Playlist>(App.State.OpenPopup<PlaylistPopupViewModel>);
+            OpenTagPopupCommand = new RelayCommand<UITagModel>(App.State.OpenPopup<TagPopupViewModel>);
 
+            ToggleQueueDrawerCommand = new RelayCommand(App.State.ToggleQueueDrawer);
 
-            ToggleQueueDrawerCommand = new RelayCommand(_navigationService.ToggleQueueDrawer);
-
-            ToggleFullScreenCommand = new RelayCommand(_navigationService.ToggleFullScreen);
+            ToggleFullScreenCommand = new RelayCommand(App.State.ToggleFullScreen);
 
             EscapeFullScreenCommand = new RelayCommand(() =>
             {
-                if (_navigationService.IsFullScreen)
-                    _navigationService.ToggleFullScreen();
+                if (App.State.IsFullScreen)
+                    App.State.ToggleFullScreen();
             });
 
-            ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);
+            ClosePopupCommand = new RelayCommand(App.State.ClosePopup);
 
-            UpdateAlbumCover = new RelayCommand<AlbumModel>((album) =>
+            UpdateAlbumCover = new RelayCommand<Album>(async (album) =>
             {
-                if (CoverService.ChangeCover(album))
+                if (await CoverService.ChangeCover(album))
                 {
-                    if (_navigationService.CurrentViewName == ViewNameEnum.Albums || _navigationService.CurrentViewName == ViewNameEnum.SpecificAlbum)
-                    {
-                        _navigationService.CurrentViewModel.Update();
-                    }
+                    App.State.CurrentView.ViewModel.Update();
                 }
             });
 

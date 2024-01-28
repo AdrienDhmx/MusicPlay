@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {
@@ -26,19 +18,15 @@ namespace MusicPlayUI.MVVM.Views.ListViews
             InitializeComponent();
         }
 
-
-
-        public List<ArtistDataRelation> Artists
+        public ObservableCollection<TrackArtistsRole> Artists
         {
-            get { return (List<ArtistDataRelation>)GetValue(ArtistsProperty); }
+            get { return (ObservableCollection<TrackArtistsRole>)GetValue(ArtistsProperty); }
             set { SetValue(ArtistsProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Artists.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for TrackArtistRole.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ArtistsProperty =
-            DependencyProperty.Register("Artists", typeof(List<ArtistDataRelation>), typeof(TrackArtistsListView), new PropertyMetadata(new List<ArtistDataRelation>()));
-
-
+            DependencyProperty.Register("Artists", typeof(ObservableCollection<TrackArtistsRole>), typeof(TrackArtistsListView), new PropertyMetadata(new ObservableCollection<TrackArtistsRole>()));
 
         public ICommand Command
         {

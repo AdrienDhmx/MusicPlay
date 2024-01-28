@@ -5,6 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using MarkdownViewerControl;
+using MusicPlay.Database.Helpers;
 
 namespace MusicPlayUI.MVVM.Views.Templates
 {
@@ -14,6 +16,8 @@ namespace MusicPlayUI.MVVM.Views.Templates
     public partial class TextPreviewTemplate : UserControl
     {
         private const int _animationDurationInMs = 400;
+        private bool _parsed = false;
+        private Size _markdownDesiredSize = Size.Empty;
 
         public TextPreviewTemplate()
         {
@@ -21,17 +25,20 @@ namespace MusicPlayUI.MVVM.Views.Templates
 
             Loaded += OnLoaded;
             SizeChanged += OnLoaded;
-            
         }
 
         protected override void OnChildDesiredSizeChanged(UIElement child)
         {
             base.OnChildDesiredSizeChanged(child);
+            MarkdownViewer.MeasureDesiredSize(new Size(this.ActualWidth, double.PositiveInfinity));
+            _markdownDesiredSize = MarkdownViewer.DesiredSize;
+            
             Init();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            _parsed = false;
             Init();
         }
 
@@ -74,12 +81,19 @@ namespace MusicPlayUI.MVVM.Views.Templates
 
         private async void Init(int retry = 2)
         {
-            Size TextDesiredSize = MeasureText();
-            CanExtend = TextDesiredSize.Height > PreviewHeight + 0.6 * PreviewHeight; // add a margin so that the extend option is not just for a single line
+            if (Text.IsNotNullOrWhiteSpace() && !_parsed)
+            {
+                MarkdownViewer.ParseMarkdown(Text);
+                _parsed = true;
+            }
+
+            MarkdownViewer.MeasureDesiredSize(new Size(this.ActualWidth, double.PositiveInfinity));
+            _markdownDesiredSize = MarkdownViewer.DesiredSize;
+            CanExtend = _markdownDesiredSize.Height > PreviewHeight + 0.6 * PreviewHeight; // add a margin so that the extend option is not just for a single line
             if (!CanExtend) // text is too short to be extended
             {
-                TextContainer.Height = TextDesiredSize.Height;
-                CacheBorder.Height = TextDesiredSize.Height;
+                TextContainer.Height = _markdownDesiredSize.Height;
+                CacheBorder.Height = _markdownDesiredSize.Height;
 
                 CacheBorder.Visibility = Visibility.Collapsed;
                 ExtendButton.Visibility = Visibility.Collapsed;
@@ -89,6 +103,7 @@ namespace MusicPlayUI.MVVM.Views.Templates
                 TextContainer.Height = PreviewHeight;
                 CacheBorder.Height = PreviewHeight;
 
+                CacheBorder.IsHitTestVisible = false;
                 CacheBorder.Visibility = Visibility.Visible;
                 ExtendButton.Visibility = Visibility.Visible;
 
@@ -96,7 +111,7 @@ namespace MusicPlayUI.MVVM.Views.Templates
                 ExtendButton.PreviewMouseLeftButtonUp += OnCacheBorderClick;
             }
 
-            if(retry > 0)
+            if(retry > 0 && !_parsed)
             {
                 await Task.Delay(1000);
                 Init(--retry);
@@ -110,9 +125,10 @@ namespace MusicPlayUI.MVVM.Views.Templates
                 Text = this.Text,
                 TextWrapping = TextWrapping.Wrap,
                 Width = this.ActualWidth,
-                FontSize = TextHolder.FontSize,
-                FontWeight = TextHolder.FontWeight,
+                FontSize = MarkdownViewer.FontSize + 0.5, // take into account possible headers
+                FontWeight = MarkdownViewer.FontWeight,
             };
+
 
             textBlock.Measure(new Size(this.ActualWidth, double.PositiveInfinity));
             return textBlock.DesiredSize;
@@ -127,7 +143,7 @@ namespace MusicPlayUI.MVVM.Views.Templates
                 DoubleAnimation animation = new DoubleAnimation
                 {
                     From = TextContainer.ActualHeight,
-                    To = MeasureText().Height,
+                    To = _markdownDesiredSize.Height,
                     Duration = TimeSpan.FromMilliseconds(_animationDurationInMs)
                 };
 

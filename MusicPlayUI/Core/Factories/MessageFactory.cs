@@ -35,6 +35,14 @@ namespace MusicPlayUI.Core.Factories
             DefaultMessageFactory.RegisterSuccessMessageStyle(MessageColors.SuccessContainer, MessageColors.OnSuccessContainer, MessageColors.SuccessHover, SuccessIcon);
         }
 
+        public static void PublishWithAppDispatcher(this MessageModel message)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                MessageHelper.PublishMessage(message);
+            });
+        }
+
         public static MessageModel ErrorMessage(ErrorEnum errorType)
         {
             string message = errorType.GetErrorMessage();

@@ -1,13 +1,4 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicFilesProcessor;
-using MusicFilesProcessor.Helpers;
-using MusicPlayModels.MusicModels;
-using MusicPlayUI.Core.Factories;
-using MusicPlayUI.Core.Services;
-using MusicPlayUI.Core.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;

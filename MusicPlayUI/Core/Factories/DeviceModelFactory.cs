@@ -1,5 +1,5 @@
-﻿using AudioHandler.Enums;
-using AudioHandler.Models;
+﻿using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models.AudioModels;
 using MusicPlayUI.MVVM.Models;
 using System;
 using System.Collections.Generic;
@@ -14,12 +14,12 @@ namespace MusicPlayUI.Core.Factories
 {
     public static class DeviceModelFactory
     {
-        public static FullDeviceModel CreateDeviceModal(this DeviceModel device)
+        public static FullDeviceModel CreateDeviceModal(this AudioDeviceModel device)
         {
-            return new(device, GetIcon(device.Type));
+            return new(device, GetIcon(device.DeviceType));
         }
 
-        public static List<FullDeviceModel> CreateDeviceModel(this List<DeviceModel> devices)
+        public static List<FullDeviceModel> CreateDeviceModel(this List<AudioDeviceModel> devices)
         {
             List<FullDeviceModel> result = new List<FullDeviceModel>();
             foreach (var d in devices)
@@ -29,10 +29,10 @@ namespace MusicPlayUI.Core.Factories
             return result;
         }
 
-        public static DeviceModel ToDeviceModel(this FullDeviceModel fullDeviceModel)
+        public static AudioDeviceModel ToDeviceModel(this FullDeviceModel fullDeviceModel)
         {
-            DeviceModel output = new();
-            output.Type = fullDeviceModel.Type;
+            AudioDeviceModel output = new(fullDeviceModel.Name);
+            output.DeviceType = fullDeviceModel.Type;
             output.Name = fullDeviceModel.Name;
             output.IsDefault = fullDeviceModel.IsDefault;
             output.IsInitialized = fullDeviceModel.IsInitialized;
@@ -40,23 +40,23 @@ namespace MusicPlayUI.Core.Factories
             return output;
         }
 
-        private static Geometry GetIcon(DeviceTypeEnum deviceType)
+        private static Geometry GetIcon(AudioDeviceTypeEnum deviceType)
         {
             switch (deviceType)
             {
-                case DeviceTypeEnum.UNKNOWN:
+                case AudioDeviceTypeEnum.UNKNOWN:
                     return (PathGeometry)App.IconDic["UnknownDevice"];
-                case DeviceTypeEnum.HeadPhones:
+                case AudioDeviceTypeEnum.HeadPhones:
                     return (PathGeometry)App.IconDic["Headphones"];
-                case DeviceTypeEnum.HeadSet:
+                case AudioDeviceTypeEnum.HeadSet:
                     return (PathGeometry)App.IconDic["Headset"];
-                case DeviceTypeEnum.Speakers:
+                case AudioDeviceTypeEnum.Speakers:
                     return (Geometry)App.IconDic["Speakers"];
-                case DeviceTypeEnum.HDMI:
+                case AudioDeviceTypeEnum.HDMI:
                     return (PathGeometry)App.IconDic["HDMI"];
-                case DeviceTypeEnum.Network:
+                case AudioDeviceTypeEnum.Network:
                     return (PathGeometry)App.IconDic["UnknownDevice"];
-                case DeviceTypeEnum.SPDIF:
+                case AudioDeviceTypeEnum.SPDIF:
                     return (PathGeometry)App.IconDic["SPDIF"];
                 default:
                     return (PathGeometry)App.IconDic["UnknownDevice"];

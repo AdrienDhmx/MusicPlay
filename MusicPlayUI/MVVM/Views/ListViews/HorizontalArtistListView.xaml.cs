@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {
@@ -27,14 +27,14 @@ namespace MusicPlayUI.MVVM.Views.ListViews
             InitializeComponent();
         }
 
-        public ObservableCollection<ArtistModel> Artists
+        public ObservableCollection<Artist> Artists
         {
-            get { return (ObservableCollection<ArtistModel>)GetValue(ArtistsProperty); }
+            get { return (ObservableCollection<Artist>)GetValue(ArtistsProperty); }
             set { SetValue(ArtistsProperty, value); }
         }
 
         public static readonly DependencyProperty ArtistsProperty =
-            DependencyProperty.Register("Artists", typeof(ObservableCollection<ArtistModel>), typeof(HorizontalArtistListView), new PropertyMetadata(new ObservableCollection<ArtistModel>()));
+            DependencyProperty.Register("Artists", typeof(ObservableCollection<Artist>), typeof(HorizontalArtistListView), new PropertyMetadata(new ObservableCollection<Artist>()));
 
 
     }

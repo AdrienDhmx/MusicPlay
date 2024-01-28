@@ -9,6 +9,7 @@ namespace MusicPlayUI.Core.Services
         public static event Action QueueCoversChange;
         private static void OnQueueCoverChanged()
         {
+            UpdateCoverSettings();
             QueueCoversChange?.Invoke();
         }
 
@@ -16,6 +17,19 @@ namespace MusicPlayUI.Core.Services
         private static void OnColorfulPlayerControlChanged()
         {
             ColorfulPlayerControlChange?.Invoke();
+        }
+
+        public static bool AreCoversEnabled { get; private set; } = true;
+
+        public static bool AlbumCoverOnly { get; private set; } = false;
+
+        public static bool ArtworkOnly { get; private set; } = false;
+
+        public static bool AutoCover { get; private set; } = true;
+
+        public static void Init()
+        {
+            UpdateCoverSettings();
         }
 
         public static int GetPreference(SettingsEnum key)
@@ -317,6 +331,33 @@ namespace MusicPlayUI.Core.Services
             }
             Settings.Default.Save();
             return true;
+        }
+
+        private static void UpdateCoverSettings()
+        {
+            AreCoversEnabled = true;
+            AlbumCoverOnly = false;
+            ArtworkOnly = false;
+            AutoCover = false;
+            SettingsValueEnum settingsValue = (SettingsValueEnum)GetPreference(SettingsEnum.QueueCovers);
+            switch (settingsValue)
+            {
+                case SettingsValueEnum.NoCovers:
+                    AreCoversEnabled = false;
+                    break;
+                case SettingsValueEnum.AlbumCovers:
+                    AlbumCoverOnly = true;
+                    break;
+                case SettingsValueEnum.ArtworkCovers:
+                    ArtworkOnly = true;
+                    break;
+                case SettingsValueEnum.AutoCovers:
+                    AutoCover = true;
+                    break;
+                default:
+                    AutoCover = true;
+                    break;
+            }
         }
     }
 }

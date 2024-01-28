@@ -1,12 +1,9 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.Enums;
-using MusicPlayModels.MusicModels;
-using MusicFilesProcessor.Helpers;
+﻿using MusicFilesProcessor.Helpers;
 using MusicPlayUI.Core.Commands;
 using System.Collections.Generic;
 using System.Windows.Input;
 using MusicPlayUI.Core.Enums;
-using MusicPlayModels;
+
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Helpers;
 using System.Collections.ObjectModel;
@@ -14,15 +11,17 @@ using System.Linq;
 using GongSolutions.Wpf.DragDrop;
 using System.Windows;
 using MusicPlayUI.MVVM.Models;
-using MusicPlayUI.Core.Services;
-using DataBaseConnection.Model;
 using System;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Enums;
+using System.Threading.Tasks;
+using MusicPlay.Database.Helpers;
+
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class PlaylistViewModel : ViewModel, IDropTarget
     {
-        private readonly INavigationService _navigationService;
         private readonly IModalService _modalService;
         private readonly IPlaylistService _playlistService;
         private readonly ICommandsManager _commandsManager;
@@ -36,8 +35,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private PlaylistModel _playlist;
-        public PlaylistModel Playlist
+        private Playlist _playlist;
+        public Playlist Playlist
         {
             get => _playlist;
             set 
@@ -49,8 +48,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<TagModel> _tags;
-        public List<TagModel> Tags
+        private List<Tag> _tags;
+        public List<Tag> Tags
         {
             get => _tags;
             set
@@ -136,16 +135,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<UIOrderedTrackModel> _playlistTracks;
-        public ObservableCollection<UIOrderedTrackModel> PlaylistTracks
-        {
-            get { return _playlistTracks; }
-            set
-            {
-                SetField(ref _playlistTracks, value);
-            }
-        }
-
         private bool trackIndexChanged = false;
 
         public ICommand OpenTrackPopupCommand { get; }
@@ -158,9 +147,8 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand NavigateToAlbumByIdCommand { get; }
         public ICommand NavigateToTagCommand { get; }
         public ICommand SaveRadioCommand { get; }
-        public PlaylistViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager)
+        public PlaylistViewModel(IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager)
         {
-            _navigationService = navigationService;
             QueueService = queueService;
             _modalService = modalService;
             _playlistService = playlistService;
@@ -169,7 +157,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             // play
             PlayPlaylistCommand = new RelayCommand(() => PlayPlaylist());
             PlayShuffledPlaylistCommand = new RelayCommand(() => PlayPlaylist(true));
-            PlayTrackCommand = new RelayCommand<UIOrderedTrackModel>((track) => PlayPlaylist(false, track));
+            PlayTrackCommand = new RelayCommand<Track>((track) => PlayPlaylist(false, track));
 
             // navigate
             NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
@@ -181,8 +169,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             OpenPlaylistPopupCommand = _commandsManager.OpenPlaylistPopupCommand;
 
             // playlist related command
-            EditPlaylistCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.CreatePlaylist, OnModalClosed, Playlist));
-            SaveRadioCommand = new RelayCommand(() => _playlistService.SaveRadio(Playlist, PlaylistTracks.ToList().ToOrderedTrackModel()));
+            EditPlaylistCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.CreatePlaylist, (canceled) => { }, Playlist));
+            SaveRadioCommand = new RelayCommand(() => _playlistService.SaveRadio(Playlist, [.. Playlist.Tracks]));
 
             // load data
             Update();
@@ -194,45 +182,28 @@ namespace MusicPlayUI.MVVM.ViewModels
             // if the index of some tracks has been changed, update the playlist
             if (trackIndexChanged)
             {
-                DataAccess.Connection.UpdatePlaylistTracks(Playlist.Id, PlaylistTracks.ToList().ToOrderedTrackModel());
+                //DataAccess.Connection.UpdatePlaylistTracks(PlaylistModel.Id, Tracks.ToList().ToOrderedTrackModel());
             }
 
             GC.SuppressFinalize(this);
         }
 
-        private void PlayPlaylist(bool shuffle = false, TrackModel track = null)
+        private void PlayPlaylist(bool shuffle = false, Track track = null)
         {
-            if (PlaylistTracks is null || PlaylistTracks.Count == 0) return;
+            if (Playlist.Tracks.IsNullOrEmpty()) return;
 
-            if (IsAutoPlaylist)
-            {
-                _queueService.SetNewQueue(PlaylistTracks.ToTrackModel(), new(Playlist.Name, ModelTypeEnum.Playlist, Playlist.Id), "", track, shuffle, false, false);
-            }
-            else
-            {
-                _queueService.SetNewQueue(PlaylistTracks.ToTrackModel(), new(Playlist.Name, ModelTypeEnum.Playlist, Playlist.Id), Playlist.Cover, track, shuffle, false, false);
-            }
+            _queueService.SetNewQueue(Playlist.Tracks, Playlist, Playlist.Name, Playlist.Cover, track, shuffle, false, false);
         }
 
-        private async void OnModalClosed(bool canceled)
-        {
-            if (!canceled)
-            {
-                // get the updated playlist
-                PlaylistModel playlist = await DataAccess.Connection.GetPlaylist(Playlist.Id);
-                Update(playlist);
-            }
-        }
-
-        public async override void Update(BaseModel parameter = null)
+        public override void Update(BaseModel parameter = null)
         {
             if(parameter is null)
             {
-                Playlist = (PlaylistModel)_navigationService.CurrentViewParameter;
+                Playlist = (Playlist)App.State.CurrentView.State.Parameter;
             }
             else
             {
-                Playlist = (PlaylistModel)parameter;
+                Playlist = (Playlist)parameter;
             }
 
             if(Playlist is not null)
@@ -245,76 +216,68 @@ namespace MusicPlayUI.MVVM.ViewModels
                 {
                     IsAutoPlaylist = true;
                     PathCover = Playlist.Cover;
-                    PlaylistTracks = new((await Playlist.Tracks.GetAlbumTrackProperties()).ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover));
+                    Playlist.Tracks = new(); //new((await Playlist.Tracks.GetAlbumTrackProperties()).ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover));
                 }
                 else if (Playlist.PlaylistType == PlaylistTypeEnum.Radio)
                 {
                     IsRadio = true;
                     Cover = Playlist.Cover;
-                    PlaylistTracks = new((await Playlist.Tracks.GetAlbumTrackProperties()).ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover));
+                    Playlist.Tracks = new(); // new((await Playlist.Tracks.GetAlbumTrackProperties()).ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover));
                 }
                 else // user playlists
                 {
                     Cover = Playlist.Cover;
-                    List<OrderedTrackModel> tracks = await DataAccess.Connection.GetTracksFromPlaylist(Playlist.Id);
-                    PlaylistTracks = new((await tracks.GetAlbumTrackProperties()).ToUIOrderedTrackModel(QueueService.AlbumCoverOnly, QueueService.AutoCover));
-                    Tags = await DataAccess.Connection.GetPlaylistTag(Playlist.Id);
-                }
-
-                PlaylistDuration = PlaylistTracks.GetTotalLength(out int _);
+                }               
             }
         }
 
         public void MoveTrack(int originalIndex, int targetIndex)
         {
-            if (targetIndex >= PlaylistTracks.Count) 
-                targetIndex = PlaylistTracks.Count - 1;
+            if (targetIndex >= Playlist.Tracks.Count) 
+                targetIndex = Playlist.Tracks.Count - 1;
 
-            PlaylistTracks.Move(originalIndex, targetIndex);
+            Playlist.Tracks.Move(originalIndex, targetIndex);
             UpdateTrackIndex();
         }
 
-        private void InsertTrack(TrackModel track, int index)
+        private async Task InsertTrack(Track track, int index)
         {
-            UIOrderedTrackModel playlistTrack = new(track, index + 1, QueueService.AlbumCoverOnly, QueueService.AutoCover);
-
-            DataAccess.Connection.AddTrackToPlaylist(Playlist, track, index + 1);
-
-            PlaylistTracks.Insert(index, playlistTrack);
-            UpdateTrackIndex();
+            await Playlist.InsertTrack(Playlist, track, index + 1);
+            //Tracks.Insert(index, playlistTrack);
+            //UpdateTrackIndex();
         }
 
         private void UpdateTrackIndex()
         {
-            for (int i = 0; i < PlaylistTracks.Count; i++)
+            for (int i = 0; i < Playlist.Tracks.Count; i++)
             {
-                PlaylistTracks[i].TrackIndex = i + 1; // update all indexes
+                Playlist.Tracks[i].TrackIndex = i + 1; // update all indexes
             }
             trackIndexChanged = true; // playlist will be updated when disposed
         }
 
         public void DragOver(IDropInfo dropInfo)
         {
-            if (dropInfo.Data is TrackModel)
+            if (dropInfo.Data is Track)
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
                 dropInfo.Effects = DragDropEffects.Move;
             }
         }
 
-        public void Drop(IDropInfo dropInfo)
+        public async void Drop(IDropInfo dropInfo)
         {
-            if(dropInfo.Data is UIOrderedTrackModel track)
+            if(dropInfo.Data is Track track)
             {
-                if (!PlaylistTracks.Any(t => t.Id == track.Id)) // new track inserted
+                if (!Playlist.Tracks.Any(t => t.TrackId == track.Id)) // new track inserted
                 {
-                    UIOrderedTrackModel sourceItem = dropInfo.Data as UIOrderedTrackModel;
+                    Track sourceItem = dropInfo.Data as Track;
 
-                    InsertTrack(sourceItem, dropInfo.InsertIndex);
+                    await InsertTrack(sourceItem, dropInfo.InsertIndex);
                 }
-                else if (dropInfo.Data is UIOrderedTrackModel) // track moved
+                else if (dropInfo.Data is Track) // track moved
                 {
-                    int originalIndex = PlaylistTracks.IndexOf(track);
+                    int originalIndex = Playlist.Tracks.IndexOf(new() { Track = track });
 
                     // when the original index is lower than the insert one, the track gets inserted one index to high
                     MoveTrack(originalIndex, dropInfo.InsertIndex > originalIndex ? dropInfo.InsertIndex - 1 : dropInfo.InsertIndex);

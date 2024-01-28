@@ -1,4 +1,6 @@
-﻿using MusicPlay.Language;
+﻿using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+using MusicPlay.Language;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.MVVM.Models;
 using System;
@@ -68,6 +70,13 @@ namespace MusicPlayUI.Core.Factories
                     break;
             }
             return CreateConfirmModel(Resources.Delete, $"{Resources.Delete} {dataType}", $"\"{dataToDelete}\" {Resources.PermanentlyDeletedWarning}", actionColor: RedColor);
+        }
+
+        public static ConfirmActionModel CreateConfirmDeleteFolderModel(this Folder folder)
+        {
+            string title = $"Deleting Folder \"{folder.Name}\"";
+            string contentMessage = $"Deleting this folder will also delete the {folder.TrackImportedCount} tracks imported from it.";
+            return CreateConfirmModel(Resources.Delete, title, contentMessage, RedColor);
         }
 
         public static ConfirmActionModel CreateConfirmClearDataBaseModel()

@@ -12,7 +12,8 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
              xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
-             xmlns:model="clr-namespace:MusicPlayModels.MusicModels;assembly=MusicPlayModels" xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
+             xmlns:model="clr-namespace:MusicPlay.Database.Models.DataBaseModels;assembly=MusicPlay.Database" 
+             xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="800" d:DesignWidth="800">
@@ -141,7 +142,7 @@
                         <TextBlock Text="{Binding PlaylistDuration}"
                                         Style="{DynamicResource NLargeSecondaryStyle}"/>
 
-                        <TextBlock Text="{Binding PlaylistTracks.Count, StringFormat=- {0}}"
+                        <TextBlock Text="{Binding Playlist.Tracks.Count, StringFormat=- {0}}"
                                         Margin="5,0"
                                         Style="{DynamicResource NLargeSecondaryStyle}"/>
 
@@ -331,7 +332,7 @@
                     </Grid>
 
                     <ItemsControl Grid.Row="2"
-                                    ItemsSource="{Binding PlaylistTracks}"
+                                    ItemsSource="{Binding Playlist.Tracks}"
                                 dd:DragDrop.IsDropTarget="True"
                                     dd:DragDrop.IsDragSource="True"
                                   dd:DragDrop.DropHandler="{Binding .}"
@@ -343,7 +344,7 @@
                                   MinHeight="200"
                                   Margin="10, 10, 10,20">
                         <dd:DragDrop.EffectMoveAdornerTemplate>
-                            <DataTemplate DataType="{x:Type model:OrderedTrackModel}">
+                            <DataTemplate DataType="{x:Type model:OrderedTrack}">
                                 <Border Background="{DynamicResource Background}"
                                         BorderBrush="{DynamicResource Outline}"
                                             BorderThickness="1"

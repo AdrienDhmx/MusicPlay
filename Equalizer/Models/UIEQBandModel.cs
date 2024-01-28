@@ -8,13 +8,13 @@ using AudioHandler.Models;
 
 namespace Equalizer.Models
 {
-    public class UIEQBandModel : EQEffectModel
+    public class UIEQBandModel : EQBand
     {
         public SolidColorBrush Brush { get; }
 
         public string BandName => $"Band {Band + 1}";
 
-        public UIEQBandModel(EQEffectModel eQBand, SolidColorBrush brush)
+        public UIEQBandModel(EQBand eQBand, SolidColorBrush brush)
         {
             Brush = brush;
             Id = eQBand.Id;
@@ -27,23 +27,23 @@ namespace Equalizer.Models
 
         public override object Clone()
         {
-            return new UIEQBandModel((EQEffectModel)base.Clone(), Brush);
+            return new UIEQBandModel((EQBand)base.Clone(), Brush);
         }
     }
 
     public static class UIEQBandModelExt
     {
-        public static UIEQBandModel ToUIEQBand(this EQEffectModel effect, SolidColorBrush baseColor)
+        public static UIEQBandModel ToUIEQBand(this EQBand effect, SolidColorBrush baseColor)
         {
             SolidColorBrush brush = ColorHelper.AdjustHue(baseColor, (effect.Band + 1) * 25);
             return new UIEQBandModel(effect, brush);
         }
 
-        public static List<UIEQBandModel> ToUIEQBand(this List<EQEffectModel> effects, SolidColorBrush baseColor)
+        public static List<UIEQBandModel> ToUIEQBand(this List<EQBand> effects, SolidColorBrush baseColor)
         {
             List<UIEQBandModel> bands = new();
 
-            foreach (EQEffectModel effect in effects)
+            foreach (EQBand effect in effects)
             {
                 bands.Add(effect.ToUIEQBand(baseColor));
             }

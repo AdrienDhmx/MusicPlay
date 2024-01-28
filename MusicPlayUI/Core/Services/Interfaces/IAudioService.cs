@@ -4,7 +4,6 @@ namespace MusicPlayUI.Core.Services.Interfaces
 {
     public interface IAudioTimeService
     {
-        bool IsLooping { get; }
         string CurrentPosition { get; }
         int CurrentPositionMs { get; set; }
         string CurrentQueuePosition { get; }

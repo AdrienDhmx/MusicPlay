@@ -9,6 +9,7 @@ namespace MusicPlayModels.MusicModels
 {
     public class TimedLyricsLineModel : BaseModel
     {
+        private int _lyricsId;
         private int _timestampMs = 0;
         private string _line = string.Empty;
 
@@ -24,9 +25,20 @@ namespace MusicPlayModels.MusicModels
             set => SetField(ref _line, value);
         }
 
-        public TimedLyricsLineModel()
+        public TimedLyricsLineModel(int lyricsId)
         {
-              
+            _lyricsId = lyricsId;
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new()
+            {
+                { nameof(Line), Line },
+                { nameof(TimestampMs), TimestampMs },
+                { DataBaseColumns.LyricsId, _lyricsId },
+            };
+            return keyValues;
         }
     }
 }

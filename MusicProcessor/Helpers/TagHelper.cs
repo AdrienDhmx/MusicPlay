@@ -1,166 +1,21 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using MusicPlay.Language;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Data;
 using System.Text;
-using System.Windows.Markup.Localizer;
-using System.Net;
-using System.Drawing;
 using System.Globalization;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Helpers;
 
 namespace MusicFilesProcessor.Helpers
 {
     public static class TagHelper
     {
-        //    "arranger",
-        //    "associatedperformer",
-        //    "bass",
-        //    "composer",
-        //    "composerlyricist",
-        //    "copyright",
-        //    "drums",
-        //    "engineer",
-        //    "featuredartist",
-        //    "http",
-        //    "lyricist",
-        //    "mainartist",
-        //    "mixer",
-        //    "producer",
-        //    "programming",
-        //    "publisher",
-        //    "studiopersonnel",
-        //    "vocals",
-
-        //    "interprete",
-        //    "label",
-        //    "purchased",
-        //    "visit",
-
-
-        //public static string DateTimeToString(this DateTime dateTime)
-        //{
-        //    return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        //}
-
-        //public static string DateTimeToDateOnlyString(this DateTime dateTime)
-        //{
-        //    return dateTime.ToString("yyyy-MM-dd");
-        //}
-
-        //public static string FormatStringToTime(this string time)
-        //{
-        //    if (time.Split(":").Length == 2)
-        //    {
-        //        return "00:" + time;
-        //    }
-        //    else return time;
-        //}
-
-        /// <summary>
-        /// take a timespan and return its string representation
-        /// </summary>
-        /// <param name="timeSpan"></param>
-        /// <returns> hh:mm:ss or mm:ss if hours are not needed </returns>
-        public static string ToFormattedString(this TimeSpan timeSpan, bool written = false)
+        public static List<Track> GetAllArtistTracks(this Artist artist)
         {
-            if (written)
+            List<Track> tracks = Track.GetAllFromArtist(artist.Id);
+            List<Album> albums = Album.GetAllFromArtist(artist.Id);
+            foreach (Album album in albums)
             {
-                string output = "";
-                if(timeSpan.Days > 0)
-                {
-                    if(timeSpan.Days > 1)
-                    {
-                        output += $"{timeSpan.Days} {Resources.Days} ";
-                    }
-                    else
-                    {
-                        output += $"{timeSpan.Days} {Resources.Day} ";
-                    }
-                }
-                if(timeSpan.Hours > 0)
-                {
-                    if(timeSpan.Hours > 1)
-                    {
-                        output += $"{timeSpan.Hours} {Resources.Hours} ";
-                    }
-                    else
-                    {
-                        output += $"{timeSpan.Hours} {Resources.Hour} ";
-                    }
-                }
-                if(timeSpan.Minutes > 1)
-                    output += $"{timeSpan.Minutes} {Resources.Minutes} ";
-                else
-                    output += $"{timeSpan.Minutes} {Resources.Minute} ";
-                if(timeSpan.Seconds > 1)
-                    output += $"{timeSpan.Seconds} {Resources.Seconds} ";
-                else
-                    output += $"{timeSpan.Seconds} {Resources.Second} ";
-                return output;
-            }
-            else
-            {
-                if(timeSpan.Days > 0)
-                    return timeSpan.ToString(@"d\.hh\:mm\:ss");
-                else if(timeSpan.Hours > 0)
-                    return timeSpan.ToString(@"hh\:mm\:ss");
-                else return timeSpan.ToString(@"mm\:ss");
-            }
-        }
-
-        /// <summary>
-        /// Take a string representation of a time (hh:mm:ss or mm:ss) and get the number of seconds corresponding to it
-        /// </summary>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        public static int ToSeconds(this string time)
-        {
-            if(string.IsNullOrEmpty(time))
-                return 0;
-
-            int length = 0;
-            List<string> values = time.Split(":").ToList();
-            for (int i = 1; i == values.Count; i++)
-            {
-                int value = 0;
-                bool result = int.TryParse(values[values.Count - i], out value);
-                if (!result)
-                    return 0;
-
-                if(i == 1) // Seconds
-                {
-                    length += value;
-                }
-                else // Minutes, hours
-                {
-                    length += value * i * 60;
-                }
-            }
-            return length;
-        }
-
-        public static string GetTotalLength<T>(this IEnumerable<T> models, out int length) where T : TrackModel
-        {
-            length = 0;
-            var asspan = CollectionsMarshal.AsSpan<T>(models.ToList());
-            for (var i = 0; i < asspan.Length; i ++)
-            {
-                if (asspan[i] != null)
-                    length += asspan[i].Length;
-            }
-
-            return TimeSpan.FromMilliseconds(length).ToFormattedString();
-        }
-
-        public static async Task<List<TrackModel>> GetAllArtistTracks(this ArtistModel artist)
-        {
-            List<TrackModel> tracks = new List<TrackModel>();
-            tracks.AddRange(await DataAccess.Connection.GetTracksFromArtist(artist.Id));
-            List<AlbumModel> albums = await DataAccess.Connection.GetAlbumsFromArtist(artist.Id);
-            foreach (AlbumModel album in albums)
-            {
-                tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(album.Id));
+                tracks.AddRange(album.Tracks);
             }
 
             return tracks.DistinctBy(t => t.Id).ToList();
@@ -197,35 +52,31 @@ namespace MusicFilesProcessor.Helpers
 
         public static void AddArtistsToDic(List<string> artistsToAdd, Dictionary<string, List<string>> artists, string role)
         {
-            for (int i = 0; i < artistsToAdd.Count; i++) 
+            foreach (string artistToAdd in artistsToAdd)
             {
-                string artist = artistsToAdd.ElementAt(i).Trim();
-                if (string.IsNullOrEmpty(artist))
+                if (string.IsNullOrWhiteSpace(artistToAdd))
                     continue;
 
-                artist = artist.RemoveDiacritics();
+                string artist = artistToAdd?.Trim().RemoveDiacritics();
+                string[] splitArtists = artist.Split('&', StringSplitOptions.RemoveEmptyEntries);
 
-                if(artist.Contains('&'))
+                for (int i = 0; i < splitArtists.Length; i++)
                 {
-                    string[] splitArtists = artist.Split('&');
-                    artistsToAdd.AddRange(splitArtists);
-                    AddArtistsToDic(artistsToAdd.GetRange(i + 1, artistsToAdd.Count), artists, role);
-                    return;
-                }
-
-                if (artists.ContainsKey(artist))
-                {
-                    if (!artists[artist].Contains(role))
+                    artist = splitArtists[i];
+                    if (artists.TryGetValue(artist, out List<string> roles))
                     {
-                        artists[artist].Add(role);
+                        // Ensure unique roles for each artist
+                        if (!roles.Contains(role, StringComparer.OrdinalIgnoreCase))
+                        {
+                            roles.Add(role);
+                        }
+                    }
+                    else
+                    {
+                        artists[artist] = [role];
                     }
                 }
-                else
-                {
-                    artists.Add(artist, new() { role });
-                }
             }
-            return;
         }
 
         public static void ReadDescription(string description, Dictionary<string, List<string>> artists)
@@ -234,8 +85,20 @@ namespace MusicFilesProcessor.Helpers
 
             string[] categories = description.Split(':');
 
-            List<string> rolesToIgnore = new()
+            foreach (string category in categories)
             {
+                string[] keyValues = category.Split("\n");
+
+                if(keyValues.Length < 2) continue;
+
+                ReadDescriptionLines(keyValues, artists);
+            }
+        }
+
+        public static void ReadDescriptionLines(string[] lines, Dictionary<string, List<string>> artists, bool skipFirstLine = true)
+        {
+            List<string> rolesToIgnore =
+            [
                 "main",
                 "primary",
                 "album",
@@ -244,56 +107,53 @@ namespace MusicFilesProcessor.Helpers
                 "visit",
                 "purchased",
                 "copyright",
-            };
+                "other",
+                "unknown",
+                "...",
+            ];
 
-            foreach (string category in categories)
+            for (int i = 1; i < lines.Length; i++)
             {
-                string[] keyValues = category.Split("\n");
+                // format => artist name, role 1, role 2...
+                string[] values = lines[i].Split(",");
+                List<string> foundArtists = [];
 
-                if(keyValues.Length < 2) continue;
-
-                // start at 1 because most of the time the description has a first _line that doesn't contain any information
-                for (int i = 1; i < keyValues.Length; i++)
+                // there may be multiple artists separated by a '&'
+                string[] splitArtists = values[0].Split("&");
+                foreach (string artist in splitArtists)
                 {
-                    // format => artist name, role 1, role 2...
-                    string[] values = keyValues[i].Split(",");
-                    List<string> foundArtists = new();
-
-                    // there may be multiple artists separated by a '&'
-                    string[] splitArtists = values[0].Split("&");
-                    foreach (string artist in splitArtists)
+                    if (!artist.IsNullOrWhiteSpace() && 
+                        !artist.Contains("...") && 
+                        !artist.Contains("label", StringComparison.CurrentCultureIgnoreCase) &&
+                        !foundArtists.Any(fa => fa.Equals(artist, StringComparison.OrdinalIgnoreCase)))
                     {
-                        if (!string.IsNullOrEmpty(artist) && !artist.Contains("...") && !artist.Contains("label"))
-                        {
-                            foundArtists.Add(artist);
-                        }
+                        foundArtists.Add(artist);
+                    }
+                }
+
+                // find the roles
+                for (int y = 1; y < values.Length; y++)
+                {
+                    string role = values[y].Trim();
+                    string roleToLower = role.ToLower();
+                    if (roleToLower.IsNullOrWhiteSpace() || rolesToIgnore.Any(r => roleToLower.Contains(r)))
+                        continue;
+
+                    if (roleToLower.Contains("performer"))
+                    {
+                        role = "Performer";
                     }
 
-                    // find the roles
-                    for (int y = 0; y < values.Length; y++)
+                    if (roleToLower.Contains("featured"))
                     {
-                        string role = values[y];
-
-                        string roleToLower = role.ToLower();
-                        if (rolesToIgnore.Any(r => rolesToIgnore.Contains(r)) || roleToLower == "engineer")
-                            continue;
-
-                        if (roleToLower.Contains("performer"))
-                        {
-                            role = "Performer";
-                        }
-
-                        if(roleToLower.Contains("featured"))
-                        {
-                            role = "Featured";
-                        }
-                        else if (roleToLower.Contains("lyricist"))
-                        {
-                            role = "Lyricist";
-                        }
-
-                        AddArtistsToDic(foundArtists, artists, role);
+                        role = "Featured";
                     }
+                    else if (roleToLower.Contains("lyricist"))
+                    {
+                        role = "Lyricist";
+                    }
+
+                    AddArtistsToDic(foundArtists, artists, role);
                 }
             }
         }

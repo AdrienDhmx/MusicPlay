@@ -1,4 +1,4 @@
-﻿using MusicPlayModels;
+﻿
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
@@ -22,7 +22,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 
         public ICommand ConfirmCommand { get; }
         public ICommand CancelCommand { get; }
-        public ValidationModalViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
+        public ValidationModalViewModel(IModalService modalService) : base(modalService)
         {
             ConfirmCommand = new RelayCommand(() => _modalService.CloseModal());
             CancelCommand = new RelayCommand(() => _modalService.CloseModal(true));

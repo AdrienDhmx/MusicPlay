@@ -1,25 +1,25 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
+﻿
 using MusicPlay.Language;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Enums;
-using MusicPlayModels.Enums;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.DataBaseModels;
+using MusicPlay.Database.DatabaseAccess;
 
 namespace MusicPlayUI.Core.Factories
 {
     public static class FilterFactory
     {
-        public static async Task<List<FilterModel>> GetAlbumArtistFilter()
+        public static List<FilterModel> GetAlbumArtistFilter()
         {
-            List<FilterModel> filters = new();
-
-            List<ArtistModel> albumArtists = await DataAccess.Connection.GetAllArtists();
-            albumArtists = albumArtists.Where(a => a.IsAlbumArtist).OrderBy(a => a.Name).ToList(); // only albums Artists
-
-            foreach (ArtistModel artist in albumArtists)
+            List<FilterModel> filters = [];
+            using DatabaseContext context = new();
+            List<Artist> albumArtists = [.. context.Artists.Where(a => a.ArtistRoles.Any(ar => ar.RoleId == 1))];
+            foreach (Artist artist in albumArtists)
             {
                 FilterModel filter = new(artist.Name, artist.Id, FilterEnum.Artist);
                 filters.Add(filter);
@@ -28,12 +28,12 @@ namespace MusicPlayUI.Core.Factories
             return filters;
         }
 
-        public static async Task<List<FilterModel>> GetGenreFilter()
+        public static List<FilterModel> GetGenreFilter()
         {
             List<FilterModel> filters = new();
-            List<TagModel> allGenre = await DataAccess.Connection.GetAllTags();
+            List<Tag> allGenre = Tag.GetAll();
 
-            foreach (TagModel genre in allGenre.OrderBy(g => g.Name))
+            foreach (Tag genre in allGenre.OrderBy(g => g.Name))
             {
                 FilterModel filter = new(genre.Name, genre.Id, FilterEnum.Genre);
                 filters.Add(filter);
@@ -46,9 +46,9 @@ namespace MusicPlayUI.Core.Factories
         {
             List<FilterModel> filters = new()
             {
-                new("Singles", (int)AlbumTypeEnum.Single, FilterEnum.AlbumType),
+                new("Main", (int)AlbumTypeEnum.Main, FilterEnum.AlbumType),
                 new("EP", (int)AlbumTypeEnum.EP, FilterEnum.AlbumType),
-                new("Compilation", (int)AlbumTypeEnum.Compilation, FilterEnum.AlbumType),
+                new("Singles", (int)AlbumTypeEnum.Single, FilterEnum.AlbumType),
             };
 
             return filters;
@@ -57,14 +57,11 @@ namespace MusicPlayUI.Core.Factories
 
         public static List<FilterModel> GetArtistTypeFilter()
         {
-            List<FilterModel> filters = new()
+            List<FilterModel> filters = [];
+            foreach(Role role in Role.GetAll())
             {
-                new(Resources.Album_Artists, (int)ArtistRoleEnum.AlbumArtist, FilterEnum.ArtistType),
-                new(Resources.Performers, (int)ArtistRoleEnum.Performer, FilterEnum.ArtistType),
-                new(Resources.Composers, (int)ArtistRoleEnum.Composer, FilterEnum.ArtistType),
-                new("Lyricist", (int)ArtistRoleEnum.Lyricist, FilterEnum.ArtistType),
-                new("Featured", (int)ArtistRoleEnum.Featured, FilterEnum.ArtistType),
-            };
+                filters.Add(new(role.Name, role.Id, FilterEnum.ArtistType));
+            }
 
             return filters;
         }

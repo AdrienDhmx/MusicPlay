@@ -6,19 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Media;
-using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
+
+using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Helpers;
 
 namespace MusicPlayUI.MVVM.Models
 {
-    public class UITagModel : TagModel
+    public class UITagModel : Tag
     {
-        public List<AlbumModel> Albums { get; private set; }
-        public List<ArtistModel> Artists { get; private set; }
-        public List<PlaylistModel> Playlists { get; private set; }
-        public List<TrackModel> Tracks { get; private set; }
-
         private string _cover;
         public string Cover
         {
@@ -36,19 +31,19 @@ namespace MusicPlayUI.MVVM.Models
         public List<string> MultipleCovers => GetMultipleCovers();
 
         protected int maxNumberOfCover = 14;
-        public UITagModel(TagModel genre, List<AlbumModel> albums, List<ArtistModel> artists, List<PlaylistModel> playlists, List<TrackModel> tracks, string cover) : base(genre.Id, genre.Name)
+        public UITagModel(Tag tag, string cover) : base(tag.Id, tag.Name)
         {
-            Albums = albums;
-            Artists = artists;
             Cover = cover;
-            Playlists = playlists;
-            Tracks = tracks;
+            AlbumTags = tag.AlbumTags;
+            ArtistTags = tag.ArtistTags;
+            PlaylistTags = tag.PlaylistTags;
+            TrackTags = tag.TrackTags;
         }
 
         protected List<string> GetMultipleCovers()
         {
             if (_multipleCovers != null) return _multipleCovers;
-            else if (Artists.Count == 0 && Albums.Count == 0 && Playlists.Count == 0 && Tracks.Count == 0) return new();
+            else if (ArtistTags.Count == 0 && AlbumTags.Count == 0 && PlaylistTags.Count == 0 && TrackTags.Count == 0) return new();
 
             List<string> covers = new();
             int totalCoverCount = 0;
@@ -63,33 +58,33 @@ namespace MusicPlayUI.MVVM.Models
                     }
                 }
 
-                if (coverCount < Albums.Count && !covers.Contains(Albums[coverCount].AlbumCover))
+                if (coverCount < AlbumTags.Count && !covers.Contains(AlbumTags[coverCount].Album.AlbumCover))
                 {
-                    covers.Add(Albums[coverCount].AlbumCover);
+                    covers.Add(AlbumTags[coverCount].Album.AlbumCover);
                     totalCoverCount++;
                 }
 
-                if (coverCount < Artists.Count && !covers.Contains(Artists[coverCount].Cover))
+                if (coverCount < ArtistTags.Count && !covers.Contains(ArtistTags[coverCount].Artist.Cover))
                 {
-                    covers.Add(Artists[coverCount].Cover);
+                    covers.Add(ArtistTags[coverCount].Artist.Cover);
                     totalCoverCount++;
                 }
 
-                if (coverCount < Playlists.Count && !covers.Contains(Playlists[coverCount].Cover))
+                if (coverCount < PlaylistTags.Count && !covers.Contains(PlaylistTags[coverCount].Playlist.Cover))
                 {
-                    covers.Add(Playlists[coverCount].Cover);
+                    covers.Add(PlaylistTags[coverCount].Playlist.Cover);
                     totalCoverCount++;
                 }
 
-                if (coverCount < Tracks.Count)
+                if (coverCount < TrackTags.Count)
                 {
-                    if (!string.IsNullOrWhiteSpace(Tracks[coverCount].Artwork) && !covers.Contains(Tracks[coverCount].Artwork))
+                    if (!string.IsNullOrWhiteSpace(TrackTags[coverCount].Track.Artwork) && !covers.Contains(TrackTags[coverCount].Track.Artwork))
                     {
-                        covers.Add(Tracks[coverCount].Artwork);
+                        covers.Add(TrackTags[coverCount].Track.Artwork);
                     }
-                    else if(!covers.Contains(Tracks[coverCount].AlbumCover))
+                    else if(!covers.Contains(TrackTags[coverCount].Track.Album.AlbumCover))
                     {
-                        covers.Add(Tracks[coverCount].AlbumCover);
+                        covers.Add(TrackTags[coverCount].Track.Album.AlbumCover);
                         totalCoverCount++;
                     }
                 }
@@ -98,47 +93,41 @@ namespace MusicPlayUI.MVVM.Models
         }
     }
 
-    public static class UIGEnreModelExt
+    public static class UIGenreModelExt
     {
-        public static async Task<UITagModel> ToUITagModel(this TagModel tag)
+        public static UITagModel ToUITagModel(this Tag tag)
         {
-            List<AlbumModel> albums = await DataAccess.Connection.GetAlbumFromTag(tag.Id);
-            List<ArtistModel> artists = await DataAccess.Connection.GetArtistFromTag(tag.Id);
-            List<PlaylistModel> playlists = await DataAccess.Connection.GetPlaylistFromTag(tag.Id);
-            List<TrackModel> tracks = await DataAccess.Connection.GetTrackFromTag(tag.Id);
-            tracks = await tracks.GetAlbumTrackProperties();
-
             string cover = "";
-            if (albums.Count > 0)
+            if (tag.AlbumTags.Count > 0)
             {
-                cover = albums.Last().AlbumCover;
+                cover = tag.AlbumTags.Last().Album.AlbumCover;
             }
-            else if (artists.Count > 0)
+            else if (tag.ArtistTags.Count > 0)
             {
-                cover = artists.Last().Cover;
+                cover = tag.ArtistTags.Last().Artist.Cover;
             }
-            else if (playlists.Count > 0)
+            else if (tag.PlaylistTags.Count > 0)
             {
-                cover = playlists.Last().Cover;
+                cover = tag.PlaylistTags.Last().Playlist.Cover;
             }
-            else if (tracks.Count > 0)
+            else if (tag.AlbumTags.Count > 0)
             {
-                if (string.IsNullOrWhiteSpace(tracks.Last().Artwork))
-                    cover = tracks.Last().AlbumCover;
+                if (string.IsNullOrWhiteSpace(tag.TrackTags.Last().Track.Artwork))
+                    cover = tag.TrackTags.Last().Track.Album.AlbumCover;
                 else
-                    cover = tracks.Last().Artwork;
+                    cover = tag.TrackTags.Last().Track.Artwork;
             }
 
-            return new(tag, albums, artists, playlists, tracks, cover);
+            return new(tag, cover);
         }
 
-        public static async Task<List<UITagModel>> ToUIGenreModel(this List<TagModel> tags)
+        public static List<UITagModel> ToUIGenreModel(this List<Tag> tags)
         {
             List<UITagModel> uiGenres = new();
 
-            foreach (TagModel tag in tags)
+            foreach (Tag tag in tags)
             {
-                uiGenres.Add(await tag.ToUITagModel());
+                uiGenres.Add(tag.ToUITagModel());
             }
 
             return uiGenres;

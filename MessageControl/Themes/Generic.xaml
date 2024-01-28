@@ -61,7 +61,8 @@
                         <!-- Message + current date and time -->
                         <StackPanel VerticalAlignment="Center" Grid.Row="0" 
                                     Grid.Column="1" Margin="0,10,15,10">
-                            <TextBlock Text="{TemplateBinding Message}" 
+                            <TextBlock x:Name="PART_Message"
+                                        Text="{TemplateBinding Message}" 
                                        Foreground="{TemplateBinding Foreground}"
                                        FontSize="{TemplateBinding FontSize}"
                                        FontWeight="{TemplateBinding FontWeight}"

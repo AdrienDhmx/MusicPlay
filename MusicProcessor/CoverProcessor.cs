@@ -1,14 +1,8 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using MusicFilesProcessor.Helpers;
 using MusicPlay.Language;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MusicPlay.Database.Models;
 
 namespace FilesProcessor
 {
@@ -28,66 +22,12 @@ namespace FilesProcessor
             return "";
         }
 
-        public static bool ChangeCover(this TrackModel track)
+        public static async Task<bool> ChangeCover(this PlayableModel playableModel)
         {
             string cover = OpenFileDialog();
             if (!string.IsNullOrWhiteSpace(cover))
             {
-                string filemane = ImageHelper.CreateCoverFilename();
-                string newPath = ImageHelper.CreateCoverPath(filemane);
-                cover.SaveFileToNewPath(newPath);
-
-                track.Artwork = newPath;
-                DataAccess.Connection.UpdateTrackArtwork(track);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ChangeCover(this PlaylistModel playlist)
-        {
-            string cover = OpenFileDialog();
-            if (!string.IsNullOrWhiteSpace(cover))
-            {
-                string filemane = ImageHelper.CreateCoverFilename();
-                string newPath = ImageHelper.CreateCoverPath(filemane);
-                cover.SaveFileToNewPath(newPath);
-
-                playlist.Cover = newPath;
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ChangeCover(this AlbumModel album)
-        {
-            string cover = OpenFileDialog();
-            if (!string.IsNullOrWhiteSpace(cover))
-            {
-                string filemane = ImageHelper.CreateCoverFilename();
-                string newpath = ImageHelper.CreateCoverPath(filemane);
-
-                cover.SaveFileToNewPath(newpath);
-
-                album.AlbumCover = newpath;
-                DataAccess.Connection.UpdateAlbumCover(album);
-                return true;
-            }
-            return false;
-        }
-
-        public static bool ChangeCover(this ArtistModel artist)
-        {
-            string cover = OpenFileDialog();
-            if (!string.IsNullOrWhiteSpace(cover))
-            {
-                string filemane = ImageHelper.CreateCoverFilename();
-                string newpath = ImageHelper.CreateCoverPath(filemane);
-
-                cover.SaveFileToNewPath(newpath);
-
-                artist.Cover = newpath;
-                DataAccess.Connection.UpdateArtistCover(artist);
+                await playableModel.UpdateCoverWithFile(cover);
                 return true;
             }
             return false;
@@ -99,7 +39,7 @@ namespace FilesProcessor
         /// <param name="path"></param>
         public static void DeleteAllCoversVersion(this string path)
         {
-            if (!path.ValidPath())
+            if (!path.ValidFilePath())
                 return; 
 
             DeleteCover(path);
@@ -114,10 +54,9 @@ namespace FilesProcessor
         /// without deleting the file.
         /// </summary>
         /// <param name="track"></param>
-        public static void RemoveCover(this TrackModel track)
+        public static async Task RemoveCover(this Track track)
         {
-            track.Artwork = "";
-            DataAccess.Connection.UpdateTrackArtwork(track);
+            await Track.UpdateArtwork(track, "");
         }
 
         /// <summary>

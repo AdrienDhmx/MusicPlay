@@ -1,7 +1,4 @@
-﻿using AudioHandler;
-using AudioHandler.Models;
-using ManagedBass.Fx;
-using MessageControl;
+﻿using MessageControl;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;

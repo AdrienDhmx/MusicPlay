@@ -13,54 +13,49 @@
              x:Name="Root"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid x:Name="RootGrid"
-          Width="500"
+          Width="450"
           Height="auto"
           Background="{DynamicResource Background}">
-        <Grid Margin="5">
+        <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="80"/>
+                <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
 
-            <iconbutton:IconButton Style="{DynamicResource CloseModalBtn}"
-                                   Command="{Binding CancelCommand}"/>
+            <TextBlock Text="{Binding ValidationMessage.Message}"
+                    Style="{DynamicResource SValidationModalHeaderStyle}"/>
 
             <Grid Grid.Row="1"
-                  Margin="10,0,10,5"
+                  Margin="10,0"
                   VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{Binding ValidationMessage.Message}"
-                           Style="{DynamicResource SValidationModalHeaderStyle}"
-                           Margin="0,10"
-                           TextAlignment="Center"
-                           HorizontalAlignment="Center"/>
-
                 <TextBlock Grid.Row="1"
                            Text="{Binding ValidationMessage.MessageDetail}"
-                           HorizontalAlignment="Center"
-                           TextAlignment="Center"
                            Style="{DynamicResource NTrackDataStyle}"/>
             </Grid>
 
             <StackPanel Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Right"
                         Grid.Row="2">
+                
                 <textbtn:TextButton Text="{x:Static lang:Resources.Cancel}"
                                     MouseOverBtnColor="{DynamicResource PrimaryHover}"
                                     Command="{Binding CancelCommand}"
-                                    Style="{DynamicResource ConfirmActionTextBtn}"/>
+                                    Style="{DynamicResource OutlinedButton}"/>
+
+                <Border Width="16"/>
 
                 <textbtn:TextButton Text="{Binding ValidationMessage.ConfirmAction}"
                                     Command="{Binding ConfirmCommand}"
                                     MouseOverBtnColor="{Binding ValidationMessage.ConfirmActionColor}"
                                     Foreground="{Binding ValidationMessage.ConfirmActionForeground}"
-                                    Style="{DynamicResource ConfirmActionTextBtn}"/>
+                                    Style="{DynamicResource OutlinedButton}"/>
             </StackPanel>
         </Grid>
     </Grid>

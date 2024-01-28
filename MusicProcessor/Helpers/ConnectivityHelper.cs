@@ -1,24 +1,21 @@
-﻿using MessageControl;
-using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
+﻿using LastFmNamespace.Interfaces;
+using MessageControl;
+using MusicPlay.Database.Helpers;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
-namespace FilesProcessor.Helpers
+namespace MusicFilesProcessor.Helpers
 {
-    public class ConnectivityHelper
+    public class ConnectivityHelper : IHttpService
     {
         private bool _tooManyRequest;
         private List<string> _serversWithTooManyRequest;
         private string _lastServer;
 
+        private string _defaultUserAgent = string.Empty;
 
         private static ConnectivityHelper _instance;
         public static ConnectivityHelper Instance
@@ -36,7 +33,7 @@ namespace FilesProcessor.Helpers
         /// Check if there is internet access by sending a ping to google.com
         /// </summary>
         /// <returns></returns>
-        public static bool CheckInternetAccess()
+        public bool CheckInternetAccess()
         {
             try
             {
@@ -54,6 +51,11 @@ namespace FilesProcessor.Helpers
             }
         }
 
+        public async Task<HttpResponseMessage> GetAsync(string url, int timeout = 2000)
+        {
+            return await GetAsync(new Uri(url), timeout);
+        }
+
         /// <summary>
         /// Send an async request to the specified <paramref name="url"/>.
         /// If the request is from a server that already send a "too many request" htttp error (http error 429) then the request is ignored.
@@ -61,14 +63,16 @@ namespace FilesProcessor.Helpers
         /// <param name="url"> The url to send the request to. </param>
         /// <param name="timeout"> The time in milliseconds to wait before the request times out. </param>
         /// <returns> The HttpResponseMessage of the request, or in case of an earlier 429 error from the same host server as the current url an empty response with that error is returned. </returns>
-        public async Task<HttpResponseMessage> SendRequestAsync(string url, int timeout = 2000)
+        public async Task<HttpResponseMessage> GetAsync(Uri url, int timeout = 2000)
         {
-            string server = GetHostServer(url);
+            string server = url.Host;
             if(!_tooManyRequest && !_serversWithTooManyRequest.Contains(server))
             {
                 _lastServer = server;
 
                 using var client = new HttpClient();
+                if (_defaultUserAgent.IsNotNullOrWhiteSpace())
+                    client.DefaultRequestHeaders.Add("User-Agent", _defaultUserAgent);
                 client.Timeout = TimeSpan.FromMilliseconds(timeout);
                 try
                 {
@@ -85,12 +89,45 @@ namespace FilesProcessor.Helpers
             }
         }
 
+        public async Task<HttpResponseMessage> PostAsync(string url, HttpContent content, int timeout = 2000)
+        {
+            return await PostAsync(new Uri(url), content, timeout);
+        }
+
         /// <summary>
-        /// Get the host server (DNS or IP address) of the <paramref name="url"/>
+        /// Send an async request to the specified <paramref name="url"/>.
+        /// If the request is from a server that already send a "too many request" htttp error (http error 429) then the request is ignored.
         /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static string GetHostServer(string url)
+        /// <param name="url"> The url to send the request to. </param>
+        /// <param name="timeout"> The time in milliseconds to wait before the request times out. </param>
+        /// <returns> The HttpResponseMessage of the request, or in case of an earlier 429 error from the same host server as the current url an empty response with that error is returned. </returns>
+        public async Task<HttpResponseMessage> PostAsync(Uri url, HttpContent content, int timeout = 2000)
+        {
+            string server = url.Host;
+            if (!_tooManyRequest && !_serversWithTooManyRequest.Contains(server))
+            {
+                _lastServer = server;
+
+                using var client = new HttpClient();
+                if(_defaultUserAgent.IsNotNullOrWhiteSpace())
+                    client.DefaultRequestHeaders.Add("User-Agent", _defaultUserAgent);
+                client.Timeout = TimeSpan.FromMilliseconds(timeout);
+                try
+                {
+                    return await client.PostAsync(url, content);
+                }
+                catch (TaskCanceledException)
+                {
+                    return new(HttpStatusCode.RequestTimeout);
+                }
+            }
+            else
+            {
+                return new(HttpStatusCode.TooManyRequests);
+            }
+        }
+
+        public string GetHostServer(string url)
         {
             Uri Uri = new Uri(url);
             return Uri.Host;
@@ -153,6 +190,29 @@ namespace FilesProcessor.Helpers
             {
                 MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: you are not connected to the internet."));
             }));
+        }
+
+        public void SetUserAgent(string userAgent)
+        {
+            _defaultUserAgent = userAgent;
+        }
+
+        public async Task<bool> DownloadImage(string imageUrl, string destinationPath)
+        {
+            using var httpClient = new HttpClient();
+            try
+            {
+                var response = await httpClient.GetByteArrayAsync(imageUrl);
+
+                using var stream = new FileStream(destinationPath, FileMode.Create);
+                await stream.WriteAsync(response, 0, response.Length);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error downloading image: {ex.Message}");
+                return false;
+            }
+            return true;
         }
     }
 }

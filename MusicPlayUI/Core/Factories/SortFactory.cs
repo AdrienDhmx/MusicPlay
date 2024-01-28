@@ -1,7 +1,6 @@
-﻿using MusicPlay.Language;
-using MusicPlayModels;
-using MusicPlayModels.Enums;
-using MusicPlayModels.MusicModels;
+﻿using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+using MusicPlay.Language;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.MVVM.Models;
@@ -18,11 +17,11 @@ namespace MusicPlayUI.Core.Factories
     {
         public static ObservableCollection<SortModel> GetSortMenu<T>() where T : PlayableModel
         {
-            if(typeof(T) == typeof(AlbumModel))
+            if(typeof(T) == typeof(Album))
             {
                 return GetAlbumSorting();
             }
-            else if (typeof(T) == typeof(ArtistModel))
+            else if (typeof(T) == typeof(Artist))
             {
                 return GetArtistsSorting();
             }

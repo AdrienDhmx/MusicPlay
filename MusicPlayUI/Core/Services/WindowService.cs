@@ -1,4 +1,6 @@
-﻿using MusicPlayModels;
+﻿using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Services.Interfaces;

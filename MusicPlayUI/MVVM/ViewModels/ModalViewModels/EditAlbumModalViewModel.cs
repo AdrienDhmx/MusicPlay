@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
 
@@ -16,8 +16,8 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
     public class EditAlbumModalViewModel : ModalViewModel
     {
         private readonly ICommandsManager _commandsManager;
-        private AlbumModel _album;
-        public AlbumModel Album
+        private Album _album;
+        public Album Album
         {
             get { return _album; }
             set
@@ -50,15 +50,15 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             set { SetField(ref _year, value);}
         }
 
-        private ObservableCollection<TagModel> _genres;
-        public ObservableCollection<TagModel> Genre
+        private ObservableCollection<Tag> _genres;
+        public ObservableCollection<Tag> Genre
         {
             get => _genres;
             set { SetField(ref _genres, value); }
         }
 
         public ICommand UpdateAlbumCover { get; }
-        public EditAlbumModalViewModel(INavigationService navigationService, IModalService modalService, ICommandsManager commandsManager) : base(modalService,navigationService)
+        public EditAlbumModalViewModel(IModalService modalService, ICommandsManager commandsManager) : base(modalService)
         {
             _commandsManager = commandsManager;
 
@@ -67,13 +67,13 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 
         public override void Update(BaseModel parameter = null)
         {
-            if(parameter != null && parameter is AlbumModel album)
+            if(parameter != null && parameter is Album album)
             {
                 Album = album;
             }
             else
             {
-                 Album = _modalService.ModalParameter as AlbumModel;
+                 Album = _modalService.ModalParameter as Album;
             }
 
             Cover = Album.AlbumCover;

@@ -1,10 +1,8 @@
-﻿using DataBaseConnection.DataAccess;
-using MessageControl;
+﻿using MessageControl;
 using MusicFilesProcessor.Helpers;
 using MusicFilesProcessor.Lyrics;
-using MusicFilesProcessor.Models;
+using MusicPlay.Database.Models;
 using MusicPlay.Language;
-using MusicPlayModels.MusicModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services;
@@ -13,8 +11,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -57,10 +53,6 @@ namespace MusicPlayUI.MVVM.ViewModels
                 {
                     CanSave = true;
                     CanCopy = true;
-                    if (!LyricsFound)
-                    {
-                        LyricsModel.IsFromUser = true;
-                    }
                 }
                 else
                 {
@@ -83,8 +75,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private LyricsModel _lyricsModel = new();
-        public LyricsModel LyricsModel
+        private Lyrics _lyricsModel = new();
+        public Lyrics LyricsModel
         {
             get { return _lyricsModel; }
             set
@@ -94,8 +86,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<TimedLyricsLineModel> _timedLyrics = new();
-        public ObservableCollection<TimedLyricsLineModel> TimedLyrics
+        private ObservableCollection<TimedLyricsLine> _timedLyrics = new();
+        public ObservableCollection<TimedLyricsLine> TimedLyrics
         {
             get { return _timedLyrics; }
             set
@@ -105,8 +97,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private TimedLyricsLineModel _playingTimedLyrics;
-        public TimedLyricsLineModel PlayingTimedLyrics
+        private TimedLyricsLine _playingTimedLyrics;
+        public TimedLyricsLine PlayingTimedLyrics
         {
             get { return _playingTimedLyrics; }
             set
@@ -317,10 +309,10 @@ namespace MusicPlayUI.MVVM.ViewModels
                     if (!IsTimed)
                     {
                         TimedLyrics = new(); // reset not saved changes
-                        LyricsModel.TimedLyrics.Clear();
+                        LyricsModel.TimedLines.Clear();
 
                         // we don't have the normal lyrics, try to get them
-                        if(string.IsNullOrWhiteSpace(LyricsModel.Lyrics))
+                        if(string.IsNullOrWhiteSpace(LyricsModel.LyricsText))
                         {
                             GetLyrics();
                         }
@@ -329,16 +321,15 @@ namespace MusicPlayUI.MVVM.ViewModels
                     }
                 }
 
-                if (_lyricsProcessor.TimedLyricsExists(LyricsModel.FileName)) // if Timed lyrics exists (file found)
+                if (LyricsModel.HasTimedLyrics) // if Timed lyrics exists (file found)
                 {
-                    LyricsModel = _lyricsProcessor.GetLyrics(LyricsModel, true);
-                    TimedLyrics = new(LyricsModel.TimedLyrics);
+                    TimedLyrics = new(LyricsModel.TimedLines);
                     AddEmptyLineToLyrics();
-                    TimedLyrics[0].IsPlaying = true; // set the fisrt line to the one playing
+                    // TimedLyrics[0].IsPlaying = true; // set the first line to the one playing
                 }
                 else if (!string.IsNullOrWhiteSpace(Lyrics)) // If the normal lyrics were found
                 {
-                    ConvertToTimedLyrics(); // Create an "empty" List<TimedLyricsLineModel> (all lengths are 0)
+                    ConvertToTimedLyrics(); // Create an "empty" List<TimedLyricsLine> (all lengths are 0)
                     IsEditMode = true; // Enter timed edit mode
                     IsTimedEditMode = true;
                 } 
@@ -351,14 +342,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             SaveTimedLyricsCommand = new RelayCommand(() =>
             {
-                foreach (TimedLyricsLineModel t in TimedLyrics)
-                {
-                    if (t.LengthInMilliseconds == 0 && !string.IsNullOrWhiteSpace(t.Time)) // If the time has been changed but not the Length
-                    {
-                        t.LengthInMilliseconds = (int)TimeSpan.Parse(t.Time.FormatStringToTime()).TotalMilliseconds;
-                    }
-                }
-                LyricsModel.TimedLyrics = TimedLyrics.ToList();
+                LyricsModel.TimedLines = TimedLyrics;
 
                 IsTimed = true;
                 IsTimedEditMode = false; // Leave timed edit mode to save
@@ -369,29 +353,28 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 if(TimedLyrics.Count > 0)
                 {
-                    LyricsModel.TimedLyrics.Clear();
+                    LyricsModel.TimedLines.Clear();
                     IsTimed = false;
 
                     // reset timestamp
-                    foreach (TimedLyricsLineModel line in TimedLyrics)
+                    foreach (TimedLyricsLine line in TimedLyrics)
                     {
-                        line.LengthInMilliseconds = 0;
-                        line.Time = "";
+                        line.TimestampMs = 0;
                     }
 
                     // delete file
-                    _lyricsProcessor.DeleteTimedLyrics(_queueService.PlayingTrack.Title, _queueService.PlayingTrack.GetAlbumArtist().Name);
+                    _lyricsProcessor.DeleteTimedLyrics(_queueService.Queue.PlayingTrack.Title, _queueService.Queue.PlayingTrack.Album.PrimaryArtist.Name);
                 }
                 IsEditMode = false; // leave edit mode
             });
 
-            SetLengthCommand = new RelayCommand<TimedLyricsLineModel>((l) =>
+            SetLengthCommand = new RelayCommand<TimedLyricsLine>((l) =>
             {
                 if (l is not null)
                 {
-                    int currentLength = CurrentPosition;
-                    TimedLyrics[l.index].LengthInMilliseconds = currentLength;
-                    TimedLyrics[l.index].Time = TimeSpan.FromMilliseconds(currentLength).ToFormattedString();
+                    //int currentLength = CurrentPosition;
+                    //TimedLyrics[l.I].LengthInMilliseconds = currentLength;
+                    //TimedLyrics[l.index].Time = TimeSpan.FromMilliseconds(currentLength).ToShortString();
                 }
             });
 
@@ -415,8 +398,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             PasteLyricsCommand = new RelayCommand(() =>
             {
                 Lyrics = Clipboard.GetText();
-                LyricsModel.Lyrics = Lyrics;
-                LyricsModel.IsFromUser = true;
+                LyricsModel.LyricsText = Lyrics;
                 LyricsModel.IsSaved = false;
                 IsSaved = false;
             });
@@ -436,10 +418,8 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void ConvertToTimedLyrics()
         {
-            LyricsModel.TimedLyrics = new(_lyricsProcessor.ConvertToTimedLyricsModel(Lyrics, true));
-            LyricsModel.IsTimed = true;
             IsTimed = true;
-            TimedLyrics = new(LyricsModel.TimedLyrics);
+            TimedLyrics = new(LyricsModel.TimedLines);
         }
 
         public override void Dispose()
@@ -484,8 +464,8 @@ namespace MusicPlayUI.MVVM.ViewModels
                 return;
             }
 
-            LyricsModel.Lyrics = Lyrics;
-            _lyricsProcessor.SaveLyrics(LyricsModel, IsTimed);
+            LyricsModel.LyricsText = Lyrics;
+            //Lyrics.Insert(LyricsModel);
             SavedLyrics = Lyrics;
 
             if (IsEditMode)
@@ -499,21 +479,21 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private async void GetLyrics(bool acceptTimedLyrics = true)
         {
-            if (_queueService.PlayingTrack is null) return;
+            if (_queueService.Queue.PlayingTrack is null) return;
 
-            LyricsModel = await _lyricsProcessor.GetLyrics(_queueService.PlayingTrack.Title, _queueService.PlayingTrack.GetAlbumArtist().Name, _queueService.PlayingTrack.Path, acceptTimedLyrics);
+            LyricsModel = _queueService.Queue.PlayingTrack.Lyrics;
 
-            IsTimed = LyricsModel.IsTimed;
+            IsTimed = LyricsModel.HasTimedLyrics;
             IsSaved = LyricsModel.IsSaved;
             OnPropertyChanged(nameof(IsSaved));
-            IsURLValid = !string.IsNullOrWhiteSpace(LyricsModel.URL);
+            IsURLValid = !string.IsNullOrWhiteSpace(LyricsModel.Url);
 
             WebsiteSource = LyricsModel.WebSiteSource;
-            URL = LyricsModel.URL;
+            URL = LyricsModel.Url;
 
-            _lyrics = LyricsModel.Lyrics;
+            _lyrics = LyricsModel.LyricsText;
             SavedLyrics = Lyrics;
-            TimedLyrics = new(LyricsModel.TimedLyrics);
+            TimedLyrics = new(LyricsModel.TimedLines);
             AddEmptyLineToLyrics();
             OnPropertyChanged(nameof(Lyrics));
 
@@ -532,13 +512,13 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 nbLineToAdd = 4;
 
-                TimedLyrics.Insert(0, new()
-                {
-                    Lyrics = "",
-                    index = 0,
-                    LengthInMilliseconds = 0,
-                    IsPlaying = false,
-                });
+                //TimedLyrics.Insert(0, new()
+                //{
+                //    Lyrics = "",
+                //    index = 0,
+                //    LengthInMilliseconds = 0,
+                //    IsPlaying = false,
+                //});
             }
 
             for (int i = 0; i < nbLineToAdd; i++)
@@ -546,13 +526,13 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (IsTimed)
                 {
                     int index = TimedLyrics.Count + 1;
-                    TimedLyrics.Add(new()
-                    {
-                        Lyrics = "",
-                        index = index,
-                        LengthInMilliseconds = TimedLyrics.Last().LengthInMilliseconds + index * 2000,
-                        IsPlaying = false,
-                    });
+                    //TimedLyrics.Add(new()
+                    //{
+                    //    Lyrics = "",
+                    //    index = index,
+                    //    LengthInMilliseconds = TimedLyrics.Last().LengthInMilliseconds + index * 2000,
+                    //    IsPlaying = false,
+                    //});
                 } 
                 else
                 {
@@ -573,7 +553,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 nbLineToAdd = 4;
 
-                if (TimedLyrics.First().Lyrics == "")
+                if (TimedLyrics.First().Line == "")
                 {
                     TimedLyrics.RemoveAt(0);
                 }
@@ -584,7 +564,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if(IsTimed)
                 {
                     int index = TimedLyrics.Count - 1;
-                    if(TimedLyrics.Last().Lyrics == "")
+                    if(TimedLyrics.Last().Line == "")
                     {
                         TimedLyrics.RemoveAt(index);
                     }
@@ -614,26 +594,26 @@ namespace MusicPlayUI.MVVM.ViewModels
                 bool found = false;
                 for (int i = 0; i < TimedLyrics.Count; i++)
                 {
-                    TimedLyrics[i].IsPlaying = false;
+                    //TimedLyrics[i].IsPlaying = false;
                     if (!found)
                     {
-                        if (i < TimedLyrics.Count - 1 && currentLength > TimedLyrics[i].LengthInMilliseconds && 
-                            currentLength < TimedLyrics[i + 1].LengthInMilliseconds)
+                        if (i < TimedLyrics.Count - 1 && currentLength > TimedLyrics[i].TimestampMs && 
+                            currentLength < TimedLyrics[i + 1].TimestampMs)
                         {
                             PlayingTimedLyrics = TimedLyrics[i];
-                            TimedLyrics[i].IsPlaying = true;
+                            // TimedLyrics[i].IsPlaying = true;
                             found = true;
                         }
-                        else if (i == 0 && CurrentPosition <= TimedLyrics[0].LengthInMilliseconds)
+                        else if (i == 0 && CurrentPosition <= TimedLyrics[0].TimestampMs)
                         {
                             PlayingTimedLyrics = TimedLyrics[i];
-                            TimedLyrics[i].IsPlaying = true;
+                            //TimedLyrics[i].IsPlaying = true;
                             found = true;
                         }
-                        else if (i == TimedLyrics.Count - 1 && CurrentPosition >= TimedLyrics[i].LengthInMilliseconds)
+                        else if (i == TimedLyrics.Count - 1 && CurrentPosition >= TimedLyrics[i].TimestampMs)
                         {
                             PlayingTimedLyrics = TimedLyrics[i];
-                            TimedLyrics[i].IsPlaying = true;
+                            //TimedLyrics[i].IsPlaying = true;
                         }
                     }
                 }

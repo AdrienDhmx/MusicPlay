@@ -5,9 +5,12 @@ using System.Linq;
 using System.Windows.Input;
 using AudioHandler;
 using AudioHandler.Models;
-using DataBaseConnection.DataAccess;
+
 using Equalizer.Models;
-using MusicPlayModels;
+
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -35,8 +38,8 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             }
         }
 
-        private ObservableCollection<EQPresetModel> _presets;
-        public ObservableCollection<EQPresetModel> Presets
+        private ObservableCollection<EQPreset> _presets;
+        public ObservableCollection<EQPreset> Presets
         {
             get => _presets;
             set
@@ -61,7 +64,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         /// <summary>
         /// The currently applied preset to the audio
         /// </summary>
-        public EQPresetModel AppliedPreset
+        public EQPreset AppliedPreset
         {
             get => EQManager.Preset;
             set
@@ -69,7 +72,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 CanSave = false;
                 CanUpdate = value.Id >= 0; // preset is user made
                 // clone to not modify the saved preset in the collection
-                EQManager.ApplyPreset((EQPresetModel)value.Clone());
+                EQManager.ApplyPreset((EQPreset)value.Clone());
                 OriginalPreset = value;
                 OnPropertyChanged(nameof(AppliedPresetName));
                 ConfigurationService.SetPreference(SettingsEnum.EqualizerPreset, value.Id.ToString());
@@ -79,8 +82,8 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         /// <summary>
         /// Represent the original pre existing preset that has been modified by the user
         /// </summary>
-        private EQPresetModel _originalPreset;
-        public EQPresetModel OriginalPreset
+        private EQPreset _originalPreset;
+        public EQPreset OriginalPreset
         {
             get => _originalPreset;
             set
@@ -135,7 +138,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         public ICommand DeletePresetCommand { get; }
         public ICommand AddBandCommand { get; }
         public ICommand RemoveBandCommand { get; }
-        public DSPSettingsViewModels(INavigationService navigationService, IWindowService windowService, IAudioPlayback audioPlayback, IModalService modalService) : base(navigationService, windowService)
+        public DSPSettingsViewModels(IWindowService windowService, IAudioPlayback audioPlayback, IModalService modalService) : base(windowService)
         {
             AudioPlayback = audioPlayback;
             _modalService = modalService;
@@ -147,7 +150,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 
             TogglePresetPopupCommand = new RelayCommand(() => IsPresetPopupOpen = !IsPresetPopupOpen);
 
-            ApplyPresetCommand = new RelayCommand<EQPresetModel>((preset) =>
+            ApplyPresetCommand = new RelayCommand<EQPreset>((preset) =>
             {
                 AppliedPreset = preset;
                 IsPresetPopupOpen = false;
@@ -155,49 +158,49 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 
             CreatePresetCommand = new RelayCommand(() =>
             {
-                Action<string> createPreset = async (string newName) =>
+                async void createPreset(string newName)
                 {
-                    EQPresetModel preset = new();
+                    EQPreset preset = new();
                     preset.Effects = new(EQManager.Preset.Effects);
                     preset.Name = newName;
-                    preset.Id = await DataAccess.Connection.InsertEQPreset(preset);
+                    await EQPreset.Insert(preset);
                     AppliedPreset = preset;
-                };
+                }
                 CreateEditNameModel model = new CreateEditNameModel("", "Preset", false, createPreset, null);
                 _modalService.OpenModal(ViewNameEnum.CreateTag, (canceled) => { }, model);
             });
 
             SavePresetCommand = new RelayCommand(async () =>
             {
-                foreach (EQEffectModel eqBand in AppliedPreset.Effects)
+                foreach (EQBand eqBand in AppliedPreset.Effects)
                 {
-                    await DataAccess.Connection.UpdateEQBand(eqBand);
+                    //DataAccess.Connection.Update(eqBand);
                 }
 
                 for (int i = 0; i < AppliedPreset.Effects.Count; i++)
                 {
-                    EQEffectModel appliedBand = AppliedPreset.Effects[i];
+                    EQBand appliedBand = AppliedPreset.Effects[i];
 
                     // band added, insert it
                     if(appliedBand.Id < 0)
                     {
-                        await DataAccess.Connection.InsertEQBand(appliedBand, AppliedPreset.Id);
+                        //await DataAccess.Connection.InsertEQBand(appliedBand, AppliedPreset.Id);
                         continue;
                     }
                     else if (i < OriginalPreset.Effects.Count)
                     {
-                        EQEffectModel originalBand = OriginalPreset.Effects[i];
+                        EQBand originalBand = OriginalPreset.Effects[i];
 
                         // a band has been removed, delete it
                         if(appliedBand.Id !=  originalBand.Id && !AppliedPreset.Effects.Any(e => e.Id == originalBand.Id))
                         {
-                            await DataAccess.Connection.DeleteEQBand(originalBand.Id);
+                            //await DataAccess.Connection.DeleteOne(originalBand);
                             continue;
                         }
                     }
 
                     // update the band
-                    await DataAccess.Connection.UpdateEQBand(appliedBand);
+                    //DataAccess.Connection.Update(appliedBand);
                 }
 
                 GetPresets();
@@ -210,7 +213,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 Action<string> updatePreset = async (string newName) =>
                 {
                     OriginalPreset.Name = newName;
-                    await DataAccess.Connection.UpdateEQPreset(OriginalPreset);
+                    //DataAccess.Connection.Update(OriginalPreset);
                     AppliedPreset.Name = newName;
                     OnPropertyChanged(nameof(AppliedPresetName));
                     GetPresets();
@@ -232,7 +235,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 OnEQBandUpdated();
             });
 
-            RemoveBandCommand = new RelayCommand<EQEffectModel>((EQEffectModel band) =>
+            RemoveBandCommand = new RelayCommand<EQBand>((EQBand band) =>
             {
                 EQManager.RemoveEffect(band);
                 OnPropertyChanged(nameof(AppliedPreset));
@@ -254,11 +257,11 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             base.Dispose();
         }
 
-        private async void ConfirmDelete(bool canceled)
+        private void ConfirmDelete(bool canceled)
         {
             if (!canceled)
             {
-                await DataAccess.Connection.DeleteEQPreset(OriginalPreset);
+                //DataAccess.Connection.DeleteOne(OriginalPreset);
 
                 ResetPreset();
                 GetPresets();
@@ -284,7 +287,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         private async void GetPresets()
         {
             // user preset at the top of the list
-            List<EQPresetModel> presets = await DataAccess.Connection.GetAllEQPresets();
+            List<EQPreset> presets = await EQPreset.GetAll();
             presets.AddRange(EQModelsFactory.GetPreMadeEQPresets());
 
             Presets = new(presets);

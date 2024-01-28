@@ -6,25 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using ABI.System.Collections.Generic;
-using DataBaseConnection.DataAccess;
-using MusicFilesProcessor.Helpers;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.DataBaseModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
-using MusicPlayUI.Core.Helpers;
-using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
-using MusicPlayUI.MVVM.ViewModels;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class GenreViewModel : ViewModel
     {
         private readonly ICommandsManager _commandsManager;
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
         private readonly IModalService _modalService;
         private const int _maxNumberOfCoversToDisplay = 14;
@@ -39,8 +32,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<ArtistModel> _artists;
-        public ObservableCollection<ArtistModel> Artists
+        private ObservableCollection<Artist> _artists;
+        public ObservableCollection<Artist> Artists
         {
             get => _artists;
             set
@@ -49,8 +42,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<AlbumModel> _albums;
-        public ObservableCollection<AlbumModel> Albums
+        private ObservableCollection<Album> _albums;
+        public ObservableCollection<Album> Albums
         {
             get => _albums;
             set
@@ -59,8 +52,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<PlaylistModel> _playlist;
-        public ObservableCollection<PlaylistModel> BindedPlaylists
+        private ObservableCollection<Playlist> _playlist;
+        public ObservableCollection<Playlist> BindedPlaylists
         {
             get => _playlist;
             set
@@ -69,8 +62,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<UIOrderedTrackModel> _tracks;
-        public ObservableCollection<UIOrderedTrackModel> Tracks
+        private ObservableCollection<OrderedTrack> _tracks;
+        public ObservableCollection<OrderedTrack> Tracks
         {
             get => _tracks;
             set
@@ -79,8 +72,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<TrackModel> _allTracks;
-        public ObservableCollection<TrackModel> AllTracks
+        private ObservableCollection<Track> _allTracks;
+        public ObservableCollection<Track> AllTracks
         {
             get => _allTracks;
             set
@@ -168,39 +161,37 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PlayPlaylistCommand { get; }
         public ICommand PlayTrackCommand { get; }
         public ICommand EditTagCommand { get; }
-        public GenreViewModel(ICommandsManager commandsManager, INavigationService navigationService, IQueueService queueService, IModalService modalService)
+        public GenreViewModel(ICommandsManager commandsManager, IQueueService queueService, IModalService modalService)
         {
             _commandsManager = commandsManager;
-            _navigationService = navigationService;
             _queueService = queueService;
             _modalService = modalService;
 
             // play commands
             PlayGenreCommand = new RelayCommand<string>((shuffle) =>
             {
-                _queueService.SetNewQueue(AllTracks.ToList(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(AllTracks, Genre, Genre.Name, "", null, shuffle == "1");
             });
 
             PlayAlbumsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
             {
-                List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbums(Albums.Select(a => a.Id));
-                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
+                //_queueService.SetNewQueue(Albums.Select(a => a.Tracks), new(Genre.Name, ModelTypeEnum.CurrentTag, Genre.Id), "", null, shuffle == "1");
             });
 
             PlayArtistsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
             {
-                List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromArtists(Artists.Select(a => a.Id));
-                _queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
+                //List<Track> tracks = await DataAccess.Connection.GetTracksFromArtists(TrackArtistRole.Select(a => a.Id));
+                //_queueService.SetNewQueue(tracks, new(Genre.Name, ModelTypeEnum.CurrentTag, Genre.Id), "", null, shuffle == "1");
             });
 
-            PlayPlaylistsOnlyCommand = new RelayCommand<string>(async (shuffle) =>
+            PlayPlaylistsOnlyCommand = new RelayCommand<string>((shuffle) =>
             {
-                _queueService.SetNewQueue(await GetPlaylistsTracks(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(GetPlaylistsTracks(), Genre, Genre.Name, "", null, shuffle == "1");
             });
 
             PlayTracksOnlyCommand = new RelayCommand<string>((shuffle) =>
             {
-                _queueService.SetNewQueue(Tracks.ToList(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), "", null, shuffle == "1");
+                _queueService.SetNewQueue(Tracks.ToList(), Genre, Genre.Name, "", null, shuffle == "1");
             });
 
             ShowHideArtistsCommand = new RelayCommand(() =>
@@ -223,36 +214,32 @@ namespace MusicPlayUI.MVVM.ViewModels
                 TracksVisibility = TracksVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
             });
 
-            PlayAlbumCommand = new RelayCommand<AlbumModel>(async (album) =>
+            PlayAlbumCommand = new RelayCommand<Album>((album) =>
             {
-                List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbum(album.Id);
-                _queueService.SetNewQueue(tracks, new(album.Name, ModelTypeEnum.Album, album.Id), album.AlbumCover);
+                _queueService.SetNewQueue(album.Tracks, album, album.Name, album.AlbumCover);
             });
 
-            PlayArtistCommand = new RelayCommand<ArtistModel>(async (artist) =>
+            PlayArtistCommand = new RelayCommand<Artist>((artist) =>
             {
-                List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromArtist(artist.Id);
-                _queueService.SetNewQueue(tracks, new(artist.Name, ModelTypeEnum.Artist, artist.Id), artist.Cover);
+                _queueService.SetNewQueue(artist.Tracks, artist, artist.Name, artist.Cover);
             });
 
-            PlayPlaylistCommand = new RelayCommand<PlaylistModel>(async (playlist) =>
+            PlayPlaylistCommand = new RelayCommand<Playlist>((playlist) =>
             {
-                List<OrderedTrackModel> tracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
-                _queueService.SetNewQueue(tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Artist, playlist.Id), playlist.Cover);
+                _queueService.SetNewQueue(playlist.Tracks, playlist, playlist.Name, playlist.Cover);
             });
 
-            PlayTrackCommand = new RelayCommand<TrackModel>((track) =>
+            PlayTrackCommand = new RelayCommand<Track>((track) =>
             {
-                _queueService.SetNewQueue(Tracks.ToList(), new(Genre.Name, ModelTypeEnum.Tag, Genre.Id), track.AlbumCover, track);
+                //_queueService.SetNewQueue(TrackTags.ToList(), new(Genre.Name, ModelTypeEnum.CurrentTag, Genre.Id), track.AlbumCover, track);
             });
 
             EditTagCommand = new RelayCommand(() =>
             {
-                Action<string> updateTag = async (string newName) =>
+                async void updateTag(string newName)
                 {
-                    Genre.Name = newName;
-                    await DataAccess.Connection.UpdateTag(Genre);
-                };
+                    await Tag.Update(Genre, newName);
+                }
                 CreateEditNameModel model = new CreateEditNameModel(Genre.Name, "Tag", true, null, updateTag);
                 _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => { }, model);
             });
@@ -275,18 +262,18 @@ namespace MusicPlayUI.MVVM.ViewModels
             Update();
         }
 
-        public async Task<List<TrackModel>> GetPlaylistsTracks()
+        public List<Track> GetPlaylistsTracks()
         {
-            List<TrackModel> tracks = new();
+            List<Track> tracks = new();
 
-            foreach (PlaylistModel playlist in BindedPlaylists)
-            {
-                tracks.AddRange(await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id));
-            }
+            //foreach (Playlist playlist in BindedPlaylists)
+            //{
+            //    tracks.AddRange(playlist.Tracks);
+            //}
             return tracks;
         }
 
-        public override async void Update(BaseModel parameter = null)
+        public override void Update(BaseModel parameter = null)
         {
             if(parameter != null && parameter is UITagModel genre)
             {
@@ -294,32 +281,25 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
             else
             {
-                Genre = _navigationService.CurrentViewParameter as UITagModel;
+                Genre = App.State.CurrentView.State.Parameter as UITagModel;
 
-                Genre ??= await (_navigationService.CurrentViewParameter as TagModel).ToUITagModel();
+                Genre ??= (App.State.CurrentView.State.Parameter as Tag).ToUITagModel();
             }
 
+            //Artists = new(Genre.ArtistTags);
+            //Albums = new(Genre.AlbumTags);
 
+            //BindedPlaylists = new(Genre.PlaylistTags);
 
-            Artists = new(Genre.Artists);
-            Albums = new(Genre.Albums);
+            //TrackTags = new(Genre.TrackTags.ToUIOrderedTrackModel(_queueService.AlbumCoverOnly, _queueService.AutoCover));
+            //List<Track> tracks = await DataAccess.Connection.GetTracksFromAlbums(AlbumTags.Select(a => a.Id));
+            //tracks.AddRange(await DataAccess.Connection.GetTracksFromArtists(TrackArtistRole.Select(a => a.Id)));
+            //tracks.AddRange(GetPlaylistsTracks());
+            //tracks.AddRange(TrackTags);
+            //tracks = tracks.DistinctBy(t => t.Id).ToList();
+            //AllTracks = new(tracks);
 
-            foreach (AlbumModel album in Albums)
-            {
-                album.Artists = album.Artists.Order();
-            }
-
-            BindedPlaylists = new(Genre.Playlists);
-
-            Tracks = new(Genre.Tracks.ToUIOrderedTrackModel(_queueService.AlbumCoverOnly, _queueService.AutoCover));
-            List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbums(Albums.Select(a => a.Id));
-            tracks.AddRange(await DataAccess.Connection.GetTracksFromArtists(Artists.Select(a => a.Id)));
-            tracks.AddRange(await GetPlaylistsTracks());
-            tracks.AddRange(Tracks);
-            tracks = tracks.DistinctBy(t => t.Id).ToList();
-            AllTracks = new(tracks);
-
-            Duration = tracks.GetTotalLength(out int _);
+            //Duration = tracks.GetTotalLength(out int _);
         }
 
         public int RemoveAlbum(int albumId)
@@ -365,7 +345,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             for (int i = 0; i < Tracks.Count; i++)
             {
-                if (Tracks[i].Id == trackId)
+                if (Tracks[i].Track.Id == trackId)
                 {
                     Tracks.RemoveAt(i);
                     return i;

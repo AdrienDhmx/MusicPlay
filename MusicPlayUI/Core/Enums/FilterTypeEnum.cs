@@ -18,6 +18,6 @@ namespace MusicPlayUI.Core.Enums
         Year = 4, // release Date
         PlayCount = 5, // can filter by specifying a min an max playcount (0 - n)
         Rating = 6, // can filter by specifying a min and max ration (0-5)
-        AlbumType = 7, // Singles, EP, Albums
+        AlbumType = 7, // Singles, EP, AlbumTags
     }
 }

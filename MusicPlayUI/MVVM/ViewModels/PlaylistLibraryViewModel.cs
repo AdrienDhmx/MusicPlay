@@ -1,33 +1,32 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using MusicPlayModels.Enums;
-using MusicPlayUI.Core.Commands;
+﻿using MusicPlayUI.Core.Commands;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
 using System.Collections.ObjectModel;
-using MusicPlayModels;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Helpers;
 using System.Threading.Tasks;
 using System.Linq;
 using MessageControl;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Enums;
+
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class PlaylistLibraryViewModel : ViewModel, IFileDragDropTarget
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
         private readonly IModalService _modalService;
+        private readonly ICommandsManager _commandsManager;
         private readonly IRadioStationsService _radioStationsServices;
         
         private readonly IPlaylistService _playlistService;
 
-        private List<PlaylistModel> _constAutoPlaylist = new();
-        public List<PlaylistModel> ConstAutoPlaylist
+        private List<Playlist> _constAutoPlaylist = new();
+        public List<Playlist> ConstAutoPlaylist
         {
             get { return _constAutoPlaylist; }
             set
@@ -37,8 +36,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<PlaylistModel> _bindedPlaylists = new ();
-        public ObservableCollection<PlaylistModel> BindedPlaylists
+        private ObservableCollection<Playlist> _bindedPlaylists = new ();
+        public ObservableCollection<Playlist> BindedPlaylists
         {
             get { return _bindedPlaylists; }
             set
@@ -86,12 +85,12 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand NavigateToPlaylistCommand { get; }
         public ICommand CreateAutoPlaylistCommand { get; }
         public ICommand OpenPlaylistPopupCommand { get; }
-        public PlaylistLibraryViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, 
+        public PlaylistLibraryViewModel(IQueueService queueService, IModalService modalService, ICommandsManager commandsManager,
             IRadioStationsService radioStationsServices, IPlaylistService playlistService)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
             _modalService = modalService;
+            _commandsManager = commandsManager;
             _radioStationsServices = radioStationsServices;
             
             _playlistService = playlistService;
@@ -103,49 +102,41 @@ namespace MusicPlayUI.MVVM.ViewModels
                 _modalService.OpenModal(ViewNameEnum.CreatePlaylist, PlaylistCreated);
             });
 
-            PlayPlaylistCommand = new RelayCommand<PlaylistModel>(async (playlist) =>
+            PlayPlaylistCommand = new RelayCommand<Playlist>(async (playlist) =>
             {
                 if (playlist is not null)
                 {
                     if (playlist.PlaylistType == PlaylistTypeEnum.UserPlaylist)
                     {
-                        List<OrderedTrackModel> tracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
-                        _queueService.SetNewQueue(tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
+                        //List<OrderedTrack> tracks = playlist.Tracks;
+                        //_queueService.SetNewQueue(tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
                     }
                     else
                     {
-                        _queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
+                        //_queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
                     }
                 }
             });
 
-            NavigateToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) =>
-            {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificPlaylist, playlist);
-            });
+            NavigateToPlaylistCommand = _commandsManager.NavigateToPlaylistCommand;
 
             CreateAutoPlaylistCommand = new RelayCommand(async () =>
             {
-                PlaylistModel playlist = await _radioStationsServices.CreateRadioStation();
+                Playlist playlist = await _radioStationsServices.CreateRadioStation();
 
                 if(playlist is not null)
-                    _navigationService.NavigateTo(ViewNameEnum.SpecificPlaylist, playlist);
+                    App.State.NavigateTo<PlaylistViewModel>(playlist);
                 else // return null when not enough data
                     MessageHelper.PublishMessage(MessageFactory.ErrorMessage(ErrorEnum.NotEnoughDataForRadio));
             });
 
-            OpenPlaylistPopupCommand = new RelayCommand<PlaylistModel>((playlist) =>
-            {
-                if (playlist is not null)
-                {
-                    _navigationService.OpenPopup(ViewNameEnum.PlaylistPopup, playlist);
-                }
-            });
+            OpenPlaylistPopupCommand = _commandsManager.OpenPlaylistPopupCommand;
+
         }
-        
+
         private async void Search()
         {
-            BindedPlaylists = new(await SearchHelper.FilterPlaylist(SearchText));
+            BindedPlaylists = new ObservableCollection<Playlist>(await SearchHelper.FilterPlaylist(SearchText));
             PlaylistCount = $"{BindedPlaylists.Count} of {_totalPlaylistCount}";
         }
 
@@ -159,7 +150,8 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public async override void Update(BaseModel parameter = null)
         {
-            List<PlaylistModel> playlists = await DataAccess.Connection.GetAllPlaylists();
+            // this update method is only called when a playlist has been deleted
+            List<Playlist> playlists = await Playlist.GetAll();
             _totalPlaylistCount = playlists.Count;
             Search();
         }
@@ -167,15 +159,15 @@ namespace MusicPlayUI.MVVM.ViewModels
         private async void LoadData()
         {
             ConstAutoPlaylist = await PlaylistsFactory.GetConstAutoPlaylists();
-            BindedPlaylists = new(await DataAccess.Connection.GetAllPlaylists());
+            BindedPlaylists = new(await Playlist.GetAll());
             _totalPlaylistCount = BindedPlaylists.Count;
             PlaylistCount = $"{BindedPlaylists.Count} of {_totalPlaylistCount}";
         }
 
-        public async void OnFileDrop(string[] filepaths)
+        public async void OnFileDrop(string[] filePaths)
         {
             FilesDropped = true;
-            await _playlistService.CreatePlaylistfromDirectory(filepaths);
+            await _playlistService.CreatePlaylistFromDirectory(filePaths);
             FilesDropped = false;
         }
     }

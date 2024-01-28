@@ -1,10 +1,12 @@
 ﻿using AudioHandler;
-using DataBaseConnection.DataAccess;
+
 using MessageControl;
+using MessageControl.Model;
 using MusicFilesProcessor;
 using MusicFilesProcessor.Helpers;
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
 using MusicPlay.Language;
-using MusicPlayModels.StatsModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -30,11 +32,18 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 
         private StorageService _storageSettings => StorageService.Instance;
 
-        private ObservableCollection<FolderModel> _folders;
-        public ObservableCollection<FolderModel> Folders
+        private ObservableCollection<Folder> _folders;
+        public ObservableCollection<Folder> Folders
         {
             get => _folders;
             set => SetField(ref _folders, value);
+        }
+
+        private bool _deleting = false; 
+        public bool Deleting
+        {
+            get => _deleting;
+            set => SetField(ref _deleting, value);
         }
 
         private double _importValue = 0;
@@ -98,30 +107,30 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
         public ICommand EditFolderCommand { get; }
         public ICommand RemoveFolderCommand { get; }
         public ICommand ClearDataBaseCommand { get; }
-        public StorageSettingsViewModel(IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService, INavigationService navigationService, IWindowService windowService) : base(navigationService, windowService)
+        public StorageSettingsViewModel(IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService, IWindowService windowService) : base(windowService)
         {
             _audioPlayback = audioPlayback;
             _queueService = queueService;
             _modalService = modalService;
 
-            ScanFolderCommand = new RelayCommand<FolderModel>((folder) => Task.Run(() => _storageSettings.ScanFolder(folder)));
+            ScanFolderCommand = new RelayCommand<Folder>((folder) => Task.Run(() => _storageSettings.ScanFolder(folder)));
 
             ScanAllFoldersCommand = new RelayCommand(() => Task.Run(() => _storageSettings.ScanFolders()));
 
-            EditFolderCommand = new RelayCommand<FolderModel>((folder) =>
+            EditFolderCommand = new RelayCommand<Folder>((folder) =>
             {
                 _modalService.OpenModal(ViewNameEnum.EditFolder, (canceled) => { }, folder);
             });
 
-            RemoveFolderCommand = new RelayCommand<FolderModel>((folder) =>
+            RemoveFolderCommand = new RelayCommand<Folder>((folder) =>
             {
-                _storageSettings.RemoveFolder(folder);
-                Folders = new(_storageSettings.Folders);
+                _storageSettings.DeleteFolder(folder);
+                Folders.Remove(folder);
             });
 
             ClearDataBaseCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.ConfirmAction, ClearDataBase, ConfirmActionModelFactory.CreateConfirmClearDataBaseModel()));
 
-            AddFolderCommand = new RelayCommand(() =>
+            AddFolderCommand = new RelayCommand(async () =>
             {
                 FolderDialogue folderDialogue = new();
                 folderDialogue.InputPath = DirectoryHelper.MusicFolder;
@@ -132,8 +141,8 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                     string newDir = folderDialogue.ResultPath;
                     if (Directory.Exists(newDir))
                     {
-                        FolderModel folderModel = new FolderModel(newDir);
-                        if (!_storageSettings.AddFolder(folderModel))
+                        Folder folderModel = new Folder(newDir);
+                        if (!await _storageSettings.AddFolder(folderModel))
                         {
                             MessageHelper.PublishMessage(DefaultMessageFactory.CreateWarningMessage($"This folder is already monitored !"));
                         }
@@ -153,11 +162,11 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 _audioPlayback.Dispose();
                 _queueService.DeleteQueue();
 
-                DataAccess.Connection.ClearDataBase();
+                //DataAccess.Connection.ClearDataBase();
 
                 if (DeleteCovers)
                 {
-                    foreach (string file in Directory.EnumerateFiles(DirectoryHelper.AppCoverFolder, "*.*", SearchOption.AllDirectories))
+                    foreach (string file in Directory.EnumerateFiles(DirectoryHelper.AppFolder, "*.*", SearchOption.AllDirectories))
                     {
                         try
                         {
@@ -177,10 +186,10 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 ConfigurationService.SetPreference(SettingsEnum.AlbumFilter, "", true);
                 ConfigurationService.SetPreference(SettingsEnum.ArtistFilter, "", true);
 
-                foreach (FolderModel folder in _storageSettings.Folders)
+                foreach (Folder folder in _storageSettings.Folders)
                 {
                     folder.TrackImportedCount = 0;
-                    _storageSettings.UpdateFolder(folder, folder.Monitored);
+                    _storageSettings.UpdateFolder(folder, folder.IsMonitored);
                 }
 
                 MessageHelper.PublishMessage(MessageFactory.DataBaseCleared());

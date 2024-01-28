@@ -7,7 +7,7 @@
              xmlns:popupviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PopupViewModels"
              xmlns:customButton="clr-namespace:IconButton;assembly=IconButton" 
              xmlns:dd="urn:gong-wpf-dragdrop"
-             xmlns:model="clr-namespace:MusicPlayUI.MVVM.Models"
+             xmlns:model="clr-namespace:MusicPlay.Database.Models.DataBaseModels;assembly=MusicPlay.Database"
              xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls" xmlns:ListView="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=popupviewmodels:QueueDrawerViewModel}"
@@ -23,7 +23,7 @@
             </Grid.RowDefinitions>
 
             <!-- Playing From -->
-            <TextBlock Text="{Binding QueueService.PlayingFrom.PlayingFrom, UpdateSourceTrigger=PropertyChanged}"
+            <TextBlock Text="{Binding QueueService.Queue.PlayingFromName, UpdateSourceTrigger=PropertyChanged}"
                        Style="{DynamicResource SLlistInfoStyle}"
                        HorizontalAlignment="Center"
                        TextAlignment="Center"
@@ -48,13 +48,13 @@
                           dd:DragDrop.DropTargetAdornerBrush="{DynamicResource Primary}"
                           HorizontalAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        ItemsSource="{Binding QueueService.QueueTracks, UpdateSourceTrigger=PropertyChanged}"
-                        SelectedItem="{Binding QueueService.PlayingTrack, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding QueueService.Queue.Tracks, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedItem="{Binding QueueService.Queue.PlayingQueueTrack, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                           ItemContainerStyle="{DynamicResource QueuePopupListViewItem}"
                           ScrollViewer.CanContentScroll="True"
                         SelectionMode="Single">
                     <dd:DragDrop.EffectMoveAdornerTemplate>
-                        <DataTemplate DataType="{x:Type model:UIOrderedTrackModel}">
+                        <DataTemplate DataType="{x:Type model:OrderedTrack}">
                             <Border Background="{DynamicResource Background}"
                                     BorderBrush="{DynamicResource Outline}"
                                     BorderThickness="1"
@@ -70,7 +70,7 @@
                                             Height="60"
                                             Width="60">
                                         <Border.Background>
-                                            <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource ONullImageConverter}}"/>
+                                            <ImageBrush ImageSource="{Binding Track, Converter={StaticResource ONullImageConverter}}"/>
                                         </Border.Background>
                                     </Border>
 
@@ -80,12 +80,12 @@
                                                 Margin="8,0"
                                                 Grid.Column="1">
 
-                                    <TextBlock Text="{Binding Title}"
+                                    <TextBlock Text="{Binding Track.Title}"
                                                    Style="{DynamicResource SStyle}"
                                                    MaxHeight="40"
                                                    HorizontalAlignment="Stretch"/>
 
-                                    <ListView:TrackArtistsListView Artists="{Binding Artists}"
+                                    <ListView:TrackArtistsListView Artists="{Binding Track.TrackArtistRole}"
                                                                    Foreground="{DynamicResource OnBackground}"/>
                                 </StackPanel>
                             </Grid>
@@ -100,7 +100,7 @@
                                 <Border.InputBindings>
                                     <MouseBinding Gesture="RightClick"
                                                   Command="{Binding DataContext.OpenTrackPopupCommand, ElementName=RootQueuePopupView}"
-                                                  CommandParameter="{Binding .}"/>
+                                                  CommandParameter="{Binding Track}"/>
                                 </Border.InputBindings>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -110,7 +110,7 @@
 
                                     <customButton:IconButton Style="{DynamicResource QueueQuickPlayButton}"
                                                             Command="{Binding DataContext.PlayTrackCommand, ElementName=RootQueuePopupView}"
-                                                             CommandParameter="{Binding .}"
+                                                             CommandParameter="{Binding Track}"
                                                             Panel.ZIndex="2"
                                                             VerticalAlignment="Center"
                                                             HorizontalAlignment="Center"
@@ -119,13 +119,13 @@
                                     <!-- Album Cover -->
                                     <Border CornerRadius="4"
                                             Margin="4"
-                                            Visibility="{Binding DataContext.QueueService.AreCoversEnabled, ElementName=RootQueuePopupView, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneTime}"
+                                            Visibility="{Binding DataContext.AreCoversEnabled, ElementName=RootQueuePopupView, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneTime}"
                                             Width="60"
                                             Height="60"
                                             VerticalAlignment="Center"
                                             x:Name="CoverBorder">
                                         <Border.Background>
-                                            <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource ONullImageConverter}}"
+                                            <ImageBrush ImageSource="{Binding Track, Converter={StaticResource ONullImageConverter}}"
                                                             Stretch="UniformToFill"/>
                                         </Border.Background>
                                     </Border>
@@ -137,12 +137,12 @@
                                                 Margin="8,4"
                                                 Grid.Column="1">
 
-                                    <TextBlock Text="{Binding Title}"
+                                    <TextBlock Text="{Binding Track.Title}"
                                                    Style="{DynamicResource SStyle}"
                                                    MaxHeight="40"
                                                    HorizontalAlignment="Stretch"/>
 
-                                    <ListView:TrackArtistsListView Artists="{Binding Artists}" 
+                                    <ListView:TrackArtistsListView Artists="{Binding Track.TrackArtistRole}" 
                                                                    FontSize="15"
                                                                 Foreground="{DynamicResource OnBackground}"
                                                                    Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootQueuePopupView}"/>
@@ -166,7 +166,7 @@
                                                              HorizontalContentAlignment="Right"
                                                              StrokeColor="Transparent"
                                                              Command="{Binding DataContext.RemoveTrackCommand, ElementName=RootQueuePopupView}"
-                                                             CommandParameter="{Binding .}">
+                                                             CommandParameter="{Binding Track}">
                                     <customButton:IconButton.Style>
                                         <Style TargetType="customButton:IconButton"
                                                    BasedOn="{StaticResource BaseIconButton}">

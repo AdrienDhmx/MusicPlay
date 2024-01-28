@@ -1,7 +1,5 @@
 ﻿using System.Windows.Input;
-using DataBaseConnection.DataAccess;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
@@ -43,7 +41,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
         }
 
         public ICommand CreateTagCommand { get; }
-        public CreateModelNameViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
+        public CreateModelNameViewModel(IModalService modalService) : base(modalService)
         {
             CreateTagCommand = new RelayCommand(() =>
             {

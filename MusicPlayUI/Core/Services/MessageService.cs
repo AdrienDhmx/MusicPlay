@@ -1,13 +1,7 @@
 ﻿using Resources = MusicPlay.Language.Resources;
-using MusicPlayModels;
 using MusicPlayUI.Core.Enums;
-using MusicPlayUI.Core.Services.Interfaces;
-using MusicPlayUI.MVVM.Models;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Timers;
-using System.Windows.Documents;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.Core.Services
 {

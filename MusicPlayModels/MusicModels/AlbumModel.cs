@@ -67,7 +67,7 @@ namespace MusicPlayModels.MusicModels
         /// If the album doesn't have a primary artists and is a compilation of tracks from different artist.
         /// Note: The <see cref="PrimaryArtist"/> is named "Various Artists" when this is true
         /// </summary>
-        public bool VariousArtists
+        public bool IsVariousArtists
         {
             get => _variousArtists;
             set => SetField(ref _variousArtists, value);
@@ -196,6 +196,23 @@ namespace MusicPlayModels.MusicModels
             }
 
             return ids;
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new()
+            {
+                { nameof(Name), Name },
+                { nameof(AlbumCover), AlbumCover },
+                { nameof(Copyright), Copyright },
+                { nameof(ReleaseDate), ReleaseDate },
+                { nameof(Type), Type },
+                { nameof(IsVariousArtists), IsVariousArtists.ToInt() },
+                { nameof(IsLive), IsLive.ToInt() },
+                { nameof(IsCompilation), IsCompilation.ToInt() },
+            };
+
+            return base.CreateTable().AddRange(keyValues);
         }
     }
 }

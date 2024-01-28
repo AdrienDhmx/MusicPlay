@@ -1,7 +1,7 @@
-﻿using AudioHandler.Enums;
-using AudioHandler.Models;
-using MusicPlayModels;
-using System.Windows.Media;
+﻿using System.Windows.Media;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.AudioModels;
 
 namespace MusicPlayUI.MVVM.Models
 {
@@ -11,7 +11,7 @@ namespace MusicPlayUI.MVVM.Models
 
         public int Index { get; set; }
 
-        public DeviceTypeEnum Type { get; set; }
+        public AudioDeviceTypeEnum Type { get; set; }
 
         private bool _isInitialized;
         public bool IsInitialized
@@ -28,10 +28,10 @@ namespace MusicPlayUI.MVVM.Models
 
         public Geometry Icon { get; set; }
 
-        public FullDeviceModel(DeviceModel device, Geometry pathGeometry)
+        public FullDeviceModel(AudioDeviceModel device, Geometry pathGeometry)
         {
             Name = device.Name;
-            Type = device.Type;
+            Type = device.DeviceType;
             Index = device.Index;
             IsDefault = device.IsDefault;
             IsInitialized = device.IsInitialized;

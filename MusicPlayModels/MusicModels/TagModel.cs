@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class TagModel : BaseModel
+    public class TagModel : PlayableModel
     {
         private string _name = "";
         public string Name {
@@ -24,5 +24,10 @@ namespace MusicPlayModels.MusicModels
         }
 
         public TagModel() { }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            return base.CreateTable().AddRange(new() { { nameof(Name), Name } });
+        }
     }
 }

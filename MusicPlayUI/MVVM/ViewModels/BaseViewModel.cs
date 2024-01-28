@@ -1,15 +1,35 @@
-﻿using MusicPlayModels;
-using MusicPlayModels.MusicModels;
-using MusicPlayUI.Core.Enums;
-using MusicPlayUI.Core.Services;
+﻿using MusicPlay.Database.Models;
+using MusicPlayUI.Core.Models;
 using System;
-using System.ComponentModel;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class ViewModel : ObservableObject, IDisposable
     {
+        public virtual NavigationState State
+        {
+            get => App.State.CurrentView?.State;
+            set
+            {
+                if(App.State.CurrentView != null)
+                {
+                    App.State.CurrentView.State = value;
+                    OnPropertyChanged(nameof(State));
+                }
+            }
+        }
+
+        public ViewModel()
+        {
+            
+        }
+
         public virtual void Dispose()
+        {
+
+        }
+
+        public virtual void Init()
         {
 
         }
@@ -19,5 +39,9 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         }
 
+        public virtual void OnStateChanged()
+        {
+            OnPropertyChanged(nameof(State));
+        }
     }
 }

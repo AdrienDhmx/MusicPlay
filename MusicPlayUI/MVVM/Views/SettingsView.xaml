@@ -60,7 +60,7 @@
                                             Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibilityConverter}}">
                                 </Border>
                                 
-                                <TextBlock Text="{Binding SettingName}"
+                                <TextBlock Text="{Binding Name}"
                                             Grid.Column="1"
                                             x:Name="SettingName"
                                             FontSize="18"
@@ -114,12 +114,12 @@
             <Border Style="{DynamicResource PageHeaderBackgroundLight}"
                 Grid.RowSpan="1"/>
 
-            <TextBlock Text="{Binding SelectedSetting.SettingName}"
+            <TextBlock Text="{Binding SelectedSetting.Name}"
                       Style="{DynamicResource SLargeHeaderStyle}"
                        HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
 
-            <ContentControl Content="{Binding NavigationService.SecondaryViewModel}"
+            <ContentControl Content="{Binding State.ChildViewModel.ViewModel}"
                             Grid.Row="1"/>
         </Grid>
     </Grid>

@@ -1,8 +1,10 @@
 ﻿using AudioHandler;
-using DataBaseConnection.DataAccess;
+
+
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
 using MusicPlay.Language;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -23,9 +25,8 @@ namespace MusicPlayUI.MVVM.ViewModels
 {
     public class ArtistLibraryViewModel : ViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
-
+        private readonly ICommandsManager _commandsManager;
         private bool _noArtistFoundVisibility = false;
         public bool NoArtistFoundVisbility
         {
@@ -85,8 +86,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<ArtistModel> _bindedArtists;
-        public ObservableCollection<ArtistModel> BindedArtists
+        private ObservableCollection<Artist> _bindedArtists;
+        public ObservableCollection<Artist> BindedArtists
         {
             get
             {
@@ -158,35 +159,25 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand RemoveFilterCommand { get; }
         public ICommand OpenSortingPopupCommand { get; }
         public ICommand SortCommand { get; }
-        public ArtistLibraryViewModel(INavigationService navigationService, IQueueService queueService)
+        public ArtistLibraryViewModel(IQueueService queueService, ICommandsManager commandsManager)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
+            _commandsManager = commandsManager;
 
             _sortingPopupTimer = new(50);
             _sortingPopupTimer.Elapsed += SortingPopupTimer_Elapsed;
             _sortingPopupTimer.AutoReset = false;
 
-            PlayArtistCommand = new RelayCommand<ArtistModel>(async (artist) =>
+            PlayArtistCommand = new RelayCommand<Artist>(async (artist) =>
             {
                 if (artist is not null)
                 {
-                    _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), new(artist.Name, ModelTypeEnum.Artist, artist.Id), artist.Cover, null, false);
+                    _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), artist, artist.Name, artist.Cover);
                 }
             });
 
-            NavigateToArtistCommand = new RelayCommand<ArtistModel>((artist) =>
-            {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, artist);
-            });
-
-            OpenArtistPopupCommand = new RelayCommand<ArtistModel>((artist) =>
-            {
-                if (artist is not null)
-                {
-                    _navigationService.OpenPopup(ViewNameEnum.ArtistPopup, artist);
-                }
-            });
+            NavigateToArtistCommand = _commandsManager.NavigateToArtistCommand;
+            OpenArtistPopupCommand = _commandsManager.OpenArtistPopupCommand;
 
             OpenFiltersCommand = new RelayCommand(() =>
             {
@@ -284,23 +275,22 @@ namespace MusicPlayUI.MVVM.ViewModels
             OnPropertyChanged(nameof(IsSortingOpen));
         }
 
-        private async void FilterSearch()
+        private void FilterSearch()
         {
-            BindedArtists = new(await SearchHelper.FilterArtists(SelectedFilters.ToList(), SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending));
+            BindedArtists = new(SearchHelper.FilterArtists([.. SelectedFilters], SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending));
 
             NoArtistFoundVisbility = BindedArtists.Count == 0;
             ArtistCount = $"{BindedArtists.Count} of {TotalArtistCount}";
-
         }
 
-        private async void InitData()
+        private void InitData()
         {
-            (TotalArtistCount, int _, int _) = await DataAccess.Connection.GetNumberOfEntries();
+            TotalArtistCount = Artist.Count();
 
-            List<FilterModel> tagFilters = await FilterFactory.GetGenreFilter();
+            List<FilterModel> tagFilters = FilterFactory.GetGenreFilter();
             List<FilterModel> artistsFilter = FilterFactory.GetArtistTypeFilter();
 
-            List<FilterModel> temp = SearchHelper.GetSelectedFilters(false).ToList();
+            List<FilterModel> temp = [.. SearchHelper.GetSelectedFilters(false)];
 
             foreach (FilterModel filter in temp)
             {
@@ -326,7 +316,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             ArtistTypeFilters = new(artistsFilter.OrderBy(f => f.Name));
             SelectedFilters = new(temp);
 
-            SortBy = SortFactory.GetSortMenu<ArtistModel>();
+            SortBy = SortFactory.GetSortMenu<Artist>();
             SelectedSorting = SortBy.ToList().Find(s => s.IsSelected);
 
             FilterSearch();

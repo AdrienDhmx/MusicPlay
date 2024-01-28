@@ -5,14 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {
@@ -26,15 +20,15 @@ namespace MusicPlayUI.MVVM.Views.ListViews
             InitializeComponent();
         }
 
-        public List<ArtistDataRelation> Artists
+        public List<TrackArtistsRole> Artists
         {
-            get { return (List<ArtistDataRelation>)GetValue(ArtistsProperty); }
+            get { return (List<TrackArtistsRole>)GetValue(ArtistsProperty); }
             set { SetValue(ArtistsProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Artists.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for TrackArtistRole.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ArtistsProperty =
-            DependencyProperty.Register("Artists", typeof(List<ArtistDataRelation>), typeof(AlbumArtistslistView), new PropertyMetadata(new List<ArtistDataRelation>()));
+            DependencyProperty.Register("Artists", typeof(List<TrackArtistsRole>), typeof(AlbumArtistslistView), new PropertyMetadata(new List<TrackArtistsRole>()));
 
         public ICommand Command
         {

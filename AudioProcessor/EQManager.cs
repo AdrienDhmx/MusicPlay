@@ -3,7 +3,7 @@ using System.Threading.Channels;
 using AudioHandler.Models;
 using ManagedBass;
 using ManagedBass.Fx;
-using MusicPlayModels;
+using MusicPlay.Database.Models;
 
 namespace AudioHandler
 {
@@ -24,8 +24,8 @@ namespace AudioHandler
             PresetChanged?.Invoke();
         }
 
-        private EQPresetModel _preset = new();
-        public EQPresetModel Preset
+        private EQPreset _preset = new();
+        public EQPreset Preset
         {
             get => _preset;
             private set
@@ -57,14 +57,14 @@ namespace AudioHandler
             Bass.Configure(Configuration.FloatDSP, true);
         }
 
-        private void SetNewPreset(EQPresetModel preset)
+        private void SetNewPreset(EQPreset preset)
         {
             if (fxHandle != -1)
                 RemovePreset(); // remove old preset
             Preset = preset;
         }
 
-        public void ApplyPreset(int stream, EQPresetModel preset = null)
+        public void ApplyPreset(int stream, EQPreset preset = null)
         {
             this.stream = stream; // update the stream and the preset even if not enabled
             preset ??= Preset;
@@ -72,7 +72,7 @@ namespace AudioHandler
             ApplyPreset(); // will not be applied if not Enabled if false
         }
 
-        public void ApplyPreset(EQPresetModel preset)
+        public void ApplyPreset(EQPreset preset)
         {
             SetNewPreset(preset);
             ApplyPreset(); // will not be applied if not Enabled if false
@@ -85,7 +85,7 @@ namespace AudioHandler
             int bandCount = 0;
 
             fxHandle = Bass.ChannelSetFX(stream, EffectType.PeakEQ, 1);
-            foreach (EQEffectModel effect in Preset.Effects)
+            foreach (EQBand effect in Preset.Effects)
             {
                 effect.Band = bandCount;
                 if (!ApplyEffect(effect))
@@ -96,7 +96,7 @@ namespace AudioHandler
             }
         }
 
-        private bool ApplyEffect(EQEffectModel effect)
+        private bool ApplyEffect(EQBand effect)
         {
             if(fxHandle == -1)
             {
@@ -107,7 +107,7 @@ namespace AudioHandler
         }
 
 
-        public void AddEffect(EQEffectModel effect)
+        public void AddEffect(EQBand effect)
         {
             effect.Band = Preset.Effects.Count;
             Preset.Effects.Add(effect);
@@ -122,7 +122,7 @@ namespace AudioHandler
             if (success) fxHandle = -1;
         }
 
-        public void RemoveEffect(EQEffectModel effect)
+        public void RemoveEffect(EQBand effect)
         {
             int index = -1;
             for (int i = 0; i < Preset.Effects.Count; i++)
@@ -147,10 +147,10 @@ namespace AudioHandler
             OnPresetChanged();
         }
 
-        public void UpdatePreset(EQEffectModel effect)
+        public void UpdatePreset(EQBand effect)
         {
             // update the data
-            EQEffectModel eff = Preset.Effects.Find(e => e.Band == effect.Band);
+            EQBand eff = Preset.Effects.Find(e => e.Band == effect.Band);
             eff.Gain = effect.Gain;
             eff.CenterFrequency = effect.CenterFrequency;
             eff.BandWidth = effect.BandWidth;
@@ -195,7 +195,7 @@ namespace AudioHandler
 
     static class EQEffectHelper
     {
-        public static PeakEQParameters EQEffectToEQParamater(this EQEffectModel effect)
+        public static PeakEQParameters EQEffectToEQParamater(this EQBand effect)
         {
             PeakEQParameters parameters = new();
             parameters.lBand = effect.Band;

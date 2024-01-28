@@ -37,7 +37,7 @@ namespace MessageControl
             }
         }
 
-        public static void PublishMessage(MessageModel message)
+        public static void PublishMessage(MessageModel? message)
         {
             if(_container is not null && message is not null)
             {
@@ -70,6 +70,34 @@ namespace MessageControl
 
                 _container.Children.Insert(0,messageControl);
             }
+        }
+    }
+
+    public static class MessageHelperExt
+    {
+        public static void Publish(this MessageModel? message)
+        {
+            MessageHelper.PublishMessage(message);
+        }
+
+        public static MessageModel? CreateErrorMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateErrorMessage(message);
+        }
+
+        public static MessageModel? CreateWarningMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateWarningMessage(message);
+        }
+
+        public static MessageModel? CreateInfoMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateInfoMessage(message);
+        }
+
+        public static MessageModel? CreateSuccessMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateSuccessMessage(message);
         }
     }
 }

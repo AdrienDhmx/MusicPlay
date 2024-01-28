@@ -4,18 +4,18 @@ using System.IO;
 using System.Linq;
 using MusicFilesProcessor.Helpers;
 using MusicFilesProcessor;
-using MusicPlayModels.StatsModels;
 using MusicPlayUI.Core.Helpers;
+using MusicPlay.Database.Models;
+using System.Threading.Tasks;
+
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.DatabaseAccess;
+using System.Data.Entity;
 
 namespace MusicPlayUI.Core.Services
 {
     public class StorageService
     {
-        private readonly string _settingsFileName = "folders.mps";
-        private readonly string _separator = "||";
-
-        private string _settingFilePath => Path.Combine(DirectoryHelper.AppSettingsFolder, _settingsFileName);
-
         private static StorageService _instance;
         public static StorageService Instance
         {
@@ -24,7 +24,7 @@ namespace MusicPlayUI.Core.Services
 
         private int _previousImportedTrackCount = 0;
 
-        public List<FolderModel> Folders { get; set; }
+        public List<Folder> Folders { get; set; }
 
         private Dictionary<string, FileSystemWatcher> _watchers = new Dictionary<string, FileSystemWatcher>();
         private System.Timers.Timer _timer;
@@ -33,7 +33,7 @@ namespace MusicPlayUI.Core.Services
         public event Action<double> ProgressUpdated;
         public event Action<int> FileImported;
 
-        public FolderModel CurrentScannedFolder { get; set; }
+        public Folder CurrentScannedFolder { get; set; }
         public string CurrentScannedFile { get; set; }
 
         private StorageService()
@@ -54,41 +54,21 @@ namespace MusicPlayUI.Core.Services
             fileCreatedAwaitCallBack?.Invoke();
         }
 
-        private void Init()
+        private async void Init()
         {
-            Folders = new List<FolderModel>();
+            Folders = await Folder.GetAll();
 
-            DirectoryHelper.CheckDirectory(DirectoryHelper.AppSettingsFolder);
-            if (!File.Exists(_settingFilePath))
+            foreach (Folder folder in Folders)
             {
-                File.Create(_settingFilePath).Close();
-                return;
-            }
-
-            string[] lines = File.ReadAllLines(Path.Combine(DirectoryHelper.AppSettingsFolder, _settingsFileName));
-
-            foreach (string line in lines)
-            {
-                string[] data = line.Split(_separator);
-
-                if (data != null)
+                folder.TrackImportedCount = Track.CountFromFolder(folder.Id);
+                if (folder.IsMonitored)
                 {
-                    FolderModel folder = new(data[1])
-                    {
-                        Monitored = data[2] == "1",
-                        TrackImportedCount = int.Parse(data[3])
-                    };
-                    Folders.Add(folder);
-
-                    if (folder.Monitored)
-                    {
-                        WatchFolder(folder);
-                    }
+                    WatchFolder(folder);
                 }
             }
         }
 
-        private void WatchFolder(FolderModel folder)
+        private void WatchFolder(Folder folder)
         {
             FileSystemWatcher watcher = new FileSystemWatcher(folder.Path);
             watcher.EnableRaisingEvents = true;
@@ -98,13 +78,13 @@ namespace MusicPlayUI.Core.Services
             _watchers.Add(folder.Path, watcher);
         }
 
-        private void StopWatchingFolder(FolderModel folder)
+        private void StopWatchingFolder(Folder folder)
         {
             _watchers[folder.Path].Created -= (sender, e) => Watcher_FileCreated(sender, e, folder);
             _watchers.Remove(folder.Path);
         }
 
-        private void Watcher_FileCreated(object sender, FileSystemEventArgs e, FolderModel folder)
+        private void Watcher_FileCreated(object sender, FileSystemEventArgs e, Folder folder)
         {
             string extension = Path.GetExtension(e.FullPath);
 
@@ -121,9 +101,9 @@ namespace MusicPlayUI.Core.Services
 
                 _timer.Start();
 
-                fileCreatedAwaitCallBack = () =>
+                fileCreatedAwaitCallBack = async () =>
                 {
-                    int newTrackCount = ScanFolder(folder);
+                    int newTrackCount = await ScanFolder(folder);
                     FileImported?.Invoke(newTrackCount);
                 };
 
@@ -131,54 +111,32 @@ namespace MusicPlayUI.Core.Services
         }
 
 
-        public void UpdateFolder(FolderModel folder, bool monitor)
+        public async Task UpdateFolder(Folder folder, bool monitor)
         {
             int index = Folders.FindIndex(f => f.Path == folder.Path);
             if (index == -1) return;
 
-            if(folder.Monitored != monitor)
+            if(folder.IsMonitored != monitor)
             {
                 if (!monitor && _watchers.ContainsKey(folder.Path))
                 {
-                    WatchFolder(folder);
-                }
-                else if (monitor && _watchers.ContainsKey(folder.Path))
-                {
                     StopWatchingFolder(folder);
                 }
-
-                folder.Monitored = monitor;
+                else if (monitor && !_watchers.ContainsKey(folder.Path))
+                {
+                    WatchFolder(folder);
+                }
             }
 
-            string[] lines = File.ReadAllLines(_settingFilePath);
-
-            if (lines.Length > index)
-            {
-                string data = folder.Name + _separator + folder.Path + _separator + (folder.Monitored ? "1" : "0") + _separator + folder.TrackImportedCount;
-                lines[index] = data;
-            }
-
-            File.WriteAllLines(_settingFilePath, lines);
+            await Folder.Update(folder, folder.Name, monitor);
         }
 
-        public void RemoveFolder(FolderModel folder)
-        {
-            int index = Folders.FindIndex(f => f.Path == folder.Path);
-            if (index == -1) return;
-
-            if (folder.Monitored && _watchers.ContainsKey(folder.Path))
-            {
-                StopWatchingFolder(folder);
-            }
-
-            Folders.RemoveAt(index);
-
-            List<string> lines = File.ReadAllLines(_settingFilePath).ToList();
-            lines.RemoveAt(index);
-            File.WriteAllLines(_settingFilePath, lines);
-        }
-
-        public bool AddFolder(FolderModel folder)
+        /// <summary>
+        /// Add a folder to the list of folder and insert it the db
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <returns></returns>
+        public async Task<bool> AddFolder(Folder folder)
         {
             int index = Folders.FindIndex(f => f.Path == folder.Path);
             if (index != -1) return false; // folder already monitored
@@ -186,27 +144,44 @@ namespace MusicPlayUI.Core.Services
             Folders.Add(folder);
             WatchFolder(folder);
 
-            string[] lines = File.ReadAllLines(_settingFilePath);
-            string data = folder.Name + _separator + folder.Path + _separator + (folder.Monitored ? "1" : "0") + _separator + folder.TrackImportedCount;
-            File.WriteAllLines(_settingFilePath, lines.Append(data));
+            await Folder.Insert(folder);
             return true;
         }
 
-        public int ScanFolders(bool onlyMonitoredFolder = false)
+        public async Task<int> ScanFolders(bool onlyMonitoredFolder = false)
         {
+            if (Folders.IsNullOrEmpty()) 
+                return 0;
+
             int newTrackCount = 0;
-            foreach (FolderModel folder in Folders)
+            foreach (Folder folder in Folders)
             {
-                if (onlyMonitoredFolder && !folder.Monitored)
+                if (onlyMonitoredFolder && !folder.IsMonitored)
                     continue;
-                newTrackCount += ScanFolder(folder);
+                newTrackCount += await ScanFolder(folder);
             }
             return newTrackCount;
         }
 
-        public int ScanFolder(FolderModel folder)
+        public void DeleteFolder(Folder folder)
         {
-            ImportMusicLibrary filesProcessor = new(folder.Path);
+            if(folder is null || folder.TrackImportedCount > 0)
+            {
+                return;
+            }
+
+            if(folder.IsMonitored && _watchers.ContainsKey(folder.Path))
+            {
+                StopWatchingFolder(folder);
+            }
+
+            Folders.Remove(folder);
+        }
+
+        public async Task<int> ScanFolder(Folder folder)
+        {
+            ClearDatabaseContext(); // avoid trying to insert existing data with embedded references
+            ImportMusicLibrary filesProcessor = new(folder);
             if (filesProcessor.FileNumber > 0)
             {
                 CurrentScannedFolder = folder;
@@ -215,18 +190,25 @@ namespace MusicPlayUI.Core.Services
                 filesProcessor.Import();
                 folder.Scanning = false;
                 _previousImportedTrackCount = 0;
-                UpdateFolder(folder, folder.Monitored);
+                await UpdateFolder(folder, folder.IsMonitored);
             }
             filesProcessor.ProgressChanged -= () => OnProgressUpdate(filesProcessor);
             return filesProcessor.FileNumber;
         }
 
+        private void ClearDatabaseContext()
+        {
+            using DatabaseContext context = new();
+            // only check if there are artists or albums being tracked because if they are not tracked nothing is
+            if(context.Artists.Local.Count > 0 || context.Albums.Local.Count > 0)
+                context.ChangeTracker.Clear();
+        }
+
         private void OnProgressUpdate(ImportMusicLibrary importMusicLibrary)
         {
-            CurrentScannedFile = importMusicLibrary.CurrentStep + "\n" + importMusicLibrary.CurrentFile;
+            CurrentScannedFile = importMusicLibrary.CurrentStep;
             if (_previousImportedTrackCount < importMusicLibrary.FileImportedCount)
             {
-                CurrentScannedFile = importMusicLibrary.CurrentStep; // only give keep the step because the file paths can get very long and look bad on the UI
                 _previousImportedTrackCount = importMusicLibrary.FileImportedCount;
                 CurrentScannedFolder.TrackImportedCount++;
             }

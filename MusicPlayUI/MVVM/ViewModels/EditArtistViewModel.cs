@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DataBaseConnection.DataAccess;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
-using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.ViewModels.WindowViewModels;
@@ -20,8 +16,8 @@ namespace MusicPlayUI.MVVM.ViewModels
     {
         private readonly ICommandsManager _commandsManager;
 
-        private ArtistModel _artist;
-        public ArtistModel Artist
+        private Artist _artist;
+        public Artist Artist
         {
             get => _artist;
             set { 
@@ -59,29 +55,28 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             NavigateToTagCommand = _commandsManager.NavigateToGenreCommand;
             ChangeCover = new RelayCommand(() => Artist.ChangeCover());
-            EditCommand = new RelayCommand(() => Edit());
+            EditCommand = new RelayCommand(async () => await Edit());
         }
 
-        private void Edit()
+        private async Task Edit()
         {
             Error = ArtistName.IsNullOrWhiteSpace();
             if (!Error)
             {
-                Artist.Name = ArtistName;
-                DataAccess.Connection.UpdateArtist(Artist);
+                await Artist.Update(a => a.Name = ArtistName, Artist);
                 CloseWindow();
             }
         }
 
-        public override async void Update(BaseModel parameter = null)
+        public override void Update(BaseModel parameter = null)
         {
-            if(parameter.IsNull() || parameter is not ArtistModel)
+            if(parameter.IsNull() || parameter is not MusicPlay.Database.Models.Artist)
             {
-                throw new Exception("The parameter of the window view model is not of type " + typeof(ArtistModel));
+                throw new Exception("The parameter of the window view model is not of type " + typeof(Artist));
             }
-            Artist = (ArtistModel)parameter;
+            Artist = (Artist)parameter;
             ArtistName = Artist.Name;
-            Artist.Tags = await DataAccess.Connection.GetArtistTag(Artist.Id);
+            //Artist.TrackTag = await DataAccess.Connection.GetArtistTag(Artist.Id);
         }
     }
 }

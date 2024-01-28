@@ -71,7 +71,7 @@
                                Padding="2, 2, 2, 0"
                                 Grid.Row="1"/>
 
-                    <TextBlock Text="{Binding Artists[0].Name}"
+                    <TextBlock Text="{Binding PrimaryArtist.Name}"
                                Visibility="{Binding ShowArtist, ElementName=RootListView, Converter={StaticResource BoolToVisibilityConverter}}"
                                 Style="{DynamicResource SListItemNameStyle}"
                                Panel.ZIndex="3"
@@ -85,7 +85,7 @@
                                Foreground="{DynamicResource OnSurfaceVariant}"
                                 Grid.Row="2"/>
 
-                    <TextBlock Text="{Binding Year, Converter={StaticResource DisplayNumberHigherThan0}}"
+                    <TextBlock Text="{Binding Release, Converter={StaticResource DisplayNumberHigherThan0}}"
                               Visibility="{Binding ShowArtist, ElementName=RootListView, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                                Style="{DynamicResource SListItemNameStyle}"
                               Panel.ZIndex="3"

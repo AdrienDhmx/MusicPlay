@@ -5,9 +5,6 @@ using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Commands;
-using MessageControl;
-using Windows.Media.Audio;
-using System;
 
 namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 {

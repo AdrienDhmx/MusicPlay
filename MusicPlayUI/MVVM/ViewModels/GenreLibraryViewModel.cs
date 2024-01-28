@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DataBaseConnection.DataAccess;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+
+
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services.Interfaces;
@@ -18,7 +19,6 @@ namespace MusicPlayUI.MVVM.ViewModels
 {
     public class GenreLibraryViewModel : ViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
         private readonly IModalService _modalService;
         private readonly ICommandsManager _commandsManager;
@@ -68,20 +68,17 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PlayGenreCommand { get; }
         public ICommand NavigateToGenreCommand { get; }
         public ICommand OpenTagPopupCommand { get; }
-        public GenreLibraryViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, ICommandsManager commandsManager)
+        public GenreLibraryViewModel(IQueueService queueService, IModalService modalService, ICommandsManager commandsManager)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
             _modalService = modalService;
             _commandsManager = commandsManager;
 
             CreateGenreCommand = new RelayCommand(() =>
             {
-                void CreateTag(string newName)
+                static async void CreateTag(string newName)
                 {
-                    TagModel tag = new();
-                    tag.Name = newName;
-                    DataAccess.Connection.InsertTag(tag);
+                    await Tag.Insert(new(newName));
                 }
                 CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, CreateTag, null);
                 _modalService.OpenModal(ViewNameEnum.CreateTag, (canceled) =>
@@ -95,16 +92,16 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             NavigateToGenreCommand = new RelayCommand<UITagModel>((genre) =>
             {
-                navigationService.NavigateTo(Core.Enums.ViewNameEnum.SpecificGenre, genre);
+                App.State.NavigateTo<GenreViewModel>(genre);
             });
 
             PlayGenreCommand = new RelayCommand<UITagModel>((genre) => Task.Run(async () =>
             {
-                List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbums(genre.Albums.Select(a => a.Id));
-                tracks = await DataAccess.Connection.GetTracksFromArtists(genre.Artists.Select(a => a.Id));
-                tracks = tracks.DistinctBy(t => t.Id).ToList();
+                //List<Track> tracks = await DataAccess.Connection.GetTracksFromAlbums(genre.AlbumTags.Select(a => a.Id));
+                //tracks = await DataAccess.Connection.GetTracksFromArtists(genre.TrackArtistRole.Select(a => a.Id));
+                //tracks = tracks.DistinctBy(t => t.Id).ToList();
 
-                queueService.SetNewQueue(tracks, new(genre.Name, Core.Enums.ModelTypeEnum.Tag, genre.Id), genre.Cover);
+                //queueService.SetNewQueue(tracks, new(genre.Name, Core.Enums.ModelTypeEnum.CurrentTag, genre.Id), genre.Cover);
             }));
 
             OpenTagPopupCommand = _commandsManager.OpenTagPopupCommand;
@@ -118,9 +115,9 @@ namespace MusicPlayUI.MVVM.ViewModels
             GenreCount = $"{BindedGenres.Count} of {AllTags.Count}";
         }
 
-        public override async void Update(BaseModel parameter = null)
+        public override void Update(BaseModel parameter = null)
         {
-            AllTags = await (await DataAccess.Connection.GetAllTags()).ToUIGenreModel();
+            AllTags = Tag.GetAll().ToUIGenreModel();
             
             BindedGenres = new(AllTags);
             GenreCount = $"{BindedGenres.Count} of {AllTags.Count}";

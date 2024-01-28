@@ -1,6 +1,9 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.Enums;
-using MusicPlayModels.MusicModels;
+﻿
+using Microsoft.EntityFrameworkCore;
+using MusicPlay.Database.DatabaseAccess;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.MVVM.Models;
@@ -12,6 +15,8 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using TagLib;
+using TagLib.Matroska;
 
 namespace MusicPlayUI.Core.Helpers
 {
@@ -59,69 +64,148 @@ namespace MusicPlayUI.Core.Helpers
             return output;
         }
 
-        public static async Task<List<ArtistModel>> FilterArtists(List<FilterModel> filters, string searchString, SortEnum sortEnum, bool ascending = false)
+        public static List<Artist> FilterArtists(List<FilterModel> filters, string searchString, SortEnum sortEnum, bool ascending = false)
         {
             SaveFilter(filters, SettingsEnum.ArtistFilter);
             SaveOrder(SettingsEnum.ArtistOrder, sortEnum, ascending);
 
-            List<int> artistTypes = new();
-            List<int> tagTypes = new();
-
-
-            foreach (FilterModel filter in filters)
+            if (filters.IsNullOrEmpty() && searchString.IsNullOrWhiteSpace())
             {
-                switch (filter.FilterType)
+                return Artist.GetAll();
+            }
+
+            DatabaseContext context = new DatabaseContext();
+
+            var query = context.Artists.AsQueryable();
+
+            if (filters.IsNotNullOrEmpty())
+            {
+                List<int> artistRoles = new();
+                List<int> tags = new();
+
+                foreach (FilterModel filter in filters)
                 {
-                    case FilterEnum.ArtistType:
-                        artistTypes.Add(filter.ValueId);
-                        break;
-                    case FilterEnum.Genre:
-                        tagTypes.Add(filter.ValueId);
-                        break;
-                    default:
-                        break;
+                    switch (filter.FilterType)
+                    {
+                        case FilterEnum.ArtistType:
+                            artistRoles.Add(filter.ValueId);
+                            break;
+                        case FilterEnum.Genre:
+                            tags.Add(filter.ValueId);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (artistRoles.Count != 0)
+                {
+                    query = query.Where(a => a.ArtistRoles.Any(ar => artistRoles.Any(r => r == ar.Role.Id)));
+                }
+
+                if (tags.Count != 0)
+                {
+                    query = query.Where(a => a.ArtistTags.Any(at => tags.Any(t => t == at.TagId)));
                 }
             }
 
-            return await DataAccess.Connection.SearchArtists(tagTypes, artistTypes, searchString, sortEnum, ascending);
+            if (searchString.IsNotNullOrWhiteSpace())
+            {
+                query = query.Where(a => a.Name.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)
+                                || a.Albums.Any(al => al.Name.StartsWith(searchString, StringComparison.CurrentCultureIgnoreCase)));
+            }
+
+            query = sortEnum switch
+            {
+                SortEnum.AZ => (ascending ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name)),
+                SortEnum.LastPlayed => (ascending ? query.OrderBy(a => a.LastPlayed) : query.OrderByDescending(a => a.LastPlayed)),
+                SortEnum.MostPlayed => (ascending ? query.OrderBy(a => a.PlayCount) : query.OrderByDescending(a => a.PlayCount)),
+                SortEnum.AddedDate => (ascending ? query.OrderBy(a => a.CreationDate) : query.OrderByDescending(a => a.CreationDate)),
+                SortEnum.UpdatedDate => (ascending ? query.OrderBy(a => a.UpdateDate) : query.OrderByDescending(a => a.UpdateDate)),
+                _ => query,
+            };
+            return [.. query];
         }
 
-        public static async Task<List<AlbumModel>> FilterAlbum(List<FilterModel> filters, string searchString, SortEnum sortEnum, bool ascending = false)
+        public static List<Album> FilterAlbum(List<FilterModel> filters, string searchString, SortEnum sortEnum, bool ascending = false)
         {
             SaveFilter(filters, SettingsEnum.AlbumFilter);
             SaveOrder(SettingsEnum.AlbumOrder, sortEnum, ascending);
 
-            List<int> genresId = new();
-            List<int> artistsId = new();
-            List<AlbumTypeEnum> albumTypes = new();
-
-            foreach (FilterModel filter in filters)
+            if (filters.IsNullOrEmpty() && searchString.IsNullOrWhiteSpace())
             {
-                switch (filter.FilterType)
+                return Album.GetAll();
+            }
+
+            DatabaseContext context = new DatabaseContext();
+
+            var query = context.Albums.AsQueryable();
+
+            if (!filters.IsNullOrEmpty())
+            {
+                List<int> tags = new();
+                List<int> artistsId = new();
+                List<AlbumTypeEnum> albumTypes = new();
+
+                foreach (FilterModel filter in filters)
                 {
-                    case FilterEnum.Artist:
-                        artistsId.Add(filter.ValueId);
-                        break;
-                    case FilterEnum.Genre:
-                        genresId.Add(filter.ValueId);
-                        break;
-                    case FilterEnum.AlbumType:
-                        albumTypes.Add((AlbumTypeEnum)filter.ValueId);
-                        break;
-                    default:
-                        break;
+                    switch (filter.FilterType)
+                    {
+                        case FilterEnum.Artist:
+                            artistsId.Add(filter.ValueId);
+                            break;
+                        case FilterEnum.Genre:
+                            tags.Add(filter.ValueId);
+                            break;
+                        case FilterEnum.AlbumType:
+                            albumTypes.Add((AlbumTypeEnum)filter.ValueId);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (artistsId.Count != 0)
+                {
+                    query = query.Where(a => artistsId.Any(ar => ar == a.PrimaryArtist.Id));
+                }
+
+                if (tags.Count != 0)
+                {
+                    query = query.Where(a => a.AlbumTags.Any(at => tags.Any(g => g == at.TagId)));
+                }
+
+                if (albumTypes.Count != 0)
+                {
+                    query = query.Where(a => albumTypes.Any(t => t == a.Type));
                 }
             }
 
-            return await DataAccess.Connection.SearchAlbums(genresId, artistsId, albumTypes, searchString, sortEnum, ascending);
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                query = query.Where(a => a.Name.ToLower().Contains(searchString.ToLower())
+                                || a.PrimaryArtist.Name.ToLower().StartsWith(searchString.ToLower()));
+            }
+
+            query = sortEnum switch
+            {
+                SortEnum.AZ => (ascending ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name)),
+                SortEnum.Year => (ascending ? query.OrderBy(a => a.ReleaseDate) : query.OrderByDescending(a => a.ReleaseDate)),
+                SortEnum.LastPlayed => (ascending ? query.OrderBy(a => a.LastPlayed) : query.OrderByDescending(a => a.LastPlayed)),
+                SortEnum.MostPlayed => (ascending ? query.OrderBy(a => a.PlayCount) : query.OrderByDescending(a => a.PlayCount)),
+                SortEnum.AddedDate => (ascending ? query.OrderBy(a => a.CreationDate) : query.OrderByDescending(a => a.CreationDate)),
+                SortEnum.UpdatedDate => (ascending ? query.OrderBy(a => a.UpdateDate) : query.OrderByDescending(a => a.UpdateDate)),
+                _ => query,
+            };
+            return query.Include(a => a.PrimaryArtist).ToList();
         }
 
-        public static async Task<List<PlaylistModel>> FilterPlaylist(string searchString)
+        public static async Task<List<Playlist>> FilterPlaylist(string searchString)
         {
             searchString = searchString.ToLower();
-            List<PlaylistModel> output = await DataAccess.Connection.GetAllPlaylists();
+            List<Playlist> output = await Playlist.GetAll();
 
-            output = output.Where(p => p.Name.ToLower().Contains(searchString) || p.Description.ToLower().Contains(searchString)).ToList();
+            output = output.Where(p => p.Name.Contains(searchString, StringComparison.CurrentCultureIgnoreCase) || p.Description.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
             return output;
         }

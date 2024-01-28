@@ -1,5 +1,5 @@
 ﻿using GongSolutions.Wpf.DragDrop.Utilities;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,14 +28,14 @@ namespace MusicPlayUI.MVVM.Views.ListViews
             InitializeComponent();
         }
 
-        public ObservableCollection<AlbumModel> Albums
+        public ObservableCollection<Album> Albums
         {
-            get { return (ObservableCollection<AlbumModel>)GetValue(AlbumsProperty); }
+            get { return (ObservableCollection<Album>)GetValue(AlbumsProperty); }
             set { SetValue(AlbumsProperty, value); }
         }
 
         public static readonly DependencyProperty AlbumsProperty =
-            DependencyProperty.Register("Albums", typeof(ObservableCollection<AlbumModel>), typeof(AlbumListView), new PropertyMetadata(new ObservableCollection<AlbumModel>()));
+            DependencyProperty.Register("Albums", typeof(ObservableCollection<Album>), typeof(AlbumListView), new PropertyMetadata(new ObservableCollection<Album>()));
 
 
 

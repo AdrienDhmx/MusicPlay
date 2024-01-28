@@ -89,5 +89,16 @@ namespace MusicPlayModels.MusicModels
         {
 
         }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>
+            {
+                { nameof(Name), Name },
+                { nameof(Description), Description },
+                { nameof(Cover), Cover },
+            };
+            return base.CreateTable().AddRange(keyValues);
+        }
     }
 }

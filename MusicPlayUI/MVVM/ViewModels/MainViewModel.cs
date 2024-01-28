@@ -28,13 +28,10 @@ namespace MusicPlayUI.MVVM.ViewModels
             set { SetField(ref _modalService, value); }
         }
 
-        private INavigationService _navigationService;
-        public INavigationService NavigationService
+        public static IAppState AppState
         {
-            get => _navigationService;
-            set { SetField(ref _navigationService, value); }
+            get => App.State;
         }
-
 
         private ViewModel _currentPlayerControl;
         public ViewModel CurrentPlayerControl
@@ -82,10 +79,10 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand MinimizeCommand { get; }
         public ICommand MaximizeCommand { get; }
         public ICommand LeaveCommand { get; }
-        public MainViewModel(INavigationService navigationService, IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService,
-             MainMenuViewModel mainMenuViewModel, QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel, ICommandsManager commandsManager)
+        public MainViewModel(IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService, MainMenuViewModel mainMenuViewModel, 
+            QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel, 
+             ICommandsManager commandsManager)
         {
-            NavigationService = navigationService;
             AudioPlayback = audioPlayback;
             QueueService = queueService;
             CurrentMenu = mainMenuViewModel;
@@ -119,7 +116,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public void OnClick(MouseButtonEventArgs e)
         {
-            if (NavigationService.IsPopupOpen)
+            if (AppState.IsPopupOpen)
             {
                 UIElement element = Mouse.DirectlyOver as UIElement;
 
@@ -127,7 +124,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 // if the click is not on the popup close popup
                 if(element is not null && ancestor is null)
                 {
-                   NavigationService.ClosePopup();
+                    AppState.ClosePopup();
                 }
             }
         }

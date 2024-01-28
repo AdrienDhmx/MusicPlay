@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataBaseConnection\DataBaseConnection.csproj" />
+    <ProjectReference Include="..\DataBaseConnection\MusicPlay.Database.csproj" />
     <ProjectReference Include="..\MusicPlay.Language\MusicPlay.Language.csproj" />
-    <ProjectReference Include="..\MusicPlayModels\MusicPlayModels.csproj" />
   </ItemGroup>
 
 </Project>

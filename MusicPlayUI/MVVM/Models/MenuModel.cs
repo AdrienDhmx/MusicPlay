@@ -1,12 +1,7 @@
-﻿using MusicPlayModels;
+﻿using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Enums;
-using MusicPlayUI.MVVM.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace MusicPlayUI.MVVM.Models
@@ -18,6 +13,7 @@ namespace MusicPlayUI.MVVM.Models
         public PathGeometry Icon { get; set; }
         public string Name { get; set; }
         public ViewNameEnum Enum { get; set; }
+        public Type Type {  get; set; }
         public bool IsSelected
         {
             get => _isSelected;

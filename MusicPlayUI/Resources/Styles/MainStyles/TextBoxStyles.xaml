@@ -131,11 +131,8 @@
     <!-- For libraries Header and data names in their views (album name, artist name...) -->
     <Style x:Key="SValidationModalHeaderStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
-        <Setter Property="FontSize" Value="20"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="TextAlignment" Value="Center"/>
-        <Setter Property="Margin" Value="0,10"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="Margin" Value="10"/>
     </Style>
 
     <!-- For libraries Header and data names in their views (album name, artist name...) -->

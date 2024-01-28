@@ -27,6 +27,8 @@ namespace MusicPlayModels.MusicModels
             _artist = artist;
             ArtistRoles = roles;
         }
+
+
     }
 
     public static class TrackArtistsRoleModelExt

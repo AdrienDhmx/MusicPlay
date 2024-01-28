@@ -9,14 +9,15 @@ namespace MusicPlayModels.MusicModels
 {
     public class ArtistModel : PlayableModel, ITaggable
     {
-        private string _cover = "";
-        private string _name = "";
-        private string _biography = "";
+        private string _cover = string.Empty;
+        private string _name = string.Empty;
+        private string _biography = string.Empty;
+        private string _realName = string.Empty;
 
         private int _birthDate = 0;
         private int _deathDate = 0;
 
-        private string _country = "";
+        private string _country = string.Empty;
         private bool _isGroup = false;
         private List<ArtistModel> _groupMembers = new();
 
@@ -51,6 +52,12 @@ namespace MusicPlayModels.MusicModels
         {
             get => _biography;
             set => SetField(ref _biography, value);
+        }
+
+        public string RealName
+        {
+            get => _realName;
+            set => SetField(ref _realName, value);
         }
 
         public string Country
@@ -138,13 +145,28 @@ namespace MusicPlayModels.MusicModels
         public ArtistModel(string name)
         {
             Name = name;
-            Cover = "";
-            Duration = "";
+            Cover = string.Empty;
+            Duration = string.Empty;
         }
 
         public ArtistModel()
         {
 
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>
+            {
+                { nameof(Name), Name },
+                { nameof(Cover), Cover },
+                { nameof(Biography), Biography },
+                { nameof(RealName), RealName },
+                { nameof(BirthDate), BirthDate },
+                { nameof(DeathDate), DeathDate },
+                { nameof(IsGroup), IsGroup.ToInt() },
+            };
+            return base.CreateTable().AddRange(keyValues);
         }
     }
 }

@@ -1,86 +1,85 @@
-﻿using DataBaseConnection.DataAccess;
-using GongSolutions.Wpf.DragDrop;
-using MessageControl;
+﻿using MessageControl;
 using MusicFilesProcessor;
 using MusicFilesProcessor.Helpers;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.DataBaseModels;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Services.Interfaces;
+using MusicPlayUI.MVVM.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media.Animation;
-using System.Windows.Navigation;
-using Windows.Media.Playlists;
 
 namespace MusicPlayUI.Core.Services
 {
     public class PlaylistService : IPlaylistService
     {
-        
-        private readonly INavigationService _navigationService;
-
-        public PlaylistService( INavigationService navigationService)
-        {
-            
-            _navigationService = navigationService;
-        }
-
-        public void AddToPlaylist(List<TrackModel> tracks, PlaylistModel playlist)
+        public void AddToPlaylist(List<Track> tracks, Playlist playlist)
         {
             AddtoPlaylistWihtoutMsg(tracks, playlist);
             MessageHelper.PublishMessage(MessageFactory.TracksAddedToPlaylist(playlist.Name, tracks.Count));
         }
 
-        private static async void AddtoPlaylistWihtoutMsg(List<TrackModel> tracks, PlaylistModel playlist)
+        private static void AddtoPlaylistWihtoutMsg(List<Track> tracks, Playlist playlist)
         {
-            List<OrderedTrackModel> playlistTracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
+            List<OrderedTrack> playlistTracks = new(); //playlist.Tracks;
 
-            tracks.AddRange(playlistTracks.ToTrackModel());
+            tracks.AddRange(playlistTracks.Select(pt => pt.Track));
             tracks = tracks.DistinctBy(t => t.Id).ToList();
-            tracks = tracks.Where(at => !playlistTracks.Select(t => t.Id).Contains(at.Id)).ToList();
+            tracks = tracks.Where(at => !playlistTracks.Select(t => t.Track.Id).Contains(at.Id)).ToList();
 
-            await DataAccess.Connection.AddTrackToPlaylist(playlist, tracks);
+            //await DataAccess.Connection.AddTrackToPlaylist(playlist, tracks);
         }
 
-        public void AddToPlaylist(List<OrderedTrackModel> tracks, PlaylistModel playlist)
+        public void AddToPlaylist(List<PlaylistTrack> tracks, Playlist playlist)
         {
-            AddtoPlaylistWihtoutMsg(tracks, playlist);
+            AddtoPlaylistWihtoutMsg(tracks.Select(t => t.Track).ToList(), playlist);
             MessageHelper.PublishMessage(MessageFactory.TracksAddedToPlaylist(playlist.Name, tracks.Count));
         }
 
-        private static async void AddtoPlaylistWihtoutMsg(List<OrderedTrackModel> tracks, PlaylistModel playlist)
+        private static async void AddtoPlaylistWihtoutMsg(List<OrderedTrack> tracks, Playlist playlist)
         {
-            List<OrderedTrackModel> playlistTracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
+            List<OrderedTrack> playlistTracks = new(); //playlist.Tracks;
 
             tracks.AddRange(playlistTracks);
-            tracks = tracks.DistinctBy(t => t.Id).ToList();
-            tracks = tracks.Where(at => !playlistTracks.Select(t => t.Id).Contains(at.Id)).ToList();
+            tracks = tracks.DistinctBy(t => t.Track.Id).ToList();
+            tracks = tracks.Where(at => !playlistTracks.Select(t => t.Track.Id).Contains(at.Track.Id)).ToList();
 
-            await DataAccess.Connection.AddTrackToPlaylist(playlist, tracks);
+            //await DataAccess.Connection.AddTrackToPlaylist(playlist, tracks);
         }
 
-        public async void SaveRadio(PlaylistModel radio, List<OrderedTrackModel> tracks)
+        private static bool IsCurrentViewPlaylistViewModel()
         {
-            radio.Id = DataAccess.Connection.InsertPlaylist(radio);
+            return App.State.CurrentView.ViewModel.GetType() == typeof(PlaylistViewModel);
+        }
+
+        private static bool IsCurrentViewPlaylistLibraryViewModel()
+        {
+            return App.State.CurrentView.ViewModel.GetType() == typeof(PlaylistLibraryViewModel);
+        }
+
+        public async void SaveRadio(Playlist radio, List<PlaylistTrack> tracks)
+        {
+            await Playlist.Insert(radio);
             AddToPlaylist(tracks, radio);
 
-            if(_navigationService.CurrentViewName == ViewNameEnum.SpecificPlaylist)
-                _navigationService.CurrentViewModel.Update(await DataAccess.Connection.GetPlaylist(radio.Id)); // update playlist view
+            if(App.State.CurrentView.ViewModel.GetType() == typeof(PlaylistViewModel))
+                App.State.CurrentView.ViewModel.Update(radio); // update playlist view
         }
 
-        public async void OnCreatePlaylistClosed(bool isCanceled, List<TrackModel> tracks)
+        public async void OnCreatePlaylistClosed(bool isCanceled, List<Track> tracks)
         {
             if (!isCanceled)
             {
-                var playlists = await DataAccess.Connection.GetAllPlaylists();
+                var playlists = await Playlist.GetAll();
 
                 playlists = playlists.ToList().OrderBy(t => t.CreationDate).ToList();
-                PlaylistModel createdPlaylist = playlists.LastOrDefault();
+                Playlist createdPlaylist = playlists.LastOrDefault();
 
                 if (createdPlaylist is not null)
                 {
@@ -93,38 +92,40 @@ namespace MusicPlayUI.Core.Services
 
         public void UpdateView(bool back)
         {
-            if (back && _navigationService.CurrentViewName == ViewNameEnum.SpecificPlaylist)
+            if (back && IsCurrentViewPlaylistViewModel())
             {
-                _navigationService.NavigateBack();
+                App.State.NavigateBack();
             }
-            else if (_navigationService.CurrentViewName == ViewNameEnum.Playlists)
+            else if (IsCurrentViewPlaylistLibraryViewModel())
             {
-                _navigationService.CurrentViewModel.Update();
+                App.State.CurrentView.ViewModel.Update();
             }
         }
 
-        public async Task CreatePlaylistfromDirectory(string[] files)
+        public async Task CreatePlaylistFromDirectory(string[] files)
         {
             var path = files[0];
             if (Directory.Exists(path))
             {
-                (bool success, string playlistName, int tracksCount)= await Task.Run<(bool, string, int)>( async () =>
+                (bool success, string playlistName, int tracksCount) = await Task.Run<(bool, string, int)>( async () =>
                 {
-                    ImportMusicLibrary importMusicLibrary = new(path);
+                    Folder newFolder = new(path);
+                    await StorageService.Instance.AddFolder(newFolder);
+
+                    ImportMusicLibrary importMusicLibrary = new(newFolder);
                     importMusicLibrary.Import();
 
                     List<string> musicFiles = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).ToList().Where(s => ImportMusicLibrary.FilesExtensions.Contains(Path.GetExtension(s).ToLower())).ToList();
-                    TrackModel t = await DataAccess.Connection.GetTrackByPath(musicFiles[0]);
-                    AlbumModel album = await DataAccess.Connection.GetAlbum(t.AlbumId);
+                    Track t = new(); //await DataAccess.Connection.GetTrackByPath(musicFiles[0]);
+                    Album album = t.Album;
 
-                    int id  = PlaylistsFactory.CreatePlaylist(path.GetFolderName(), album.AlbumCover);
-                    if (id >= 0)
+                    Playlist playlist = await PlaylistsFactory.CreatePlaylist(path.GetFolderName(), album.AlbumCover);
+                    if (playlist.IsNotNull())
                     {
-                        PlaylistModel playlist = await DataAccess.Connection.GetPlaylist(id);
-                        List<TrackModel> tracks = new();
+                        List<Track> tracks = new();
                         foreach (string m in musicFiles)
                         {
-                            TrackModel track = await DataAccess.Connection.GetTrackByPath(m);
+                            Track track = new(); //await DataAccess.Connection.GetTrackByPath(m);
 
                             if (track != null)
                             {

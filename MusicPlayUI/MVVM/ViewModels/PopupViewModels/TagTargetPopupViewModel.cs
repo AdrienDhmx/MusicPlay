@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DataBaseConnection.DataAccess;
 using MessageControl;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.DataBaseModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -17,13 +17,12 @@ using MusicPlayUI.MVVM.Models;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
-    public class TagTargetPopupViewModel : ViewModel
+    public class TagTargetPopupViewModel : PopupViewModel
     {
-        internal readonly INavigationService _navigationService;
         internal readonly IModalService _modalService;
 
-        private ObservableCollection<TagModel> _allTags;
-        public ObservableCollection<TagModel> AllTags
+        private ObservableCollection<Tag> _allTags;
+        public ObservableCollection<Tag> AllTags
         {
             get => _allTags;
             set
@@ -43,8 +42,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private TagModel _currentTagView;
-        public TagModel CurrentTagView
+        private Tag _currentTagView;
+        public Tag CurrentTagView
         {
             get => _currentTagView;
             set
@@ -53,47 +52,46 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private MessageCancelClosedModel<TagModel> _genreMessageCancelClosedModel { get; set; }
+        private MessageCancelClosedModel<Tag> _genreMessageCancelClosedModel { get; set; }
         private int RemovedDataTagIndex { get; set; }
 
         public ICommand RemoveTagCommand { get; }
-        public TagTargetPopupViewModel(INavigationService navigationService, IModalService modalService) 
+        public TagTargetPopupViewModel(IModalService modalService) 
         {
-            _navigationService = navigationService;
             _modalService = modalService;
 
             RemoveTagCommand = new RelayCommand<BaseModel>((data) =>
             {
-                if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
+                if (App.State.CurrentView.ViewModel is GenreViewModel genreViewModel)
                 {
-                    _navigationService.ClosePopup();
+                    ClosePopup();
                     switch (data)
                     {
-                        case AlbumModel:
+                        case Album:
                             RemovedDataTagIndex = genreViewModel.RemoveAlbum(data.Id);
 
                             _genreMessageCancelClosedModel = new(CurrentTagView, () => RestoreGenre(data));
-                            MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre((data as AlbumModel).Name, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
+                            MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre((data as Album).Name, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
                             break;
-                        case ArtistModel:
+                        case Artist:
                             RemovedDataTagIndex = genreViewModel.RemoveArtist(data.Id);
 
                             _genreMessageCancelClosedModel = new(CurrentTagView, () => RestoreGenre(data));
-                            MessageHelper.PublishMessage(MessageFactory.ArtistRemovedFromGenre((data as ArtistModel).Name, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
+                            MessageHelper.PublishMessage(MessageFactory.ArtistRemovedFromGenre((data as Artist).Name, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
                             break;
-                        case PlaylistModel:
+                        case Playlist:
                             RemovedDataTagIndex = genreViewModel.RemovePlaylist(data.Id);
 
                             // TODO: changing the message factory function to fit playlists
                             _genreMessageCancelClosedModel = new(CurrentTagView, () => RestoreGenre(data));
-                            MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre((data as PlaylistModel).Name, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
+                            MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre((data as Playlist).Name, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
                             break;
-                        case TrackModel:
+                        case Track:
                             RemovedDataTagIndex = genreViewModel.RemoveTrack(data.Id);
 
                             // TODO: changing the message factory function to fit tracks
                             _genreMessageCancelClosedModel = new(CurrentTagView, () => RestoreGenre(data));
-                            MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre((data as TrackModel).Title, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
+                            MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre((data as Track).Title, CurrentTagView.Name, _genreMessageCancelClosedModel.Cancel, () => RemoveFromTagCloseCallBack(data)));
                             break;
                         default:
                             break;
@@ -104,60 +102,66 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             });
 
 
-            if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
+            if (App.State.CurrentView.ViewModel is GenreViewModel genreViewModel)
             {
                 CurrentTagView = genreViewModel.Genre;
-                CanRemoveFromGenre = _navigationService.PopupViewName switch
+
+                int parameterId = App.State.CurrentPopup.State.Parameter.Id;
+
+                CanRemoveFromGenre = App.State.CurrentPopup.ViewModel switch
                 {
-                    ViewNameEnum.AlbumPopup => genreViewModel.Albums.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
-                    ViewNameEnum.ArtistPopup => genreViewModel.Artists.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
-                    ViewNameEnum.PlaylistPopup => genreViewModel.BindedPlaylists.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
-                    ViewNameEnum.TrackPopup => genreViewModel.Tracks.Any(a => a.Id == _navigationService.PopupViewParameter.Id),
+                    AlbumPopupViewModel albumPopup => genreViewModel.Albums.Any(a => a.Id == parameterId),
+                    ArtistPopupViewModel artistPopup => genreViewModel.Artists.Any(a => a.Id == parameterId),
+                    PlaylistPopupViewModel playlistPopup => genreViewModel.BindedPlaylists.Any(a => a.Id == parameterId),
+                    TrackPopupViewModel trackPopup => genreViewModel.Tracks.Any(a => a.Track.Id == parameterId),
                     _ => false,
                 };
             }
         }
 
-        internal void AddToTag(TagModel tag, BaseModel data)
+        internal async Task AddToTag(Tag tag, BaseModel data)
         {
             switch (data)
             {
-                case AlbumModel:
-                    DataAccess.Connection.InsertAlbumTag(data.Id, tag.Id);
-                    MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as AlbumModel).Name, tag.Name));
+                case Album:
+                    await Tag.Add(tag, data as Album);
+                    MessageFactory.TrackAddedToPlaylist((data as Album).Name, tag.Name).Publish();
                     break;
-                case ArtistModel:
-                    DataAccess.Connection.InsertArtistTag(data.Id, tag.Id);
-                    MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as ArtistModel).Name, tag.Name));
+                case Artist:
+                    await Tag.Add(tag, data as Artist);
+                    MessageFactory.TrackAddedToPlaylist((data as Artist).Name, tag.Name).Publish();
                     break;
-                case PlaylistModel:
-                    DataAccess.Connection.InsertPlaylistTag(data.Id, tag.Id);
-                    MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as PlaylistModel).Name, tag.Name));
+                case Playlist:
+                    await Tag.Add(tag, data as Playlist);
+                    MessageFactory.TrackAddedToPlaylist((data as Playlist).Name, tag.Name).Publish();
                     break;
-                case TrackModel:
-                    DataAccess.Connection.InsertTrackTag(data.Id, tag.Id);
-                    MessageHelper.PublishMessage(MessageFactory.TrackAddedToPlaylist((data as TrackModel).Title, tag.Name));
+                case Track:
+                    await Tag.Add(tag, data as Track);
+                    MessageFactory.TrackAddedToPlaylist((data as Track).Title, tag.Name).Publish();
                     break;
                 default:
                     break;
             }
             AllTags.Remove(tag);
 
-            if (_navigationService.CurrentViewName == ViewNameEnum.SpecificGenre || _navigationService.CurrentViewName == ViewNameEnum.Genres)
+            ViewModel currentPopupViewModel = App.State.CurrentPopup.ViewModel;
+            if (currentPopupViewModel is GenreLibraryViewModel genreLibraryViewModel)
             {
-                _navigationService.CurrentViewModel.Update();
+                genreLibraryViewModel.Update();
+            } 
+            else if(currentPopupViewModel is GenreViewModel genreViewModel)
+            {
+                genreViewModel.Update();
             }
         }
 
         internal void CreateTag(BaseModel dataToAddToNewTag)
         {
-            static void CreateTag(string newName)
+            static async void CreateTag(string newName)
             {
-                TagModel tag = new();
-                tag.Name = newName;
-                DataAccess.Connection.InsertTag(tag);
+                await Tag.Insert(new(newName));
             }
-            CreateEditNameModel model = new CreateEditNameModel("", "Tag", false, CreateTag, null);
+            CreateEditNameModel model = new("", "Tag", false, CreateTag, null);
             _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => OnCreateTagClosed(canceled, dataToAddToNewTag), model);
         }
 
@@ -166,43 +170,43 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             if (!_modalService.IsModalOpen && !isCanceled)
             {
                 await Task.Delay(500);
-                var tags = await DataAccess.Connection.GetAllTags();
-                tags = tags.ToList().OrderBy(t => t.Id).ToList();
-                TagModel createdTag = tags.LastOrDefault();
-                AddToTag(createdTag, data);
+                var tags = Tag.GetAll();
+                tags = [.. tags.ToList().OrderBy(t => t.Id)];
+                Tag createdTag = tags.LastOrDefault();
+                await AddToTag(createdTag, data);
 
-                if (_navigationService.CurrentViewName == ViewNameEnum.Genres)
+                if (App.State.CurrentPopup.ViewModel is GenreLibraryViewModel genreLibraryViewModel)
                 {
-                    _navigationService.CurrentViewModel.Update();
+                    genreLibraryViewModel.Update();
                 }
 
                 MessageHelper.PublishMessage(MessageFactory.PlaylistCreatedWithAction(createdTag.Name, (bool valid) => NavigateToTag(createdTag), $"Go to {createdTag.Name}"));
             }
         }
 
-        internal void NavigateToTag(TagModel tag)
+        internal static void NavigateToTag(Tag tag)
         {
-            _navigationService.NavigateTo(ViewNameEnum.SpecificGenre, tag);
+            App.State.NavigateTo<GenreViewModel>(tag);
         }
 
-        private bool RestoreGenre(BaseModel data)
+        private bool RestoreGenre(ObservableObject data)
         {
-            if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel &&
+            if (App.State.CurrentView.ViewModel is GenreViewModel genreViewModel &&
                 RemovedDataTagIndex != -1)
             {
                 switch (data)
                 {
-                    case AlbumModel:
-                        genreViewModel.Albums.Insert(RemovedDataTagIndex, data as AlbumModel);
+                    case Album:
+                        genreViewModel.Albums.Insert(RemovedDataTagIndex, data as Album);
                         break;
-                    case ArtistModel:
-                        genreViewModel.Artists.Insert(RemovedDataTagIndex, data as ArtistModel);
+                    case Artist:
+                        genreViewModel.Artists.Insert(RemovedDataTagIndex, data as Artist);
                         break;
-                    case PlaylistModel:
-                        genreViewModel.BindedPlaylists.Insert(RemovedDataTagIndex, data as PlaylistModel);
+                    case Playlist:
+                        genreViewModel.BindedPlaylists.Insert(RemovedDataTagIndex, data as Playlist);
                         break;
-                    case TrackModel:
-                        genreViewModel.Tracks.Insert(RemovedDataTagIndex, data as UIOrderedTrackModel);
+                    case Track or OrderedTrack:
+                        genreViewModel.Tracks.Insert(RemovedDataTagIndex, data as OrderedTrack);
                         break;
                     default:
                         break;
@@ -216,32 +220,32 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             if (!_genreMessageCancelClosedModel.IsCanceled)
             {
                 // real deletion
-                switch (data)
-                {
-                    case AlbumModel:
-                        await DataAccess.Connection.RemoveAlbumTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
-                        break;
-                    case ArtistModel:
-                        await DataAccess.Connection.RemoveArtistTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
-                        break;
-                    case PlaylistModel:
-                        await DataAccess.Connection.RemovePlaylistTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
-                        break;
-                    case TrackModel:
-                        await DataAccess.Connection.RemoveTrackTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
-                        break;
-                    default:
-                        break;
-                }
+                //switch (data)
+                //{
+                //    case Album:
+                //        await DataAccess.Connection.RemoveAlbumTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
+                //        break;
+                //    case Artist:
+                //        await DataAccess.Connection.RemoveArtistTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
+                //        break;
+                //    case PlaylistModel:
+                //        await DataAccess.Connection.RemovePlaylistTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
+                //        break;
+                //    case Track:
+                //        await DataAccess.Connection.RemoveTrackTag(data.Id, _genreMessageCancelClosedModel.Data.Id);
+                //        break;
+                //    default:
+                //        break;
+                //}
 
                 CanRemoveFromGenre = false;
                 AllTags.Remove(CurrentTagView);
             }
         }
 
-        internal async Task GetTags(IEnumerable<int> tagsIdsToRemove)
+        internal void GetTags(IEnumerable<int> tagsIdsToRemove)
         {
-            List<TagModel> tags = await DataAccess.Connection.GetAllTags();
+            List<Tag> tags = Tag.GetAll();
             AllTags = new(tags.Where(t => !tagsIdsToRemove.Contains(t.Id)).OrderBy(t => t.Name));
         }
     }

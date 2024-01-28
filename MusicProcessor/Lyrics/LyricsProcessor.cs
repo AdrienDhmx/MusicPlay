@@ -1,9 +1,8 @@
-﻿using FilesProcessor.Helpers;
-using MessageControl;
-using MusicFilesProcessor.Enums;
+﻿using MusicFilesProcessor.Enums;
 using MusicFilesProcessor.Helpers;
 using MusicFilesProcessor.Lyrics.Helper;
-using MusicFilesProcessor.Models;
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
 using MusicPlay.Language;
 using System.IO;
 using System.Net.Http;
@@ -78,7 +77,7 @@ namespace MusicFilesProcessor.Lyrics
             return _lyricsFileHelper.GetFilePath(GetFileName(title, artist));
         }
 
-        public async Task<LyricsModel> GetLyrics(string title, string artist, string audioFilePath, bool acceptTimedLyrics = true)
+        public async Task<MusicPlay.Database.Models.Lyrics> GetLyrics(string title, string artist, string audioFilePath, bool acceptTimedLyrics = true)
         {
             CurrentURL = "";
             string filePath;
@@ -125,19 +124,19 @@ namespace MusicFilesProcessor.Lyrics
             }
         }
 
-        private async Task<LyricsModel> GetLyricsOnTheWeb(string title, string artist)
+        private async Task<MusicPlay.Database.Models.Lyrics> GetLyricsOnTheWeb(string title, string artist)
         {
-            if (ConnectivityHelper.CheckInternetAccess())
+            if (ConnectivityHelper.Instance.CheckInternetAccess())
             {
                 string url = _lyricsHelper.GetUrl(title, artist);
 
-                HttpResponseMessage response = await _connectivityHelper.SendRequestAsync(url);
+                HttpResponseMessage response = await _connectivityHelper.GetAsync(url);
                 string lyrics = _lyricsHelper.ReadWebPage(await response.Content.ReadAsStringAsync());
 
                 if (response.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(lyrics))
                 {
                     CurrentURL = url;
-                    LyricsModel lyricsModel = CreateLyricsModel(lyrics, url, CurrentWebSite, GetFileName(title, artist));
+                    MusicPlay.Database.Models.Lyrics lyricsModel = CreateLyricsModel(lyrics, url, CurrentWebSite, GetFileName(title, artist));
                     return lyricsModel;
                 }
                 else
@@ -157,44 +156,39 @@ namespace MusicFilesProcessor.Lyrics
         }
 
 
-        private LyricsModel CreateLyricsModel(string lyrics, string url, string website, string fileName = "", bool isFromUser = false, bool isTimed = false)
+        private MusicPlay.Database.Models.Lyrics CreateLyricsModel(string lyrics, string url, string website, string fileName = "", bool isFromUser = false, bool isTimed = false)
         {
-            LyricsModel lyricsModel = new LyricsModel()
+            MusicPlay.Database.Models.Lyrics lyricsModel = new()
             {
-                Lyrics = lyrics,
-                FileName = fileName,
-                IsFromUser = isFromUser,
-                IsTimed = isTimed,
-                URL = url,
+                LyricsText = lyrics,
+                Url = url,
                 WebSiteSource = website
             };
             return lyricsModel;
         }
 
-        public void SaveLyrics(LyricsModel lyrics, bool isTimed =false)
+        public void SaveLyrics(MusicPlay.Database.Models.Lyrics lyrics, string fileName, bool isTimed =false)
         {
             ChangeLyricsFileHelper(isTimed);
-            _lyricsFileHelper.SaveLyrics(_lyricsFileHelper.GetFilePath(lyrics.FileName), lyrics);
+            _lyricsFileHelper.SaveLyrics(_lyricsFileHelper.GetFilePath(fileName), lyrics);
         }
 
-        public List<TimedLyricsLineModel> ConvertToTimedLyricsModel(string lyrics, bool create = false)
+        public List<TimedLyricsLine> ConvertToTimedLyricsModel(string lyrics, bool create = false)
         {
             List<string> lines = lyrics.Split("\n").ToList();
             if (create)
             {
-                List<TimedLyricsLineModel> timedLyricsLines = new List<TimedLyricsLineModel>();
+                List<TimedLyricsLine> timedLyricsLines = new List<TimedLyricsLine>();
                 int count = 0;
                 for (int i = 0; i < lines.Count; i++)
                 {
                     // remove blank lines and info lines (AZLyrics adds [Language])
                     if (string.IsNullOrWhiteSpace(lines[i]) || Regex.IsMatch(lines[i], @"\[(.*?)\]"))
                         continue;
-                    TimedLyricsLineModel timedLyrics = new()
+                    TimedLyricsLine timedLyrics = new()
                     {
-                        index = count, // Not i since we ignore empty _line
-                        LengthInMilliseconds = 0,
-                        Time = TimeSpan.FromMilliseconds(0).ToFormattedString(),
-                        Lyrics = lines[i],
+                        TimestampMs = 0,
+                        Line = lines[i],
                     };
                     count++;
                     timedLyricsLines.Add(timedLyrics);
@@ -216,10 +210,10 @@ namespace MusicFilesProcessor.Lyrics
             }
         }
 
-        public LyricsModel GetLyrics(LyricsModel lyrics, bool isTimed = false)
+        public MusicPlay.Database.Models.Lyrics GetLyrics(MusicPlay.Database.Models.Lyrics lyrics, bool isTimed = false)
         {
             ChangeLyricsFileHelper(isTimed);
-            return _lyricsFileHelper.GetLyrics(lyrics);
+            return _lyricsFileHelper.GetLyrics(lyrics, "");
         }
 
         public string GetFileName(string title, string artist)

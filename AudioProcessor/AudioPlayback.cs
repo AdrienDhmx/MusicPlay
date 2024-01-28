@@ -1,9 +1,9 @@
 using System.Timers;
-using AudioHandler.Enums;
-using AudioHandler.Models;
 using ManagedBass;
 using MessageControl;
-using MusicPlayModels;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.AudioModels;
 using Timer = System.Timers.Timer;
 
 namespace AudioHandler
@@ -32,7 +32,7 @@ namespace AudioHandler
 
         public bool AutoChangeOutputDevice { get; private set; } = false;
 
-        public DeviceModel Device { get; private set; }
+        public AudioDeviceModel Device { get; private set; }
 
 
         public int Frequency { get; private set; } = 44100;
@@ -264,7 +264,7 @@ namespace AudioHandler
 
         private void DeviceTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            DeviceModel device = AudioOutput.GetDefaultDevice();
+            AudioDeviceModel device = AudioOutput.GetDefaultDevice();
             // the user has not choosen a device manually
             // and new default device or the current device isn't available anymore
             if (_deviceChoosenByUser == -1 && (device.Index != Device.Index || !AudioOutput.GetAllDevices().Any(d => d.Index == Device.Index)))
@@ -276,7 +276,7 @@ namespace AudioHandler
             }
         }
 
-        public bool ChangeOutputDevice(DeviceModel device, bool fromUser = true)
+        public bool ChangeOutputDevice(AudioDeviceModel device, bool fromUser = true)
         {
             if (Device.Index == device.Index) return false;
 
@@ -302,7 +302,7 @@ namespace AudioHandler
                 Loop(IsLooping);
 
                 // if the device are speakers the playback does not resume but if the device are headphones then resume
-                if ((!isPlaying && Device.Type != DeviceTypeEnum.HeadPhones) || Device.Type == DeviceTypeEnum.Speakers)
+                if ((!isPlaying && Device.DeviceType != AudioDeviceTypeEnum.HeadPhones) || Device.DeviceType == AudioDeviceTypeEnum.Speakers)
                 {
                     Pause();
                 }

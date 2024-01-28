@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <PackageIcon>Play.png</PackageIcon>
@@ -33,6 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="bass.dll" />
+    <None Remove="bass_fx.dll" />
     <None Remove="musicdb.db" />
     <None Remove="Resources\DefaultArtistImage.jpg" />
     <None Remove="Resources\DefaultImage.png" />
@@ -50,10 +52,10 @@
 
   <ItemGroup>
     <PackageReference Include="gong-wpf-dragdrop" Version="3.2.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,16 +63,16 @@
     <ProjectReference Include="..\CardDropDown\CardDropDown.csproj" />
     <ProjectReference Include="..\ColorCanvas\ColorCanvas.csproj" />
     <ProjectReference Include="..\CustomCardControl\CustomCardControl.csproj" />
-    <ProjectReference Include="..\DataBaseConnection\DataBaseConnection.csproj" />
+    <ProjectReference Include="..\DataBaseConnection\MusicPlay.Database.csproj" />
     <ProjectReference Include="..\DynamicScrollViewer\DynamicScrollViewer.csproj" />
     <ProjectReference Include="..\Equalizer\Equalizer.csproj" />
     <ProjectReference Include="..\HistoryChart\HistoryChart.csproj" />
     <ProjectReference Include="..\IconButton\IconButton.csproj" />
     <ProjectReference Include="..\LoadingControl\LoadingControl.csproj" />
+    <ProjectReference Include="..\MarkdownViewer\MarkdownViewerControl.csproj" />
     <ProjectReference Include="..\MessageControl\MessageControl.csproj" />
     <ProjectReference Include="..\Modal\Modal.csproj" />
     <ProjectReference Include="..\MusicPlay.Language\MusicPlay.Language.csproj" />
-    <ProjectReference Include="..\MusicPlayModels\MusicPlayModels.csproj" />
     <ProjectReference Include="..\MusicProcessor\FilesProcessor.csproj" />
     <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.csproj" />
     <ProjectReference Include="..\RatingControl\RatingControl.csproj" />
@@ -82,6 +84,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="bass.dll" />
+    <Resource Include="bass_fx.dll" />
     <Resource Include="Resources\DefaultArtistImage.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

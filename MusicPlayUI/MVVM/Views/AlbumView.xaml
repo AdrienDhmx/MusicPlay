@@ -7,7 +7,8 @@
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" xmlns:dynamicscrollviewer="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer" xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" 
+             xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
              d:DataContext="{d:DesignInstance Type=viewmodel:AlbumViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
@@ -76,8 +77,7 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="{Binding Album.Year}"
-                                   Visibility="{Binding Album.Year, Converter={StaticResource BoolToVisibilityConverter}}"
+                        <TextBlock Text="{Binding Album.Release}"
                                         Style="{DynamicResource NLargeStyle}"
                                Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}">
                             <TextBlock.Height>
@@ -104,14 +104,14 @@
 
 
                         <!--  Artist Name -->
-                        <TextBlock Text="{Binding MainArtist.Name}"
+                        <TextBlock Text="{Binding Album.PrimaryArtist.Name}"
                                        Grid.Row="2"
                                    Margin="0, 6, 0, 0"
                                        Style="{DynamicResource SLSubDataStyle}">
                             <TextBlock.InputBindings>
                                 <MouseBinding Gesture="LeftClick"
                                                   Command="{Binding NavigateToArtistByIdCommand}"
-                                                  CommandParameter="{Binding MainArtist.ArtistId}"/>
+                                                  CommandParameter="{Binding Album.PrimaryArtist.Id}"/>
                             </TextBlock.InputBindings>
                         </TextBlock>
 
@@ -130,7 +130,7 @@
                             <TextBlock Text="{Binding Album.Duration}"
                                             Style="{DynamicResource NLargeSecondaryStyle}"/>
 
-                            <TextBlock Text="{Binding AlbumTracks.Count, StringFormat=- {0}}"
+                            <TextBlock Text="{Binding Album.Tracks.Count, StringFormat=- {0}}"
                                            Margin="5,0"
                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
 
@@ -207,7 +207,7 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <listview:ChipListView Genres="{Binding Genres}"
+                <listview:ChipListView Genres="{Binding Album.Tags}"
                                        NavigateToGenreCommand="{Binding NavigateToGenreCommand}"
                                         Margin="0,5,0,0"
                                         VerticalAlignment="Center"
@@ -215,8 +215,8 @@
 
                 <listview:TrackListView Grid.Row="1"
                                         AlbumVisibility="Collapsed"
-                                        CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"
-                                        TrackModels="{Binding AlbumTracks}"/>
+                                        CoverVisibility="{Binding ConfigurationServices.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"
+                                        TrackModels="{Binding Album.OrderedTracks}"/>
 
                 <StackPanel Grid.Row="3"
                             MaxWidth="1500"
@@ -225,7 +225,7 @@
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Artists.Count}" Value="0">
+                                <DataTrigger Binding="{Binding Album.CreditedArtists.Count}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -236,7 +236,7 @@
                             BorderThickness="0,0,0,1"
                             BorderBrush="{DynamicResource Primary}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Artists.Count}"
+                            <TextBlock Text="{Binding Album.CreditedArtists.Count}"
                                        Style="{DynamicResource SlistInfoStyle}"/>
 
                             <TextBlock Text="credited artists"
@@ -244,8 +244,8 @@
                                        Style="{DynamicResource SlistInfoStyle}"/>
                         </StackPanel>
                     </Border>
-                    
-                    <listview:HorizontalArtistListView Artists="{Binding Artists}"
+
+                    <listview:HorizontalArtistListView Artists="{Binding Album.CreditedArtists}"
                                                             VerticalAlignment="Stretch"
                                                            Margin="30,0"
                                                             ScrollViewer.VerticalScrollBarVisibility="Disabled"/>

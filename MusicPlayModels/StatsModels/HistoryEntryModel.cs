@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using MusicPlayModels.MusicModels;
 
 namespace MusicPlayModels.StatsModels
 {
     public class HistoryEntryModel : BaseModel
     {
+        private readonly int _historyId;
         private TrackModel _track;
         private int _playTime;
         private int _playedLength;
@@ -47,19 +49,33 @@ namespace MusicPlayModels.StatsModels
 
         public string PlayedPercentage => (PlayedLength * 100 / Track.Length).ToString() + "%";
 
-        public HistoryEntryModel(TrackModel track, int playedLength, int playTime)
+        public HistoryEntryModel(TrackModel track, int playedLength, int playTime, int historyId)
         {
             _track = track;
             _playTime = playTime;
             _playedLength = playedLength;
+            _historyId = historyId;
         }
 
 
-        public HistoryEntryModel(TrackModel track, int playedLength)
+        public HistoryEntryModel(TrackModel track, int playedLength, int historyId)
         {
             _track = track;
             _playedLength = playedLength;
             _playTime = (int)DateTime.Now.TimeOfDay.TotalSeconds;
+            _historyId = historyId;
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>
+            {
+                { DataBaseColumns.TrackId, Track.Id },
+                { nameof(PlayTime), PlayTime },
+                { nameof(PlayedLength), PlayedLength },
+                { DataBaseColumns.HistoryId, _historyId },
+            };
+            return keyValues;
         }
     }
 }

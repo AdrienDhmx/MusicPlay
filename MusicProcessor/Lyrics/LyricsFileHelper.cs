@@ -1,11 +1,6 @@
 ﻿using MusicFilesProcessor.Helpers;
-using MusicFilesProcessor.Models;
-using System;
-using System.Collections.Generic;
+using MusicPlay.Database.Helpers;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MusicFilesProcessor.Lyrics.Helper
 {
@@ -16,27 +11,26 @@ namespace MusicFilesProcessor.Lyrics.Helper
             return Path.Combine(DirectoryHelper.LyricsDirectory, fileName);
         }
 
-        public LyricsModel GetLyrics(string filePath)
+        public MusicPlay.Database.Models.Lyrics GetLyrics(string filePath)
         {
-            LyricsModel lyricsModel = new LyricsModel();
-            lyricsModel.IsTimed = false;
-            lyricsModel.IsSaved = true;
-            lyricsModel.FileName = Path.GetFileName(filePath);
+            MusicPlay.Database.Models.Lyrics lyricsModel = new()
+            {
+                IsSaved = true
+            };
             string l = File.ReadAllText(filePath);
-            lyricsModel.Lyrics = l.Replace("\r", string.Empty);
-            (string website, string url, bool isFromUser) = lyricsModel.Lyrics.GetHeader();
-            lyricsModel.IsFromUser = isFromUser;
+            lyricsModel.LyricsText = l.Replace("\r", string.Empty);
+            (string website, string url, bool isFromUser) = lyricsModel.LyricsText.GetHeader();
             lyricsModel.WebSiteSource = website;
-            lyricsModel.URL = url;
-            lyricsModel.Lyrics = lyricsModel.Lyrics.RemoveHeader();
+            lyricsModel.Url = url;
+            lyricsModel.LyricsText = lyricsModel.LyricsText.RemoveHeader();
             return lyricsModel;
         }
 
-        public LyricsModel GetLyrics(LyricsModel lyrics)
+        public MusicPlay.Database.Models.Lyrics GetLyrics(MusicPlay.Database.Models.Lyrics lyrics, string fileName)
         {
             try
             {
-                lyrics.Lyrics = File.ReadAllText(GetFilePath(lyrics.FileName)).RemoveHeader();
+                lyrics.LyricsText = File.ReadAllText(GetFilePath(fileName)).RemoveHeader();
             }
             catch (Exception)
             {
@@ -45,9 +39,9 @@ namespace MusicFilesProcessor.Lyrics.Helper
             return lyrics;
         }
 
-        public void SaveLyrics(string filePath, LyricsModel lyrics)
+        public void SaveLyrics(string filePath, MusicPlay.Database.Models.Lyrics lyrics)
         {
-            File.WriteAllLines(filePath, lyrics.Lyrics.WriteHeader(lyrics.WebSiteSource, lyrics.URL, lyrics.IsFromUser));
+            File.WriteAllLines(filePath, lyrics.LyricsText.WriteHeader(lyrics.WebSiteSource, lyrics.Url));
         }
     }
 }

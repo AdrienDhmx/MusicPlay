@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DataBaseConnection.DataAccess;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+
+
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -16,15 +18,14 @@ using MusicPlayUI.MVVM.Models;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
-    public class TagPopupViewModel : ViewModel
+    public class TagPopupViewModel : PopupViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
         private readonly IModalService _modalService;
         private readonly ICommandsManager _commandsManager;
 
         private UITagModel _tag;
-        public UITagModel Tag
+        public UITagModel CurrentTag
         {
             get => _tag;
             set
@@ -37,9 +38,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand AddToQueueCommand { get; }
         public ICommand EditTagCommand { get; }
         public ICommand DeleteTagCommand { get; }
-        public TagPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, ICommandsManager commandsManager)
+        public TagPopupViewModel(IQueueService queueService, IModalService modalService, ICommandsManager commandsManager)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
             _modalService = modalService;
             _commandsManager = commandsManager;
@@ -49,73 +49,75 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
             EditTagCommand = new RelayCommand(() =>
             {
-                Action<string> updateTag = async (string newName) =>
+                async void updateTag(string newName)
                 {
-                    Tag.Name = newName;
-                    await DataAccess.Connection.UpdateTag(Tag);
-                };
-                CreateEditNameModel model = new CreateEditNameModel(Tag.Name, "Tag", true, null, updateTag);
+                    await Tag.Update(CurrentTag, newName);
+                }
+                CreateEditNameModel model = new CreateEditNameModel(CurrentTag.Name, "Tag", true, null, updateTag);
                 _modalService.OpenModal(ViewNameEnum.CreateTag, (bool canceled) => { }, model);
             });
 
             DeleteTagCommand = new RelayCommand(() =>
             {
-                _modalService.OpenModal(ViewNameEnum.ConfirmAction, DeleteTag, ConfirmActionModelFactory.CreateConfirmDeleteModel(Tag.Name, ModelTypeEnum.Tag));
+                _modalService.OpenModal(ViewNameEnum.ConfirmAction, DeleteTag, ConfirmActionModelFactory.CreateConfirmDeleteModel(CurrentTag.Name, ModelTypeEnum.Tag));
             });
-
-            Update();
         }
 
         private async void PlayNext(bool end = false)
         {
-            List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbums(Tag.Albums.Select(a => a.Id));
-            tracks.AddRange(await DataAccess.Connection.GetTracksFromArtists(Tag.Artists.Select(a => a.Id)));
-            tracks.AddRange(await GetPlaylistsTracks());
-            tracks.AddRange(Tag.Tracks);
-            tracks = tracks.DistinctBy(t => t.Id).ToList();
-            tracks = await tracks.GetAlbumTrackProperties();
+            //List<Track> tracks = await DataAccess.Connection.GetTracksFromAlbums(CurrentTag.AlbumTags.Select(a => a.Id));
+            //tracks.AddRange(await DataAccess.Connection.GetTracksFromArtists(CurrentTag.TrackArtistRole.Select(a => a.Id)));
+            //tracks.AddRange(await GetPlaylistsTracks());
+            //tracks.AddRange(CurrentTag.TrackTags);
+            //tracks = tracks.DistinctBy(t => t.Id).ToList();
+            //tracks = await tracks.GetAlbumTrackProperties();
 
-            _queueService.AddTracks(tracks, end, album: false, name: Tag.Name);
-            _navigationService.ClosePopup();
+            //_queueService.AddTracks(tracks, end, album: false, name: CurrentTag.Name);
+            //_navigationService.ClosePopup();
         }
 
-        private async Task<List<TrackModel>> GetPlaylistsTracks()
+        private List<Track> GetPlaylistsTracks()
         {
-            List<TrackModel> tracks = new();
+            List<Track> tracks = new();
 
-            foreach (PlaylistModel playlist in Tag.Playlists)
-            {
-                tracks.AddRange(await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id));
-            }
+            //foreach (Playlist playlist in CurrentTag.PlaylistTags)
+            //{
+            //    tracks.AddRange(playlist.Tracks);
+            //}
             return tracks;
         }
 
-        private void DeleteTag(bool canceled)
+        private async void DeleteTag(bool canceled)
         {
             if (canceled) return;
 
-            DataAccess.Connection.DeleteTag(Tag.Id);
+            await Tag.Delete(CurrentTag);
 
-            if (_navigationService.CurrentViewName == ViewNameEnum.SpecificGenre)
+            if (App.State.CurrentView.ViewModel is GenreViewModel)
             {
-                _navigationService.NavigateBack();
+                App.State.NavigateBack();
             }
-            else if (_navigationService.CurrentViewName == ViewNameEnum.Genres)
+            else
             {
-                _navigationService.CurrentViewModel.Update();
+                App.State.UpdateCurrentViewIfIs([typeof(GenreLibraryViewModel)]);
             }
-            _navigationService.ClosePopup();
+            ClosePopup();
+        }
+
+        public override void Init()
+        {
+            Update();
         }
 
         public override void Update(BaseModel parameter = null)
         {
             if(parameter == null)
             {
-                Tag = (UITagModel)_navigationService.PopupViewParameter;
+                CurrentTag = (UITagModel)App.State.CurrentPopup.State.Parameter;
             } 
             else
             {
-                Tag = parameter as UITagModel;
+                CurrentTag = parameter as UITagModel;
             }
         }
     }

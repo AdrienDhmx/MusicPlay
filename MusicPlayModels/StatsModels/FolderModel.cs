@@ -1,11 +1,12 @@
-﻿using MusicPlayModels;
+﻿using System;
+using MusicPlayModels;
 
 namespace MusicPlayModels.StatsModels
 {
     public class FolderModel : BaseModel
     {
         private string _name = string.Empty;
-        private bool _monitored = true;
+        private bool _isMonitored = true;
         private int _trackImportedCount = 0;
         private bool _scanning = false;
 
@@ -17,10 +18,10 @@ namespace MusicPlayModels.StatsModels
             set => SetField(ref _name, value);
         }
 
-        public bool Monitored
+        public bool IsMonitored
         {
-            get => _monitored;
-            set => SetField(ref _monitored, value);
+            get => _isMonitored;
+            set => SetField(ref _isMonitored, value);
         }
 
         public int TrackImportedCount
@@ -39,6 +40,17 @@ namespace MusicPlayModels.StatsModels
         {
             Path = path;
             Name = Path.Split('\\').Last();
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new()
+            {
+                { nameof(Path), Path },
+                { nameof(Name), Name },
+                { nameof(IsMonitored), IsMonitored },
+            };
+            return keyValues;
         }
     }
 }

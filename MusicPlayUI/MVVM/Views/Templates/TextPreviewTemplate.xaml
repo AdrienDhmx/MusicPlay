@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.Templates"
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.Templates" xmlns:markdownviewercontrol="clr-namespace:MarkdownViewerControl;assembly=MarkdownViewerControl"
              mc:Ignorable="d" 
              x:Name="TextPreviewTemplateRoot"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -17,12 +17,16 @@
                 ClipToBounds="True"
                 Margin="0, 0, 0, 2"
                 VerticalAlignment="Top">
-            <TextBlock Text="{Binding Text, ElementName=TextPreviewTemplateRoot}"
-                       Style="{DynamicResource NTrackDataStyle}"
-                       TextTrimming="None"
-                       VerticalAlignment="Top"
-                       Name="TextHolder">
-            </TextBlock>
+            <markdownviewercontrol:MarkdownViewer Name="MarkdownViewer"
+                                                  LinkColor="{DynamicResource Primary}"
+                                                  Foreground="{DynamicResource OnSurfaceVariant}"
+                                                  Header1Foreground="{DynamicResource OnBackground}"
+                                                  Header2Foreground="{DynamicResource OnBackground}"
+                                                  Header3Foreground="{DynamicResource OnBackground}"
+                                                  Header4Foreground="{DynamicResource OnBackground}"
+                                                  Header5Foreground="{DynamicResource OnBackground}"
+                                                  Header6Foreground="{DynamicResource OnBackground}"
+                                                  TextTrimming="None"/>
         </Border>
 
         <Border Name="CacheBorder"

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Enums;
 using System.Windows.Media;
+using MusicPlayUI.MVVM.ViewModels.SettingsViewModels;
 
 namespace MusicPlayUI.Core.Factories
 {
@@ -83,13 +84,13 @@ namespace MusicPlayUI.Core.Factories
         {
             List<SettingModel> settings = new()
             {
-                new(ViewNameEnum.General, Resources.General_Setting, "", true),
-                new(ViewNameEnum.Import, Resources.Storage, "", false),
-                new(ViewNameEnum.AppTheme, Resources.Themes_Setting, ""),
-                new(ViewNameEnum.Language, Resources.Language_Setting, ""),
-                new(ViewNameEnum.DSP, "Equalizer", ""), 
-                new(ViewNameEnum.Visualizer, Resources.Visualizer, ""),
-                new(ViewNameEnum.Shortcuts, "Shortcuts", ""),
+                new(ViewNameEnum.General, Resources.General_Setting, typeof(GeneralSettingsViewModel), true),
+                new(ViewNameEnum.Import, Resources.Storage, typeof(StorageSettingsViewModel)),
+                new(ViewNameEnum.AppTheme, Resources.Themes_Setting, typeof(AppThemeSettingViewModel)),
+                new(ViewNameEnum.Language, Resources.Language_Setting, typeof(LanguageSettingViewModel)),
+                new(ViewNameEnum.DSP, "Equalizer", typeof(DSPSettingsViewModels)), 
+                new(ViewNameEnum.Visualizer, Resources.Visualizer, typeof(VisualizerSettingViewModel)),
+                new(ViewNameEnum.Shortcuts, "Shortcuts", typeof(ShortcutSettingViewModel)),
             };
             return settings;
         }

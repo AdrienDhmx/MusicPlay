@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using MusicPlayModels.MusicModels;
 
 namespace MusicPlayModels.StatsModels
@@ -10,7 +11,7 @@ namespace MusicPlayModels.StatsModels
     public class HistoryModel : BaseModel
     {
         private DateTime _date = DateTime.Today;
-        private int _listenTime = 0;
+        private int _playTime = 0;
         private int _playCount = 0;
         private List<HistoryEntryModel> _entries = new List<HistoryEntryModel>();
 
@@ -30,13 +31,13 @@ namespace MusicPlayModels.StatsModels
         /// <summary>
         /// The total playback time in milliseconds
         /// </summary>
-        public int ListenTime
+        public int PlayTime
         {
-            get { return _listenTime; }
+            get { return _playTime; }
             set
             {
-                _listenTime = value;
-                OnPropertyChanged(nameof(ListenTime));
+                _playTime = value;
+                OnPropertyChanged(nameof(PlayTime));
             }
         }
 
@@ -67,8 +68,20 @@ namespace MusicPlayModels.StatsModels
         public HistoryModel(DateTime date, int listenTime, int playCount)
         {
             Date = date;
-            ListenTime = listenTime;
+            PlayTime = listenTime;
             PlayCount = playCount;
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>
+            {
+                { nameof(Date), Date },
+                { nameof(PlayTime), PlayTime },
+                { nameof(PlayCount), PlayCount },
+            };
+
+            return keyValues;
         }
     }
 }

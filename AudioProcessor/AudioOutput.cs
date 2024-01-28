@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using AudioHandler.Enums;
-using AudioHandler.Models;
-using ManagedBass;
-using MusicPlayModels.AudioModels;
-using MusicPlayModels.Enums;
+﻿using ManagedBass;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models.AudioModels;
 
 namespace AudioHandler
 {

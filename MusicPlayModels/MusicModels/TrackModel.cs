@@ -9,6 +9,7 @@ namespace MusicPlayModels.MusicModels
 {
     public class TrackModel : PlayableModel, ITaggable
     {
+        private readonly int _folderId;
         private string _artwork = "";
         private string _path = "";
         private string _title = "";
@@ -109,31 +110,43 @@ namespace MusicPlayModels.MusicModels
 
         public bool HasLyrics => _lyrics != null;
 
-        public TrackModel(int id, string path, string title, List<TrackArtistsRoleModel> artists, AlbumModel album, string artwork, int trackNumber, int discNumber, int length, string duration)
+        public TrackModel(int id, int folderId, string path, string title, List<TrackArtistsRoleModel> artists, AlbumModel album, List<TagModel> tags, string artwork, int trackNumber, int discNumber, int length, string duration, bool isLive, double rating, bool isFavorite)
         {
             Id = id;
+            _folderId = folderId;
+            _tags = tags;
+            _album = album;
+            Artists = artists;
             Path = path;
             Title = title;
-            Artists = artists;
             Artwork = artwork;
-            _album = album;
             TrackNumber = trackNumber;
             DiscNumber = discNumber;
             Length = length;
             Duration = duration;
+            IsLive = isLive;
+            Rating = rating;
+            IsFavorite = isFavorite;
         }
 
-        public TrackModel(string path, string title, List<TrackArtistsRoleModel> artists, AlbumModel album, string artwork, int trackNumber, int discNumber, int length, string duration)
+        public TrackModel(int id, int folderId, string path, string title, List<TrackArtistsRoleModel> artists, AlbumModel album, List<TagModel> tags, LyricsModel lyrics, string artwork, int trackNumber, int discNumber, int length, string duration, bool isLive, double rating, bool isFavorite)
         {
+            Id = id;
+            _folderId = folderId;
+            _tags = tags;
+            _album = album;
+            Artists = artists;
+            Lyrics = lyrics;
             Path = path;
             Title = title;
             Artwork = artwork;
-            Artists = artists;
-            _album = album;
             TrackNumber = trackNumber;
             DiscNumber = discNumber;
             Length = length;
             Duration = duration;
+            IsLive = isLive;
+            Rating = rating;
+            IsFavorite = isFavorite;
         }
 
         public TrackModel(TrackModel trackModel)
@@ -186,6 +199,32 @@ namespace MusicPlayModels.MusicModels
         public TrackModel()
         {
 
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>
+            {
+                { nameof(Title), Title },
+                { nameof(Artwork), Artwork },
+                { nameof(Path), Path },
+                { nameof(Length), Length },
+                { nameof(Duration), Duration },
+                { nameof(TrackNumber), TrackNumber },
+                { nameof(DiscNumber), DiscNumber },
+                { nameof(PlayCount), PlayCount },
+                { DataBaseColumns.AlbumId, Album.Id },
+                { nameof(IsFavorite), IsFavorite.ToInt() },
+                { nameof(Rating), Rating },
+                { DataBaseColumns.FolderId,  _folderId},
+            };
+
+            if(HasLyrics)
+            {
+                keyValues.Add(DataBaseColumns.LyricsId, Lyrics.Id);
+            }
+
+            return base.CreateTable().AddRange(keyValues);
         }
     }
 }

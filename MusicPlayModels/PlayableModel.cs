@@ -88,5 +88,16 @@ namespace MusicPlayModels
                 return DateOnly.FromDayNumber(timestamp).ToShortDateString();
             }
         }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            return new Dictionary<string, object>()
+            {
+                { nameof(PlayCount), PlayCount },
+                { nameof(LastPlayed), DateTime.MinValue.DateTimeToString() },
+                { nameof(CreationDate), DateTime.Now.DateTimeToString() },
+                { nameof(UpdateDate), DateTime.MinValue },
+            };
+        }
     }
 }

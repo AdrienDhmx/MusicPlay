@@ -1,10 +1,5 @@
-﻿using MusicPlayModels;
-using MusicPlayUI.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Models
 {

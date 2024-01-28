@@ -24,7 +24,7 @@
         Width="1000"
         MinWidth="820"
         MinHeight="750"
-        Title="{Binding QueueService.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}"
+        Title="{Binding QueueService.Queue.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}"
         x:Name="Root"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}">
 
@@ -39,7 +39,7 @@
             <Style TargetType="Border">
                 <Setter Property="BorderBrush" Value="{DynamicResource Background}"/>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding DataContext.NavigationService.IsFullScreen, ElementName=Root}" Value="True">
+                    <DataTrigger Binding="{Binding DataContext.AppState.IsFullScreen, ElementName=Root}" Value="True">
                         <Setter Property="BorderBrush" Value="Transparent"/>
                     </DataTrigger>
                 </Style.Triggers>
@@ -67,7 +67,7 @@
                     Margin="0"
                     Panel.ZIndex="2"
                     Background="Transparent"
-                    Visibility="{Binding NavigationService.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                    Visibility="{Binding AppState.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                     BorderBrush="{DynamicResource SurfaceVariant}"
                     BorderThickness="0,0,0,1"
                     MouseDown="WindowTopBorder_MouseLeftButtonDown">
@@ -132,7 +132,7 @@
                     VerticalAlignment="Stretch"
                     BorderBrush="{DynamicResource SurfaceVariant}"
                     BorderThickness="0,0,1,0"
-                    Visibility="{Binding NavigationService.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}">
+                    Visibility="{Binding AppState.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}">
                 <views:MainMenuView DataContext="{Binding CurrentMenu}"/>
             </Border>
 
@@ -144,13 +144,13 @@
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="0"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.NavigationService.IsFullScreen, ElementName=Root}" Value="True">
+                            <DataTrigger Binding="{Binding DataContext.AppState.IsFullScreen, ElementName=Root}" Value="True">
                                 <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <ContentControl Content="{Binding NavigationService.CurrentViewModel}"
+                <ContentControl Content="{Binding AppState.CurrentView.ViewModel}"
                                 Style="{DynamicResource Basestyle}"
                                 ClipToBounds="True"
                                 x:Name="MainContent">
@@ -164,7 +164,7 @@
                     Grid.ColumnSpan="3"
                     ClipToBounds="False"
                     Panel.ZIndex="2"
-                    Visibility="{Binding NavigationService.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}">
+                    Visibility="{Binding AppState.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="10" 
                             Color="#000000"
@@ -197,7 +197,7 @@
                                 </Setter.Value>
                             </Setter>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding NavigationService.IsQueueDrawerOpen}" Value="True">
+                                <DataTrigger Binding="{Binding AppState.IsQueueDrawerOpen}" Value="True">
                                     <DataTrigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
@@ -261,9 +261,9 @@
                 VerticalOffset="5"
                 ClipToBounds="false"
                 Panel.ZIndex="80"
-                IsOpen="{Binding NavigationService.IsPopupOpen}"
+                IsOpen="{Binding AppState.IsPopupOpen}"
                  AllowsTransparency="True">
-                <ContentControl Content="{Binding NavigationService.PopupViewModel}"
+                <ContentControl Content="{Binding AppState.CurrentPopup.ViewModel}"
                          ClipToBounds="false"
                          Background="{DynamicResource Background}">
                 </ContentControl>

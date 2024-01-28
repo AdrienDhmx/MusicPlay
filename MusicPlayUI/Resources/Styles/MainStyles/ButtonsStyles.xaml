@@ -202,14 +202,14 @@
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="FillColor" Value="{DynamicResource OnBackground}"/>
         <Setter Property="StrokeWidth" Value="0"/>
-        <Setter Property="Opacity" Value="0.7"/>
+        <Setter Property="Opacity" Value="0.85"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Trigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
-                            <DoubleAnimation Duration="0:00:0.2"
-                                     To="1" From="0.7"
+                            <DoubleAnimation Duration="0:00:0.1"
+                                     To="1" From="0.85"
                                      Storyboard.TargetProperty="Opacity"/>
                         </Storyboard>
                     </BeginStoryboard>
@@ -217,8 +217,8 @@
                 <Trigger.ExitActions>
                     <BeginStoryboard>
                         <Storyboard>
-                            <DoubleAnimation Duration="0:00:0.2"
-                                     To="0.7" From="1"
+                            <DoubleAnimation Duration="0:00:0.1"
+                                     To="0.85" From="1"
                                      Storyboard.TargetProperty="Opacity"/>
                         </Storyboard>
                     </BeginStoryboard>
@@ -445,18 +445,18 @@
     </Style>
 
     <Style x:Key="CloseModalBtn" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource BaseIconButton}">
+           BasedOn="{StaticResource OpacityIconButton}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
-        <Setter Property="Width" Value="35"/>
-        <Setter Property="Height" Value="35"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Height" Value="20"/>
         <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
-        <Setter Property="IconHeight" Value="22"/>
-        <Setter Property="IconWidth" Value="22"/>
+        <Setter Property="IconHeight" Value="18"/>
+        <Setter Property="IconWidth" Value="18"/>
         <Setter Property="IconStretch" Value="Uniform"/>
         <Setter Property="Icon" Value="{StaticResource CloseIcon}"/>
         <Setter Property="FillColor" Value="{DynamicResource Error}"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource ErrorHover}"/>
     </Style>
 
     <Style x:Key="FilterButton" TargetType="IconButton:IconButton"
@@ -609,11 +609,13 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="ConfirmActionTextBtn" TargetType="textbtn:TextButton"
+    <Style x:Key="OutlinedButton" TargetType="textbtn:TextButton"
            BasedOn="{StaticResource BaseTextBtn}">
-        <Setter Property="Width" Value="180"/>
-        <Setter Property="Height" Value="50"/>
+        <Setter Property="Width" Value="140"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Margin" Value="0"/>
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+        <Setter Property="BorderBrush" Value="{Binding Foreground, RelativeSource={RelativeSource self}}"/>
     </Style>
 
     <Style x:Key="PopupBtn" TargetType="textbtn:TextButton"

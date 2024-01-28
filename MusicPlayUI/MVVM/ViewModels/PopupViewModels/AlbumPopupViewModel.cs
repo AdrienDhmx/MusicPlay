@@ -1,7 +1,4 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.Enums;
-using MusicPlayModels.MusicModels;
-using MusicPlayUI.Core.Commands;
+﻿using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Enums;
 using System;
@@ -11,6 +8,9 @@ using System.Windows.Input;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Helpers;
 using System.Collections.ObjectModel;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Enums;
+
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
@@ -19,8 +19,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         private readonly IQueueService _queueService;
         private readonly IPlaylistService _playlistService;
         private readonly ICommandsManager _commandsManager;
-        private AlbumModel _album;
-        public AlbumModel Album
+        private Album _album;
+        public Album Album
         {
             get { return _album; }
             set
@@ -30,8 +30,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private ObservableCollection<PlaylistModel> _userPlaylists;
-        public ObservableCollection<PlaylistModel> UserPlaylists
+        private ObservableCollection<Playlist> _userPlaylists;
+        public ObservableCollection<Playlist> UserPlaylists
         {
             get => _userPlaylists;
             set
@@ -50,39 +50,38 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand CreatePlaylistCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
         public ICommand CreateTagCommand { get; }
-        public AlbumPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager) : base(navigationService, modalService)
+        public AlbumPopupViewModel(IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager) : base(modalService)
         {
             _queueService = queueService;
             _playlistService = playlistService;
             _commandsManager = commandsManager;
-            LoadData();
 
             PlayNextCommand = new RelayCommand(() => PlayNext());
             AddToQueueCommand = new RelayCommand(() => PlayNext(true));
-            AddToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) => AddToPlaylist(playlist));
+            AddToPlaylistCommand = new RelayCommand<Playlist>(async (playlist) => await AddToPlaylist(playlist));
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
-            ChangeCoverCommand = new RelayCommand(ChangeCover);
+            ChangeCoverCommand = new RelayCommand(async () => await ChangeCover());
             NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
 
             CreateTagCommand = new RelayCommand(() => CreateTag(Album));
-            AddToTagCommand = new RelayCommand<TagModel>((tag) => AddToTag(tag, Album));
+            AddToTagCommand = new RelayCommand<Tag>(async (tag) => await AddToTag(tag, Album));
         }
 
-        private async void PlayNext(bool end = false)
+        private void PlayNext(bool end = false)
         {
-            _queueService.AddTracks(await (await DataAccess.Connection.GetTracksFromAlbum(Album.Id)).GetAlbumTrackProperties(), end, true, Album.Name);
-            _navigationService.ClosePopup();
+            _queueService.AddTracks([..Album.Tracks], end, true, Album.Name);
+            App.State.ClosePopup();
         }
 
-        private async void AddToPlaylist(PlaylistModel playlist)
+        private async Task AddToPlaylist(Playlist playlist)
         {
-            _playlistService.AddToPlaylist(await DataAccess.Connection.GetTracksFromAlbum(Album.Id), playlist);
+            await Playlist.AddTracks(playlist, [.. Album.Tracks]);
 
             UserPlaylists.Remove(playlist);
 
-            if (_navigationService.CurrentViewParameter is PlaylistModel playlistModel && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
+            if (App.State.CurrentView.State.Parameter is Playlist playlistModel && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
             {
-                _navigationService.CurrentViewModel.Update();
+                App.State.CurrentView.ViewModel.Update();
             }
         }
 
@@ -96,17 +95,17 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             if (!_modalService.IsModalOpen && !isCanceled)
             {
                 await Task.Delay(500);
-                var playlists = await DataAccess.Connection.GetAllPlaylists();
+                var playlists = await Playlist.GetAll();
                 playlists.ToList().OrderBy(p => p.Id);
-                PlaylistModel createdPlaylist = playlists.LastOrDefault();
-                AddToPlaylist(createdPlaylist);
+                Playlist createdPlaylist = playlists.LastOrDefault();
+                await AddToPlaylist(createdPlaylist);
             }
         }
 
-        private void ChangeCover()
+        private async Task ChangeCover()
         {
-            _navigationService.ClosePopup();
-            bool result = Album.ChangeCover();
+            App.State.ClosePopup();
+            bool result = await Album.ChangeCover();
             if (result)
             {
                 UpdateView();
@@ -115,31 +114,33 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private void UpdateView()
         {
-            if (_navigationService.CurrentViewName == ViewNameEnum.Albums || _navigationService.CurrentViewName == ViewNameEnum.SpecificAlbum)
-            {
-                _navigationService.CurrentViewModel.Update();
-            }
+            App.State.UpdateCurrentViewIfIs([typeof(AlbumLibraryViewModel), typeof(AlbumViewModel)]);
         }
 
         private async Task GetUserPlaylists()
         {
-            UserPlaylists = new((await DataAccess.Connection.GetAllPlaylists()).OrderBy(p => p.Name));
+            UserPlaylists = new(await Playlist.GetAll());
+        }
+
+        public override void Init()
+        {
+            LoadData();
         }
 
         private async void LoadData()
         {
-            Album = (AlbumModel)_navigationService.PopupViewParameter;
+            Album = (Album)State.Parameter;
 
-            if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
+            if (App.State.CurrentView.ViewModel is GenreViewModel genreViewModel)
             {
                 CanRemoveFromGenre = true;
                 CurrentTagView = genreViewModel.Genre;
             }
 
-            Album.Tags = await DataAccess.Connection.GetAlbumTag(Album.Id);
+            //Album.TrackTag = await DataAccess.Connection.GetAlbumTag(Album.Id);
 
             await GetUserPlaylists();
-            await GetTags(Album.Tags.Select(g => g.Id));
+            GetTags(Album.AlbumTags.Select(g => g.TagId));
         }
     }
 }

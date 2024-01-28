@@ -1,6 +1,5 @@
-﻿using MusicPlayModels;
-using MusicPlayModels.Enums;
-using MusicPlayUI.Core.Enums;
+﻿using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Models
 {

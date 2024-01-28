@@ -6,19 +6,15 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using MusicPlayUI.Core.Services.Interfaces;
 using System;
+using MusicPlayUI.MVVM.ViewModels.SettingsViewModels;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class SettingsViewModel : ViewModel
     {
         private readonly IWindowService _windowService;
-
-        private INavigationService _navigationService;
-        public INavigationService NavigationService 
-        {
-            get => _navigationService;
-            set { SetField(ref _navigationService, value); }
-        }
 
         private bool _isSettingsMenuOpen = false;
         public bool IsSettingsMenuOpen
@@ -31,8 +27,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<SettingModel> _settings;
-        public List<SettingModel> Settings
+        private ObservableCollection<SettingModel> _settings;
+        public ObservableCollection<SettingModel> Settings
         {
             get => _settings;
             set
@@ -47,8 +43,6 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             get
             {
-                if (_selectedSetting is null)
-                    return Settings.Find(s => s.IsSelected);
                 return _selectedSetting;
             }
             set
@@ -59,13 +53,9 @@ namespace MusicPlayUI.MVVM.ViewModels
         }
 
         public ICommand NavigateToSettingCommand { get; }
-        public SettingsViewModel(INavigationService navigationService, IWindowService windowService)
+        public SettingsViewModel(IWindowService windowService)
         {
-            NavigationService = navigationService;
             _windowService = windowService;
-
-            // navigate to general settings by default (sub view)
-            NavigationService.NavigateTo(ViewNameEnum.General);
 
             NavigateToSettingCommand = new RelayCommand<SettingModel>((setting) =>
             {
@@ -82,7 +72,17 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void Init()
         {
-            Settings = SettingsModelFactory.GetSettings();
+            Settings = new(SettingsModelFactory.GetSettings());
+
+            if(State?.Parameter != null)
+            {
+                SelectedSetting = (SettingModel)State.Parameter;
+            }
+            else
+            {
+                SetSelectedSetting(Settings.FirstOrDefault(s => s.IsSelected));
+            }
+
             NavigateToSettings(SelectedSetting);
             IsSettingsMenuOpen = true;
         }
@@ -92,9 +92,18 @@ namespace MusicPlayUI.MVVM.ViewModels
             if (setting is not null)
             {
                 SelectedSetting = setting;
-                Settings.ForEach(s => s.IsSelected = false);
-                Settings.Find(s => s.SettingName == setting.SettingName).IsSelected = true;
-                Settings = new(Settings);
+
+                foreach(SettingModel settings in Settings)
+                {
+                    if (settings.IsSelected)
+                    {
+                        settings.IsSelected = false;
+                    } 
+                    else if(settings.Name == setting.Name)
+                    {
+                        settings.IsSelected = true;
+                    }
+                }
             }
         }
 
@@ -104,7 +113,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 return;
 
             SetSelectedSetting(setting);
-            NavigationService.NavigateTo(setting.SettingViewEnum);
+            State.ChildViewModel = App.State.CreateNavigationModel(setting.Type);
         }
     }
 }

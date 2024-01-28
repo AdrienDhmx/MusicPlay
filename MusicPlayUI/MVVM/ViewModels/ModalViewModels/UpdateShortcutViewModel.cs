@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MessageControl;
-using MusicPlayModels;
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services.Interfaces;
@@ -67,7 +68,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 
         public ICommand ChangeModifierCommand { get; }
         public ICommand ChangeShortcutCommand { get; }
-        public UpdateShortcutViewModel(IModalService modalService, INavigationService navigationService) : base(modalService, navigationService)
+        public UpdateShortcutViewModel(IModalService modalService) : base(modalService)
         {
             ChangeModifierCommand = new RelayCommand<string>((string modifier) =>
             {

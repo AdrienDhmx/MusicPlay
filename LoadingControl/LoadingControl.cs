@@ -37,9 +37,6 @@ namespace LoadingControl
         public static readonly DependencyProperty BarCountProperty =
             DependencyProperty.Register("BarCount", typeof(int), typeof(LoadingControl), new PropertyMetadata(4));
 
-
-
-
         private static Random rng = new Random();
         private static int barQty = 4;
         private double[] data = new double[barQty];
@@ -71,7 +68,7 @@ namespace LoadingControl
                 int max = (int)Height;
 
                 // random starting value
-                data[i] = rng.Next(min, max);
+                data[i] = Height / barQty * i;
                 minData[i] = min;
                 maxData[i] = max;
                 increaseBool[i] = true;
@@ -103,13 +100,14 @@ namespace LoadingControl
                 {
                     Children.Clear();
                 }
+
                 double space = (ActualWidth / barQty);
                 for (int i = 0; i < barQty; i++)
                 {
                     Buff(i);
 
                     Rectangle rectangle = new Rectangle();
-                    rectangle.Width = space * 0.9;
+                    rectangle.Width = space * 0.85;
                     rectangle.Height = data[i]; // min data values
                     rectangle.Fill = MainColor;
                     rectangle.StrokeThickness = 0;

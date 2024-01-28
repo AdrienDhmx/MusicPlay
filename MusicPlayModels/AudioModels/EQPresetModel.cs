@@ -4,7 +4,7 @@ namespace AudioHandler.Models
 {
     public class EQPresetModel : BaseModel, ICloneable
     {
-        private readonly List<EQEffectModel> _defaultEffects = new()
+        private readonly List<EQBandModel> _defaultEffects = new()
         {
             new (0, 1000, 1, 0),
             //new (1, 64, 1.2, 0),
@@ -28,8 +28,8 @@ namespace AudioHandler.Models
             }
         }
 
-        private List<EQEffectModel> _effects;
-        public List<EQEffectModel> Effects
+        private List<EQBandModel> _effects;
+        public List<EQBandModel> Effects
         {
             get => _effects;
             set 
@@ -43,7 +43,7 @@ namespace AudioHandler.Models
             _effects = new(_defaultEffects);
         }
 
-        public EQPresetModel(List<EQEffectModel> effects, string name)
+        public EQPresetModel(List<EQBandModel> effects, string name)
         {
             _effects = new(effects);
             Name = name;
