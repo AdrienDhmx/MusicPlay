@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Navigation;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.MVVM.ViewModels;
 
 namespace MusicPlayUI.Core.Models
@@ -98,6 +99,9 @@ namespace MusicPlayUI.Core.Models
         private int _page = 1;
         private int _itemPerPage = 25;
 
+        private string _searchText = string.Empty;
+        private SortModel _sortBy;
+
         public int Page
         {
             get => _page;
@@ -108,6 +112,21 @@ namespace MusicPlayUI.Core.Models
         {
             get => _itemPerPage;
             set => SetField(ref _itemPerPage, value);
+        }
+
+        public string SearchText
+        {
+            get => _searchText;
+            set => SetField(ref _searchText, value);
+        }
+
+        public SortModel SortBy
+        {
+            get { return _sortBy; }
+            set
+            {
+                SetField(ref _sortBy, value);
+            }
         }
 
         public LibraryNavigationState(BaseModel parameters) : base(parameters)

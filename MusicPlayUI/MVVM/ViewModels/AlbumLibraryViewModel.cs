@@ -16,41 +16,13 @@ using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Models;
 using MusicPlayUI.MVVM.ViewModels.PopupViewModels;
 using DynamicScrollViewer;
+using MusicPlay.Database.Helpers;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class AlbumLibraryViewModel : LibraryViewModel
     {
         private readonly IQueueService _queueService;
-
-        private string _searchText = "";
-        public string SearchText
-        {
-            get { return _searchText; }
-            set
-            {
-                if (!IsLoading)
-                {
-                    if (string.IsNullOrWhiteSpace(SearchText) && string.IsNullOrWhiteSpace(value))
-                        return; // empty and no changes
-
-                    _searchText = value;
-                    OnPropertyChanged(nameof(SearchText));
-                    Task.Run(FilterSearch);
-                }
-            }
-        }
-
-        private bool _isLoading = true;
-        public bool IsLoading
-        {
-            get { return _isLoading; }
-            set
-            {
-                _isLoading = value;
-                OnPropertyChanged(nameof(IsLoading));
-            }
-        }
 
         private bool _noAlbumFoundVisibility = false;
         public bool NoAlbumFoundVisibility
@@ -73,18 +45,6 @@ namespace MusicPlayUI.MVVM.ViewModels
                 OnPropertyChanged(nameof(IsFilterOpen));
             }
         }
-
-        private bool _isSortingOpen = false;
-        public bool IsSortingOpen
-        {
-            get { return _isSortingOpen; }
-            set
-            {
-                _sortingPopupTimer.Start();
-            }
-        }
-
-        private readonly Timer _sortingPopupTimer;
 
         private string _albumsHeader;
         public string AlbumCount
@@ -152,41 +112,15 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private SortModel _selectedSorting;
-        public SortModel SelectedSorting
-        {
-            get { return _selectedSorting; }
-            set
-            {
-                SetField(ref _selectedSorting, value);
-            }
-        }
-
-        private ObservableCollection<SortModel> _sortBy;
-        public ObservableCollection<SortModel> SortBy
-        {
-            get => _sortBy;
-            set
-            {
-                SetField(ref _sortBy, value);
-            }
-        }
-
         public ICommand PlayAlbumCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public ICommand OpenCloseFiltersCommand { get; }
         public ICommand AddFilterCommand { get; }
         public ICommand RemoveFilterCommand { get; }
-        public ICommand OpenSortingPopupCommand { get; }
-        public ICommand SortCommand { get; }
         public ICommand OpenAlbumPopupCommand { get; }
         public AlbumLibraryViewModel(IQueueService queueService)
         {
             _queueService = queueService;
-
-            _sortingPopupTimer = new(50);
-            _sortingPopupTimer.Elapsed += SortingPopupTimer_Elapsed;
-            _sortingPopupTimer.AutoReset = false;
 
             PlayAlbumCommand = new RelayCommand<Album>((album) =>
             {
@@ -256,66 +190,25 @@ namespace MusicPlayUI.MVVM.ViewModels
                 }
                 FilterSearch();
             });
-
-            OpenSortingPopupCommand = new RelayCommand(() =>
-            {
-                if(!IsSortingOpen)
-                {
-                    _isSortingOpen = true;
-                    OnPropertyChanged(nameof(IsSortingOpen));
-                }
-            });
-
-            SortCommand = new RelayCommand<SortModel>((sortModel) =>
-            {
-                if(sortModel is not null)
-                {
-                    if(SelectedSorting.SortType == sortModel.SortType)
-                    {
-                        SelectedSorting.IsAscending = !SelectedSorting.IsAscending;
-                        foreach (SortModel sort in SortBy)
-                        {
-                            if(SelectedSorting.SortType == sort.SortType)
-                            {
-                                sort.IsAscending = SelectedSorting.IsAscending;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (SortModel sort in SortBy)
-                        {
-                            if (sortModel.SortType == sort.SortType)
-                            {
-                                sort.IsSelected = true;
-                            }
-                            else
-                            {
-                                sort.IsSelected = false;
-                            }
-                        }
-                        SelectedSorting = sortModel;
-                    }
-                    FilterSearch();
-                }
-            });
         }
 
         public override void Dispose()
         {
-            _sortingPopupTimer.Elapsed -= SortingPopupTimer_Elapsed;
             GC.SuppressFinalize(this);
         }
 
-        private void SortingPopupTimer_Elapsed(object sender, ElapsedEventArgs e)
+        internal override void Sort()
         {
-            _isSortingOpen = false;
-            OnPropertyChanged(nameof(IsSortingOpen));
+            if(SortBy is not null && !IsLoading)
+            {
+                AllFilteredAlbums = AllFilteredAlbums.SortAlbums(SortBy);
+                PaginateData();
+            }
         }
 
-        private void FilterSearch()
+        internal override void FilterSearch()
         {
-            AllFilteredAlbums = SearchHelper.FilterAlbum([.. SelectedFilters], SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending);
+            AllFilteredAlbums = SearchHelper.FilterAlbum([.. SelectedFilters], SearchText, SortBy);
             LibraryState.Page = 1; // reset pagination
             PaginateData();
 
@@ -353,11 +246,12 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void Init()
         {
+            SortOptions = SortFactory.GetSortMenu<Album>();
             base.Init();
-
             InitData();
             TotalItemCount = Album.Count();
             FilterSearch();
+            IsLoading = false;
         }
 
         public override void Update(BaseModel parameter = null)
@@ -406,8 +300,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             ArtistsFilters = new(artistsFilter);
             AlbumTypeFilters = new(albumFilter);
 
-            SortBy = SortFactory.GetSortMenu<Album>();
-            SelectedSorting = SortBy.ToList().Find(s => s.IsSelected);
+            SortBy ??= SortOptions.First(s => s.IsSelected);
         }
        
     }

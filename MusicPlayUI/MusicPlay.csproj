@@ -71,6 +71,7 @@
     <ProjectReference Include="..\LoadingControl\LoadingControl.csproj" />
     <ProjectReference Include="..\MarkdownViewer\MarkdownViewerControl.csproj" />
     <ProjectReference Include="..\MessageControl\MessageControl.csproj" />
+    <ProjectReference Include="..\ModalPopupControl\ModalPopupControl.csproj" />
     <ProjectReference Include="..\Modal\Modal.csproj" />
     <ProjectReference Include="..\MusicPlay.Language\MusicPlay.Language.csproj" />
     <ProjectReference Include="..\MusicProcessor\FilesProcessor.csproj" />

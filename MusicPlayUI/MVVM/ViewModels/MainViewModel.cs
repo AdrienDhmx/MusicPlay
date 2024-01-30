@@ -16,7 +16,7 @@ using System.Windows.Media;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
-    public class MainViewModel : ViewModel, IOnMouseDownListener
+    public class MainViewModel : ViewModel
     {
         public IAudioPlayback AudioPlayback { get; }
         public IQueueService QueueService { get; }
@@ -112,21 +112,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 App.Current.Shutdown();
             });
-        }
-
-        public void OnClick(MouseButtonEventArgs e)
-        {
-            if (AppState.IsPopupOpen)
-            {
-                UIElement element = Mouse.DirectlyOver as UIElement;
-
-                Popup ancestor = FindParent<Popup>(element);
-                // if the click is not on the popup close popup
-                if(element is not null && ancestor is null)
-                {
-                    AppState.ClosePopup();
-                }
-            }
         }
 
         public override void Dispose()

@@ -9,7 +9,7 @@
              xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.ModalViewModels"
              xmlns:customTextBox="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox"
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
-             d:DataContext="{d:DesignInstance Type=viewmodels:CreateTagViewModel}"
+             d:DataContext="{d:DesignInstance Type=viewmodels:CreateModelNameViewModel}"
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
     <Border x:Name="RootGrid"
@@ -76,7 +76,7 @@
             <textbtn:TextButton Grid.Row="2"
                                 Style="{DynamicResource EditBtn}"
                                 Command="{Binding CreateTagCommand}"
-                                Visibility="{Binding IsEdit, Converter={StaticResource BoolToVisibilityConverter},  ConverterParameter=2}"/>
+                                Visibility="{Binding IsEdit, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2}"/>
 
             <textbtn:TextButton Grid.Row="2"
                                     Style="{DynamicResource CreateBtn}"

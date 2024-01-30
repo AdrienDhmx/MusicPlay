@@ -38,12 +38,12 @@ namespace MusicPlayUI.Core.Factories
 
             ObservableCollection<SortModel> output = new()
             {
-                new(SortEnum.AZ, Resources.Title, false, false),
-                new(SortEnum.Year, Resources.Year, false, false),
-                new(SortEnum.MostPlayed, Resources.Most_Played, false, false),
-                new(SortEnum.LastPlayed, Resources.Last_Played, false, false),
-                new(SortEnum.AddedDate, "Added Date", false, false),
-                new(SortEnum.UpdatedDate, "Last Update Date", false, false),
+                new SortModel(1, SortEnum.AZ, Resources.Title, false, false),
+                new(2, SortEnum.Year, Resources.Year, false, false),
+                new(3, SortEnum.MostPlayed, Resources.Most_Played, false, false),
+                new(4, SortEnum.LastPlayed, Resources.Last_Played, false, false),
+                new(7, SortEnum.AddedDate, "Added Date", false, false),
+                new(6, SortEnum.UpdatedDate, "Last Update Date", false, false),
 
             };
 
@@ -71,11 +71,11 @@ namespace MusicPlayUI.Core.Factories
 
             ObservableCollection<SortModel> output = new()
             {
-                new(SortEnum.AZ, Resources.Title, false, false),
-                new(SortEnum.MostPlayed, Resources.Most_Played, false, false),
-                new(SortEnum.LastPlayed, Resources.Last_Played, false, false),
-                new(SortEnum.AddedDate, "Added Date", false, false),
-                new(SortEnum.UpdatedDate, "Last Update Date", false, false),
+                new(1, SortEnum.AZ, Resources.Title, false, false),
+                new(2, SortEnum.MostPlayed, Resources.Most_Played, false, false),
+                new(3, SortEnum.LastPlayed, Resources.Last_Played, false, false),
+                new(4, SortEnum.AddedDate, "Added Date", false, false),
+                new(5, SortEnum.UpdatedDate, "Last Update Date", false, false),
 
             };
 
@@ -86,7 +86,7 @@ namespace MusicPlayUI.Core.Factories
 
                 foreach (SortModel sort in output)
                 {
-                    if(sort.SortType == sortEnum)
+                    if(sort.Type == sortEnum)
                     {
                         sort.IsSelected = true;
                         sort.IsAscending = isAscending;

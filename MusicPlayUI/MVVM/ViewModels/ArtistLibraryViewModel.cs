@@ -19,6 +19,7 @@ using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
+using TagLib.Mpeg4;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -37,21 +38,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private string _searchText;
-        public string SearchText
-        {
-            get { return _searchText; }
-            set
-            {
-                if (string.IsNullOrWhiteSpace(SearchText) && string.IsNullOrWhiteSpace(value))
-                    return;
-
-                _searchText = value;
-                OnPropertyChanged(nameof(SearchText));
-                Task.Run(FilterSearch);
-            }
-        }
-
         private bool _isFilterOpen = false;
         public bool IsFilterOpen
         {
@@ -62,18 +48,6 @@ namespace MusicPlayUI.MVVM.ViewModels
                 OnPropertyChanged(nameof(IsFilterOpen));
             }
         }
-
-        private bool _isSortingOpen = false;
-        public bool IsSortingOpen
-        {
-            get { return _isSortingOpen; }
-            set
-            {
-                _sortingPopupTimer.Start();
-            }
-        }
-
-        private readonly Timer _sortingPopupTimer;
 
         private string _artistHeader;
         public string ArtistCount
@@ -131,26 +105,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private SortModel _selectedSorting;
-        public SortModel SelectedSorting
-        {
-            get { return _selectedSorting; }
-            set
-            {
-                SetField(ref _selectedSorting, value);
-            }
-        }
-
-        private ObservableCollection<SortModel> _sortBy;
-        public ObservableCollection<SortModel> SortBy
-        {
-            get => _sortBy;
-            set
-            {
-                SetField(ref _sortBy, value);
-            }
-        }
-
         private int TotalArtistCount { get; set; }
 
         public ICommand PlayArtistCommand { get; }
@@ -159,16 +113,10 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand OpenArtistPopupCommand { get; }
         public ICommand AddFilterCommand { get; }
         public ICommand RemoveFilterCommand { get; }
-        public ICommand OpenSortingPopupCommand { get; }
-        public ICommand SortCommand { get; }
         public ArtistLibraryViewModel(IQueueService queueService, ICommandsManager commandsManager)
         {
             _queueService = queueService;
             _commandsManager = commandsManager;
-
-            _sortingPopupTimer = new(50);
-            _sortingPopupTimer.Elapsed += SortingPopupTimer_Elapsed;
-            _sortingPopupTimer.AutoReset = false;
 
             PlayArtistCommand = new RelayCommand<Artist>(async (artist) =>
             {
@@ -184,15 +132,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             OpenFiltersCommand = new RelayCommand(() =>
             {
                 IsFilterOpen = !IsFilterOpen;
-            });
-
-            OpenSortingPopupCommand = new RelayCommand(() =>
-            {
-                if (!IsSortingOpen)
-                {
-                    _isSortingOpen = true;
-                    OnPropertyChanged(nameof(IsSortingOpen));
-                }
             });
 
             AddFilterCommand = new RelayCommand<FilterModel>((filter) =>
@@ -230,54 +169,24 @@ namespace MusicPlayUI.MVVM.ViewModels
                 }
                 FilterSearch();
             });
-
-            SortCommand = new RelayCommand<SortModel>((sort) =>
-            {
-                if (SelectedSorting.SortType == sort.SortType)
-                {
-                    SelectedSorting.IsAscending = !SelectedSorting.IsAscending;
-                    foreach (SortModel s in SortBy)
-                    {
-                        if (SelectedSorting.SortType == s.SortType)
-                        {
-                            s.IsAscending = SelectedSorting.IsAscending;
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (SortModel s in SortBy)
-                    {
-                        if (sort.SortType == s.SortType)
-                        {
-                            s.IsSelected = true;
-                        }
-                        else
-                        {
-                            s.IsSelected = false;
-
-                        }
-                    }
-                    SelectedSorting = sort;
-                }
-                FilterSearch();
-            });
         }
 
         public override void Dispose()
         {
-            _sortingPopupTimer.Elapsed -= SortingPopupTimer_Elapsed;
         }
 
-        private void SortingPopupTimer_Elapsed(object sender, ElapsedEventArgs e)
+        internal override void Sort()
         {
-            _isSortingOpen = false;
-            OnPropertyChanged(nameof(IsSortingOpen));
+            if(SortBy is not null && !IsLoading)
+            {
+                AllFilteredArtists = AllFilteredArtists.SortArtists(SortBy);
+                PaginateData();
+            }
         }
 
-        private void FilterSearch()
+        internal override void FilterSearch()
         {
-            AllFilteredArtists = SearchHelper.FilterArtists([.. SelectedFilters], SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending);
+            AllFilteredArtists = SearchHelper.FilterArtists([.. SelectedFilters], SearchText, SortBy.Type, SortBy.IsAscending);
             LibraryState.Page = 1; // reset pagination
             PaginateData();
 
@@ -317,6 +226,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             base.Init();
             InitData();
+            IsLoading = false;
         }
 
         private void InitData()
@@ -352,8 +262,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             ArtistTypeFilters = new(artistsFilter.OrderBy(f => f.Name));
             SelectedFilters = new(temp);
 
-            SortBy = SortFactory.GetSortMenu<Artist>();
-            SelectedSorting = SortBy.ToList().Find(s => s.IsSelected);
+            SortOptions = SortFactory.GetSortMenu<Artist>();
+            SortBy ??= SortOptions.First(s => s.IsSelected);
 
             FilterSearch();
         }

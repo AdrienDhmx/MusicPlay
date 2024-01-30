@@ -87,11 +87,8 @@
 
                 <textbtn:TextButton x:Name="SortBtn"
                                     Grid.Column="2"
-                                    Style="{DynamicResource SortedByBtn}"
-                                    Height="25"
-                                    CornerRadius="4"
-                                    Text="{Binding SelectedSorting.SortName, Converter={StaticResource AddTextConverter}, ConverterParameter={x:Static lang:Resources.SortedBy}}"
-                                    Command="{Binding OpenSortingPopupCommand}"/>
+                                    Text="{Binding DataContext.SortBy.Name, ElementName=RootView, Converter={StaticResource AddTextConverter}, ConverterParameter={x:Static lang:Resources.SortedBy}}"
+                                    Style="{DynamicResource SortedByBtn}"/>
             </Grid>
 
             <Grid  Grid.Row="2"
@@ -333,8 +330,8 @@
             </ds:DynamicScrollViewer>
         </Border>
 
-        <Popup IsOpen="{Binding IsSortingOpen}"
-                StaysOpen="False"
+        <Popup IsOpen="{Binding IsSortOptionsPopupOpen}"
+                StaysOpen="True"
                 AllowsTransparency="True"
                 Placement="Bottom"
                PlacementTarget="{Binding ElementName=SortBtn}"

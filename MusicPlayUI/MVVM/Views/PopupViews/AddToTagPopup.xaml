@@ -3,7 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews" xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton" xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews" 
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton" 
+             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" 
+             xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
              mc:Ignorable="d" 
              x:Name="TagRootPopup"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -12,25 +15,34 @@
             x:Name="PopupRootBorder">
         <Border Height="auto"
                 x:Name="PopupContentBorder"
+                Effect="{DynamicResource PopupSmallDropShadow}"
                 Background="{DynamicResource Background}"
                 BorderBrush="{DynamicResource Outline}"
                 BorderThickness="1"
                 Width="200"
-                MaxHeight="500"
-                    Margin="5,2, 5, 8"
-                CornerRadius="5">
-            <Grid>
+                MaxHeight="364"
+                    Margin="5, 8, 8, 8"
+                CornerRadius="{DynamicResource PrimaryCornerRadius}">
+                <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <Border Effect="{DynamicResource PageHeaderDropShadow}"
+                        Background="{DynamicResource Background}"
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}"/>
+                    
+                <Border Style="{DynamicResource BottomBlackGradientBorder}"
+                        Visibility="{Binding DataContext.AllTags.Count, ElementName=TagRootPopup, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Grid.Row="1"/>
+                    
                 <iconbtn:IconButton Icon="{DynamicResource CircledAddIcon}"
                                     HorizontalAlignment="Stretch"
                                     Height="40"
                                     IconWidth="25"
                                     IconHeight="25"
                                     IconStretch="Fill"
-                                    CornerRadius="5"
+                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
                                     StrokeColor="Transparent"
@@ -38,24 +50,25 @@
                                     Command="{Binding DataContext.CreateTagCommand, ElementName=TagRootPopup}"
                                     FillColor="{DynamicResource Primary}">
                 </iconbtn:IconButton>
-                <ItemsControl ItemsSource="{Binding DataContext.AllTags, ElementName=TagRootPopup, UpdateSourceTrigger=PropertyChanged}"
-                              Visibility="{Binding DataContext.AllTags.Count, ElementName=TagRootPopup, Converter={StaticResource BoolToVisibilityConverter}}"
-                            FontSize="16"
-                              Margin="0,0,0,4"
-                            Grid.Row="1">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <textbtn:TextButton Height="30"
-                                                Text="{Binding Name}"
-                                                Command="{Binding DataContext.AddToTagCommand, ElementName=TagRootPopup}"
-                                                CommandParameter="{Binding .}"
-                                                Style="{DynamicResource PopupBtn}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <ds:DynamicScrollViewer VerticalScrollBarVisibility="Hidden"
+                                Grid.Row="1">
+                    <ItemsControl ItemsSource="{Binding DataContext.AllTags, ElementName=TagRootPopup, UpdateSourceTrigger=PropertyChanged}"
+                                  Visibility="{Binding DataContext.AllTags.Count, ElementName=TagRootPopup, Converter={StaticResource BoolToVisibilityConverter}}"
+                                FontSize="16">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <textbtn:TextButton Height="34"
+                                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                                    Text="{Binding Name}"
+                                                    Command="{Binding DataContext.AddToTagCommand, ElementName=TagRootPopup}"
+                                                    CommandParameter="{Binding .}"
+                                                    Style="{DynamicResource PopupBtn}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
+                </ds:DynamicScrollViewer>
             </Grid>
-
         </Border>
     </Border>
 

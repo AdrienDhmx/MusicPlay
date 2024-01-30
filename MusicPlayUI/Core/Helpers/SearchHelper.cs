@@ -64,6 +64,21 @@ namespace MusicPlayUI.Core.Helpers
             return output;
         }
 
+        public static List<Artist> SortArtists(this List<Artist> artists, SortModel sortBy)
+        {
+            bool ascending = sortBy.IsAscending;
+            IOrderedEnumerable<Artist> sortedArtists = sortBy.Type switch
+            {
+                SortEnum.AZ => ascending ? artists.OrderBy(a => a.Name) : artists.OrderByDescending(a => a.Name),
+                SortEnum.LastPlayed => ascending ? artists.OrderBy(a => a.LastPlayed) : artists.OrderByDescending(a => a.LastPlayed),
+                SortEnum.MostPlayed => ascending ? artists.OrderBy(a => a.PlayCount) : artists.OrderByDescending(a => a.PlayCount),
+                SortEnum.AddedDate => ascending ? artists.OrderBy(a => a.CreationDate) : artists.OrderByDescending(a => a.CreationDate),
+                SortEnum.UpdatedDate => ascending ? artists.OrderBy(a => a.UpdateDate) : artists.OrderByDescending(a => a.UpdateDate),
+                _ => artists.OrderBy(a => a.Name),
+            };
+            return new(sortedArtists);
+        }
+
         public static List<Artist> FilterArtists(List<FilterModel> filters, string searchString, SortEnum sortEnum, bool ascending = false)
         {
             SaveFilter(filters, SettingsEnum.ArtistFilter);
@@ -111,8 +126,8 @@ namespace MusicPlayUI.Core.Helpers
 
             if (searchString.IsNotNullOrWhiteSpace())
             {
-                query = query.Where(a => a.Name.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)
-                                || a.Albums.Any(al => al.Name.StartsWith(searchString, StringComparison.CurrentCultureIgnoreCase)));
+                query = query.Where(a => a.Name.ToLower().Contains(searchString.ToLower())
+                                || a.Albums.Any(al => al.Name.ToLower().StartsWith(searchString.ToLower())));
             }
 
             query = sortEnum switch
@@ -127,10 +142,30 @@ namespace MusicPlayUI.Core.Helpers
             return [.. query];
         }
 
-        public static List<Album> FilterAlbum(List<FilterModel> filters, string searchString, SortEnum sortEnum, bool ascending = false)
+        public static List<Album> SortAlbums(this List<Album> albums, SortModel sortBy)
         {
+            bool ascending = sortBy.IsAscending;
+            IOrderedEnumerable<Album> sortedAlbums = sortBy.Type switch
+            {
+                SortEnum.AZ => ascending ? albums.OrderBy(a => a.Name) : albums.OrderByDescending(a => a.Name),
+                SortEnum.Year => ascending ? albums.OrderBy(a => a.ReleaseDate) : albums.OrderByDescending(a => a.ReleaseDate),
+                SortEnum.LastPlayed => ascending ? albums.OrderBy(a => a.LastPlayed) : albums.OrderByDescending(a => a.LastPlayed),
+                SortEnum.MostPlayed => ascending ? albums.OrderBy(a => a.PlayCount) : albums.OrderByDescending(a => a.PlayCount),
+                SortEnum.AddedDate => ascending ? albums.OrderBy(a => a.CreationDate) : albums.OrderByDescending(a => a.CreationDate),
+                SortEnum.UpdatedDate => ascending ? albums.OrderBy(a => a.UpdateDate) : albums.OrderByDescending(a => a.UpdateDate),
+                _ => albums.OrderBy(a => a.Name),
+            };
+            return new(sortedAlbums);
+        }
+
+
+
+        public static List<Album> FilterAlbum(List<FilterModel> filters, string searchString, SortModel sortBy)
+        {
+
+
             SaveFilter(filters, SettingsEnum.AlbumFilter);
-            SaveOrder(SettingsEnum.AlbumOrder, sortEnum, ascending);
+            SaveOrder(SettingsEnum.AlbumOrder, sortBy.Type, sortBy.IsAscending);
 
             if (filters.IsNullOrEmpty() && searchString.IsNullOrWhiteSpace())
             {
@@ -187,17 +222,17 @@ namespace MusicPlayUI.Core.Helpers
                                 || a.PrimaryArtist.Name.ToLower().StartsWith(searchString.ToLower()));
             }
 
-            query = sortEnum switch
+            query = sortBy.Type switch
             {
-                SortEnum.AZ => (ascending ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name)),
-                SortEnum.Year => (ascending ? query.OrderBy(a => a.ReleaseDate) : query.OrderByDescending(a => a.ReleaseDate)),
-                SortEnum.LastPlayed => (ascending ? query.OrderBy(a => a.LastPlayed) : query.OrderByDescending(a => a.LastPlayed)),
-                SortEnum.MostPlayed => (ascending ? query.OrderBy(a => a.PlayCount) : query.OrderByDescending(a => a.PlayCount)),
-                SortEnum.AddedDate => (ascending ? query.OrderBy(a => a.CreationDate) : query.OrderByDescending(a => a.CreationDate)),
-                SortEnum.UpdatedDate => (ascending ? query.OrderBy(a => a.UpdateDate) : query.OrderByDescending(a => a.UpdateDate)),
+                SortEnum.AZ => (sortBy.IsAscending ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name)),
+                SortEnum.Year => (sortBy.IsAscending ? query.OrderBy(a => a.ReleaseDate) : query.OrderByDescending(a => a.ReleaseDate)),
+                SortEnum.LastPlayed => (sortBy.IsAscending ? query.OrderBy(a => a.LastPlayed) : query.OrderByDescending(a => a.LastPlayed)),
+                SortEnum.MostPlayed => (sortBy.IsAscending ? query.OrderBy(a => a.PlayCount) : query.OrderByDescending(a => a.PlayCount)),
+                SortEnum.AddedDate => (sortBy.IsAscending ? query.OrderBy(a => a.CreationDate) : query.OrderByDescending(a => a.CreationDate)),
+                SortEnum.UpdatedDate => (sortBy.IsAscending ? query.OrderBy(a => a.UpdateDate) : query.OrderByDescending(a => a.UpdateDate)),
                 _ => query,
             };
-            return query.Include(a => a.PrimaryArtist).ToList();
+            return [.. query.Include(a => a.PrimaryArtist)];
         }
 
         public static async Task<List<Playlist>> FilterPlaylist(string searchString)

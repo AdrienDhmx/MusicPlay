@@ -12,17 +12,16 @@
              CornerRadius="4"
              BorderBrush="{DynamicResource Outline}"
              BorderThickness="1"
-             Padding="4"
-             MinWidth="150"
-             Margin="2,5,2,2">
-        <ItemsControl ItemsSource="{Binding DataContext.SortBy, ElementName=SortByPopup}"
+             Margin="2,16,16,2">
+        <ItemsControl ItemsSource="{Binding DataContext.SortOptions, ElementName=SortByPopup}"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Top">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border CornerRadius="4"
                             x:Name="ItemBorder"
-                            Padding="4,2">
+                            Padding="6"
+                            Cursor="Hand">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Background" Value="Transparent"/>
@@ -46,8 +45,9 @@
 
                             <Path Fill="{DynamicResource Primary}"
                                   Stretch="Uniform"
-                                  Width="14"
-                                  Height="14"
+                                  Width="18"
+                                  Height="16"
+                                  Margin="4, 4, 8, 4"
                                   VerticalAlignment="Center"
                                   HorizontalAlignment="Center"
                                   Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -63,7 +63,7 @@
                                 </Path.Style>
                             </Path>
 
-                            <TextBlock Text="{Binding SortName}"
+                            <TextBlock Text="{Binding Name}"
                                        Grid.Column="1">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock"
@@ -76,6 +76,7 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
+
                         </Grid>
                     </Border>
                 </DataTemplate>

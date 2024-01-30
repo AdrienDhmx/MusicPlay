@@ -12,7 +12,7 @@
         xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
         xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
         xmlns:messagehelper="clr-namespace:MessageControl;assembly=MessageControl"
-        xmlns:command="clr-namespace:MusicPlayUI.Core.Commands" xmlns:appBar="clr-namespace:MusicPlayUI.MVVM.Views.AppBars"
+        xmlns:command="clr-namespace:MusicPlayUI.Core.Commands" xmlns:appBar="clr-namespace:MusicPlayUI.MVVM.Views.AppBars" xmlns:mp="clr-namespace:ModalPopupControl;assembly=ModalPopupControl"
         mc:Ignorable="d"
         ResizeMode="CanResize"
         WindowStyle="SingleBorderWindow"
@@ -29,9 +29,7 @@
 
     <!-- Root Border -->
     <Border x:Name="WindowBorder"
-            Background="{DynamicResource Background}"
-
-            helper:OnMouseDownHelper.OnClickListener="{Binding .}">
+            Background="{DynamicResource Background}">
         <Border.Style>
             <Style TargetType="Border">
                 <Setter Property="BorderBrush" Value="{DynamicResource Background}"/>
@@ -232,19 +230,23 @@
 
 
             <!-- Popup Views -->
-            <Popup Placement="MousePoint"
-                StaysOpen="True"
-                HorizontalOffset="5"
-                VerticalOffset="5"
-                ClipToBounds="false"
-                Panel.ZIndex="80"
-                IsOpen="{Binding AppState.IsPopupOpen}"
-                 AllowsTransparency="True">
+            <mp:ModalPopup Placement="MousePoint"
+                        StaysOpen="False"
+                        HorizontalOffset="5"
+                        VerticalOffset="5"
+                        PopupAnimation="Fade"
+                        ClipToBounds="false"
+                        Panel.ZIndex="80"
+                           Effect="{DynamicResource FilterPanelDropShadow}"
+                        IsOpen="{Binding AppState.IsPopupOpen}"
+                         AllowsTransparency="True">
                 <ContentControl Content="{Binding AppState.CurrentPopup.ViewModel}"
+                                Margin="24"
                          ClipToBounds="false"
-                         Background="{DynamicResource Background}">
+                         Background="{DynamicResource Background}"
+                                Effect="{DynamicResource PopupDropShadow}">
                 </ContentControl>
-            </Popup>
+            </mp:ModalPopup>
         </Grid>
     </Border>
    

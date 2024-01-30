@@ -10,30 +10,37 @@
              mc:Ignorable="d" 
              x:Name="AddToPlaylistUC"
              d:DesignHeight="450" d:DesignWidth="800">
-<Border Background="#01ffffff"
+    <Border Background="#01ffffff"
         IsHitTestVisible="True"
             x:Name="PopupRootBorder">
         <Border Height="auto"
                 x:Name="PopupContentBorder"
+                Effect="{DynamicResource PopupSmallDropShadow}"
                 Background="{DynamicResource Background}"
                 BorderBrush="{DynamicResource Outline}"
                 BorderThickness="1"
                 Width="200"
-                MaxHeight="500"
-                    Margin="5,2, 5, 8"
-                CornerRadius="5">
+                MaxHeight="350"
+                Margin="5, 8, 8, 8"
+                CornerRadius="{DynamicResource PrimaryCornerRadius}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <Border Effect="{DynamicResource PageHeaderDropShadow}"
+                        Background="{DynamicResource Background}"
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}"/>
+                <Border Style="{DynamicResource BottomBlackGradientBorder}"
+                        Visibility="{Binding DataContext.UserPlaylists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Grid.Row="1"/>
                 <iconbtn:IconButton Icon="{DynamicResource CircledAddIcon}"
                                     HorizontalAlignment="Stretch"
                                     Height="40"
                                     IconWidth="25"
                                     IconHeight="25"
                                     IconStretch="Fill"
-                                    CornerRadius="5"
+                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
                                     StrokeColor="Transparent"

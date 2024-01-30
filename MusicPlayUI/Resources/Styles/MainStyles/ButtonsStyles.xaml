@@ -499,12 +499,17 @@
         <Setter Property="Margin" Value="10,0"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Padding" Value="5, 0"/>
+        <Setter Property="Command" Value="{Binding DataContext.OpenSortingPopupCommand, ElementName=RootView}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
             </Trigger>
-            <DataTrigger Binding="{Binding DataContext.IsSortingOpen, ElementName=RootView}" Value="True">
+            <DataTrigger Binding="{Binding DataContext.IsSortOptionsPopupOpen, ElementName=RootView}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+                <Setter Property="IsEnabled" Value="False"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -566,14 +571,6 @@
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
-    <Style x:Key="CreateBtn" TargetType="textbtn:TextButton"
-           BasedOn="{StaticResource OutlinedButton}">
-        <Setter Property="Width" Value="150"/>
-        <Setter Property="Height" Value="40"/>
-        <Setter Property="Text" Value="{x:Static lang:Resources.Create}"/>
-        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
-    </Style>
-
     <Style x:Key="SaveBtn" TargetType="textbtn:TextButton"
            BasedOn="{StaticResource BaseTextBtn}">
         <Setter Property="Width" Value="150"/>
@@ -607,6 +604,23 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="OutlinedButton" TargetType="textbtn:TextButton"
+           BasedOn="{StaticResource BaseTextBtn}">
+        <Setter Property="Width" Value="140"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+        <Setter Property="BorderBrush" Value="{Binding Foreground, RelativeSource={RelativeSource self}}"/>
+    </Style>
+
+    <Style x:Key="CreateBtn" TargetType="textbtn:TextButton"
+           BasedOn="{StaticResource OutlinedButton}">
+        <Setter Property="Width" Value="150"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Text" Value="{x:Static lang:Resources.Create}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+    </Style>
+
     <Style x:Key="EditBtn" TargetType="textbtn:TextButton"
            BasedOn="{StaticResource OutlinedButton}">
         <Setter Property="Width" Value="150"/>
@@ -619,15 +633,6 @@
                 <Setter Property="Foreground" Value="{DynamicResource Error}"/>
             </Trigger>
         </Style.Triggers>
-    </Style>
-
-    <Style x:Key="OutlinedButton" TargetType="textbtn:TextButton"
-           BasedOn="{StaticResource BaseTextBtn}">
-        <Setter Property="Width" Value="140"/>
-        <Setter Property="Height" Value="40"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
-        <Setter Property="BorderBrush" Value="{Binding Foreground, RelativeSource={RelativeSource self}}"/>
     </Style>
 
     <Style x:Key="PopupBtn" TargetType="textbtn:TextButton"

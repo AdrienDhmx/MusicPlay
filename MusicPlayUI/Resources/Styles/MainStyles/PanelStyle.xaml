@@ -28,6 +28,20 @@
                     Opacity="0.6"
                     Direction="-80"/>
 
+    <DropShadowEffect x:Key="PopupDropShadow" 
+                    Color="#101010"
+                    BlurRadius="20"
+                    ShadowDepth="2"
+                    Opacity="0.8"
+                    Direction="-80"/>
+
+    <DropShadowEffect x:Key="PopupSmallDropShadow" 
+                    Color="#101010"
+                    BlurRadius="12"
+                    ShadowDepth="2"
+                    Opacity="0.8"
+                    Direction="-80"/>
+
     <DropShadowEffect x:Key="MouseOverDropShadow" 
                     Color="#101010"
                     BlurRadius="16"
@@ -53,6 +67,11 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="PopupRootBorder" TargetType="Border">
+        <Setter Property="Margin" Value="20"/>
+        <Setter Property="Effect" Value="{DynamicResource PopupDropShadow}"/>
+    </Style>
+    
     <Style x:Key="PageHeaderBackground" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
         <Setter Property="Opacity" Value="0.2"/>
@@ -65,6 +84,28 @@
         <Setter Property="Grid.ColumnSpan" Value="3"/>
     </Style>
 
+    <Style x:Key="BottomBlackGradientBorder" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource BlackGradient}"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="Opacity" Value="0.8"/>
+        <Setter Property="Panel.ZIndex" Value="2"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="OpacityMask">
+            <Setter.Value>
+                <LinearGradientBrush  StartPoint="0,1"
+                          EndPoint="0,0">
+                    <GradientStop Color="#00000000" Offset="1"/>
+                    <GradientStop Color="#10000000" Offset="0.8"/>
+                    <GradientStop Color="#25000000" Offset="0.6"/>
+                    <GradientStop Color="#38000000" Offset="0.4"/>
+                    <GradientStop Color="#5a000000" Offset="0.2"/>
+                    <GradientStop Color="#5f000000" Offset="0"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <Style x:Key="RootDataBorder" TargetType="Border">
         <Setter Property="Padding" Value="20"/>

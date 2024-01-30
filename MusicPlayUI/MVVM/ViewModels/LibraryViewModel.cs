@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +10,7 @@ using DynamicScrollViewer;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Models;
 using MusicPlayUI.Core.Services;
+using MusicPlayUI.MVVM.Models;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -29,6 +32,12 @@ namespace MusicPlayUI.MVVM.ViewModels
         private int _totalFilteredItems = 0;
         private int _totalItemCount = 0;
 
+        private string _searchText = string.Empty;
+        private SortModel _sortBy;
+        private ObservableCollection<SortModel> _sortOptions;
+
+        private bool _isLoading = true;
+
         public int TotalFilteredItems
         {
             get => _totalFilteredItems;
@@ -41,8 +50,76 @@ namespace MusicPlayUI.MVVM.ViewModels
             set => SetField(ref _totalItemCount, value);
         }
 
+        public string SearchText
+        {
+            get { return _searchText; }
+            set
+            {
+                if (!IsLoading)
+                {
+                    if (string.IsNullOrWhiteSpace(SearchText) && string.IsNullOrWhiteSpace(value))
+                        return; // empty and no changes
+
+                    SetField(ref _searchText, value);
+                    LibraryState.SearchText = value;
+                    Task.Run(FilterSearch);
+                }
+            }
+        }
+
+        public SortModel SortBy
+        {
+            get { return _sortBy; }
+            set
+            {
+                SetField(ref _sortBy, value);
+                if (value is not null)
+                {
+                    LibraryState.SortBy = value;
+                }
+            }
+        }
+
+        public ObservableCollection<SortModel> SortOptions
+        {
+            get => _sortOptions;
+            set
+            {
+                SetField(ref _sortOptions, value);
+            }
+        }
+
+        private bool _isSortOptionsPopupOpen = false;
+        public bool IsSortOptionsPopupOpen
+        {
+            get { return _isSortOptionsPopupOpen; }
+            set
+            {
+                SetField(ref _isSortOptionsPopupOpen, value);
+            }
+        }
+
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
+
+        public ICommand OpenSortingPopupCommand { get; }
+        public ICommand SortCommand { get; }
         public LibraryViewModel()
         {
+
+            OpenSortingPopupCommand = new RelayCommand(() =>
+            {
+                IsSortOptionsPopupOpen = !IsSortOptionsPopupOpen;
+            });
+
+            SortCommand = new RelayCommand<SortModel>(UpdateSortBy);
         }
 
         internal virtual (bool, int, int) CanLoadNewItems(OnScrollEvent onScrollEvent)
@@ -79,11 +156,66 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         }
 
+        internal virtual void UpdateSortBy(SortModel sortBy)
+        {
+            if (sortBy is null)
+                return;
+
+            if (SortBy.Type == sortBy.Type)
+            {
+                SortBy.IsAscending = !SortBy.IsAscending;
+                sortBy.IsAscending = SortBy.IsAscending;
+            }
+            else
+            {
+                SortBy = sortBy;
+                foreach (SortModel sortOption in SortOptions)
+                {
+                    if (sortBy.Type == sortOption.Type)
+                    {
+                        sortOption.IsSelected = true;
+                        continue;
+                    }
+                    sortOption.IsSelected = false;
+                }
+            }
+            Sort();
+        }
+
+        internal virtual void Sort()
+        {
+
+        }
+
+        internal virtual void FilterSearch()
+        {
+
+        }
+
+        public override void Init()
+        {
+            base.Init();
+
+            _searchText = LibraryState.SearchText;
+            SortBy = LibraryState.SortBy;
+
+            if (SortBy is null)
+                return;
+
+            foreach (SortModel sortOption in SortOptions)
+            {
+                if (SortBy.Type == sortOption.Type)
+                {
+                    sortOption.IsSelected = true;
+                    continue;
+                }
+                sortOption.IsSelected = false;
+            }
+        }
+
         public override void UpdateAppBarStyle()
         {
-            AppBar.Reset();
-            AppBar.BackgroundOpacity = 0.05;
-            AppBar.Background = AppTheme.Palette.PrimaryContainer;
+            AppBar.SetStyle(AppTheme.Palette.PrimaryContainer, 0, 0, false);
         }
     }
 }

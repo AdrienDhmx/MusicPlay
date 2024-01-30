@@ -10,7 +10,9 @@
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
              xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" 
              xmlns:popupviews="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" 
+             xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer" 
+             xmlns:mp="clr-namespace:ModalPopupControl;assembly=ModalPopupControl"
              d:DataContext="{d:DesignInstance Type=viewmodels:AlbumLibraryViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
@@ -56,10 +58,10 @@
                                   Style="{DynamicResource NLargeSecondaryStyle}"/>
                     </StackPanel>
                     <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
-                                                            Grid.Column="1"
-                                                            HorizontalAlignment="Right"
-                                                                Style="{DynamicResource SearchBarStyle}"
-                                                                Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="Right"
+                                                        Style="{DynamicResource SearchBarStyle}"
+                                                        Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
             </Border>
 
@@ -81,15 +83,9 @@
                                                 DataContext="{Binding DataContext, ElementName=RootView}"/>
 
                 <textbtn:TextButton x:Name="SortBtn"
-                                        Grid.Column="2"
-                                           Style="{DynamicResource SortedByBtn}"
-                                        Height="25"
-                                        CornerRadius="4"
-                                        Padding="5,0"
-                                            Text="{Binding SelectedSorting.SortName, Converter={StaticResource AddTextConverter}, ConverterParameter={x:Static lang:Resources.SortedBy}}"
-                                            Background="Transparent"
-                                            MouseOverBtnColor="Transparent"
-                                            Command="{Binding OpenSortingPopupCommand}"/>
+                                    Grid.Column="2"
+                                    Text="{Binding DataContext.SortBy.Name, ElementName=RootView, Converter={StaticResource AddTextConverter}, ConverterParameter={x:Static lang:Resources.SortedBy}}"
+                                    Style="{DynamicResource SortedByBtn}"/>
             </Grid>
 
             <Grid  Grid.Row="2"
@@ -253,7 +249,7 @@
             <ds:DynamicScrollViewer OnScrollCommand="{Binding OnScrollCommand}"
                                     StartingVerticalOffset="{Binding LibraryState.ScrollOffset, Mode=OneTime}"
                                      CanMouseWheel="True"
-                                    IsInertiaEnabled="True">
+                                    IsInertiaEnabled="False">
                 <ItemsControl ItemsSource="{Binding Albums}"
                               HorizontalAlignment="Center"
                                 VerticalAlignment="Top">
@@ -281,12 +277,12 @@
                                 </Grid.RowDefinitions>
 
                                 <Border x:Name="MouseOverBorder"
-                            Grid.Row="0"
-                            Panel.ZIndex="3"
-                            Opacity="0"
-                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
-                            CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                            Background="{DynamicResource TransparentGradient}"/>
+                                        Grid.Row="0"
+                                            Panel.ZIndex="3"
+                                            Opacity="0"
+                                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
+                                            CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                            Background="{DynamicResource TransparentGradient}"/>
 
                                 <Border Style="{DynamicResource LibraryItemsRoundedImageBorder}"
                             x:Name="BorderImage">
@@ -299,11 +295,11 @@
                                 </Border>
 
                                 <Grid Opacity="0"
-                          VerticalAlignment="Bottom"
-                          Panel.ZIndex="4"
-                          Margin="12,5, 12, 5"
-                          IsHitTestVisible="True"
-                          x:Name="BtnGrid">
+                                      VerticalAlignment="Bottom"
+                                      Panel.ZIndex="4"
+                                      Margin="12,5, 12, 5"
+                                      IsHitTestVisible="True"
+                                      x:Name="BtnGrid">
 
                                     <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
                                             Command="{Binding DataContext.PlayAlbumCommand, ElementName=RootView}"
@@ -386,7 +382,8 @@
             </ds:DynamicScrollViewer>
         </Border>
 
-        <Popup IsOpen="{Binding IsSortingOpen}"
+        <mp:ModalPopup IsOpen="{Binding IsSortOptionsPopupOpen}"
+               x:Name="SortPopup"
                     StaysOpen="False"
                     AllowsTransparency="True"
                     Placement="Bottom"
@@ -394,6 +391,6 @@
                    HorizontalOffset="0"
                    VerticalOffset="3">
             <popupviews:SortByPopupView DataContext="{Binding DataContext, ElementName=RootView}"/>
-        </Popup>
+        </mp:ModalPopup>
     </Grid>
 </UserControl>
