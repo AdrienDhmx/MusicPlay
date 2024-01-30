@@ -17,6 +17,7 @@ using Root = LastFmNamespace.Models.Root;
 using MusicFilesProcessor.Helpers;
 using System.IO;
 using MusicFilesProcessor;
+using DynamicScrollViewer;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -393,8 +394,21 @@ namespace MusicPlayUI.MVVM.ViewModels
             QueueService.SetNewQueue(Tracks, Artist, Artist.Name, Artist.Cover, startingTrack, shuffle);
         }
 
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            AppBar.AnimateElevation(e.VerticalOffset);
+            base.OnScrollEvent(e);
+        }
+
+        public override void UpdateAppBarStyle()
+        {
+            AppBar.SetStyle(AppTheme.Palette.PrimaryContainer, 0, 0, false);
+            AppBar.SetForeground(AppTheme.Palette.OnPrimaryContainer);
+        }
+
         public override void Init()
         {
+            base.Init();
             Update();
         }
 
@@ -408,6 +422,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 Artist = (Artist)baseModel;
             }
+            AppBar.Title = Artist.Name;
 
             Genres = [..Artist.ArtistTags.Select(at => at.Tag)];
             List<Track> tracks = new();

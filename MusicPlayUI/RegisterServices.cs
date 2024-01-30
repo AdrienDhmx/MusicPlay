@@ -19,6 +19,8 @@ using System.Windows;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.MVVM.Windows;
+using MusicPlayUI.MVVM.Views.AppBars;
+using MusicPlayUI.MVVM.ViewModels.AppBars;
 
 namespace MusicPlayUI
 {
@@ -50,6 +52,9 @@ namespace MusicPlayUI
                 // Views
                 services.AddSingleton<MainMenuView>();
                 services.AddSingleton<MainMenuViewModel>();
+
+                services.AddSingleton<AppBarView>();
+                services.AddSingleton<AppBar>();
 
                 services.AddSingleton<PlayerControlView>();
                 services.AddSingleton<PlayerControlViewModel>();

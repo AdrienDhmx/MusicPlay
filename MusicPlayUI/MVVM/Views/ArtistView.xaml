@@ -9,145 +9,90 @@
              xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" 
-             xmlns:templates="clr-namespace:MusicPlayUI.MVVM.Views.Templates" xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
+             xmlns:templates="clr-namespace:MusicPlayUI.MVVM.Views.Templates" xmlns:mathconv="clr-namespace:MusicPlayUI.Converters" xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
              d:DataContext="{d:DesignInstance Type=viewmodels:ArtistViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid helper:ScrollViewerHelper.IsStickyEnabled="True"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=ArtistScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyPart}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Grid x:Name="StickyPart"
-              Panel.ZIndex="2"
-                MinHeight="125"
-                Height="200"
-                MaxHeight="200">
-            <Border Background="{DynamicResource Background}"
-                    Effect="{DynamicResource PageHeaderDropShadow}"/>
+    <ds:DynamicScrollViewer OnScrollCommand="{Binding OnScrollCommand}"
+                            IsInertiaEnabled="False"
+                            VerticalScrollBarVisibility="Hidden"
+                            CanMouseWheel="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
             <Border Style="{DynamicResource PageHeaderBackground}"/>
-            <Grid HorizontalAlignment="Stretch"
-                Margin="14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
 
-                <Border Visibility="Hidden"
-                            x:Name="BorderAnimationPercentage">
-                    <Border.Opacity>
-                        <!-- Map range the height of the sticky part to a 0 - 1 scale -->
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 125) / (200 - 125)">
-                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
-                        </MultiBinding>
-                    </Border.Opacity>
-                </Border>
+            <Border Margin="{Binding TopMargin}">
+                <Grid Panel.ZIndex="2"
+                        MinHeight="125"
+                        Height="200"
+                        MaxHeight="200">
+                    <Grid HorizontalAlignment="Stretch"
+                        Margin="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Artist Cover -->
+                        <Border Grid.RowSpan="2"
+                                Margin="8, 0, 20, 0"
+                                    CornerRadius="{Binding ActualWidth, RelativeSource={RelativeSource self}, Converter={StaticResource SizeConverter}, ConverterParameter='2'}"
+                                    Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
+                            <Border.Background>
+                                <ImageBrush ImageSource="{Binding Artist.Cover, Converter={StaticResource MNullImageConverter}, ConverterParameter=1}"
+                                                        Stretch="UniformToFill"/>
+                            </Border.Background>
+                        </Border>
 
-                <!-- Artist Cover -->
-                <Border Grid.RowSpan="2"
-                        Margin="8, 0, 20, 0"
-                            CornerRadius="{Binding ActualWidth, RelativeSource={RelativeSource self}, Converter={StaticResource SizeConverter}, ConverterParameter='2'}"
-                            Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
-                    <Border.Background>
-                        <ImageBrush ImageSource="{Binding Artist.Cover, Converter={StaticResource MNullImageConverter}, ConverterParameter=1}"
-                                                Stretch="UniformToFill"/>
-                    </Border.Background>
-                </Border>
+                        <!-- Artist Name + Duration + More Opt Btn -->
+                        <Grid VerticalAlignment="Top"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="0, 6, 0, 0"
+                              x:Name="GridArtistInfo"
+                                Grid.Column="1">
 
-                <!-- Artist Name + Duration + More Opt Btn -->
-                <Grid VerticalAlignment="Top"
-                          HorizontalAlignment="Stretch"
-                          Margin="0, 6, 0, 0"
-                      x:Name="GridArtistInfo"
-                        Grid.Column="1">
+                            <!--  Artist Name -->
+                            <TextBlock Text="{Binding Artist.Name}"
+                                            TextWrapping="Wrap"
+                                            TextTrimming="CharacterEllipsis"
+                                            HorizontalAlignment="Left"
+                                       VerticalAlignment="Bottom"
+                                            Style="{DynamicResource SLargeHeaderStyle}">
+                            </TextBlock>
+                        </Grid>
 
-                    <Grid.Height>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 30 * b) / 2">
-                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                        </MultiBinding>
-                    </Grid.Height>
+                        <!-- Action Buttons -->
+                        <StackPanel Orientation="Horizontal"
+                                     Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Left">
+                            <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
+                                                    Style="{DynamicResource FilledPlayBtn}"/>
 
-                    <!--  Artist Name -->
-                    <TextBlock Text="{Binding Artist.Name}"
-                                    TextWrapping="Wrap"
-                                    TextTrimming="CharacterEllipsis"
-                                    HorizontalAlignment="Left"
-                               VerticalAlignment="Bottom"
-                                    Style="{DynamicResource SLargeHeaderStyle}">
-                        <TextBlock.MaxWidth>
-                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - (1-b) * 182)">
-                                <Binding ElementName="GridArtistInfo" Path="ActualWidth"/>
-                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            </MultiBinding>
-                        </TextBlock.MaxWidth>
-                    </TextBlock>
+                            <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
+                                                    Style="{DynamicResource FilledPlayShuffleBtn}"/>
+
+                            <!-- More Option Button -->
+                            <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                                                            IconHeight="5"
+                                                            IconWidth="28"
+                                                                Icon="{DynamicResource MoreOptionIcon}"
+                                                                Command="{Binding OpenArtistPopupCommand}"
+                                                            CommandParameter="{Binding Artist}"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
+            </Border>
 
-                <Border Visibility="Hidden"
-                            MinWidth="50"
-                            x:Name="BorderButtonWidthValue">
-                    <Border.Width>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="80 * a + 48">
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                        </MultiBinding>
-                    </Border.Width>
-                </Border>
-
-                <!-- Action Buttons -->
-                <Border VerticalAlignment="Bottom"
-                        Grid.Column="1"
-                            MaxWidth="{Binding ActualWidth, ElementName=GridArtistInfo}"
-                            MinWidth="50"
-                            HorizontalAlignment="Left">
-                    <Border.Width>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(1 - a) * b + 340">
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            <Binding ElementName="GridArtistInfo" Path="ActualWidth"/>
-                        </MultiBinding>
-                    </Border.Width>
-
-                    <Border.Height>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="48 + b / (a + 2.5) * (1-a)">
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
-                        </MultiBinding>
-                    </Border.Height>
-
-                    <StackPanel Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right">
-                        <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
-                                            Style="{DynamicResource LargePlayButton}"
-                                            Width="{Binding Width, ElementName=BorderButtonWidthValue}"/>
-
-                        <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
-                                            Style="{DynamicResource LargePlayShuffleButton}"
-                                             Width="{Binding Width, ElementName=BorderButtonWidthValue}"/>
-
-                        <!-- More Option Button -->
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                    IconHeight="5"
-                                                    IconWidth="28"
-                                                        Icon="{DynamicResource MoreOptionIcon}"
-                                                        Command="{Binding OpenArtistPopupCommand}"
-                                                    CommandParameter="{Binding Artist}"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Grid>
-
-        <ScrollViewer x:Name="ArtistScroll"
-                      VerticalScrollBarVisibility="Hidden"
-                      Grid.Row="1">
             <Grid Margin="10,0"
-                  x:Name="ContentGrid">
+                  Grid.Row="1"
+                      x:Name="ContentGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -160,11 +105,11 @@
                 </Grid.RowDefinitions>
 
                 <!-- Genres -->
-                <listview:ChipListView Genres="{Binding Genres}"
-                                       NavigateToGenreCommand="{Binding NavigateToGenreCommand}"
-                                        Margin="0,10,0,0"
-                                        VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"/>
+                <listview:ChipListView Genres="{Binding Artist.Tags}"
+                                           NavigateToGenreCommand="{Binding NavigateToGenreCommand}"
+                                            Margin="0,10,0,0"
+                                            VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
 
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
@@ -172,21 +117,18 @@
                         </ColumnDefinition>
                         <ColumnDefinition MinWidth="250" Width="0.2*"/>
                     </Grid.ColumnDefinitions>
-
                     <templates:TextPreviewTemplate Text="{Binding Biography}"
-                                                   Visibility="{Binding Biography, Converter={StaticResource EmptyTextToVisibilityConverter}}"
-                                                    Margin="25, 15">
+                                                       Visibility="{Binding Biography, Converter={StaticResource EmptyTextToVisibilityConverter}}"
+                                                        Margin="25, 15">
                         <templates:TextPreviewTemplate.Width>
                             <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="a - 320">
                                 <Binding ElementName="ContentGrid" Path="ActualWidth"/>
                             </MultiBinding>
                         </templates:TextPreviewTemplate.Width>
                     </templates:TextPreviewTemplate>
-
-
                     <Grid Margin="2,10, 25, 10"
-                          HorizontalAlignment="Center"
-                            Grid.Column="1">
+                              HorizontalAlignment="Center"
+                                Grid.Column="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="150"/>
                             <ColumnDefinition Width="80"/>
@@ -198,23 +140,23 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Text="Track count"
-                                    FontWeight="SemiBold"
-                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
+                                        FontWeight="SemiBold"
+                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
 
                         <TextBlock Text="{Binding Tracks.Count}"
-                                   Grid.Column="1"
-                                    Style="{DynamicResource NLargeSecondaryStyle}"/>
+                                       Grid.Column="1"
+                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
 
 
                         <TextBlock Text="Length"
-                                   Grid.Row="1"
-                                    FontWeight="SemiBold"
-                                    Style="{DynamicResource NLargeSecondaryStyle}"/>
+                                       Grid.Row="1"
+                                        FontWeight="SemiBold"
+                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
 
                         <TextBlock Text="{Binding Artist.Duration}"
-                                   Grid.Row="1"
-                                    Grid.Column="1"
-                                    Style="{DynamicResource NLargeSecondaryStyle}"/>
+                                       Grid.Row="1"
+                                        Grid.Column="1"
+                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
                     </Grid>
                 </Grid>
 
@@ -226,7 +168,7 @@
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding MainAlbums.Count}"
-                                                             Value="0">
+                                                                 Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -234,18 +176,18 @@
                     </StackPanel.Style>
 
                     <templates:ListHeaderTemplate Header="{Binding MainAlbumsHeader}"
-                                                  HeaderCommand="{Binding ShowHideMainAlbumsCommand}"
-                                                  ContentVisibility="{Binding MainAlbumsVisibility}"
-                                                  PlayCommand="{Binding PlayAlbumsOnlyCommand}"
-                                                  PlayShuffledCommand="{Binding PlayAlbumsOnlyCommand}"/>
+                                                      HeaderCommand="{Binding ShowHideMainAlbumsCommand}"
+                                                      ContentVisibility="{Binding MainAlbumsVisibility}"
+                                                      PlayCommand="{Binding PlayAlbumsOnlyCommand}"
+                                                      PlayShuffledCommand="{Binding PlayAlbumsOnlyCommand}"/>
 
                     <!-- Albums -->
                     <listviews:AlbumListView Albums="{Binding MainAlbums}"
-                                             ShowArtist="false"
-                                             Visibility="{Binding MainAlbumsVisibility}"
-                                             Margin="30,5"/>
+                                                 ShowArtist="false"
+                                                 Visibility="{Binding MainAlbumsVisibility}"
+                                                 Margin="30,5"/>
                 </StackPanel>
-                
+
                 <!-- Singles & EP -->
                 <StackPanel Grid.Row="3">
                     <StackPanel.Style>
@@ -253,7 +195,7 @@
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SinglesAndEP.Count}"
-                                                             Value="0">
+                                                                 Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -261,16 +203,16 @@
                     </StackPanel.Style>
 
                     <templates:ListHeaderTemplate Header="{Binding SinglesAndEPHeader}"
-                                                  HeaderCommand="{Binding ShowHideSinglesAndEPCommand}"
-                                                  ContentVisibility="{Binding SinglesAndEPVisibility}"
-                                                  PlayCommand="{Binding PlaySinglesAndEpCommand}"
-                                                  PlayShuffledCommand="{Binding PlaySinglesAndEpCommand}"/>
+                                                      HeaderCommand="{Binding ShowHideSinglesAndEPCommand}"
+                                                      ContentVisibility="{Binding SinglesAndEPVisibility}"
+                                                      PlayCommand="{Binding PlaySinglesAndEpCommand}"
+                                                      PlayShuffledCommand="{Binding PlaySinglesAndEpCommand}"/>
 
                     <!-- Albums -->
                     <listviews:AlbumListView Albums="{Binding SinglesAndEP}"
-                                             ShowArtist="false"
-                                             Visibility="{Binding SinglesAndEPVisibility}"
-                                             Margin="30,5"/>
+                                                 ShowArtist="false"
+                                                 Visibility="{Binding SinglesAndEPVisibility}"
+                                                 Margin="30,5"/>
                 </StackPanel>
 
                 <!-- Featured in Albums -->
@@ -280,7 +222,7 @@
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding FeaturedInAlbum.Count}"
-                                                             Value="0">
+                                                                 Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -288,18 +230,18 @@
                     </StackPanel.Style>
 
                     <templates:ListHeaderTemplate Header="{Binding FeaturedInHeader}"
-                                                  HeaderCommand="{Binding ShowHideFeaturedAlbumsCommand}"
-                                                  ContentVisibility="{Binding FeaturedInAlbumsVisbility}"
-                                                  PlayCommand="{Binding PlayFeaturedInAlbumsCommand}"
-                                                  PlayShuffledCommand="{Binding PlayFeaturedInAlbumsCommand}"/>
+                                                      HeaderCommand="{Binding ShowHideFeaturedAlbumsCommand}"
+                                                      ContentVisibility="{Binding FeaturedInAlbumsVisbility}"
+                                                      PlayCommand="{Binding PlayFeaturedInAlbumsCommand}"
+                                                      PlayShuffledCommand="{Binding PlayFeaturedInAlbumsCommand}"/>
 
                     <!-- Albums -->
                     <listviews:AlbumListView Albums="{Binding FeaturedInAlbum}"
-                                             ShowArtist="false"
-                                             Visibility="{Binding FeaturedInAlbumsVisbility}"
-                                             Margin="30,5"/>
+                                                 ShowArtist="false"
+                                                 Visibility="{Binding FeaturedInAlbumsVisbility}"
+                                                 Margin="30,5"/>
                 </StackPanel>
-                
+
                 <!-- Composed Tracks -->
                 <StackPanel Grid.Row="5">
                     <StackPanel.Style>
@@ -307,7 +249,7 @@
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ComposedTracks.Count}"
-                                                             Value="0">
+                                                                 Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -315,16 +257,16 @@
                     </StackPanel.Style>
 
                     <templates:ListHeaderTemplate Header="{Binding ComposerOfHeader}"
-                                                  HeaderCommand="{Binding ShowHideComposedTracksCommand}"
-                                                  ContentVisibility="{Binding ComposedTracksVisibility}"
-                                                  PlayCommand="{Binding PlayComposedTracksCommand}"
-                                                  PlayShuffledCommand="{Binding PlayComposedTracksCommand}"/>
+                                                      HeaderCommand="{Binding ShowHideComposedTracksCommand}"
+                                                      ContentVisibility="{Binding ComposedTracksVisibility}"
+                                                      PlayCommand="{Binding PlayComposedTracksCommand}"
+                                                      PlayShuffledCommand="{Binding PlayComposedTracksCommand}"/>
 
                     <!--<listview:TrackListView TrackModels="{Binding ComposedTracks}"
-                                            Visibility="{Binding ComposedTracksVisibility}"
-                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
+                                                Visibility="{Binding ComposedTracksVisibility}"
+                                                CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
                 </StackPanel>
-                
+
                 <!-- Performed Tracks -->
                 <StackPanel Grid.Row="6">
                     <StackPanel.Style>
@@ -332,22 +274,22 @@
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding PerformedInTracks.Count}"
-                                                             Value="0">
+                                                                 Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    
+
                     <templates:ListHeaderTemplate Header="{Binding PerformedInHeader}"
-                                                  HeaderCommand="{Binding ShowHidePerformedTracksCommand}"
-                                                  ContentVisibility="{Binding PerformedTracksVisibility}"
-                                                  PlayCommand="{Binding PlayPerformedTracksCommand}"
-                                                  PlayShuffledCommand="{Binding PlayPerformedTracksCommand}"/>
+                                                      HeaderCommand="{Binding ShowHidePerformedTracksCommand}"
+                                                      ContentVisibility="{Binding PerformedTracksVisibility}"
+                                                      PlayCommand="{Binding PlayPerformedTracksCommand}"
+                                                      PlayShuffledCommand="{Binding PlayPerformedTracksCommand}"/>
 
                     <!--<listview:TrackListView TrackModels="{Binding PerformedInTracks}"
-                                            Visibility="{Binding PerformedTracksVisibility}"
-                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
+                                                Visibility="{Binding PerformedTracksVisibility}"
+                                                CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
                 </StackPanel>
 
                 <!-- Lyricist of Tracks -->
@@ -357,24 +299,24 @@
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding LyricistOfTracks.Count}"
-                                                             Value="0">
+                                                                 Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    
+
                     <templates:ListHeaderTemplate Header="{Binding LyricistOfHeader}"
-                                                  HeaderCommand="{Binding ShowHideLyricistTracksCommand}"
-                                                  ContentVisibility="{Binding LyricistTracksVisiblity}"
-                                                  PlayCommand="{Binding PlayLyricistOfTracksCommand}"
-                                                  PlayShuffledCommand="{Binding PlayLyricistOfTracksCommand}"/>
+                                                      HeaderCommand="{Binding ShowHideLyricistTracksCommand}"
+                                                      ContentVisibility="{Binding LyricistTracksVisiblity}"
+                                                      PlayCommand="{Binding PlayLyricistOfTracksCommand}"
+                                                      PlayShuffledCommand="{Binding PlayLyricistOfTracksCommand}"/>
 
                     <!--<listview:TrackListView TrackModels="{Binding LyricistOfTracks}"
-                                            Visibility="{Binding LyricistTracksVisiblity}"
-                                            CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
+                                                Visibility="{Binding LyricistTracksVisiblity}"
+                                                CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"/>-->
                 </StackPanel>
             </Grid>
-        </ScrollViewer>
-    </Grid>
+        </Grid>
+    </ds:DynamicScrollViewer>
 </UserControl>

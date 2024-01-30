@@ -152,15 +152,16 @@
         <Setter Property="IconStretch" Value="Uniform"/>
         <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
         <Setter Property="StrokeColor" Value="{DynamicResource PrimaryHover}"/>
-        <Setter Property="Opacity" Value="0.8"/>
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="IconOpacity" Value="0.85"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Trigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Duration="0:00:0.2"
-                             To="1" From="0.8"
-                             Storyboard.TargetProperty="Opacity"/>
+                             To="1" From="0.85"
+                             Storyboard.TargetProperty="IconOpacity"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.EnterActions>
@@ -168,8 +169,8 @@
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Duration="0:00:0.2"
-                             To="0.8" From="1"
-                             Storyboard.TargetProperty="Opacity"/>
+                             To="0.85" From="1"
+                             Storyboard.TargetProperty="IconOpacity"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.ExitActions>
@@ -202,7 +203,7 @@
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="FillColor" Value="{DynamicResource OnBackground}"/>
         <Setter Property="StrokeWidth" Value="0"/>
-        <Setter Property="Opacity" Value="0.85"/>
+        <Setter Property="IconOpacity" Value="0.85"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Trigger.EnterActions>
@@ -210,7 +211,7 @@
                         <Storyboard>
                             <DoubleAnimation Duration="0:00:0.1"
                                      To="1" From="0.85"
-                                     Storyboard.TargetProperty="Opacity"/>
+                                     Storyboard.TargetProperty="IconOpacity"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.EnterActions>
@@ -219,7 +220,7 @@
                         <Storyboard>
                             <DoubleAnimation Duration="0:00:0.1"
                                      To="0.85" From="1"
-                                     Storyboard.TargetProperty="Opacity"/>
+                                     Storyboard.TargetProperty="IconOpacity"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.ExitActions>
@@ -271,13 +272,14 @@
     </Style>
 
     <Style x:Key="MoreOptionIconButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource BaseIconButton}">
+           BasedOn="{StaticResource OpacityIconButton}">
         <Setter Property="FillColor" Value="{DynamicResource OnBackground}"/>
         <Setter Property="IconWidth" Value="32"/>
         <Setter Property="IconHeight" Value="6"/>
         <Setter Property="Width" Value="35"/>
         <Setter Property="Height" Value="20"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
+      
+        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="Icon" Value="{StaticResource MoreOptionIcon}"/>
     </Style>
 
@@ -392,16 +394,6 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="LargePlayButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource FilledBtn}">
-        <Setter Property="Icon" Value="{StaticResource PlayIcon}"/>
-    </Style>
-
-    <Style x:Key="LargePlayShuffleButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource FilledBtn}">
-        <Setter Property="Icon" Value="{StaticResource ShuffleIcon}"/>
-    </Style>
-
     <Style x:Key="SmallBtn" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Width" Value="48"/>
@@ -409,11 +401,29 @@
         <Setter Property="IconHeight" Value="22"/>
         <Setter Property="IconWidth" Value="20"/>
     </Style>
+    
+    <Style x:Key="FilledPlayBtn" TargetType="IconButton:IconButton"
+           BasedOn="{StaticResource FilledBtn}">
+        <Setter Property="Width" Value="100"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="IconHeight" Value="22"/>
+        <Setter Property="IconWidth" Value="20"/>
+        <Setter Property="Icon" Value="{StaticResource PlayIcon}"/>
+    </Style>
+
+    <Style x:Key="FilledPlayShuffleBtn" TargetType="IconButton:IconButton"
+           BasedOn="{StaticResource FilledBtn}">
+        <Setter Property="Width" Value="100"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="IconHeight" Value="22"/>
+        <Setter Property="IconWidth" Value="20"/>
+        <Setter Property="Icon" Value="{StaticResource ShuffleIcon}"/>
+    </Style>
+
 
     <Style x:Key="SmallPlayButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Icon" Value="{StaticResource PlayIcon}"/>
-
     </Style>
 
     <Style x:Key="SmallPlayShuffleButton" TargetType="IconButton:IconButton"
@@ -429,19 +439,21 @@
         <Setter Property="MouseOverBackground" Value="{DynamicResource ErrorHover}"/>
     </Style>
 
-    <Style x:Key="BackButton" TargetType="IconButton:IconButton"
-           BasedOn="{StaticResource BaseIconButton}">
+    <Style x:Key="NavigationButton" TargetType="IconButton:IconButton"
+           BasedOn="{StaticResource OpacityIconButton}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"/>
         <Setter Property="IconHeight" Value="18"/>
         <Setter Property="IconWidth" Value="18"/>
-        <Setter Property="Icon" Value="{StaticResource Back}"/>
         <Setter Property="IconStretch" Value="Uniform"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource PrimaryHover}"/>
         <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
-        <Setter Property="StrokeColor" Value="{DynamicResource OnPrimaryContainer}"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="CloseModalBtn" TargetType="IconButton:IconButton"
@@ -555,7 +567,7 @@
     </Style>
 
     <Style x:Key="CreateBtn" TargetType="textbtn:TextButton"
-           BasedOn="{StaticResource BaseTextBtn}">
+           BasedOn="{StaticResource OutlinedButton}">
         <Setter Property="Width" Value="150"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="Text" Value="{x:Static lang:Resources.Create}"/>
@@ -596,7 +608,7 @@
     </Style>
 
     <Style x:Key="EditBtn" TargetType="textbtn:TextButton"
-           BasedOn="{StaticResource BaseTextBtn}">
+           BasedOn="{StaticResource OutlinedButton}">
         <Setter Property="Width" Value="150"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>

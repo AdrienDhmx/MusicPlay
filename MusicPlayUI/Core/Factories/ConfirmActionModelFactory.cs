@@ -2,6 +2,7 @@
 using MusicPlay.Database.Models;
 using MusicPlay.Language;
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Services;
 using MusicPlayUI.MVVM.Models;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,10 @@ namespace MusicPlayUI.Core.Factories
 {
     public static class ConfirmActionModelFactory
     {
-        private static SolidColorBrush RedColor => (SolidColorBrush)App.appThemeDic["ErrorHover"];
-        private static SolidColorBrush MainHoverColor => (SolidColorBrush)App.appThemeDic["PrimaryHover"];
-        private static SolidColorBrush OnRedColor => (SolidColorBrush)App.appThemeDic["Error"];
-        private static SolidColorBrush OnMainHoverColor => (SolidColorBrush)App.appThemeDic["Primary"];
+        private static SolidColorBrush RedColor => (SolidColorBrush)AppTheme.AppThemeDic["ErrorHover"];
+        private static SolidColorBrush MainHoverColor => (SolidColorBrush)AppTheme.AppThemeDic["PrimaryHover"];
+        private static SolidColorBrush OnRedColor => (SolidColorBrush)AppTheme.AppThemeDic["Error"];
+        private static SolidColorBrush OnMainHoverColor => (SolidColorBrush)AppTheme.AppThemeDic["Primary"];
 
         public static ConfirmActionModel CreateConfirmModel(this string confirmAction, string message, string messageDetail = "", Brush actionColor = null)
         {

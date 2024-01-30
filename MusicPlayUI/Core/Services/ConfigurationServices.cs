@@ -103,6 +103,7 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.NowPlaying => Settings.Default.NavNowPlayingShortcut,
                 SettingsEnum.Settings => Settings.Default.NavSettingsShortcut,
                 SettingsEnum.Back => Settings.Default.NavBackShortcut,
+                SettingsEnum.Forward => Settings.Default.NavForwardShortcut,
                 SettingsEnum.ToggleFullScreen => Settings.Default.ToggleFullScreenShortcut,
                 SettingsEnum.EscapeFullScreen => Settings.Default.EscapeFullScreenShortcut,
                 SettingsEnum.ToggleTheme => Settings.Default.ToggleLightThemeShortcut,

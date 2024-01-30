@@ -57,13 +57,21 @@ namespace MusicPlayUI.Core.Models
     public class NavigationState : ObservableObject
     {
         private BaseModel _parameter;
+        private double _scrollOffset;
+        private NavigationModel _childViewModel;
+
         public BaseModel Parameter
         {
             get => _parameter;
             set => SetField(ref _parameter, value);
         }
 
-        private NavigationModel _childViewModel;
+        public double ScrollOffset
+        {
+            get => _scrollOffset;
+            set => SetField(ref _scrollOffset, value);
+        }
+
         public NavigationModel ChildViewModel
         {
             get => _childViewModel;
@@ -76,6 +84,39 @@ namespace MusicPlayUI.Core.Models
         public NavigationState(BaseModel parameters)
         {
             Parameter = parameters;
+        }
+
+        public NavigationState(BaseModel parameters, NavigationModel childViewModel)
+        {
+            Parameter = parameters;
+            ChildViewModel = childViewModel;
+        }
+    }
+
+    public class LibraryNavigationState : NavigationState
+    {
+        private int _page = 1;
+        private int _itemPerPage = 25;
+
+        public int Page
+        {
+            get => _page;
+            set => SetField(ref _page, value);
+        }
+
+        public int ItemPerPage
+        {
+            get => _itemPerPage;
+            set => SetField(ref _itemPerPage, value);
+        }
+
+        public LibraryNavigationState(BaseModel parameters) : base(parameters)
+        {
+        }
+
+        public LibraryNavigationState(NavigationState navigationState) : base(navigationState.Parameter, navigationState.ChildViewModel)
+        {
+            ScrollOffset = navigationState.ScrollOffset;
         }
     }
 }

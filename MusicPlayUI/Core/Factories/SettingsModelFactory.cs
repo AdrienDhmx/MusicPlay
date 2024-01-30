@@ -31,7 +31,7 @@ namespace MusicPlayUI.Core.Factories
 
         public static List<AppThemeModel> GetExistingThemes()
         {
-            if (AppThemeService.IsLightTheme)
+            if (AppTheme.IsLightTheme)
             {
                 return new()
                 {

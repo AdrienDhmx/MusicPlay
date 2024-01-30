@@ -110,11 +110,6 @@ namespace AudioHandler
         private void AudioPlayback_StreamChanged()
         {
             _audioTimer.Stop();
-            _onStreamChangedCallbacks?.Invoke();
-
-            _halfWayThroughPassed = false;
-            StreamSkippedDurationMs = 0;
-            _previousTickStreamPosition = -1;
 
             if (_audioPlayback.Stream == -1)
             {
@@ -127,6 +122,12 @@ namespace AudioHandler
                 StreamPositionMs = _audioPlayback.Position.TotalMilliseconds;
                 _audioTimer.Start();
             }
+
+            _onStreamChangedCallbacks?.Invoke();
+
+            _halfWayThroughPassed = false;
+            StreamSkippedDurationMs = 0;
+            _previousTickStreamPosition = -1;
         }
 
         /// <summary>

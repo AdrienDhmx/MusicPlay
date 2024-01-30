@@ -778,5 +778,17 @@ namespace MusicPlayUI {
                 this["ColorfulPlayerControl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string NavForwardShortcut {
+            get {
+                return ((string)(this["NavForwardShortcut"]));
+            }
+            set {
+                this["NavForwardShortcut"] = value;
+            }
+        }
     }
 }

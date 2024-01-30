@@ -10,7 +10,7 @@
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
              xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" 
              xmlns:popupviews="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
              d:DataContext="{d:DesignInstance Type=viewmodels:AlbumLibraryViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
@@ -38,28 +38,30 @@
                     Effect="{DynamicResource PageHeaderDropShadow}"
                     Visibility="{Binding IsFilterOpen, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                     Grid.RowSpan="3"/>
-
+            
             <Border Style="{DynamicResource PageHeaderBackgroundLight}"/>
 
-            <Grid  Margin="30,10"
-                   ClipToBounds="false">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="{x:Static lang:Resources.MyAlbums}"
-                               Style="{DynamicResource SLargeHeaderStyle}"/>
+            <Border Margin="{Binding TopMargin}">
+                <Grid  Margin="30, 0"
+                       ClipToBounds="false">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{x:Static lang:Resources.MyAlbums}"
+                                   Style="{DynamicResource SLargeHeaderStyle}"/>
 
-                    <TextBlock Text="{Binding AlbumCount}"
-                              Style="{DynamicResource NLargeSecondaryStyle}"/>
-                </StackPanel>
-                <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
-                                                        Grid.Column="1"
-                                                        HorizontalAlignment="Right"
-                                                            Style="{DynamicResource SearchBarStyle}"
-                                                            Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
-            </Grid>
+                        <TextBlock Text="{Binding AlbumCount}"
+                                  Style="{DynamicResource NLargeSecondaryStyle}"/>
+                    </StackPanel>
+                    <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
+                                                            Grid.Column="1"
+                                                            HorizontalAlignment="Right"
+                                                                Style="{DynamicResource SearchBarStyle}"
+                                                                Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
+            </Border>
 
             <Grid Margin="30, 0, 30, 6"
                   ClipToBounds="false"
@@ -246,12 +248,142 @@
 
         <Border Grid.Row="1"
                 Panel.ZIndex="0"
-                Background="{DynamicResource Background}"
-                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverterInverted}}">
+                Background="{DynamicResource Background}">
 
-            <listviews:AlbumListView Albums="{Binding Albums}"
-                                         HorizontalAlignment="Center"
-                                         x:Name="Albums"/>
+            <ds:DynamicScrollViewer OnScrollCommand="{Binding OnScrollCommand}"
+                                    StartingVerticalOffset="{Binding LibraryState.ScrollOffset, Mode=OneTime}"
+                                     CanMouseWheel="True"
+                                    IsInertiaEnabled="True">
+                <ItemsControl ItemsSource="{Binding Albums}"
+                              HorizontalAlignment="Center"
+                                VerticalAlignment="Top">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                       IsItemsHost="true"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid x:Name="itemgrid"
+                                    Style="{DynamicResource LibraryItemsRootGrid}">
+                                <Grid.InputBindings>
+                                    <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToAlbumCommand, ElementName=RootView}"
+                                                  CommandParameter="{Binding }"/>
+                                    <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=RootView}"
+                                                  CommandParameter="{Binding }"/>
+                                </Grid.InputBindings>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Border x:Name="MouseOverBorder"
+                            Grid.Row="0"
+                            Panel.ZIndex="3"
+                            Opacity="0"
+                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
+                            CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                            Background="{DynamicResource TransparentGradient}"/>
+
+                                <Border Style="{DynamicResource LibraryItemsRoundedImageBorder}"
+                            x:Name="BorderImage">
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="{Binding AlbumCover, Converter={StaticResource MNullImageConverter}}"
+                                        Stretch="UniformToFill"
+                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                        RenderOptions.EdgeMode="Unspecified"/>
+                                    </Border.Background>
+                                </Border>
+
+                                <Grid Opacity="0"
+                          VerticalAlignment="Bottom"
+                          Panel.ZIndex="4"
+                          Margin="12,5, 12, 5"
+                          IsHitTestVisible="True"
+                          x:Name="BtnGrid">
+
+                                    <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
+                                            Command="{Binding DataContext.PlayAlbumCommand, ElementName=RootView}"
+                                            CommandParameter="{Binding .}"/>
+
+                                    <iconbtn:IconButton Style="{DynamicResource CircledMoreOptionButton}"
+                                                Command="{Binding DataContext.OpenAlbumPopupCommand, ElementName=RootView}"
+                                            CommandParameter="{Binding .}"/>
+                                </Grid>
+
+                                <TextBlock Text="{Binding Name}"
+                                Style="{DynamicResource SListItemNameStyle}"
+                               Panel.ZIndex="3"
+                               HorizontalAlignment="Left"
+                               TextAlignment="Left"
+                               Padding="2, 2, 2, 0"
+                                Grid.Row="1"/>
+
+                                <TextBlock Text="{Binding PrimaryArtist.Name}"
+                                        Style="{DynamicResource SListItemNameStyle}"
+                                       Panel.ZIndex="3"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis"
+                                       HorizontalAlignment="Left"
+                                       TextAlignment="Left"
+                                       FontSize="14"
+                                       Padding="2, 0"
+                                       FontWeight="Normal"
+                                       Foreground="{DynamicResource OnSurfaceVariant}"
+                                        Grid.Row="2"/>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True" SourceName="itemgrid">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Duration="0:0:0.1"
+                                                          To="1" From="0"
+                                                          Storyboard.TargetName="MouseOverBorder"
+                                                         Storyboard.TargetProperty="Opacity">
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Duration="0:0:0.1"
+                                                          To="1" From="0"
+                                                          Storyboard.TargetName="BtnGrid"
+                                                         Storyboard.TargetProperty="Opacity">
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                    <Trigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Duration="0:0:0.1"
+                                                          To="0" From="1"
+                                                          Storyboard.TargetName="MouseOverBorder"
+                                                         Storyboard.TargetProperty="Opacity">
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Duration="0:0:0.1"
+                                                          To="0" From="1"
+                                                          Storyboard.TargetName="BtnGrid"
+                                                         Storyboard.TargetProperty="Opacity">
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.ExitActions>
+
+                                </Trigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ds:DynamicScrollViewer>
         </Border>
 
         <Popup IsOpen="{Binding IsSortingOpen}"

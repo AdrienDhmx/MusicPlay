@@ -3,19 +3,31 @@ using System.Collections.Generic;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Models;
 using MusicPlayUI.MVVM.ViewModels;
+using MusicPlayUI.MVVM.ViewModels.AppBars;
 
 namespace MusicPlayUI.Core.Services.Interfaces
 {
     public interface IAppState
     {
+        AppBar AppBar { get; }
         NavigationModel CurrentPopup { get; set; }
         NavigationModel CurrentView { get; set; }
         bool IsFullScreen { get; set; }
-        bool IsPopupOpen { get; set; }
+        bool IsMenuDrawerOpen { get; set; }
         bool IsQueueDrawerOpen { get; set; }
+        bool IsPopupOpen { get; set; }
+
+        bool CanNavigateBack { get; set; }
+        bool CanNavigateForward { get; set; }
 
         event Action FullScreenChanged;
         event Action CurrentViewChanged;
+
+        /// <summary>
+        /// Set the app bar
+        /// </summary>
+        /// <param name="appBar"></param>
+        void SetAppBar(AppBar appBar);
 
         /// <summary>
         /// Navigate to the last page in the Back stack of the history,
@@ -104,6 +116,12 @@ namespace MusicPlayUI.Core.Services.Interfaces
         /// Toggle the application between full-screen and windowed mode.
         /// </summary>
         void ToggleFullScreen();
+
+        /// <summary>
+        /// Toggle the visibility of the menu drawer.
+        /// </summary>
+        void ToggleMenuDrawer();
+
         /// <summary>
         /// Toggle the visibility of the queue drawer.
         /// </summary>

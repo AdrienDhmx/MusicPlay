@@ -25,7 +25,7 @@ namespace MusicPlay.Database.Models
 
         private ObservableCollection<ArtistRole> _artistRole = [];
         private List<Album> _albums;
-        private ObservableCollection<ArtistTag> _artistTags = [];
+        private List<ArtistTag> _artistTags = [];
         private ObservableCollection<Track> _tracks = [];
 
         public int? CountryId { get; set; }
@@ -150,10 +150,35 @@ namespace MusicPlay.Database.Models
             }
         }
 
-        public ObservableCollection<ArtistTag> ArtistTags
+        public List<ArtistTag> ArtistTags
         {
-            get => _artistTags;
+            get 
+            { 
+                if(_artistTags.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _artistTags = [..context.ArtistTags.Where(at => at.ArtistId == Id)
+                                                        .Include(at => at.Tag)];
+                }
+                return _artistTags;
+            }
             set => SetField(ref _artistTags, value);
+        }
+
+        private ObservableCollection<Tag> _tags;
+        [NotMapped]
+        public ObservableCollection<Tag> Tags
+        {
+            get
+            {
+                if(_tags.IsNullOrEmpty())
+                {
+                    _tags = new(ArtistTags.Select(t => t.Tag));
+                }
+
+                return _tags;
+            }
+            set => SetField(ref _tags, value);
         }
 
         public string Birth

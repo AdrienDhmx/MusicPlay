@@ -1,0 +1,104 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.AppBars.AppBarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.AppBars" 
+             xmlns:iconbutton="clr-namespace:IconButton;assembly=IconButton" 
+             xmlns:appbars="clr-namespace:MusicPlayUI.MVVM.ViewModels.AppBars" d:DataContext="{d:DesignInstance Type=appbars:AppBar}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Height="{Binding Height}"
+          Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="140"/>
+        </Grid.ColumnDefinitions>
+
+		<Border Grid.ColumnSpan="3"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="{DynamicResource Background}"
+                Visibility="{Binding ApplyDropShadow, Converter={StaticResource BoolToVisibilityConverter}}"
+                Effect="{Binding DropShadowEffect}">
+        </Border>
+
+        <Border Grid.ColumnSpan="3"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="{Binding Background}"
+                Opacity="{Binding BackgroundOpacity}">
+        </Border>
+
+        <!-- menu drawer toggle button + navigation back/forward -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <iconbutton:IconButton Style="{DynamicResource OpacityIconButton}"
+                                   Icon="{DynamicResource MenuIcon}"
+                                   Width="60"
+                                   Height="60"
+                                   IconWidth="22"
+                                   IconHeight="18"
+                                   Margin="0, 0, 10, 0"
+                                   FillColor="{Binding Foreground}"
+                                   StrokeColor="Transparent"
+                                  Command="{Binding ToggleMenuDrawerCommand}"/>
+
+            <iconbutton:IconButton  Grid.Column="1"
+                                    Style="{DynamicResource NavigationButton}"
+                                    FillColor="{Binding Foreground}"
+                                   Icon="{DynamicResource Back}"
+                                    IsEnabled="{Binding AppState.CanNavigateBack, UpdateSourceTrigger=PropertyChanged}"
+                                  Command="{Binding NavigateBackCommand}"/>
+
+            <iconbutton:IconButton Grid.Column="2"
+                                   Style="{DynamicResource NavigationButton}"
+                                   FillColor="{Binding Foreground}"
+                                   Icon="{DynamicResource Forward}"
+                                   IsEnabled="{Binding AppState.CanNavigateForward, UpdateSourceTrigger=PropertyChanged}"
+                                  Command="{Binding NavigateForwardCommand}"/>
+        </Grid>
+
+        <!-- The main content (Title, Subtitle, Image, Icon...) -->
+        <Grid HorizontalAlignment="Stretch"
+              Grid.Column="1"
+              Opacity="{Binding ContentOpacity}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+			<StackPanel Orientation="Vertical"
+						VerticalAlignment="Center">
+                <TextBlock Style="{DynamicResource NLargeStyle}"
+                           Text="{Binding Title}"
+                           Foreground="{Binding Foreground}"
+                           FontSize="{Binding TitleFontSize}"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="NoWrap"/>
+                
+                <TextBlock Style="{DynamicResource NSmallSecondayStyle}"
+                           Grid.Row="1"
+                           Text="{Binding Subtitle}"
+                           Foreground="{Binding SecondaryForeground}"
+                           Visibility="{Binding Subtitle.Length, Converter={StaticResource BoolToVisibilityConverter}}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="NoWrap"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Additional options to come => Profile, Search... -->
+        <Grid Grid.Column="2"
+              HorizontalAlignment="Right">
+
+        </Grid>
+    </Grid>
+</UserControl>

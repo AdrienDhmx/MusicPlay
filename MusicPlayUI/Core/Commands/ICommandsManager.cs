@@ -14,8 +14,11 @@ namespace MusicPlayUI.Core.Commands
         ICommand MaximizeCommand { get; }
         ICommand MinimizeCommand { get; }
         ICommand MuteVolumeCommand { get; }
+
         ICommand NavigateCommand { get; }
         ICommand NavigateBackCommand { get; }
+        ICommand NavigateForwardCommand { get; }
+
         ICommand NavigateToAlbumByIdCommand { get; }
         ICommand NavigateToArtistByIdCommand { get; }
         ICommand NavigateToGenreCommand { get; }
@@ -28,6 +31,7 @@ namespace MusicPlayUI.Core.Commands
         ICommand OpenTagPopupCommand { get; }
         ICommand OpenPlaylistPopupCommand { get; }
         ICommand NextTrackCommand { get; }
+        ICommand ToggleMenuDrawerCommand { get; }
         ICommand ToggleQueueDrawerCommand { get; }
 
         ICommand UpdateAlbumCover { get; }

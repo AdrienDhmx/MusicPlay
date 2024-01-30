@@ -15,10 +15,11 @@ using System.Timers;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Models;
 using MusicPlayUI.MVVM.ViewModels.PopupViewModels;
+using DynamicScrollViewer;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
-    public class AlbumLibraryViewModel : ViewModel
+    public class AlbumLibraryViewModel : LibraryViewModel
     {
         private readonly IQueueService _queueService;
 
@@ -95,6 +96,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
+        private List<Album> AllFilteredAlbums { get; set; } = [];
+
         private ObservableCollection<Album> _albums;
         public ObservableCollection<Album> Albums
         {
@@ -168,8 +171,6 @@ namespace MusicPlayUI.MVVM.ViewModels
                 SetField(ref _sortBy, value);
             }
         }
-
-        private int _totalAlbumCount { get; set; }
 
         public ICommand PlayAlbumCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
@@ -314,23 +315,49 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void FilterSearch()
         {
-            List<Album> albumModels = SearchHelper.FilterAlbum([.. SelectedFilters], SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending);
-            Albums = new(albumModels);
+            AllFilteredAlbums = SearchHelper.FilterAlbum([.. SelectedFilters], SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending);
+            LibraryState.Page = 1; // reset pagination
+            PaginateData();
 
             NoAlbumFoundVisibility = Albums.Count == 0;
-            AlbumCount = $"{Albums.Count} of {_totalAlbumCount}";
+            TotalFilteredItems = AllFilteredAlbums.Count;
+            AlbumCount = $"{TotalFilteredItems} of {TotalItemCount}";
+        }
+
+        private void PaginateData()
+        {
+            int endIndex = LibraryState.Page * LibraryState.ItemPerPage;
+
+            if(endIndex > AllFilteredAlbums.Count)
+            {
+                Albums = new(AllFilteredAlbums);
+            }
+            else
+            {
+                Albums = new(AllFilteredAlbums.Take(endIndex)); 
+            }
+        }
+
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            (bool canAddItems, int startIndex, int endIndex) = base.CanLoadNewItems(e);
+            if(canAddItems)
+            {
+                for(int i = startIndex; i < endIndex; i++)
+                {
+                    Albums.Add(AllFilteredAlbums[i]);
+                }
+            }
+            base.OnScrollEvent(e);
         }
 
         public override void Init()
         {
-            IsLoading = true;
+            base.Init();
 
             InitData();
-            _totalAlbumCount = Album.Count();
-
+            TotalItemCount = Album.Count();
             FilterSearch();
-
-            IsLoading = false;
         }
 
         public override void Update(BaseModel parameter = null)

@@ -1,6 +1,5 @@
 ﻿using AudioHandler;
-
-
+using DynamicScrollViewer;
 using MusicPlay.Database.Enums;
 using MusicPlay.Database.Models;
 using MusicPlay.Language;
@@ -23,7 +22,7 @@ using System.Windows.Navigation;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
-    public class ArtistLibraryViewModel : ViewModel
+    public class ArtistLibraryViewModel : LibraryViewModel
     {
         private readonly IQueueService _queueService;
         private readonly ICommandsManager _commandsManager;
@@ -86,19 +85,22 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<Artist> _bindedArtists;
-        public ObservableCollection<Artist> BindedArtists
+        private List<Artist> AllFilteredArtists = [];
+
+        private ObservableCollection<Artist> _artists;
+        public ObservableCollection<Artist> Artists
         {
             get
             {
-                return _bindedArtists;
+                return _artists;
             }
             set
             {
-                _bindedArtists = value;
-                OnPropertyChanged(nameof(BindedArtists));
+                _artists = value;
+                OnPropertyChanged(nameof(Artists));
             }
         }
+
         private ObservableCollection<FilterModel> _selectedFilters;
         public ObservableCollection<FilterModel> SelectedFilters
         {
@@ -260,8 +262,6 @@ namespace MusicPlayUI.MVVM.ViewModels
                 }
                 FilterSearch();
             });
-
-            Task.Run(InitData);
         }
 
         public override void Dispose()
@@ -277,10 +277,46 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void FilterSearch()
         {
-            BindedArtists = new(SearchHelper.FilterArtists([.. SelectedFilters], SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending));
+            AllFilteredArtists = SearchHelper.FilterArtists([.. SelectedFilters], SearchText, SelectedSorting.SortType, SelectedSorting.IsAscending);
+            LibraryState.Page = 1; // reset pagination
+            PaginateData();
 
-            NoArtistFoundVisbility = BindedArtists.Count == 0;
-            ArtistCount = $"{BindedArtists.Count} of {TotalArtistCount}";
+            TotalFilteredItems = AllFilteredArtists.Count;
+            NoArtistFoundVisbility = Artists.Count == 0;
+            ArtistCount = $"{TotalFilteredItems} of {TotalArtistCount}";
+        }
+
+        private void PaginateData()
+        {
+            int endIndex = LibraryState.Page * LibraryState.ItemPerPage;
+
+            if (endIndex > AllFilteredArtists.Count)
+            {
+                Artists = new(AllFilteredArtists);
+            }
+            else
+            {
+                Artists = new(AllFilteredArtists.Take(endIndex));
+            }
+        }
+
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            (bool canAddItems, int startIndex, int endIndex) = base.CanLoadNewItems(e);
+            if (canAddItems)
+            {
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    Artists.Add(AllFilteredArtists[i]);
+                }
+            }
+            base.OnScrollEvent(e);
+        }
+
+        public override void Init()
+        {
+            base.Init();
+            InitData();
         }
 
         private void InitData()

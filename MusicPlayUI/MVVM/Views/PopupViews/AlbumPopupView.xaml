@@ -56,10 +56,14 @@
                                MaxWidth="380">
 
                     </TextBlock>
-                    <listview:TrackArtistsListView Artists="{Binding Album.Artists}"
-                                                   FontSize="14"
-                                                   Foreground="{DynamicResource OnBackground}"
-                                                   Command="{Binding NavigateToArtistCommand}"/>
+                    <TextBlock Text="{Binding Album.PrimaryArtist.Name}"
+                                    FontSize="14"
+                               Style="{DynamicResource NLSmallSecondaryStyle}">
+                        <TextBlock.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToArtistByIdCommand, ElementName=RootView}"
+                                          CommandParameter="{Binding Album.PrimaryArtist.Id}"/>
+                        </TextBlock.InputBindings>
+                    </TextBlock>
                 </StackPanel>
 
             </StackPanel>

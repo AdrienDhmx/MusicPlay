@@ -48,7 +48,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand RemoveAlbumTagCommand { get; }
         public ICommand ChangeCoverCommand { get; }
         public ICommand CreatePlaylistCommand { get; }
-        public ICommand NavigateToArtistCommand { get; }
+        public ICommand NavigateToArtistByIdCommand { get; }
         public ICommand CreateTagCommand { get; }
         public AlbumPopupViewModel(IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager) : base(modalService)
         {
@@ -61,7 +61,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             AddToPlaylistCommand = new RelayCommand<Playlist>(async (playlist) => await AddToPlaylist(playlist));
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
             ChangeCoverCommand = new RelayCommand(async () => await ChangeCover());
-            NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
+            NavigateToArtistByIdCommand = _commandsManager.NavigateToArtistByIdCommand;
 
             CreateTagCommand = new RelayCommand(() => CreateTag(Album));
             AddToTagCommand = new RelayCommand<Tag>(async (tag) => await AddToTag(tag, Album));

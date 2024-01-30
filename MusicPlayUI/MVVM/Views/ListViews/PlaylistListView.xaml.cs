@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MusicPlayUI.MVVM.Views.Windows;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {
@@ -23,6 +24,16 @@ namespace MusicPlayUI.MVVM.Views.ListViews
         public PlaylistListView()
         {
             InitializeComponent();
+        }
+
+        protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
+        {
+            DynamicScrollViewer.DynamicScrollViewer parentScrollviewer = MainWindow.FindParent<DynamicScrollViewer.DynamicScrollViewer>(e.Source as DependencyObject);
+            if (parentScrollviewer != null)
+            {
+                parentScrollviewer.ScrollToVerticalOffset(parentScrollviewer.VerticalOffset - e.Delta / 3);
+                e.Handled = true;
+            }
         }
     }
 }

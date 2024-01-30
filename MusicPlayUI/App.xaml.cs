@@ -27,6 +27,7 @@ using LastFmNamespace.Interfaces;
 using LastFmNamespace;
 using MusicFilesProcessor.Helpers;
 using Microsoft.EntityFrameworkCore;
+using MusicPlayUI.MVVM.ViewModels.AppBars;
 
 namespace MusicPlayUI
 {
@@ -35,8 +36,6 @@ namespace MusicPlayUI
     /// </summary>
     public partial class App : Application
     {
-        public static readonly ResourceDictionary appThemeDic = Current.Resources.MergedDictionaries[0];
-        public static readonly ResourceDictionary IconDic = new() { Source = new Uri("Resources\\Icons.xaml", UriKind.Relative) };
         public static readonly string defaultImage = "Resources\\DefaultImage.png";
         public static readonly string defaultArtistImage = "Resources\\DefaultArtistImage.jpg";
 
@@ -73,15 +72,18 @@ namespace MusicPlayUI
                 LanguageService.SetLanguage(((SettingsValueEnum)ConfigurationService.GetPreference(SettingsEnum.Language)).GetLanguageCulture());
 
                 // init app theme
-                AppThemeService.InitializeAppTheme();
+                AppTheme.InitializeAppTheme();
                 MessageFactory.RegisterMessagesStyles();
 
                 // create and show main window
                 MainWindow window = _services.GetRequiredService<MainWindow>();
-                window.Show();
 
-                // init shortcuts services
+                // init shortcuts services with this window
                 ShortcutsManager = new(_services.GetRequiredService<ICommandsManager>(), window);
+                // init the appBar
+                State.SetAppBar(_services.GetRequiredService<AppBar>());
+                // show the window
+                window.Show();
 
                 // init LastFm Services
                 LastFm = new(LastFmApiKey, "MusicPlay", "3.0.1", ConnectivityHelper.Instance);

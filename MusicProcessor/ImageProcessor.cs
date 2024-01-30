@@ -199,6 +199,20 @@ namespace MusicFilesProcessor
             return new(System.Windows.Media.Color.FromRgb((byte)red, (byte)green, (byte)blue));
         }
 
+        public static SolidColorBrush MultiplyBy(this SolidColorBrush color, double value)
+        {
+            double red = FormatRGB(color.Color.R, value, 255, 0);
+            double green = FormatRGB(color.Color.G, value, 255, 0);
+            double blue = FormatRGB(color.Color.B, value, 255, 0);
+
+            return new(System.Windows.Media.Color.FromRgb((byte)red, (byte)green, (byte)blue));
+        }
+
+        /// <summary>
+        /// Calculate the mean value of the 3 channels (RGB)
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns>The mean value between 0 and 1</returns>
         public static double CalculateBrightness(this SolidColorBrush color)
         {
             return (color.Color.R + color.Color.G + color.Color.B) / 765d;

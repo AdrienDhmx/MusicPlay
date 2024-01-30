@@ -204,7 +204,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             _audioPlayback.DeviceChanged += OnDeviceChanged;
 
             ConfigurationService.ColorfulPlayerControlChange += OnColorfulPlayerChanged;
-            AppThemeService.ThemeChanged += UpdateBlurredCover;
+            AppTheme.ThemeChanged += UpdateBlurredCover;
 
             Volume = ConfigurationService.GetPreference(SettingsEnum.Volume);
             OnDeviceChanged();
@@ -303,10 +303,10 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             int modifier = (int)(20 * (1 - meanChannelsValue)); // invert the mean to make dark color more important
 
-            if ((AppThemeService.IsLightTheme && meanChannelsValue < 0.65) // dark color on light color
-                || (!AppThemeService.IsLightTheme && meanChannelsValue > 0.65)) // light color on dark color
+            if ((AppTheme.IsLightTheme && meanChannelsValue < 0.65) // dark color on light color
+                || (!AppTheme.IsLightTheme && meanChannelsValue > 0.65)) // light color on dark color
             {
-                if (AppThemeService.IsLightTheme && meanChannelsValue > 0.45)
+                if (AppTheme.IsLightTheme && meanChannelsValue > 0.45)
                 {
                     modifier = 20;
                 }
@@ -323,11 +323,11 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             {
                 if (!ShowMeanColor)
                 {
-                    if (AppThemeService.IsLightTheme && meanChannelsValue > 0.85)
+                    if (AppTheme.IsLightTheme && meanChannelsValue > 0.85)
                     {
                         modifier = -10;
                     } 
-                    else if(!AppThemeService.IsLightTheme && meanChannelsValue < 0.28)
+                    else if(!AppTheme.IsLightTheme && meanChannelsValue < 0.28)
                     {
                         modifier = -20;
                     }
@@ -375,7 +375,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             QueueService.PlayingTrackInteractionChanged -= OnPlayingTrackChanged;
 
             ConfigurationService.ColorfulPlayerControlChange -= OnColorfulPlayerChanged;
-            AppThemeService.ThemeChanged -= UpdateBlurredCover;
+            AppTheme.ThemeChanged -= UpdateBlurredCover;
 
             _audioPlayback.Dispose(); // dispose of all audio resources
             GC.SuppressFinalize(this);

@@ -4,14 +4,62 @@ using MusicPlayUI.Core.Factories;
 using System;
 using System.Timers;
 using System.Windows;
+using System.Windows.Media;
 using Windows.UI.ViewManagement;
 
 namespace MusicPlayUI.Core.Services
 {
-    public static class AppThemeService
+    public static class AppTheme
     {
+        private static ResourceDictionary _appThemeDic = App.Current.Resources.MergedDictionaries[0];
+        public static ResourceDictionary AppThemeDic
+        {
+            get => _appThemeDic;
+            private set => _appThemeDic = value;
+        }
+        public static readonly ResourceDictionary IconDic = new() { Source = new Uri("Resources\\Icons.xaml", UriKind.Relative) };
+
+
         private static Timer _appThemeTimer;
         private static UISettings _uiSettings;
+
+        public static class Palette
+        {
+            public static Brush Background => (Brush)AppThemeDic["Background"];
+            public static Brush OnBackground => (Brush)AppThemeDic["OnBackground"];
+
+            public static Brush SurfaceVariant => (Brush)AppThemeDic["SurfaceVariant"];
+            public static Brush OnSurfaceVariant => (Brush)AppThemeDic["OnSurfaceVariant"];
+
+            public static Brush Outline => (Brush)AppThemeDic["Outline"];
+
+            public static Brush Primary => (Brush)AppThemeDic["Primary"];
+            public static Brush OnPrimary => (Brush)AppThemeDic["OnPrimary"];
+            public static Brush PrimaryContainer => (Brush)AppThemeDic["PrimaryContainer"];
+            public static Brush OnPrimaryContainer => (Brush)AppThemeDic["OnPrimaryContainer"];
+            public static Brush PrimaryHover => (Brush)AppThemeDic["PrimaryHover"];
+
+            public static Brush Secondary => (Brush)AppThemeDic["Secondary"];
+            public static Brush OnSecondary => (Brush)AppThemeDic["OnSecondary"];
+            public static Brush SecondaryContainer => (Brush)AppThemeDic["SecondaryContainer"];
+            public static Brush OnSecondaryContainer => (Brush)AppThemeDic["OnSecondaryContainer"];
+            public static Brush SecondaryHover => (Brush)AppThemeDic["SecondaryHover"];
+
+            public static Brush Tertiary => (Brush)AppThemeDic["Tertiary"];
+            public static Brush OnTertiary => (Brush)AppThemeDic["OnTertiary"];
+            public static Brush TertiaryContainer => (Brush)AppThemeDic["TertiaryContainer"];
+            public static Brush OnTertiaryContainer => (Brush)AppThemeDic["OnTertiaryContainer"];
+            public static Brush TertiaryHover => (Brush)AppThemeDic["TertiaryHover"];
+
+            public static Brush Error => (Brush)AppThemeDic["Error"];
+            public static Brush OnError => (Brush)AppThemeDic["OnError"];
+            public static Brush ErrorContainer => (Brush)AppThemeDic["ErrorContainer"];
+            public static Brush OnErrorContainer => (Brush)AppThemeDic["OnErrorContainer"];
+            public static Brush ErrorHover => (Brush)AppThemeDic["ErrorHover"];
+
+            public static Brush BlackForeground => (Brush)AppThemeDic["BlackForeground"];
+            public static Brush WhiteForeground => (Brush)AppThemeDic["WhiteForeground"];
+        }
 
         private const int _sunrise = 8;
         private const int _sunset = 20;
@@ -21,7 +69,7 @@ namespace MusicPlayUI.Core.Services
         public static bool IsSystemSync { get; private set; }
 
         public static event Action ThemeChanged;
-        public static void OnThemeChanged()
+        private static void OnThemeChanged()
         {
             ThemeChanged?.Invoke();
         }
@@ -74,9 +122,11 @@ namespace MusicPlayUI.Core.Services
 
         private static void LoadAppTheme(SettingsValueEnum theme, bool light)
         {
+            AppThemeDic = new ResourceDictionary() { Source = GetThemeColorsResourceDictionary(theme, light) };
             ResourceDictionary _themeDictionary = Application.Current.Resources.MergedDictionaries[0];
             _themeDictionary.MergedDictionaries.Clear();
-            _themeDictionary.MergedDictionaries.Add(new ResourceDictionary() { Source = GetThemeColorsResourceDictionary(theme, light) });
+            _themeDictionary.MergedDictionaries.Add(AppThemeDic);
+            OnThemeChanged();
         }
 
         private static Uri GetThemeColorsResourceDictionary(SettingsValueEnum theme, bool light)

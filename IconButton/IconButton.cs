@@ -14,6 +14,12 @@ namespace IconButton
             set { SetValue(IconProperty, value); }
         }
 
+        public double IconOpacity
+        {
+            get { return (double)GetValue(IconOpacityProperty); }
+            set { SetValue(IconOpacityProperty, value); }
+        }
+
         public Brush FillColor
         {
             get { return (Brush)GetValue(FillColorProperty); }
@@ -71,6 +77,10 @@ namespace IconButton
 
         public static readonly DependencyProperty MouseOverBackgroundProperty =
             DependencyProperty.Register("MouseOverBackground", typeof(Brush), typeof(IconButton), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 90, 90, 90))));
+
+        public static readonly DependencyProperty IconOpacityProperty =
+            DependencyProperty.Register("IconOpacity", typeof(double), typeof(IconButton), new PropertyMetadata(1d));
+
 
         public static readonly DependencyProperty IconHeightProperty =
             DependencyProperty.Register("IconHeight", typeof(double), typeof(IconButton), new PropertyMetadata(20d));

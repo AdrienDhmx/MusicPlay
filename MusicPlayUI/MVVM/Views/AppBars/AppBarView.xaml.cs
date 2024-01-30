@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace MusicPlayUI.MVVM.Views
+namespace MusicPlayUI.MVVM.Views.AppBars
 {
     /// <summary>
-    /// Logique d'interaction pour MainMenuView.xaml
+    /// Interaction logic for AppBarView.xaml
     /// </summary>
-    public partial class MainMenuView : UserControl
+    public partial class AppBarView : UserControl
     {
-        public MainMenuView()
+        public AppBarView()
         {
             InitializeComponent();
         }

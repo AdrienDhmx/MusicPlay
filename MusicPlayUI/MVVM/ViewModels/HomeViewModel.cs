@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using MusicPlay.Database.Models;
 using MusicPlay.Database.Enums;
 using MusicPlay.Database.Helpers;
+using DynamicScrollViewer;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -158,12 +159,18 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PlayPlaylistCommand { get; }
         public ICommand NavigateToPlaylistCommand { get; }
         public ICommand OpenPlaylistPopupCommand { get; }
+        public ICommand OnScrollCommand { get; }
         public HomeViewModel(IQueueService queueService, IRadioStationsService radioStationsServices, IHistoryServices historyServices, ICommandsManager commandsManager)
         {
             _queueService = queueService;
             _radioStationsServices = radioStationsServices;
             _historyServices = historyServices;
             _commandsManager = commandsManager;
+
+            OnScrollCommand = new RelayCommand<OnScrollEvent>(e =>
+            {
+                AppBar.AnimateElevation(e.VerticalOffset, true);
+            });
 
             // Cards navigation Commands
             NavigateToArtistsCommand = new RelayCommand(() => App.State.NavigateTo<ArtistLibraryViewModel>());
@@ -183,13 +190,25 @@ namespace MusicPlayUI.MVVM.ViewModels
             OpenArtistPopupCommand = _commandsManager.OpenArtistPopupCommand;
             OpenAlbumPopupCommand = _commandsManager.OpenAlbumPopupCommand;
             OpenPlaylistPopupCommand = _commandsManager.OpenPlaylistPopupCommand;
-
-            Task.Run(Init);
         }
 
-        private void Init()
+        public override void UpdateAppBarStyle()
+        {
+            if (AppBar is not null)
+            {
+                AppBar.Reset();
+                AppBar.ApplyDropShadow = false;
+                AppBar.BackgroundOpacity = 0;
+                AppBar.ContentOpacity = 0;
+                AppBar.Title = WelcomeMessage;
+            }
+        }
+
+        public override void Init()
         {
             WelcomeMessage = MessageService.GetWelcomeMessage();
+
+            base.Init();
 
             NumberOfArtists = Artist.Count() + " " + Resources.Artists_View;
             NumberOfAlbums = Album.Count() + " " + Resources.Albums_View;

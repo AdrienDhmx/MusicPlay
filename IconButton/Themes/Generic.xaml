@@ -16,7 +16,7 @@
                                 VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                 Width="{TemplateBinding Width}"
                                 Height="{TemplateBinding Height}"
-                                Opacity="1"
+                                Opacity="{TemplateBinding Opacity}"
                                 x:Name="Border">
 
                             <Grid>
@@ -30,6 +30,7 @@
                             
                                 <Path Data="{TemplateBinding Icon}"
                                       Panel.ZIndex="2"
+                                      Opacity="{TemplateBinding IconOpacity}"
                                       Fill="{TemplateBinding FillColor}"
                                       Stroke="{TemplateBinding StrokeColor}"
                                       Margin="{TemplateBinding IconMargin}"

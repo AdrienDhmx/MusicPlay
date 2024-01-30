@@ -1,5 +1,6 @@
 ﻿using MusicPlay.Database.Enums;
 using MusicPlay.Database.Models.AudioModels;
+using MusicPlayUI.Core.Services;
 using MusicPlayUI.MVVM.Models;
 using System;
 using System.Collections.Generic;
@@ -45,21 +46,21 @@ namespace MusicPlayUI.Core.Factories
             switch (deviceType)
             {
                 case AudioDeviceTypeEnum.UNKNOWN:
-                    return (PathGeometry)App.IconDic["UnknownDevice"];
+                    return (PathGeometry)AppTheme.IconDic["UnknownDevice"];
                 case AudioDeviceTypeEnum.HeadPhones:
-                    return (PathGeometry)App.IconDic["Headphones"];
+                    return (PathGeometry)AppTheme.IconDic["Headphones"];
                 case AudioDeviceTypeEnum.HeadSet:
-                    return (PathGeometry)App.IconDic["Headset"];
+                    return (PathGeometry)AppTheme.IconDic["Headset"];
                 case AudioDeviceTypeEnum.Speakers:
-                    return (Geometry)App.IconDic["Speakers"];
+                    return (Geometry)AppTheme.IconDic["Speakers"];
                 case AudioDeviceTypeEnum.HDMI:
-                    return (PathGeometry)App.IconDic["HDMI"];
+                    return (PathGeometry)AppTheme.IconDic["HDMI"];
                 case AudioDeviceTypeEnum.Network:
-                    return (PathGeometry)App.IconDic["UnknownDevice"];
+                    return (PathGeometry)AppTheme.IconDic["UnknownDevice"];
                 case AudioDeviceTypeEnum.SPDIF:
-                    return (PathGeometry)App.IconDic["SPDIF"];
+                    return (PathGeometry)AppTheme.IconDic["SPDIF"];
                 default:
-                    return (PathGeometry)App.IconDic["UnknownDevice"];
+                    return (PathGeometry)AppTheme.IconDic["UnknownDevice"];
             }
         }
     }

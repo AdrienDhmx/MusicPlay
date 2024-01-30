@@ -13,20 +13,21 @@ using MessageControl.Model;
 using MessageControl;
 using MusicPlayUI.ThemeColors;
 using TagLib.Ape;
+using MusicPlayUI.Core.Services;
 
 namespace MusicPlayUI.Core.Factories
 {
     public static class MessageFactory
     {
-        private static PathGeometry AppThemeIcon => (PathGeometry)App.IconDic["PaletteIcon"]; // 0
-        private static PathGeometry CoverChangedIcon => (PathGeometry)App.IconDic["ImageIcon"]; // 1
-        private static PathGeometry ErrorIcon => (PathGeometry)App.IconDic["WarningIcon"]; // 2
-        private static PathGeometry LanguageIcon => (PathGeometry)App.IconDic["TranslateIcon"]; // 3
-        private static PathGeometry ImportLibraryDoneIcon => (PathGeometry)App.IconDic["ImportDoneIcon"]; // 4
-        private static PathGeometry SettingIcon => (PathGeometry)App.IconDic["SettingsIcon"]; // 5
-        private static PathGeometry CircledAddIcon => (PathGeometry)App.IconDic["CircledAddIcon"]; // 6
-        private static PathGeometry CircledRemoveIcon => (PathGeometry)App.IconDic["CircledRemoveIcon"]; // 7
-        private static PathGeometry SuccessIcon => (PathGeometry)App.IconDic["CheckBox.Checked"]; // 8
+        private static PathGeometry AppThemeIcon => (PathGeometry)AppTheme.IconDic["PaletteIcon"]; // 0
+        private static PathGeometry CoverChangedIcon => (PathGeometry)AppTheme.IconDic["ImageIcon"]; // 1
+        private static PathGeometry ErrorIcon => (PathGeometry)AppTheme.IconDic["WarningIcon"]; // 2
+        private static PathGeometry LanguageIcon => (PathGeometry)AppTheme.IconDic["TranslateIcon"]; // 3
+        private static PathGeometry ImportLibraryDoneIcon => (PathGeometry)AppTheme.IconDic["ImportDoneIcon"]; // 4
+        private static PathGeometry SettingIcon => (PathGeometry)AppTheme.IconDic["SettingsIcon"]; // 5
+        private static PathGeometry CircledAddIcon => (PathGeometry)AppTheme.IconDic["CircledAddIcon"]; // 6
+        private static PathGeometry CircledRemoveIcon => (PathGeometry)AppTheme.IconDic["CircledRemoveIcon"]; // 7
+        private static PathGeometry SuccessIcon => (PathGeometry)AppTheme.IconDic["CheckBox.Checked"]; // 8
 
         public static void RegisterMessagesStyles()
         {

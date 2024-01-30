@@ -119,7 +119,7 @@ namespace MusicPlayUI.Core.Helpers
                     }
 
                     if(scroll)
-                        scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - scrollValue);
+                        scrollViewer.ScrollToVerticalOffset(0);
                     else
                     {
                         scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset);

@@ -152,7 +152,7 @@
                                     <!-- Remove from queue button -->
                                     <customButton:IconButton Grid.Column="2"
                                                              x:Name="RemoveTrackButton"
-                                                             Background="{DynamicResource PrimaryContainer}"
+                                                             Background="{DynamicResource ErrorContainer}"
                                                              CornerRadius="6"
                                                              Icon="{DynamicResource close}"
                                                              Width="40"
@@ -169,14 +169,9 @@
                                                              CommandParameter="{Binding Track}">
                                     <customButton:IconButton.Style>
                                         <Style TargetType="customButton:IconButton"
-                                                   BasedOn="{StaticResource BaseIconButton}">
-                                            <Setter Property="FillColor" Value="{DynamicResource OnSurfaceVariant}"/>
+                                                   BasedOn="{StaticResource OpacityIconButton}">
+                                            <Setter Property="FillColor" Value="{DynamicResource OnErrorContainer}"/>
                                             <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="FillColor" Value="{DynamicResource OnBackground}"/>
-                                                </Trigger>
-                                            </Style.Triggers>
                                         </Style>
                                     </customButton:IconButton.Style>
                                     <customButton:IconButton.OpacityMask>

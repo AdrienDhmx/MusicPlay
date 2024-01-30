@@ -3,6 +3,8 @@ using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlay.Database.Models;
 using MusicPlay.Database.Models.DataBaseModels;
+using MusicPlayUI.Core.Services;
+using DynamicScrollViewer;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -63,6 +65,18 @@ namespace MusicPlayUI.MVVM.ViewModels
             OpenArtistPopupCommand = _commandsManager.OpenArtistPopupCommand;
         }
 
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            AppBar.AnimateElevation(e.VerticalOffset);
+            base.OnScrollEvent(e);
+        }
+
+        public override void UpdateAppBarStyle()
+        {
+            AppBar.SetStyle(AppTheme.Palette.PrimaryContainer, 0, 0, false);
+            AppBar.SetForeground(AppTheme.Palette.OnPrimaryContainer);
+        }
+
         public override void Init()
         {
             base.Init();
@@ -79,6 +93,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 Album = (Album)baseModel;
             }
+
+            AppBar.SetData(Album.Name, Album.PrimaryArtist.Name);
         }
     }
 }

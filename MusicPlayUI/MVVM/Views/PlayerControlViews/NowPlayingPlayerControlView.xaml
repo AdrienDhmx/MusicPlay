@@ -35,7 +35,7 @@
                                    BasedOn="{StaticResource ThirdPlayBackButton}">
                         <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.QueueService.IsShuffled, ElementName=RootView}" Value="true">
+                            <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsShuffled, ElementName=RootView}" Value="true">
                                 <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -82,7 +82,7 @@
                         <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
                         <Setter Property="Icon" Value="{DynamicResource RepeatIcon}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.QueueService.IsOnRepeat, ElementName=RootView}" Value="true">
+                            <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsOnRepeat, ElementName=RootView}" Value="true">
                                 <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootView}" Value="true">

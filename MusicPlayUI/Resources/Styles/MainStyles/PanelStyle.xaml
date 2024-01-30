@@ -19,7 +19,7 @@
     <DropShadowEffect x:Key="PageHeaderDropShadow" 
                     BlurRadius="12" ShadowDepth="2" Color="#101010"
                     Direction="-20"
-                    Opacity="0.6"/>
+                    Opacity="0.5"/>
 
     <DropShadowEffect x:Key="FilterPanelDropShadow" 
                     Color="#101010"

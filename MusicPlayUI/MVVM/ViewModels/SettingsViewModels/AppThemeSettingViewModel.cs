@@ -107,19 +107,19 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 SetNewTheme(theme);
             });
 
-            AppThemeService.ThemeChanged += Load;
+            AppTheme.ThemeChanged += Load;
             Load();
         }
 
         public override void Dispose()
         {
             Themes.Clear();
-            AppThemeService.ThemeChanged -= Load;
+            AppTheme.ThemeChanged -= Load;
         }
 
         private void Load()
         {
-            _lightTheme = AppThemeService.IsLightTheme;
+            _lightTheme = AppTheme.IsLightTheme;
             _sunsetSunrise = ConfigurationService.GetPreference(SettingsEnum.SunsetSunrise) == 1;
             _systemSync = ConfigurationService.GetPreference(SettingsEnum.SystemSyncTheme) == 1;
             _colorfulPlayerControl = ConfigurationService.GetPreference(SettingsEnum.ColorfulPlayerControl) == 1;
@@ -146,9 +146,9 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             SetPreference(SettingsEnum.SunsetSunrise, BoolToString(sunsetSunrise));
             SetPreference(SettingsEnum.SystemSyncTheme, BoolToString(systemSync));
 
-            AppThemeService.InitializeAppTheme();
+            AppTheme.InitializeAppTheme();
 
-            _lightTheme = AppThemeService.IsLightTheme;
+            _lightTheme = AppTheme.IsLightTheme;
             OnPropertyChanged(nameof(LightTheme));
 
             LoadThemes();
@@ -161,7 +161,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             SetPreference(SettingsEnum.AppTheme, ((int)theme.Value).ToString());
             AppliedTheme = theme.Name;
             // init new theme
-            AppThemeService.InitializeAppTheme();
+            AppTheme.InitializeAppTheme();
         }
 
         private void UpdateSelectedTheme(SettingsValueEnum theme)

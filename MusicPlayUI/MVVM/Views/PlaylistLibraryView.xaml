@@ -15,6 +15,7 @@
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <Grid x:Name="RootGrid"
           AllowDrop="True"
         Drop="RootGrid_Drop"
@@ -58,7 +59,8 @@
 
             <Border Style="{DynamicResource PageHeaderBackgroundLight}"/>
 
-            <Grid Margin="30,10">
+            <Border Margin="{Binding TopMargin}">
+                <Grid Margin="30,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.45*"/>
                     <ColumnDefinition Width="0.18*"/>
@@ -102,6 +104,7 @@
                 
                 </Border>
             </Grid>
+            </Border>
 
             <ItemsControl Grid.Row="1"
                             x:Name="ConstAutoPlaylists"

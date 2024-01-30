@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using MessageControl;
 using Microsoft.EntityFrameworkCore;
@@ -29,26 +30,122 @@ namespace MusicPlay.Database.Models
 
         public List<AlbumTag> AlbumTags
         {
-            get => _albumTags;
+            get
+            {
+                if(_albumTags.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _albumTags = [..context.AlbumTags.Where(at => at.TagId == Id)
+                                                    .Include(at => at.Album)];
+                }
+                return _albumTags;
+            }
             set => SetField(ref _albumTags, value);
         }
 
         public List<ArtistTag> ArtistTags
         {
-            get => _artistTags;
+            get
+            {
+                if (_artistTags.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _artistTags = [.. context.ArtistTags.Where(at => at.TagId == Id)
+                                                    .Include(at => at.Artist)];
+                }
+                return _artistTags;
+            }
             set => SetField(ref _artistTags, value);
         }
 
         public List<TrackTag> TrackTags
         {
-            get => _trackTags;
+            get
+            {
+                if (_trackTags.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _trackTags = [.. context.TrackTags.Where(at => at.TagId == Id)
+                                                    .Include(at => at.Track)];
+                }
+                return _trackTags;
+            }
             set => SetField(ref _trackTags, value);
         }
 
         public List<PlaylistTag> PlaylistTags
         {
-            get => _playlistTags;
+            get
+            {
+                if (_playlistTags.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _playlistTags = [.. context.PlaylistTags.Where(at => at.TagId == Id)
+                                                    .Include(at => at.Playlist)];
+                }
+                return _playlistTags;
+            }
             set => SetField(ref _playlistTags, value);
+        }
+
+        private ObservableCollection<Album> _albums;
+        [NotMapped]
+        public ObservableCollection<Album> Albums
+        {
+            get
+            {
+                if(_albums.IsNullOrEmpty())
+                {
+                    _albums = new(AlbumTags.Select(at => at.Album));
+                }
+                return _albums;
+            }
+            set => SetField(ref _albums, value);
+        }
+
+        private ObservableCollection<Artist> _artists;
+        [NotMapped]
+        public ObservableCollection<Artist> Artists
+        {
+            get
+            {
+                if (_artists.IsNullOrEmpty())
+                {
+                    _artists = new(ArtistTags.Select(at => at.Artist));
+                }
+                return _artists;
+            }
+            set => SetField(ref _artists, value);
+        }
+
+        private ObservableCollection<Track> _tracks;
+        [NotMapped]
+        public ObservableCollection<Track> Tracks
+        {
+            get
+            {
+                if (_tracks.IsNullOrEmpty())
+                {
+                    _tracks = new(TrackTags.Select(at => at.Track));
+                }
+                return _tracks;
+            }
+            set => SetField(ref _tracks, value);
+        }
+
+        private ObservableCollection<Playlist> _playlists;
+        [NotMapped]
+        public ObservableCollection<Playlist> Playlists
+        {
+            get
+            {
+                if (_playlists.IsNullOrEmpty())
+                {
+                    _playlists = new(PlaylistTags.Select(at => at.Playlist));
+                }
+                return _playlists;
+            }
+            set => SetField(ref _playlists, value);
         }
 
         public Tag(int id, string name)

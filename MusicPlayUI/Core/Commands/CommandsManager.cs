@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using AudioHandler;
@@ -36,6 +37,7 @@ namespace MusicPlayUI.Core.Commands
         // navigation
         public ICommand NavigateCommand { get; }
         public ICommand NavigateBackCommand { get; }
+        public ICommand NavigateForwardCommand { get; }
         public ICommand NavigateToAlbumByIdCommand { get; }
         public ICommand NavigateToArtistByIdCommand { get; }
         public ICommand NavigateToGenreCommand { get; }
@@ -60,6 +62,7 @@ namespace MusicPlayUI.Core.Commands
         // others
         public ICommand FavoriteCommand { get; }
         public ICommand RatingCommand { get; }
+        public ICommand ToggleMenuDrawerCommand { get; }
         public ICommand ToggleFullScreenCommand { get; }
         public ICommand EscapeFullScreenCommand { get; }
         public ICommand MinimizeCommand { get; }
@@ -122,7 +125,13 @@ namespace MusicPlayUI.Core.Commands
                     queueService.UpdateRating(rating);
             });
 
+            NavigateCommand = new RelayCommand<Type>(type =>
+            {
+                App.State.NavigateTo(type);
+            });
+
             NavigateBackCommand = new RelayCommand(App.State.NavigateBack);
+            NavigateForwardCommand = new RelayCommand(App.State.NavigateForward);
 
             NavigateToAlbumByIdCommand = new RelayCommand<int>(async (int id) =>
             {
@@ -159,6 +168,8 @@ namespace MusicPlayUI.Core.Commands
             OpenArtistPopupCommand = new RelayCommand<Artist>(App.State.OpenPopup<ArtistPopupViewModel>);
             OpenPlaylistPopupCommand = new RelayCommand<Playlist>(App.State.OpenPopup<PlaylistPopupViewModel>);
             OpenTagPopupCommand = new RelayCommand<UITagModel>(App.State.OpenPopup<TagPopupViewModel>);
+
+            ToggleMenuDrawerCommand = new RelayCommand(App.State.ToggleMenuDrawer);
 
             ToggleQueueDrawerCommand = new RelayCommand(App.State.ToggleQueueDrawer);
 
@@ -208,31 +219,28 @@ namespace MusicPlayUI.Core.Commands
                 {
                     if (changeTheme)
                     {
-                        if (AppThemeService.IsSystemSync)
+                        if (AppTheme.IsSystemSync)
                         {
                             ConfigurationService.SetPreference(SettingsEnum.SystemSyncTheme, "0");
                         }
-                        else if (AppThemeService.IsSunsetSunrise)
+                        else if (AppTheme.IsSunsetSunrise)
                         {
                             ConfigurationService.SetPreference(SettingsEnum.SunsetSunrise, "0");
                         }
 
                         // invert the theme in the config
-                        ConfigurationService.SetPreference(SettingsEnum.LightTheme, AppThemeService.IsLightTheme ? "0" : "1");
+                        ConfigurationService.SetPreference(SettingsEnum.LightTheme, AppTheme.IsLightTheme ? "0" : "1");
 
                         // reload app theme
-                        AppThemeService.InitializeAppTheme();
-
-                        // warn listeners that the theme has changed
-                        AppThemeService.OnThemeChanged();
+                        AppTheme.InitializeAppTheme();
                     }
                 }
 
-                if (AppThemeService.IsSystemSync)
+                if (AppTheme.IsSystemSync)
                 {
                     MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the system theme. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
                 } 
-                else if (AppThemeService.IsSunsetSunrise)
+                else if (AppTheme.IsSunsetSunrise)
                 {
                     MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the time of day. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
                 } else

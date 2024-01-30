@@ -112,6 +112,10 @@ namespace MusicPlay.Database.Models
         {
             get
             {
+                if(_playingQueueTrack == null && Tracks.IsNullOrEmpty())
+                {
+                    return new(new Track(), 0);
+                }
                 _playingQueueTrack ??= Tracks.First(t => t.Track.Id == PlayingTrack.Id);
                 return _playingQueueTrack;
             }

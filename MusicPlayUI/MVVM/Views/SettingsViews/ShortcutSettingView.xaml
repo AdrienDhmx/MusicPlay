@@ -13,129 +13,126 @@
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="RootModal">
 
-    <dynamicscrollviewer:DynamicScrollViewer VerticalScrollBarVisibility="Hidden"
-                                             IsInertiaEnabled="true"
-                 x:Name="SettingScroll">
-        <Grid Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-            <Grid HorizontalAlignment="Center"
+        <Grid HorizontalAlignment="Center"
                       Margin="10">
 
-                <cardbtn:CustomCardControl Icon="{DynamicResource Refresh}"
+            <cardbtn:CustomCardControl Icon="{DynamicResource Refresh}"
                                                Style="{DynamicResource BaseCardStyle}"
                                                Command="{Binding ResetAllShortcutsCommand}"
                                                CardDescriptionVisibility="Collapsed"
                                                HorizontalContentAlignment="Center"
                                                CardHeader="Reset All "/>
-            </Grid>
+        </Grid>
 
-            <Grid MaxWidth="900"
+        <Grid MaxWidth="900"
                       Grid.Row="1"
                       HorizontalAlignment="Stretch"
                       Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="110"/>
-                    <ColumnDefinition Width="115"/>
-                    <ColumnDefinition Width="110"/>
-                </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="115"/>
+                <ColumnDefinition Width="110"/>
+            </Grid.ColumnDefinitions>
 
-                <Border BorderBrush="{DynamicResource SurfaceVariant}"
+            <Border BorderBrush="{DynamicResource SurfaceVariant}"
                             Padding="10,0"
                             BorderThickness="1,0,1,0">
-                    <TextBlock Text="Command"
+                <TextBlock Text="Command"
                                    Style="{DynamicResource NTrackDataStyle}"/>
-                </Border>
+            </Border>
 
 
-                <Border BorderBrush="{DynamicResource SurfaceVariant}"
+            <Border BorderBrush="{DynamicResource SurfaceVariant}"
                             Grid.Column="1"
                             Padding="10,0"
                             BorderThickness="0,0,1,0">
-                    <TextBlock Text="Modifier"
+                <TextBlock Text="Modifier"
                                    Style="{DynamicResource NTrackDataStyle}"/>
-                </Border>
+            </Border>
 
-                <Border BorderBrush="{DynamicResource SurfaceVariant}"
+            <Border BorderBrush="{DynamicResource SurfaceVariant}"
                             Grid.Column="2"
                             Padding="10,0"
                             BorderThickness="0,0,1,0">
-                    <TextBlock Text="Key"
+                <TextBlock Text="Key"
                                    Style="{DynamicResource NTrackDataStyle}"/>
-                </Border>
+            </Border>
 
-                <Border BorderBrush="{DynamicResource SurfaceVariant}"
+            <Border BorderBrush="{DynamicResource SurfaceVariant}"
                             Grid.Column="3"
                             Padding="10,0"
                             BorderThickness="0,0,1,0">
-                    <TextBlock Text="Edit"
+                <TextBlock Text="Edit"
                                    Style="{DynamicResource NTrackDataStyle}"/>
-                </Border>
-            </Grid>
+            </Border>
+        </Grid>
 
-            <ItemsControl x:Name="Shortcuts"
+        <ItemsControl x:Name="Shortcuts"
                               ItemsSource="{Binding Shortcuts}"
                               MaxWidth="900"
                               Grid.Row="2"
                               HorizontalAlignment="Stretch"
                               Margin="10">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="{DynamicResource SurfaceVariant}"
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="{DynamicResource SurfaceVariant}"
                                     BorderThickness="0,1,0,0"
                                     Padding="6, 4">
-                            <Grid Height="45">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="100"/>
-                                </Grid.ColumnDefinitions>
+                        <Grid Height="45">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="{Binding Name}"
+                            <TextBlock Text="{Binding Name}"
                                                Margin="10,0"
                                                FontSize="18"
                                            VerticalAlignment="Center"
                                                Style="{DynamicResource SlistInfoStyle}"/>
 
-                                <Border Background="{DynamicResource SecondaryContainer}"
+                            <Border Background="{DynamicResource SecondaryContainer}"
                                             Grid.Column="1"
                                             Padding="6,4"
                                             Visibility="{Binding HasModifier, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=1}"
                                             CornerRadius="{DynamicResource PrimaryCornerRadius}">
-                                    <TextBlock Text="{Binding ModifierName}"
+                                <TextBlock Text="{Binding ModifierName}"
                                                    HorizontalAlignment="Center"
                                                    FontSize="16"
                                                    Foreground="{DynamicResource OnSecondaryContainer}"
                                                    Style="{DynamicResource BStyle}"
                                                    />
-                                </Border>
+                            </Border>
 
-                                <Border Background="{DynamicResource SecondaryContainer}" 
+                            <Border Background="{DynamicResource SecondaryContainer}" 
                                              Grid.Column="3"
                                             Padding="6,4"
                                             CornerRadius="{DynamicResource PrimaryCornerRadius}">
-                                    <TextBlock Text="{Binding KeyName}"
+                                <TextBlock Text="{Binding KeyName}"
                                                    HorizontalAlignment="Center"
                                                    FontSize="16"
                                                    Foreground="{DynamicResource OnSecondaryContainer}"
                                                    Style="{DynamicResource BStyle}"
                                                    />
-                                </Border>
+                            </Border>
 
-                                <Grid Grid.Column="4">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
 
-                                    <iconbtn:IconButton Icon="{DynamicResource Edit}"
+                                <iconbtn:IconButton Icon="{DynamicResource Edit}"
                                                             Width="36"
                                                             IconWidth="22"
                                                             Height="36"
@@ -144,7 +141,7 @@
                                                             Command="{Binding DataContext.ChangeShortcutCommand, ElementName=RootModal}"
                                                             CommandParameter="{Binding .}"/>
 
-                                    <iconbtn:IconButton Icon="{DynamicResource Refresh}"
+                                <iconbtn:IconButton Icon="{DynamicResource Refresh}"
                                                             Grid.Column="1"
                                                             Width="36"
                                                             IconWidth="22"
@@ -153,14 +150,12 @@
                                                             Style="{DynamicResource NormalIconBtn}"
                                                             Command="{Binding DataContext.ResetShortcutCommand, ElementName=RootModal}"
                                                             CommandParameter="{Binding .}"/>
-                                </Grid>
-
                             </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Grid>
-    </dynamicscrollviewer:DynamicScrollViewer
-                  >
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
 </UserControl>

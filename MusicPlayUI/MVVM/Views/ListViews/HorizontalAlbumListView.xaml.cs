@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MusicPlay.Database.Models;
+using MusicPlayUI.MVVM.Views.Windows;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {
@@ -35,6 +36,5 @@ namespace MusicPlayUI.MVVM.Views.ListViews
 
         public static readonly DependencyProperty AlbumsProperty =
             DependencyProperty.Register("Albums", typeof(ObservableCollection<Album>), typeof(HorizontalAlbumListView), new PropertyMetadata(new ObservableCollection<Album>()));
-
     }
 }

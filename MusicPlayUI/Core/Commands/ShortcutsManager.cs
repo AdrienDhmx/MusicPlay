@@ -9,13 +9,14 @@ using System.Windows.Input;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.MVVM.Models;
+using MusicPlayUI.MVVM.ViewModels;
 
 namespace MusicPlayUI.Core.Commands
 {
     public class ShortcutsManager
     {
         public static readonly int SettingsEnumStartCommandEnum = 100;
-        public static readonly int ShortcutQuantity = 26;
+        public static readonly int ShortcutQuantity = 27;
         private readonly ICommandsManager _commandsManager; // command manager that define all the commands
         private readonly Window _window; // window to listen to the key down event from
 
@@ -207,13 +208,14 @@ namespace MusicPlayUI.Core.Commands
                 CommandEnums.Rating3 => new(Key.D3, _commandsManager.RatingCommand, "3", CommandEnums.Rating3),
                 CommandEnums.Rating4 => new(Key.D4, _commandsManager.RatingCommand, "4", CommandEnums.Rating4),
                 CommandEnums.Rating5 => new(Key.D5, _commandsManager.RatingCommand, "5", CommandEnums.Rating5),
-                CommandEnums.Home => new(Key.H, _commandsManager.NavigateCommand, (int)ViewNameEnum.Home, CommandEnums.Home),
-                CommandEnums.Albums => new(Key.D, _commandsManager.NavigateCommand, (int)ViewNameEnum.Albums, CommandEnums.Albums),
-                CommandEnums.Artists => new(Key.A, _commandsManager.NavigateCommand, (int)ViewNameEnum.Artists, CommandEnums.Artists),
-                CommandEnums.Playlists => new(Key.P, _commandsManager.NavigateCommand, (int)ViewNameEnum.Playlists, CommandEnums.Playlists),
-                CommandEnums.NowPlaying => new(Key.N, _commandsManager.NavigateCommand, (int)ViewNameEnum.NowPlaying, CommandEnums.NowPlaying),
-                CommandEnums.Settings => new(Key.S, ModifierKeys.Alt, _commandsManager.NavigateCommand, (int)ViewNameEnum.Settings, CommandEnums.Settings),
-                CommandEnums.NavigateBack => new(Key.B, _commandsManager.NavigateBackCommand, CommandEnums.NavigateBack),
+                CommandEnums.Home => new(Key.H, _commandsManager.NavigateCommand, typeof(HomeViewModel), CommandEnums.Home),
+                CommandEnums.Albums => new(Key.D, _commandsManager.NavigateCommand, typeof(AlbumLibraryViewModel), CommandEnums.Albums),
+                CommandEnums.Artists => new(Key.A, _commandsManager.NavigateCommand, typeof(ArtistLibraryViewModel), CommandEnums.Artists),
+                CommandEnums.Playlists => new(Key.P, _commandsManager.NavigateCommand, typeof(PlaylistLibraryViewModel), CommandEnums.Playlists),
+                CommandEnums.NowPlaying => new(Key.N, _commandsManager.NavigateCommand, typeof(NowPlayingViewModel), CommandEnums.NowPlaying),
+                CommandEnums.Settings => new(Key.O, _commandsManager.NavigateCommand, typeof(SettingsViewModel), CommandEnums.Settings),
+                CommandEnums.NavigateBack => new(Key.B, ModifierKeys.Control, _commandsManager.NavigateBackCommand, CommandEnums.NavigateBack),
+                CommandEnums.NavigateForward => new(Key.F, ModifierKeys.Control, _commandsManager.NavigateForwardCommand, CommandEnums.NavigateForward),
                 CommandEnums.EscapeFullScreen => new(Key.Escape, _commandsManager.EscapeFullScreenCommand, CommandEnums.EscapeFullScreen),
                 CommandEnums.ToggleFullScreen => new(Key.F, ModifierKeys.Control, _commandsManager.ToggleFullScreenCommand, CommandEnums.ToggleFullScreen),
                 CommandEnums.ToggleQueueDrawer => new(Key.Q, ModifierKeys.Control, _commandsManager.ToggleQueueDrawerCommand, CommandEnums.ToggleQueueDrawer),
