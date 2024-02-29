@@ -1,7 +1,6 @@
 ﻿using System.Windows.Input;
 using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
-
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Services;
@@ -47,14 +46,14 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
         public ICommand EditFolderCommand { get; }
         public EditFolderViewModel(IModalService modalService) : base(modalService)
         {
-            EditFolderCommand = new RelayCommand(async () =>
+            EditFolderCommand = new RelayCommand(() =>
             {
                 ValidName = !FolderName.IsNullOrWhiteSpace();
 
                 if (ValidName)
                 {
                     Folder.Name = FolderName;
-                    await StorageService.Instance.UpdateFolder(Folder, Monitored);
+                    StorageService.Instance.UpdateFolder(Folder, Monitored, FolderName);
                     CloseModal();
                 }
             });

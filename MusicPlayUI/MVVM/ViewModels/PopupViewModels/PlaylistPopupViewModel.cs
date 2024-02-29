@@ -15,6 +15,7 @@ using MusicPlay.Database.Models;
 using MusicPlay.Database.Enums;
 using System.Threading.Tasks;
 using MusicPlay.Database.Models.DataBaseModels;
+using MusicPlay.Database.Helpers;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
@@ -88,7 +89,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public PlaylistPopupViewModel(IQueueService queueService, IModalService modalService, 
             IPlaylistService playlistService) : base(modalService)
         {
-
             _queueService = queueService;
             _playlistService = playlistService;
 
@@ -98,8 +98,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             EditPlaylistCommand = new RelayCommand(EditPlaylist);
             AddToTagCommand = new RelayCommand<Tag>((tag) => AddToTag(tag, Playlist));
             CreateTagCommand = new RelayCommand(() => CreateTag(Playlist));
-
-            LoadData();
         }
 
         public override void Dispose()
@@ -144,8 +142,19 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
+        public override void Init()
+        {
+            LoadData();
+        }
+
         private void LoadData()
         {
+            if (App.State.CurrentPopup.State.Parameter.IsNull())
+            {
+                App.State.ClosePopup();
+                return;
+            }
+
             Playlist = (Playlist)App.State.CurrentPopup.State.Parameter;
             if(Playlist is not null)
             {
@@ -166,7 +175,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
                     }
                     else
                     {
-                        //PlaylistModel.TrackTag = await DataAccess.Connection.GetPlaylistTag(PlaylistModel.Id);
                         GetTags(Playlist.PlaylistTags.Select(t => t.TagId));
                     }
                 }

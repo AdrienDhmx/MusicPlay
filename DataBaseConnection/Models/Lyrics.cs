@@ -64,16 +64,6 @@ namespace MusicPlay.Database.Models
 
         }
 
-        public override Dictionary<string, object> InsertTable()
-        {
-            Dictionary<string, object> keyValues = new()
-            {
-                { nameof(Lyrics), LyricsText },
-                { nameof(Url), Url },
-            };
-            return keyValues;
-        }
-
         public static async Task Insert(Lyrics lyrics)
         {
             using DatabaseContext context = new();

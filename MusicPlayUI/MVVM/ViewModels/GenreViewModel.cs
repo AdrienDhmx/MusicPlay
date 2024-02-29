@@ -226,7 +226,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             PlayPlaylistCommand = new RelayCommand<Playlist>((playlist) =>
             {
-                _queueService.SetNewQueue(playlist.Tracks, playlist, playlist.Name, playlist.Cover);
+                _queueService.SetNewQueue(playlist.PlaylistTracks, playlist, playlist.Name, playlist.Cover);
             });
 
             PlayTrackCommand = new RelayCommand<Track>((track) =>

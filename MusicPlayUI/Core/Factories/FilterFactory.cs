@@ -14,14 +14,14 @@ namespace MusicPlayUI.Core.Factories
 {
     public static class FilterFactory
     {
-        public static List<FilterModel> GetAlbumArtistFilter()
+        public static List<FilterModel> GetPrimaryArtistFilter()
         {
             List<FilterModel> filters = [];
             using DatabaseContext context = new();
             List<Artist> albumArtists = [.. context.Artists.Where(a => a.ArtistRoles.Any(ar => ar.RoleId == 1))];
             foreach (Artist artist in albumArtists)
             {
-                FilterModel filter = new(artist.Name, artist.Id, FilterEnum.Artist);
+                FilterModel filter = new FilterModel(artist.Id, artist.Name, FilterEnum.Artist);
                 filters.Add(filter);
             }
 
@@ -35,7 +35,7 @@ namespace MusicPlayUI.Core.Factories
 
             foreach (Tag genre in allGenre.OrderBy(g => g.Name))
             {
-                FilterModel filter = new(genre.Name, genre.Id, FilterEnum.Genre);
+                FilterModel filter = new(genre.Id, genre.Name, FilterEnum.Tag);
                 filters.Add(filter);
             }
 
@@ -46,21 +46,21 @@ namespace MusicPlayUI.Core.Factories
         {
             List<FilterModel> filters = new()
             {
-                new("Main", (int)AlbumTypeEnum.Main, FilterEnum.AlbumType),
-                new("EP", (int)AlbumTypeEnum.EP, FilterEnum.AlbumType),
-                new("Singles", (int)AlbumTypeEnum.Single, FilterEnum.AlbumType),
+                new((int)AlbumTypeEnum.Main,"Main", FilterEnum.AlbumType),
+                new((int)AlbumTypeEnum.EP,"EP", FilterEnum.AlbumType),
+                new( (int)AlbumTypeEnum.Single,"Singles", FilterEnum.AlbumType),
             };
 
             return filters;
         }
 
 
-        public static List<FilterModel> GetArtistTypeFilter()
+        public static List<FilterModel> GetArtistRoleFilter()
         {
             List<FilterModel> filters = [];
             foreach(Role role in Role.GetAll())
             {
-                filters.Add(new(role.Name, role.Id, FilterEnum.ArtistType));
+                filters.Add(new(role.Id, role.Name, FilterEnum.ArtistType));
             }
 
             return filters;

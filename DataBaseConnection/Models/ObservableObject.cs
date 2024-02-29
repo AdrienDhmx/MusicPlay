@@ -17,5 +17,10 @@ namespace MusicPlay.Database.Models
             OnPropertyChanged(propertyName);
             return true;
         }
+
+        public void CallOnPropertyChanged(string propertyName)
+        {
+            OnPropertyChanged(propertyName);
+        }
     }
 }

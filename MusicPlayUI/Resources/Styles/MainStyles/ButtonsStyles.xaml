@@ -115,14 +115,13 @@
             <Trigger Property="IsMouseOver" Value="True">
                 <Trigger.EnterActions>
                     <BeginStoryboard
-              Storyboard="{StaticResource GlowOnLight}"/>
+                            Storyboard="{StaticResource GlowOnLight}"/>
                 </Trigger.EnterActions>
 
                 <Trigger.ExitActions>
                     <BeginStoryboard
-              Storyboard="{StaticResource GlowOff}"/>
+                            Storyboard="{StaticResource GlowOff}"/>
                 </Trigger.ExitActions>
-
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -294,6 +293,23 @@
         <Setter Property="IconStretch" Value="Uniform"/>
         <Setter Property="CornerRadius" Value="{DynamicResource SecondaryCornerRadius}"/>
         <Setter Property="MouseOverBackground" Value="{DynamicResource TertiaryHover}"/>
+        <Setter Property="Effect" Value="{DynamicResource MouseOverDropShadow}"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.4"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard
+                            Storyboard="{StaticResource GlowOnLight}"/>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+                    <BeginStoryboard
+                            Storyboard="{StaticResource GlowOff}"/>
+                </Trigger.ExitActions>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="IconButton:IconButton" x:Key="CircledMoreOptionButton"
@@ -389,7 +405,6 @@
                     <BeginStoryboard
                       Storyboard="{StaticResource GlowOff}"/>
                 </Trigger.ExitActions>
-
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -434,9 +449,11 @@
     <Style x:Key="SmallDeleteButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource FilledBtn}">
         <Setter Property="Icon" Value="{StaticResource Trash}"/>
+        <Setter Property="IconStretch" Value="Uniform"/>
         <Setter Property="FillColor" Value="{DynamicResource OnError}"/>
         <Setter Property="Background" Value="{DynamicResource Error}"/>
-        <Setter Property="MouseOverBackground" Value="{DynamicResource ErrorHover}"/>
+        <Setter Property="Width" Value="{Binding ActualHeight, RelativeSource={RelativeSource self}}"/>
+        <Setter Property="MouseOverBackground" Value="#10050505"/>
     </Style>
 
     <Style x:Key="NavigationButton" TargetType="IconButton:IconButton"
@@ -491,7 +508,7 @@
     </Style>
 
     <Style TargetType="textbtn:TextButton"
-           x:Key="SortedByBtn">
+           x:Key="LinkTextBtn">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="MouseOverBtnColor" Value="Transparent"/>
         <Setter Property="FontSize" Value="16"/>
@@ -502,11 +519,17 @@
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Height" Value="25"/>
         <Setter Property="Padding" Value="5, 0"/>
-        <Setter Property="Command" Value="{Binding DataContext.OpenSortingPopupCommand, ElementName=RootView}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
             </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="textbtn:TextButton"
+           x:Key="SortedByBtn" BasedOn="{StaticResource LinkTextBtn}">
+        <Setter Property="Command" Value="{Binding DataContext.OpenSortingPopupCommand, ElementName=RootView}"/>
+        <Style.Triggers>
             <DataTrigger Binding="{Binding DataContext.IsSortOptionsPopupOpen, ElementName=RootView}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
                 <Setter Property="IsEnabled" Value="False"/>

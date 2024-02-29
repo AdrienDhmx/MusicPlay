@@ -15,6 +15,7 @@ using System.Windows;
 using MessageControl;
 
 using MusicPlay.Database.Models;
+using MusicPlayUI.Core.Models;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -267,13 +268,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 SetSelectedCover(SelectedCoverIndex);
             });
 
-            OpenCloseSubViewCommand = new RelayCommand<string>((value) =>
-            {
-                if(int.TryParse(value, out int view))
-                {
-                    OpenCloseSubView(view);
-                }
-            });
+            OpenCloseSubViewCommand = new RelayCommand<ViewNameEnum>(OpenCloseSubView);
 
             SwitchFullScreenCommand = new RelayCommand(AppState.ToggleFullScreen);
 
@@ -299,9 +294,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             NavigateToAlbumCommand = _commandsManager.NavigateToAlbumByIdCommand;
 
-            LoadData();
             Stream = _audioPlayback.Stream;
-            InitSubView();
         }
 
         private void IsFullScreenChanged()
@@ -311,6 +304,9 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void Dispose()
         {
+            // need to set this back to false when changing view
+            AppBar.Visibility = Visibility.Visible;
+
             _queueService.PlayingTrackChanged -= OnPlayingTrackChanged;
             _visualizerParameterService.AutoColorChanged -= VAutoColorChanged;
             _visualizerParameterService.RepresentationChanged -= VRepresentationChanged;
@@ -323,29 +319,68 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 AppState.CurrentView.State.ChildViewModel.ViewModel?.Dispose();
             }
+        }
 
-            GC.SuppressFinalize(this);
+        public override void UpdateAppBarStyle()
+        {
+            AppBar.ResetStyle();
+            AppBar.ResetData();
+            AppBar.Visibility = Visibility.Hidden;
+        }
+
+        public override void Init()
+        {
+            base.Init();
+            LoadData();
+
+            if (!IsSubViewOpen)
+            {
+                if(State.ChildViewModel != null)
+                {
+                    Type childViewType = State.ChildViewModel.ViewModel.GetType();
+                    if (childViewType == typeof(QueueViewModel))
+                    {
+                        OpenCloseSubView(ViewNameEnum.Queue);
+                    }
+                    else if (childViewType == typeof(LyricsViewModel))
+                    {
+                        OpenCloseSubView(ViewNameEnum.Lyrics);
+                    }
+                    else if (childViewType == typeof(TrackInfoViewModel))
+                    {
+                        OpenCloseSubView(ViewNameEnum.TrackInfo);
+                    }
+                }
+                else
+                {
+                    InitSubView();
+                }
+            }
         }
 
         private void InitSubView()
         {
-            OpenCloseSubView(ConfigurationService.GetPreference(SettingsEnum.NowPlayingStartingSubView));
+            OpenCloseSubView((ViewNameEnum)ConfigurationService.GetPreference(SettingsEnum.NowPlayingStartingSubView));
         }
 
-        private void OpenCloseSubView(int view)
+        private void OpenCloseSubView(ViewNameEnum view)
         {
             ViewNameEnum selectedView = ViewNameEnum.Empty;
+            NavigationModel navigationModel = null;
 
-            if (view == 41) // queue
+            if (view == ViewNameEnum.Queue) // queue
             {
                 IsQueueOpen = !IsQueueOpen;
                 IsLyricsOpen = false;
                 IsTrackInfoOpen = false;
 
                 if (IsQueueOpen)
+                {
                     selectedView = ViewNameEnum.Queue;
+                    navigationModel = App.State.CreateNavigationModel<QueueViewModel>();
+                }
             }
-            else if (view == 42) // lyrics
+            else if (view == ViewNameEnum.Lyrics) // lyrics
             {
                 IsQueueOpen = false;
                 IsLyricsOpen = !IsLyricsOpen;
@@ -354,30 +389,35 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (IsLyricsOpen)
                 {
                     selectedView = ViewNameEnum.Lyrics;
+                    navigationModel = App.State.CreateNavigationModel<LyricsViewModel>();
                 }
             }
-            else if (view == 43) // track info
+            else if (view == ViewNameEnum.TrackInfo) // track info
             {
                 IsQueueOpen = false;
                 IsLyricsOpen = false;
                 IsTrackInfoOpen = !IsTrackInfoOpen;
 
-                if (IsTrackInfoOpen) 
+                if (IsTrackInfoOpen)
+                {
                     selectedView = ViewNameEnum.TrackInfo;
+                    navigationModel = App.State.CreateNavigationModel<TrackInfoViewModel>();
+                }
             }
 
             if (selectedView == ViewNameEnum.Empty)
             {
                 IsSubViewOpen = false;
-                AppState.CurrentView.State.ChildViewModel = new(new EmptyViewModel(), null);
+                State.ChildViewModel = new(new EmptyViewModel(), null);
                 ConfigurationService.SetPreference(SettingsEnum.NowPlayingStartingSubView, "0");
             }
             else
             {
                 IsSubViewOpen = true;
-                //NavigationService.NavigateTo(selectedView);
-                ConfigurationService.SetPreference(SettingsEnum.NowPlayingStartingSubView, view.ToString());
+                State.ChildViewModel = navigationModel;
+                ConfigurationService.SetPreference(SettingsEnum.NowPlayingStartingSubView, ((int)view).ToString());
             }
+
             SetWidthValue();
         }
 
@@ -522,26 +562,24 @@ namespace MusicPlayUI.MVVM.ViewModels
                 SetSelectedCover(index - 1);
             }
         }
+
         private void GetBlurredCover()
         {
             if (SelectedCover.ValidFilePath())
             {
                 BlurredCover = SelectedCover.GetBlurredImage(20);
 
-                if(BlurredCover is not null)
+                if(BlurredCover.ValidFilePath())
                     SetSpectrumColor();
             }
         }
 
         private void SetSpectrumColor()
         {
-            if (BlurredCover.ValidFilePath() && VisualizerParameterService.AutoColor)
-            {
-                SolidColorBrush meanColor = ImageProcessor.CalculateMeanColor(BlurredCover);
+            SolidColorBrush meanColor = ImageProcessor.CalculateMeanColor(BlurredCover);
 
-                SolidColorBrush emphasizedColor = meanColor.GetEmphasizedColor();
-                VisualizerParameterService.ObjectColor = emphasizedColor;
-            }
+            SolidColorBrush emphasizedColor = meanColor.GetEmphasizedColor();
+            VisualizerParameterService.ObjectColor = emphasizedColor;
         }
 
         private void OnPlayingTrackChanged()
@@ -556,7 +594,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void VAutoColorChanged()
         {
-            if (VisualizerParameterService.AutoColor)
+            if (VisualizerParameterService.AutoColor && BlurredCover.ValidFilePath())
             {
                 SetSpectrumColor();
             }

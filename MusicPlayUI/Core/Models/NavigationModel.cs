@@ -14,6 +14,7 @@ namespace MusicPlayUI.Core.Models
     public class NavigationModel : ObservableObject
     {
         public ViewModel ViewModel { get; private set; }
+        public Type ViewModelType { get; set; } = typeof(ViewModel);
 
         private NavigationState _state;
         public NavigationState State
@@ -101,6 +102,7 @@ namespace MusicPlayUI.Core.Models
 
         private string _searchText = string.Empty;
         private SortModel _sortBy;
+        private LibraryFilters _appliedFilters;
 
         public int Page
         {
@@ -118,6 +120,12 @@ namespace MusicPlayUI.Core.Models
         {
             get => _searchText;
             set => SetField(ref _searchText, value);
+        }
+
+        public LibraryFilters AppliedFilters
+        {
+            get => _appliedFilters;
+            set => SetField(ref _appliedFilters, value);
         }
 
         public SortModel SortBy

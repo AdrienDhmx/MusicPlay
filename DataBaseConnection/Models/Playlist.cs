@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Windows.Controls.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MusicPlay.Database.DatabaseAccess;
@@ -16,8 +18,8 @@ namespace MusicPlay.Database.Models
         private string _description = "";
         private string _cover = "";
         private PlaylistTypeEnum _playlistType = PlaylistTypeEnum.UserPlaylist;
-        private ObservableCollection<PlaylistTrack> _tracks = [];
-        private ObservableCollection<PlaylistTag> _playlistTags = [];
+        private ObservableCollection<PlaylistTrack> _playlistTracks = [];
+        private List<PlaylistTag> _playlistTags = [];
 
         public string Name
         {
@@ -55,28 +57,92 @@ namespace MusicPlay.Database.Models
             set => SetField(ref _playlistType, value);
         }
 
-        public ObservableCollection<PlaylistTrack> Tracks
+        public ObservableCollection<PlaylistTrack> PlaylistTracks
+        {
+            get
+            {
+                if (_playlistTracks.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _playlistTracks = new(
+                    [
+                        .. context.PlaylistTracks.Where(pt => pt.PlaylistId == Id)
+                                                .Include(pt => pt.Track)
+                                                .ThenInclude(t => t.Album)
+                                                .OrderBy(pt => pt.TrackIndex)
+                    ]);
+               }
+
+                return _playlistTracks;
+            }
+            set => SetField(ref _playlistTracks, value);
+        }
+
+        private ObservableCollection<Track> _tracks;
+        [NotMapped]
+        public ObservableCollection<Track> Tracks
         {
             get
             {
                 if (_tracks.IsNullOrEmpty())
                 {
-                    if (Tracks.IsNullOrEmpty())
-                    {
-
-                        _tracks = new(GetTracks(this));
-                    }
+                    _tracks = new(PlaylistTracks.Select(pt => pt.Track));
                 }
 
                 return _tracks;
             }
-            set => SetField(ref _tracks, value);
         }
 
-        public ObservableCollection<PlaylistTag> PlaylistTags
+        public List<PlaylistTag> PlaylistTags
         {
-            get => _playlistTags;
+            get
+            {
+                if(_playlistTags.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _playlistTags = [.. context.PlaylistTags.Where(pt => pt.Playlist.Id == Id)];
+                }
+                return _playlistTags;
+            }
             set => SetField(ref _playlistTags, value);
+        }
+
+        private ObservableCollection<Tag> _tags;
+        [NotMapped]
+        public ObservableCollection<Tag> Tags
+        {
+            get
+            {
+                if(_tags.IsNullOrEmpty())
+                {
+                    _tags = new(PlaylistTags.Select(pt => pt.Tag));
+                }
+                return _tags;
+            }
+        }
+
+        public override int Length
+        {
+            get
+            {
+                if (_length == 0)
+                {
+                    _length = Tracks.GetTotalLength();
+
+                    if(_length != 0)
+                    {
+                        OnPropertyChanged(nameof(Duration));
+                        OnPropertyChanged(nameof(WrittenDuration));
+                    }
+                }
+                return _length;
+            }
+            set
+            {
+                SetField(ref _length, value);
+                OnPropertyChanged(nameof(Duration));
+                OnPropertyChanged(nameof(WrittenDuration));
+            }
         }
 
         public Playlist(int id, string name, string description, string cover, string duration)
@@ -99,34 +165,30 @@ namespace MusicPlay.Database.Models
 
         public Playlist() { }
 
-        public static async ValueTask Insert(Playlist playlist, bool insertRoles = true)
+        public static async ValueTask Insert(Playlist playlist)
         {
             using DatabaseContext context = new();
             context.Playlists.Add(playlist);
             await context.SaveChangesAsync();
         }
 
-        public static async ValueTask<Playlist?> Get(int id)
+        public static Playlist Get(int id)
         {
             using DatabaseContext context = new();
-            return await context.Playlists.FindAsync(id);
+            return context.Playlists.Find(id);
         }
 
         public static async Task<List<Playlist>> GetAll()
         {
             using DatabaseContext context = new();
-            return await context.Playlists
-                        .Include(p => p.Tracks)
-                        .ToListAsync();
+            return await context.Playlists.ToListAsync();
         }
 
         public static List<Playlist> GetLastPlayed(int top)
             => GetLastPlayed<Playlist>(top);
 
-        public static async Task<List<Playlist>> GetMostPlayed(int top)
-            => await GetMostPlayed<Playlist>(top)
-                    .Include(p => p.Tracks)
-                    .ToListAsync();
+        public static List<Playlist> GetMostPlayed(int top)
+            => GetMostPlayed<Playlist>(top);
 
         public static List<PlaylistTrack> GetTracks(Playlist playlist)
         {
@@ -135,31 +197,29 @@ namespace MusicPlay.Database.Models
                         .Where(pt => pt.PlaylistId == playlist.Id)
                         .Include(pt => pt.Track)
                         .ThenInclude(t => t.Album)
+                        .OrderBy(pt => pt.TrackIndex)
                 ];
         }
 
-        public static async Task AddTrack(Playlist playlist, Track track)
+        public static void AddTrack(Playlist playlist, Track track)
         {
             using DatabaseContext context = new();
-            if (!context.Tracks.Local.Any(e => e.Id == track.Id))
-            {
-                context.Attach(track);
-            }
-
-            playlist.Tracks.Add(new PlaylistTrack(playlist, track, playlist.Tracks.Count));
-            await context.SaveChangesAsync();
+            PlaylistTrack playlistTrack = new PlaylistTrack(playlist.Id, track.Id, playlist.PlaylistTracks.Count + 1);
+            context.PlaylistTracks.Add(playlistTrack);
+            context.SaveChanges();
+            playlistTrack.Track = track;
+            playlist.PlaylistTracks.Add(playlistTrack);
         }
 
         public static async Task InsertTrack(Playlist playlist, Track track, int index)
         {
             using DatabaseContext context = new();
-            if (!context.Tracks.Local.Any(e => e.Id == track.Id))
-            {
-                context.Attach(track);
-            }
+            PlaylistTrack playlistTrack = new PlaylistTrack(playlist.Id, track.Id, index);
+            context.PlaylistTracks.Add(playlistTrack);
+            context.SaveChanges();
 
-            playlist.Tracks.Insert(index, new PlaylistTrack(playlist, track, index));
-            UpdateTrackIndexes(playlist.Tracks);
+            playlist.PlaylistTracks.Insert(index, playlistTrack);
+            UpdateTrackIndexes(playlist.PlaylistTracks, playlist.Id, context, index);
             await context.SaveChangesAsync();
         }
 
@@ -168,7 +228,7 @@ namespace MusicPlay.Database.Models
             using DatabaseContext context = new();
             foreach (var track in tracks)
             {
-                playlist.Tracks.Add(new PlaylistTrack(playlist, track, playlist.Tracks.Count));
+                playlist.PlaylistTracks.Add(new PlaylistTrack(playlist.Id, track.Id, playlist.PlaylistTracks.Count));
             }
             await context.SaveChangesAsync();
         }
@@ -176,40 +236,46 @@ namespace MusicPlay.Database.Models
         public static async Task MoveTrack(Playlist playlist, int oldIndex, int newIndex) 
         {
             using DatabaseContext context = new();
-            playlist.Tracks.Move(oldIndex, newIndex);
-            UpdateTrackIndexes(playlist.Tracks);
+            playlist.PlaylistTracks.Move(oldIndex, newIndex);
+            int startIndex = oldIndex > newIndex ? newIndex : oldIndex;
+
+            UpdateTrackIndexes(playlist.PlaylistTracks, playlist.Id, context, startIndex);
             await context.SaveChangesAsync();
         }
 
-        private static void UpdateTrackIndexes(ICollection<PlaylistTrack> tracks)
+        public static void UpdateTrackIndexes(ICollection<PlaylistTrack> tracks, int playlistId, DatabaseContext context, int startIndex = 0)
         {
-            for (int i = 0; i < tracks.Count; i++)
+            for (int i = startIndex; i < tracks.Count; i++)
             {
-                tracks.ElementAt(i).TrackIndex = i;
+                context.PlaylistTracks.Where(pt => pt.PlaylistId == playlistId && pt.TrackId == tracks.ElementAt(i).TrackId)
+                                       .ExecuteUpdate(propCall => propCall.SetProperty(pt => pt.TrackIndex, i + 1));
             }
         }
 
         public static async Task RemoveTrack(Playlist playlist, PlaylistTrack track)
         {
             using DatabaseContext context = new();
-            playlist.Tracks.Remove(track);
+            playlist.PlaylistTracks.Remove(track);
             await context.SaveChangesAsync();
         }
 
         public static async Task Update(Playlist playlist, string newName, string newDescription, string newCover)
         {
             using DatabaseContext context = new();
-            playlist.Name = newName;
-            playlist.Description = newDescription;
-            playlist.Cover = newCover;
+            Playlist playlistToUpdate = context.Playlists.Find(playlist.Id);
+            context.Update(playlistToUpdate);
+            playlistToUpdate.Name = newName;
+            playlistToUpdate.Description = newDescription;
+            playlistToUpdate.Cover = newCover;
             await context.SaveChangesAsync();
         }
 
-        public static async Task UpdateCover(Playlist playlist, string newCover)
+        public static void UpdateCover(Playlist playlist, string newCover)
         {
             using DatabaseContext context = new();
+            context.Update(playlist);
             playlist.Cover = newCover;
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         public static async Task Delete(Playlist playlist)

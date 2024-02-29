@@ -114,7 +114,7 @@
     <Style x:Key="SStyle" TargetType="TextBlock"
            BasedOn="{StaticResource TextblockBaseStyle}">
         <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontSize" Value="20"/>
     </Style>
 
     <!-- For name of item in libraries (album name, artist name, playlist name...) -->
@@ -171,12 +171,13 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Left"/>
         <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainer}"/>
-        <Setter Property="Margin" Value="4,0"/>
+        <Setter Property="Margin" Value="4,2"/>
     </Style>
 
     <!-- For filters Header -->
     <Style x:Key="SFilterHeaderStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SFilterStyle}">
+        <Setter Property="Margin" Value="10,0"/>
         <Setter Property="FontSize" Value="18"/>
     </Style>
 
@@ -185,7 +186,7 @@
            BasedOn="{StaticResource TextblockBaseStyle}">
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="40"/>
-        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
@@ -281,7 +282,7 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Margin" Value="10,0"/>
         <Setter Property="CornerRadius" Value="5"/>
-        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="MinWidth" Value="250"/>
         <Setter Property="Padding" Value="4,0"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="FontSize" Value="18"/>

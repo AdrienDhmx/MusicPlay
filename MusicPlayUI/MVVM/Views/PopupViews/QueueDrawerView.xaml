@@ -8,7 +8,7 @@
              xmlns:customButton="clr-namespace:IconButton;assembly=IconButton" 
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:model="clr-namespace:MusicPlay.Database.Models.DataBaseModels;assembly=MusicPlay.Database"
-             xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls" xmlns:ListView="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls" xmlns:ListView="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" xmlns:asyncImage="clr-namespace:MusicPlayUI.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=popupviewmodels:QueueDrawerViewModel}"
              x:Name="RootQueuePopupView"
@@ -22,23 +22,52 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Playing From -->
-            <TextBlock Text="{Binding QueueService.Queue.PlayingFromName, UpdateSourceTrigger=PropertyChanged}"
-                       Style="{DynamicResource SLlistInfoStyle}"
-                       HorizontalAlignment="Center"
-                       TextAlignment="Center"
-                       MaxHeight="80"
-                       FontSize="24"
-                       Margin="20, 16">
-                <TextBlock.InputBindings>
-                    <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToPlayingFromCommand}"/>
-                </TextBlock.InputBindings>
-            </TextBlock>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <!-- Playing From -->
+                <TextBlock Text="{Binding QueueService.Queue.PlayingFromName, UpdateSourceTrigger=PropertyChanged}"
+                           Style="{DynamicResource SLlistInfoStyle}"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center"
+                           MaxHeight="80"
+                           FontSize="24"
+                           Margin="20, 16">
+                    <TextBlock.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToPlayingFromCommand}"/>
+                    </TextBlock.InputBindings>
+                </TextBlock>
+
+                <StackPanel Grid.Row="1" 
+                            Margin="10, 6"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <customButton:IconButton Icon="{DynamicResource PlaylistLibrary}"
+                                             Style="{DynamicResource FilledBtn}"
+                                             Width="40"
+                                             Height="40"
+                                             IconStretch="Uniform"
+                                            Command="{Binding SaveQueueAsPlaylistCommand}">
+                    </customButton:IconButton>
+
+                    <Border Width="6"/>
+
+                    <customButton:IconButton Icon="{DynamicResource Trash}"
+                                            Width="40"
+                                            Height="40"
+                                         Style="{DynamicResource SmallDeleteButton}"
+                                        Command="{Binding ClearQueueCommand}">
+                    </customButton:IconButton>
+                </StackPanel>
+            </Grid>
 
             <!-- Queue Tracks -->
-            <vcontrol:VirtualizingListView x:Name="QueueTracks"
-                                               Grid.Row="1"
-                                           Style="{DynamicResource QueueListView}"
+            <ListView x:Name="QueueTracks"
+                      Grid.Row="1"
+                            Style="{DynamicResource QueueListView}"
+                      Loaded="QueueTracks_Loaded"
                           Margin="5, 0"
                           dd:DragDrop.IsDragSource="True"
                          dd:DragDrop.IsDropTarget="True"
@@ -47,11 +76,9 @@
                           dd:DragDrop.DropTargetScrollViewer="{Binding ElementName=QueueTracks, Converter={StaticResource FindScrollViewerConverter}}"
                           dd:DragDrop.DropTargetAdornerBrush="{DynamicResource Primary}"
                           HorizontalAlignment="Stretch"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        ItemsSource="{Binding QueueService.Queue.Tracks, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding QueueTracks, UpdateSourceTrigger=PropertyChanged}"
                         SelectedItem="{Binding QueueService.Queue.PlayingQueueTrack, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                           ItemContainerStyle="{DynamicResource QueuePopupListViewItem}"
-                          ScrollViewer.CanContentScroll="True"
                         SelectionMode="Single">
                     <dd:DragDrop.EffectMoveAdornerTemplate>
                         <DataTemplate DataType="{x:Type model:OrderedTrack}">
@@ -92,7 +119,7 @@
                             </Border>
                         </DataTemplate>
                     </dd:DragDrop.EffectMoveAdornerTemplate>
-                    <vcontrol:VirtualizingListView.ItemTemplate>
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border x:Name="RootItemBorder"
                                     IsHitTestVisible="true"
@@ -116,38 +143,37 @@
                                                             HorizontalAlignment="Center"
                                                             Visibility="{Binding IsMouseOver, ElementName=RootItemBorder, Converter={StaticResource BoolToVisibilityConverter}}"
                                                             x:Name="PlayBtn"/>
-                                    <!-- Album Cover -->
-                                    <Border CornerRadius="4"
-                                            Margin="4"
-                                            Visibility="{Binding DataContext.AreCoversEnabled, ElementName=RootQueuePopupView, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneTime}"
-                                            Width="60"
-                                            Height="60"
-                                            VerticalAlignment="Center"
-                                            x:Name="CoverBorder">
-                                        <Border.Background>
-                                            <ImageBrush ImageSource="{Binding Track, Converter={StaticResource ONullImageConverter}}"
-                                                            Stretch="UniformToFill"/>
-                                        </Border.Background>
-                                    </Border>
+                                    <!-- Cover -->
+                                    <asyncImage:AsyncImage CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                                               Width="60"
+                                                               Height="60"
+                                                               IsInViewport="False"
+                                                               ImagePath="{Binding Track, Converter={StaticResource TNullImageConverter}}"
+                                                               x:Name="CoverBorder">
+                                        <asyncImage:AsyncImage.Placeholder>
+                                            <Border ClipToBounds="True"
+                                                        Background="{DynamicResource SecondaryContainer}"/>
+                                        </asyncImage:AsyncImage.Placeholder>
+                                    </asyncImage:AsyncImage>
 
                                     <!-- Title & Album -->
-                                <StackPanel HorizontalAlignment="Stretch"
-                                                VerticalAlignment="Top"
-                                            ClipToBounds="false"
-                                                Margin="8,4"
-                                                Grid.Column="1">
+                                    <StackPanel HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Top"
+                                                ClipToBounds="false"
+                                                    Margin="8,4"
+                                                    Grid.Column="1">
 
-                                    <TextBlock Text="{Binding Track.Title}"
-                                                   Style="{DynamicResource SStyle}"
-                                                   MaxHeight="40"
-                                                   HorizontalAlignment="Stretch"/>
+                                        <TextBlock Text="{Binding Track.Title}"
+                                                       Style="{DynamicResource SStyle}"
+                                                       MaxHeight="40"
+                                                       HorizontalAlignment="Stretch"/>
 
-                                    <ListView:TrackArtistsListView Artists="{Binding Track.TrackArtistRole}" 
-                                                                   FontSize="15"
-                                                                Foreground="{DynamicResource OnBackground}"
-                                                                   Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootQueuePopupView}"/>
+                                        <ListView:TrackArtistsListView Artists="{Binding Track.TrackArtistRole}" 
+                                                                       FontSize="15"
+                                                                    Foreground="{DynamicResource OnBackground}"
+                                                                       Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootQueuePopupView}"/>
 
-                                </StackPanel>
+                                    </StackPanel>
 
                                     <!-- Remove from queue button -->
                                     <customButton:IconButton Grid.Column="2"
@@ -193,8 +219,8 @@
                             </Trigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
-                    </vcontrol:VirtualizingListView.ItemTemplate>
-                </vcontrol:VirtualizingListView>
+                    </ListView.ItemTemplate>
+                </ListView>
 
             <Border Background="{DynamicResource BlackGradient}"
                     IsHitTestVisible="False"
@@ -218,27 +244,6 @@
 
             <Border Style="{DynamicResource BottomBlackGradientBorder}"
                        Grid.Row="1"/>
-
-            <StackPanel Grid.Row="1"
-                        Margin="0,0,40,10"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal"
-                        Panel.ZIndex="1">
-
-                <customButton:IconButton Icon="{DynamicResource PlaylistLibrary}"
-                                             Style="{DynamicResource PlaylistIconButton}"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Bottom"
-                                            Command="{Binding SaveQueueAsPlaylistCommand}">
-                    <customButton:IconButton.Effect>
-                        <DropShadowEffect BlurRadius="10" 
-                                          Color="#101010"
-                                           Opacity="0.2"
-                                          Direction="290"/>
-                    </customButton:IconButton.Effect>
-                </customButton:IconButton>
-            </StackPanel>
         </Grid>
     </Border>
 </UserControl>

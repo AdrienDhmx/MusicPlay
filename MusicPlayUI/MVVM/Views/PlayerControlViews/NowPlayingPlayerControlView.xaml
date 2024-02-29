@@ -115,8 +115,8 @@
                     Style="{DynamicResource NPSlider}"
                             HorizontalAlignment="Stretch"
                              VerticalAlignment="Center"
-                    Foreground="{DynamicResource ScdWhiteTransparent}"
-                    Background="{DynamicResource ScdWhiteTransparent}"
+                                Foreground="{DynamicResource ScdWhiteTransparent}"
+                                Background="{DynamicResource ScdWhiteTransparent}"
                             Value="{Binding AudioService.CurrentPositionMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="0"
                             Maximum="{Binding AudioService.MaxPositionMs}"
@@ -125,7 +125,7 @@
                             helper:SliderDragHelper.DragTarget="{Binding AudioService}">
             </Slider>
 
-            <TextBlock Text="{Binding QueueService.PlayingTrack.Duration}"
+            <TextBlock Text="{Binding QueueService.Queue.PlayingTrack.Duration}"
                                Foreground="{DynamicResource WhiteForeground}"
                                FontSize="14"
                                Margin="4,0,0,0"

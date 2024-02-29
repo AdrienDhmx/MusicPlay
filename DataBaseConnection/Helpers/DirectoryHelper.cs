@@ -14,7 +14,11 @@ namespace MusicPlay.Database.Helpers
 {
     public static class DirectoryHelper
     {
+#if DEBUG
+        public static readonly string AppName = "MusicPlay_DEBUG";
+#else
         public static readonly string AppName = "MusicPlay";
+#endif
 
         /// <summary>
         /// C:\User\UserName\Music\
@@ -42,6 +46,7 @@ namespace MusicPlay.Database.Helpers
 
         private static readonly string ArtistFolderName = "artists";
         private static readonly string AlbumsFolderName = "albums";
+        private static readonly string PlaylistsFolderName = "playlists";
         private static readonly string TrackFolderName = "track_covers";
         private static readonly string CoverFolderName = "covers";
         private static readonly string BlurredCoverFolderName = $"${CoverFolderName}/blurred";
@@ -193,8 +198,12 @@ namespace MusicPlay.Database.Helpers
             {
                 return CheckDirectory(AppFolder + TrackFolderName + "/");
             }
+            else if (playableModel.GetType() == typeof(Playlist))
+            {
+                folderName = PlaylistsFolderName;
+            }
 
-            if(folderName.IsNotNullOrWhiteSpace())
+            if (folderName.IsNotNullOrWhiteSpace())
             {
                 string directory = AppFolder + folderName + "/" + playableModel.Id + "/";
                 return CheckDirectory(directory);

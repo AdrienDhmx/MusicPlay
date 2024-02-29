@@ -1,7 +1,10 @@
 ﻿using DynamicScrollViewer;
+using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Models;
+using MusicPlayUI.Core.Services;
+using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.ViewModels.AppBars;
 using System;
 using System.Windows;
@@ -11,20 +14,35 @@ namespace MusicPlayUI.MVVM.ViewModels
 {
     public class ViewModel : ObservableObject, IDisposable
     {
+        protected DynamicScrollViewer.DynamicScrollViewer _scrollViewer;
+
         public virtual NavigationState State
         {
-            get => App.State.CurrentView?.State;
+            get => AppState.CurrentView?.State;
             set
             {
-                if(App.State.CurrentView != null)
+                if(AppState.CurrentView != null)
                 {
-                    App.State.CurrentView.State = value;
+                    AppState.CurrentView.State = value;
                     OnPropertyChanged(nameof(State));
                 }
             }
         }
 
-        public static AppBar AppBar => App.State.AppBar;
+        public static IAppState AppState => App.State;
+        public static AppBar AppBar => AppState.AppBar;
+
+        public bool CanScroll
+        {
+            get
+            {
+                if(_scrollViewer.IsNotNull())
+                {
+                    return _scrollViewer.ExtentHeight > _scrollViewer.ViewportHeight;
+                }
+                return false;
+            }
+        }
 
         private Thickness _topMargin = AppBar is null ? new(0, 60, 0, 0) : new(0, AppBar.Height, 0, 0);
         public Thickness TopMargin
@@ -50,10 +68,27 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         }
 
+        public void ScrollToTop()
+        {
+            _scrollViewer?.ScrollToVerticalOffsetWithAnimation(0, 500);
+        }
+
+        /// <summary>
+        /// This method is called whenever the <see cref="_scrollViewer"/> calls the <see cref="DynamicScrollViewer.DynamicScrollViewer.OnScrollCommand"/> command.<br></br>
+        /// This base implementation does the following: <br></br>
+        /// - set the <see cref="_scrollViewer"/> property if null, <br></br>
+        /// - save the new <see cref="OnScrollEvent.VerticalOffset"/> in the <see cref="State"/>, <br></br>
+        /// - update the <see cref="AppBar.CanScrollToTop"/> property (e.VerticalOffset > _scrollViewer.ViewportHeight)
+        /// </summary>
+        /// <param name="e"></param>
         public virtual void OnScrollEvent(OnScrollEvent e)
         {
+            _scrollViewer = e.Sender;
+            OnPropertyChanged(nameof(CanScroll));
             // save the scroll offset
             State.ScrollOffset = e.VerticalOffset;
+            
+            AppBar.CanScrollToTop = e.VerticalOffset > _scrollViewer.ViewportHeight * 0.8;
         }
 
         /// <summary>
@@ -69,6 +104,10 @@ namespace MusicPlayUI.MVVM.ViewModels
         public virtual void Init()
         {
             UpdateAppBarStyle();
+            if(AppBar != null)
+            {
+                AppBar.CanScrollToTop = false;
+            }
         }
 
         public virtual void Update(BaseModel parameter = null)

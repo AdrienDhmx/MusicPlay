@@ -9,6 +9,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Height="{Binding Height}"
+          x:Name="AppBarGrid"
+          Visibility="{Binding Visibility}"
           Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="140"/>
@@ -45,6 +47,7 @@
                                    IconWidth="22"
                                    IconHeight="18"
                                    Margin="0, 0, 10, 0"
+                                   ToolTip="Open menu"
                                    FillColor="{Binding Foreground}"
                                    StrokeColor="Transparent"
                                   Command="{Binding ToggleMenuDrawerCommand}"/>
@@ -53,6 +56,7 @@
                                     Style="{DynamicResource NavigationButton}"
                                     FillColor="{Binding Foreground}"
                                    Icon="{DynamicResource Back}"
+                                   ToolTip="Naviagate back"
                                     IsEnabled="{Binding AppState.CanNavigateBack, UpdateSourceTrigger=PropertyChanged}"
                                   Command="{Binding NavigateBackCommand}"/>
 
@@ -60,6 +64,7 @@
                                    Style="{DynamicResource NavigationButton}"
                                    FillColor="{Binding Foreground}"
                                    Icon="{DynamicResource Forward}"
+                                   ToolTip="Naviagate forward"
                                    IsEnabled="{Binding AppState.CanNavigateForward, UpdateSourceTrigger=PropertyChanged}"
                                   Command="{Binding NavigateForwardCommand}"/>
         </Grid>
@@ -67,6 +72,7 @@
         <!-- The main content (Title, Subtitle, Image, Icon...) -->
         <Grid HorizontalAlignment="Stretch"
               Grid.Column="1"
+              x:Name="CustomizableGridContent"
               Opacity="{Binding ContentOpacity}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -98,7 +104,14 @@
         <!-- Additional options to come => Profile, Search... -->
         <Grid Grid.Column="2"
               HorizontalAlignment="Right">
-
+            <iconbutton:IconButton Grid.Column="2"
+                                   Margin="20, 0"
+                                   Style="{DynamicResource NavigationButton}"
+                                   FillColor="{Binding Foreground}"
+                                   Icon="{DynamicResource ExpandLess}"
+                                   ToolTip="Scroll to top"
+                                   Visibility="{Binding CanScrollToTop, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHVisibilityConverter}}"
+                                  Command="{Binding ScrollToTopCommand}"/>
         </Grid>
     </Grid>
 </UserControl>

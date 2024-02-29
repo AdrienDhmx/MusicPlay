@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
-             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton" xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
              mc:Ignorable="d" 
              x:Name="ListRootView"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ItemsControl ItemsSource="{Binding DataContext.SelectedFilters, ElementName=ListRootView}"
+        <ItemsControl ItemsSource="{Binding DataContext.AppliedFilters.Filters, ElementName=ListRootView}"
                        HorizontalAlignment="Center"
                       VerticalAlignment="Center">
             <ItemsControl.ItemsPanel>
@@ -19,34 +19,77 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border x:Name="RootFilterBorder"
-                            Height="32"
-                            CornerRadius="16"
-                            Margin="5, 3"
-                            Background="{DynamicResource SecondaryContainer}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="34"/>
-                            </Grid.ColumnDefinitions>
+                    <Border CornerRadius="16"
+                          Margin="2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource SecondaryContainer}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsNegative}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource TertiaryContainer}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Grid ShowGridLines="False"
+                          SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="{Binding Name}"
-                                       FontSize="14"
-                                        VerticalAlignment="Center"
-                                   Style="{DynamicResource NChipStyle}"/>
+                        <textbtn:TextButton 
+                                    Padding="12, 0, 6, 0"
+                                    Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}"
+                                    FontSize="14"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    CornerRadius="16, 0, 0, 16"
+                                    SnapsToDevicePixels="True"
+                                    Background="Transparent"
+                                    Cursor="Hand"
+                                    Command="{Binding DataContext.InverseFilterCommand, ElementName=ListRootView}"
+                                    CommandParameter="{Binding .}">
+                            <textbtn:TextButton.Style>
+                                    <Style TargetType="textbtn:TextButton">
+                                        <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainer}"/>
+                                        <Setter Property="MouseOverBtnColor" Value="{DynamicResource SecondaryHover}"/>
+                                    <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsNegative}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource OnTertiaryContainer}"/>
+                                                <Setter Property="MouseOverBtnColor" Value="{DynamicResource TertiaryHover}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </textbtn:TextButton.Style>
+                        </textbtn:TextButton>
 
                             <iconbtn:IconButton Icon="{DynamicResource CloseIcon}"
-                                                Style="{DynamicResource BaseIconButton}"
+                                            Background="Transparent"
                                                 Height="32"
                                                 Width="32"
                                                 IconWidth="12"
                                                 IconHeight="12"
+                                            SnapsToDevicePixels="True"
                                                 Grid.Column="1"
                                                 CornerRadius="0,16,16,0"
-                                                FillColor="{DynamicResource OnSecondaryContainer}"
                                                 Command="{Binding DataContext.RemoveFilterCommand, ElementName=ListRootView}"
-                                                CommandParameter="{Binding .}"
-                                                MouseOverBackground="{DynamicResource SecondaryHover}"/>
+                                                CommandParameter="{Binding .}">
+                                <iconbtn:IconButton.Style>
+                                    <Style TargetType="iconbtn:IconButton"
+                                           BasedOn="{StaticResource BaseIconButton}">
+                                        <Setter Property="FillColor" Value="{DynamicResource OnSecondaryContainer}"/>
+                                        <Setter Property="MouseOverBackground" Value="{DynamicResource SecondaryHover}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsNegative}" Value="True">
+                                                <Setter Property="FillColor" Value="{DynamicResource OnTertiaryContainer}"/>
+                                                <Setter Property="MouseOverBackground" Value="{DynamicResource TertiaryHover}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </iconbtn:IconButton.Style>
+                            </iconbtn:IconButton>
                         </Grid>
                     </Border>
                 </DataTemplate>

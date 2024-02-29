@@ -14,7 +14,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 {
     public class CreatePlaylistViewModel : ModalViewModel
     {
-        private MusicPlay.Database.Models.Playlist PlaylistModel { get; set; }
+        private Playlist PlaylistModel { get; set; }
 
         private string _playlistName = "";
         public string PlaylistName
@@ -93,7 +93,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
             SelectCoverCommand = new RelayCommand(async () => await SelectCover());
 
-            if(_modalService.ModalParameter is MusicPlay.Database.Models.Playlist playlist)
+            if(_modalService.ModalParameter is Playlist playlist)
             {
                 IsCreate = false; // updating instead
                 PlaylistModel = playlist;
@@ -115,7 +115,7 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             openFileDialog.Multiselect = false;
             openFileDialog.Title = Resources.Select_an_Image;
 
-            PlaylistCover = await CoverService.ChangeCover(PlaylistModel);
+            PlaylistCover = await CoverService.ChangeCover(PlaylistModel, !IsCreate);
         }
 
         private async void CreatePlaylist()

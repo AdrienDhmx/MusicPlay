@@ -16,7 +16,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Colors -->
+                <!-- Theme -->
                 <ResourceDictionary>
                     <ResourceDictionary.MergedDictionaries>
                         <ResourceDictionary Source="Resources\ThemeColors\MainLightThemeColors.xaml"/>
@@ -36,6 +36,7 @@
                         <ResourceDictionary Source="Resources\ThemeStyles\MainThemeStyles.xaml"/>
                     </ResourceDictionary.MergedDictionaries>
                 </ResourceDictionary>
+
             </ResourceDictionary.MergedDictionaries>
 
 
@@ -145,7 +146,6 @@
                 <settingsviews:VisualizerSettingView/>
             </DataTemplate>
 
-            
             <!-- Converters -->
             <converter:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converter:PercentageConverter x:Key="PercentageConverter" Invert="False"/>
@@ -168,10 +168,13 @@
             <converter:FindScrollViewerConverter x:Key="FindScrollViewerConverter"/>
             <converter:ArtistsRelationConverter x:Key="ArtistsRelationConverter"/>
             <converter:NumberDisplayConverter x:Key="DisplayNumberHigherThan0"/>
+            <converter:IsNullConverter x:Key="IsNullConverter"/>
+            <converter:ToTypeConverter x:Key="ToTypeConverter"/>
 
             <BitmapImage x:Key="PlayImg" UriSource="Resources\Play.png" />
             <BitmapImage x:Key="PreviousImg" UriSource="Resources\Previous.png" />
             <BitmapImage x:Key="NextImg" UriSource="Resources\Next.png" />
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

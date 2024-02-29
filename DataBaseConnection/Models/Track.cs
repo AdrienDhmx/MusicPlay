@@ -307,27 +307,23 @@ namespace MusicPlay.Database.Models
             ];
         }
 
-        public static async Task<List<Track>> GetFavorites()
+        public static List<Track> GetFavorites()
         {
             using DatabaseContext context = new();
-            return await context.Tracks.Where(t => t.IsFavorite).ToListAsync();
+            return [.. context.Tracks.Where(t => t.IsFavorite)];
         }
 
         public static List<Track> GetLastPlayed(int top)
             => GetLastPlayed<Track>(top);
-                        
 
-        public static async Task<List<Track>> GetMostPlayed(int top)
-            => await GetMostPlayed<Track>(top)
-                        .Include(t => t.Album)
-                        .Include(t => t.Lyrics)
-                        .Include(t => t.TrackArtistRole)
-                        .ThenInclude(tar => tar.ArtistRole)
-                        .ToListAsync();
+
+        public static List<Track> GetMostPlayed(int top)
+            => GetMostPlayed<Track>(top);
 
         public static int Count()
         {
-            return GetAll().Count;
+            using DatabaseContext context = new();
+            return context.Tracks.Count();
         }
 
         public static int CountFromFolder(int folderId)
@@ -336,38 +332,30 @@ namespace MusicPlay.Database.Models
             return context.Tracks.Where(t => t.FolderId == folderId).Count();
         }
 
-        public static async Task Update(Action<Track, DatabaseContext> update, Track track)
+        public static async Task Update(Action<Track> update, int id)
         {
             using DatabaseContext context = new();
-            if (!context.Tracks.Local.Contains(track))
-            {
-                context.Attach(track);
-            }
 
-            // Perform the update
-            update(track, context);
-            // context.Entry(track).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-        }
-
-        public static async Task Update(Action<Track> update, Track track)
-        {
-            using DatabaseContext context = new();
+            Track track = context.Tracks.Find(id);
+            if (track == null)
+                return;
+            context.Tracks.Update(track);
             update(track);
             await context.SaveChangesAsync();
         }
 
         public static async Task UpdateIsFavorite(Track track)
-            => await Update(t => t.IsFavorite = !t.IsFavorite, track);
+            => await Update(t => t.IsFavorite = !t.IsFavorite, track.Id);
 
         public static async Task UpdateRating(Track track, double newRating)
-            => await Update(t => t.Rating = newRating, track);
+            => await Update(t => t.Rating = newRating, track.Id);
 
         public static async Task UpdateArtwork(Track track, string newArtwork)
-            => await Update(t => t.Artwork = newArtwork, track);
+            => await Update(t => t.Artwork = newArtwork, track.Id);
 
         public static async Task UpdatePlayCount(Track track)
-            => await PlayableModel.UpdatePlayCount(track);
+            => await Update(t => PlayableModel.UpdatePlayCount(t), track.Id);
+
 
         public static async Task Delete(Track track)
         {

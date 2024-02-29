@@ -8,7 +8,7 @@ namespace FilesProcessor
 {
     public static class CoverProcessor
     {
-        private static string OpenFileDialog()
+        public static string OpenFileDialog()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Images (*.BMP;*.JPG;*.GIF,*.PNG,*.TIFF)|*.BMP;*.JPG;*.GIF;*.PNG;*.TIFF";

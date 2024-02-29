@@ -40,5 +40,13 @@ namespace MusicPlayUI.MVVM.Views.PopupViews
                 QueueScroll.ScrollToVerticalOffset(verticalOffset);
             }
         }
+
+        private void QueueTracks_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (QueueTracks.Template.FindName("PART_ContentHost", QueueTracks) is DynamicScrollViewer.DynamicScrollViewer scrollViewer)
+            {
+                scrollViewer.ScrollToItem(QueueTracks.SelectedItem);
+            }
+        }
     }
 }

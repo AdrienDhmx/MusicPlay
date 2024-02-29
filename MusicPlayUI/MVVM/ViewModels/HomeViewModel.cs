@@ -214,7 +214,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             NumberOfAlbums = Album.Count() + " " + Resources.Albums_View;
             NumberOfTracks = Track.Count() + " " + Resources.Tracks;
 
-            int playCount = _historyServices.TodayHistory.PlayCount;
+            int playCount = 0; //_historyServices.TodayHistory.PlayCount;
             if (playCount > 0)
             {
                 string tracks = playCount > 1 ? Resources.Tracks : Resources.Track;
@@ -256,7 +256,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         }
         private void PlayPlaylist(Playlist playlist)
         {
-            _queueService.SetNewQueue(playlist.Tracks, playlist, playlist.Name, playlist.Cover);
+            _queueService.SetNewQueue(playlist.PlaylistTracks, playlist, playlist.Name, playlist.Cover);
         }
     }
 }

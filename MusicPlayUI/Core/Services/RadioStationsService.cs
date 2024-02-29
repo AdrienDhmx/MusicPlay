@@ -149,7 +149,7 @@ namespace MusicPlayUI.Core.Services
             RadioTracks.Insert(0, track);
             RadioTracks = RadioTracks.DistinctBy(t => t?.Id).ToList();
 
-            radio.Tracks = new(); //RadioTracks.ToOrderedTrackModel();
+            radio.PlaylistTracks = new(); //RadioTracks.ToOrderedTrackModel();
             return radio;
         }
 

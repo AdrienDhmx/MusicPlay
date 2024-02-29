@@ -12,7 +12,6 @@ namespace MusicPlayUI.MVVM.ViewModels
     {
         private readonly ICommandsManager _commandsManager;
         public IQueueService QueueService { get; }
-        public IConfigurationServices ConfigurationServices { get; }
 
         private Album _album;
         public Album Album

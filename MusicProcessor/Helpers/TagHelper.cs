@@ -58,11 +58,14 @@ namespace MusicFilesProcessor.Helpers
                     continue;
 
                 string artist = artistToAdd?.Trim().RemoveDiacritics();
-                string[] splitArtists = artist.Split('&', StringSplitOptions.RemoveEmptyEntries);
+                string[] splitArtists = artist.Split('&', StringSplitOptions.TrimEntries);
 
                 for (int i = 0; i < splitArtists.Length; i++)
                 {
                     artist = splitArtists[i];
+                    if(artist == string.Empty) 
+                        continue;
+
                     if (artists.TryGetValue(artist, out List<string> roles))
                     {
                         // Ensure unique roles for each artist

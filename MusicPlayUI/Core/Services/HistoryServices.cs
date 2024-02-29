@@ -32,7 +32,7 @@ namespace MusicPlayUI.Core.Services
 
         public HistoryServices()
         {
-            TodayHistory = PlayHistory.GetTodayHistory().Result;
+            TodayHistory = PlayHistory.GetTodayHistory();
             TodayListenTime = TimeSpan.FromMilliseconds(TodayHistory.PlayTime);
         }
 
@@ -42,7 +42,7 @@ namespace MusicPlayUI.Core.Services
                 return;
 
             UpdateTodayListenTime(listenTimeIncrease);
-            PlayHistoryEntry entry = new PlayHistoryEntry()
+            PlayHistoryEntry entry = new()
             {
                 TrackId = track.Id,
                 HistoryId = TodayHistory.Id,
@@ -56,8 +56,11 @@ namespace MusicPlayUI.Core.Services
 
         private void UpdateTodayListenTime(int listenTimeIncrease)
         {
+            using DatabaseContext context = new DatabaseContext();
+            context.PlayHistories.Update(TodayHistory);
             TodayHistory.PlayTime += listenTimeIncrease;
             TodayListenTime = TimeSpan.FromMilliseconds(TodayHistory.PlayTime);
+            context.SaveChanges();
         }
     }
 

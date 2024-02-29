@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
 
 namespace MusicPlay.Database.Models.DataBaseModels
@@ -53,9 +54,17 @@ namespace MusicPlay.Database.Models.DataBaseModels
             TrackIndex = trackIndex;
         }
 
+        public PlaylistTrack(Track track, int trackIndex)
+        {
+            TrackId = track.Id;
+            Track = track;
+            TrackIndex = trackIndex;
+        }
+
         public PlaylistTrack() { }
     }
 
+    [Table("QueueTrack")]
     public class QueueTrack : OrderedTrack
     {
         public int QueueId { get; set; }
@@ -81,7 +90,19 @@ namespace MusicPlay.Database.Models.DataBaseModels
 
         public override bool Equals(object obj)
         {
-            return obj is QueueTrack queueTrack && queueTrack.Track.Id == Track.Id;
+            if (obj is QueueTrack queueTrack)
+            {
+                if(queueTrack.TrackId != 0 && TrackId != 0)
+                {
+                    return queueTrack.TrackId == TrackId;
+                } 
+                else if(queueTrack.IsNotNull() && Track.IsNotNull())
+                {
+                    return queueTrack.Track.Id == Track.Id;
+                }
+                return base.Equals(obj); // can't compare by Id
+            }
+            return false;
         }
     }
 

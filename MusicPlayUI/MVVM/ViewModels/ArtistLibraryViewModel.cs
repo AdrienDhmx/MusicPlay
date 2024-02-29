@@ -2,8 +2,6 @@
 using DynamicScrollViewer;
 using MusicPlay.Database.Enums;
 using MusicPlay.Database.Models;
-using MusicPlay.Language;
-
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -14,12 +12,7 @@ using MusicPlayUI.MVVM.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Timers;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Navigation;
-using TagLib.Mpeg4;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -27,6 +20,7 @@ namespace MusicPlayUI.MVVM.ViewModels
     {
         private readonly IQueueService _queueService;
         private readonly ICommandsManager _commandsManager;
+
         private bool _noArtistFoundVisibility = false;
         public bool NoArtistFoundVisbility
         {
@@ -38,17 +32,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private bool _isFilterOpen = false;
-        public bool IsFilterOpen
-        {
-            get { return _isFilterOpen; }
-            set
-            {
-                _isFilterOpen = value;
-                OnPropertyChanged(nameof(IsFilterOpen));
-            }
-        }
-
         private string _artistHeader;
         public string ArtistCount
         {
@@ -56,6 +39,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             set
             {
                 SetField(ref _artistHeader, value);
+                AppBar.Subtitle = value;
             }
         }
 
@@ -75,104 +59,33 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<FilterModel> _selectedFilters;
-        public ObservableCollection<FilterModel> SelectedFilters
-        {
-            get { return _selectedFilters; }
-            set
-            {
-                SetField(ref _selectedFilters, value);
-            }
-        }
-
-        private ObservableCollection<FilterModel> _artistTypeFilters;
-        public ObservableCollection<FilterModel> ArtistTypeFilters
-        {
-            get => _artistTypeFilters;
-            set
-            {
-                SetField(ref _artistTypeFilters, value);
-            }
-        }
-
-        private ObservableCollection<FilterModel> _tagFilters;
-        public ObservableCollection<FilterModel> TagFilters
-        {
-            get => _tagFilters;
-            set
-            {
-                SetField(ref _tagFilters, value);
-            }
-        }
-
         private int TotalArtistCount { get; set; }
 
         public ICommand PlayArtistCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
-        public ICommand OpenFiltersCommand { get; }
         public ICommand OpenArtistPopupCommand { get; }
-        public ICommand AddFilterCommand { get; }
-        public ICommand RemoveFilterCommand { get; }
         public ArtistLibraryViewModel(IQueueService queueService, ICommandsManager commandsManager)
         {
             _queueService = queueService;
             _commandsManager = commandsManager;
 
-            PlayArtistCommand = new RelayCommand<Artist>(async (artist) =>
+            PlayArtistCommand = new RelayCommand<Artist>((artist) =>
             {
                 if (artist is not null)
                 {
-                    _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), artist, artist.Name, artist.Cover);
+                    _queueService.SetNewQueue(artist.Tracks, artist, artist.Name, artist.Cover);
                 }
             });
 
             NavigateToArtistCommand = _commandsManager.NavigateToArtistCommand;
             OpenArtistPopupCommand = _commandsManager.OpenArtistPopupCommand;
-
-            OpenFiltersCommand = new RelayCommand(() =>
-            {
-                IsFilterOpen = !IsFilterOpen;
-            });
-
-            AddFilterCommand = new RelayCommand<FilterModel>((filter) =>
-            {
-                if (filter is not null)
-                {
-                    SelectedFilters.Add(filter);
-                    if (filter.FilterType == FilterEnum.ArtistType)
-                    {
-                        ArtistTypeFilters.Remove(filter);
-                    } 
-                    else if(filter.FilterType == FilterEnum.Genre)
-                    {
-                        TagFilters.Remove(filter);
-                    }
-                    FilterSearch();
-                }
-            });
-
-            RemoveFilterCommand = new RelayCommand<FilterModel>((filter) =>
-            {
-                SelectedFilters.Remove(filter);
-                if (!string.IsNullOrWhiteSpace(filter.Name))
-                {
-                    if (filter.FilterType == FilterEnum.ArtistType)
-                    {
-                        ArtistTypeFilters.Add(filter);
-                        ArtistTypeFilters = new(ArtistTypeFilters.OrderBy(f => f.Name));
-                    } 
-                    else if(filter.FilterType == FilterEnum.Genre)
-                    {
-                        TagFilters.Add(filter);
-                        TagFilters = new(TagFilters.OrderBy(f => f.Name));
-                    }
-                }
-                FilterSearch();
-            });
         }
 
         public override void Dispose()
         {
+            SearchHelper.SaveFilter(SettingsEnum.ArtistFilter, AppliedFilters);
+            SearchHelper.SaveOrder(SettingsEnum.ArtistOrder, SortBy);
+            base.Dispose();
         }
 
         internal override void Sort()
@@ -186,7 +99,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         internal override void FilterSearch()
         {
-            AllFilteredArtists = SearchHelper.FilterArtists([.. SelectedFilters], SearchText, SortBy.Type, SortBy.IsAscending);
+            AllFilteredArtists = SearchHelper.FilterArtists(AppliedFilters, SearchText, SortBy);
             LibraryState.Page = 1; // reset pagination
             PaginateData();
 
@@ -199,13 +112,19 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             int endIndex = LibraryState.Page * LibraryState.ItemPerPage;
 
+            List<Artist> temp = [];
             if (endIndex > AllFilteredArtists.Count)
             {
-                Artists = new(AllFilteredArtists);
+                temp = AllFilteredArtists;
             }
             else
             {
-                Artists = new(AllFilteredArtists.Take(endIndex));
+                temp = new(AllFilteredArtists.Take(endIndex));
+            }
+
+            if (!temp.AreEquals([.. Artists ?? new()]))
+            {
+                Artists = new(temp);
             }
         }
 
@@ -222,49 +141,25 @@ namespace MusicPlayUI.MVVM.ViewModels
             base.OnScrollEvent(e);
         }
 
-        public override void Init()
+        public override void InitFilters()
         {
-            base.Init();
-            InitData();
-            IsLoading = false;
+            AppliedFilters ??= SearchHelper.GetSelectedFilters(false);
+
+            Filters.Filters = new(FilterFactory.GetGenreFilter());
+            Filters.AddFilters(FilterFactory.GetArtistRoleFilter());
+            Filters.AddFilters(FilterFactory.GetAlbumTypeFilter());
+
+            base.InitFilters();
         }
 
-        private void InitData()
+        public override void Init()
         {
-            TotalArtistCount = Artist.Count();
-
-            List<FilterModel> tagFilters = FilterFactory.GetGenreFilter();
-            List<FilterModel> artistsFilter = FilterFactory.GetArtistTypeFilter();
-
-            List<FilterModel> temp = [.. SearchHelper.GetSelectedFilters(false)];
-
-            foreach (FilterModel filter in temp)
-            {
-                for (int i = 0; i < tagFilters.Count; i++)
-                {
-                    if (filter.Equals(tagFilters[i]))
-                    {
-                        filter.Name = tagFilters[i].Name;
-                        tagFilters.RemoveAt(i);
-                    }
-                }
-                for (int i = 0; i < artistsFilter.Count; i++)
-                {
-                    if (filter.Equals(artistsFilter[i]))
-                    {
-                        filter.Name = artistsFilter[i].Name;
-                        artistsFilter.RemoveAt(i);
-                    }
-                }
-            }
-
-            TagFilters = new(tagFilters.OrderBy(f => f.Name));
-            ArtistTypeFilters = new(artistsFilter.OrderBy(f => f.Name));
-            SelectedFilters = new(temp);
-
+            AppBar.Title = "My Artists";
+            UpdateAppBarStyle();
             SortOptions = SortFactory.GetSortMenu<Artist>();
-            SortBy ??= SortOptions.First(s => s.IsSelected);
-
+            base.Init();
+            IsLoading = false;
+            TotalArtistCount = Artist.Count();
             FilterSearch();
         }
 

@@ -26,14 +26,19 @@ namespace FilesProcessor.Providers
 
             if (page.extract.IsNotNullOrWhiteSpace())
             {
+                // try to only get the interesting paragraph of the wiki page
+                // so as to not have something too long
                 string discographyHeader = "== discography ==";
                 string recordingHeader = "== recordings ==";
                 string seeAlsoHeader = "== see also ==";
+                string bandMembersHeader = "== band members ==";
                 string referencesHeader = "== references ==";
                 page.extract = CutTextAfterMarker(page.extract, seeAlsoHeader);
                 page.extract = CutTextAfterMarker(page.extract, discographyHeader);
                 page.extract = CutTextAfterMarker(page.extract, recordingHeader);
+                page.extract = CutTextAfterMarker(page.extract, bandMembersHeader);
                 page.extract = CutTextAfterMarker(page.extract, referencesHeader);
+
                 page.extract = ReplaceWikiHeadingsByMarkdownHeadings(page.extract);
                 page.extract += $"\n\n- From the Wikipedia article about [{page.title}]({page.fullurl})";
             }
@@ -69,10 +74,10 @@ namespace FilesProcessor.Providers
             if (response.IsSuccessStatusCode)
             {
                 WikiQueryResult result = await response.Content.ReadFromJsonAsync<WikiQueryResult>();
-                // page found
-                if (result != null && result.query != null && result.query.pages != null && result.query?.pages?.FirstOrDefault().Key != "-1")
+                if (result != null && result.query != null && result.query.pages != null 
+                    && result.query?.pages?.FirstOrDefault().Key != "-1")
                 {
-                    return result.query.pages.Values.FirstOrDefault();                   
+                    return result.query.pages.Values.FirstOrDefault(); // only take the first page                
                 }
                 return null;
             }

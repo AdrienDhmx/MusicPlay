@@ -52,6 +52,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             get { return _albumsHeader; }
             set
             {
+                AppBar.Subtitle = value;
                 SetField(ref _albumsHeader, value);
             }
         }
@@ -114,9 +115,6 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public ICommand PlayAlbumCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
-        public ICommand OpenCloseFiltersCommand { get; }
-        public ICommand AddFilterCommand { get; }
-        public ICommand RemoveFilterCommand { get; }
         public ICommand OpenAlbumPopupCommand { get; }
         public AlbumLibraryViewModel(IQueueService queueService)
         {
@@ -142,59 +140,13 @@ namespace MusicPlayUI.MVVM.ViewModels
                     App.State.OpenPopup<AlbumPopupViewModel>(album);
                 }
             });
-
-            OpenCloseFiltersCommand = new RelayCommand(() =>
-            {
-                IsFilterOpen = !IsFilterOpen;
-            });
-
-            AddFilterCommand = new RelayCommand<FilterModel>((filter) =>
-            {
-                SelectedFilters.Add(filter);
-                if(filter.FilterType == FilterEnum.Artist)
-                {
-                    ArtistsFilters.Remove(filter);
-                }
-                else if(filter.FilterType == FilterEnum.Genre)
-                {
-                    GenreFilters.Remove(filter);
-                }
-                else if (filter.FilterType == FilterEnum.AlbumType)
-                {
-                    AlbumTypeFilters.Remove(filter);
-                }
-
-                FilterSearch();
-            });
-
-            RemoveFilterCommand = new RelayCommand<FilterModel>((filter) =>
-            {
-                SelectedFilters.Remove(filter);
-                if (!string.IsNullOrWhiteSpace(filter.Name))
-                {
-                    if (filter.FilterType == FilterEnum.Artist)
-                    {
-                        ArtistsFilters.Add(filter);
-                        ArtistsFilters = new(ArtistsFilters.OrderBy(f => f.Name));
-                    }
-                    else if (filter.FilterType == FilterEnum.Genre)
-                    {
-                        GenreFilters.Add(filter);
-                        GenreFilters = new(GenreFilters.OrderBy(f => f.Name));
-                    }
-                    else if (filter.FilterType == FilterEnum.AlbumType)
-                    {
-                        AlbumTypeFilters.Add(filter);
-                        AlbumTypeFilters = new(AlbumTypeFilters.OrderByDescending(f => f.Name));
-                    }
-                }
-                FilterSearch();
-            });
         }
 
         public override void Dispose()
         {
-            GC.SuppressFinalize(this);
+            SearchHelper.SaveFilter(SettingsEnum.AlbumFilter, AppliedFilters);
+            SearchHelper.SaveOrder(SettingsEnum.AlbumOrder, SortBy);
+            base.Dispose();
         }
 
         internal override void Sort()
@@ -208,7 +160,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         internal override void FilterSearch()
         {
-            AllFilteredAlbums = SearchHelper.FilterAlbum([.. SelectedFilters], SearchText, SortBy);
+            AllFilteredAlbums = SearchHelper.FilterAlbum(AppliedFilters, SearchText, SortBy);
             LibraryState.Page = 1; // reset pagination
             PaginateData();
 
@@ -221,13 +173,19 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             int endIndex = LibraryState.Page * LibraryState.ItemPerPage;
 
+            List<Album> temp = [];
             if(endIndex > AllFilteredAlbums.Count)
             {
-                Albums = new(AllFilteredAlbums);
+                temp = AllFilteredAlbums;
             }
             else
             {
-                Albums = new(AllFilteredAlbums.Take(endIndex)); 
+                temp = [..AllFilteredAlbums.Take(endIndex)]; 
+            }
+
+            if(!temp.AreEquals([..Albums?? new()]))
+            {
+                Albums = new(temp);
             }
         }
 
@@ -244,64 +202,31 @@ namespace MusicPlayUI.MVVM.ViewModels
             base.OnScrollEvent(e);
         }
 
+        public override void InitFilters()
+        {
+            AppliedFilters ??= SearchHelper.GetSelectedFilters();
+
+            Filters.Filters = new(FilterFactory.GetGenreFilter());
+            Filters.AddFilters(FilterFactory.GetPrimaryArtistFilter());
+            Filters.AddFilters(FilterFactory.GetAlbumTypeFilter());
+
+            base.InitFilters();
+        }
+
         public override void Init()
         {
+            UpdateAppBarStyle();
+            AppBar.Title = "My Albums";
             SortOptions = SortFactory.GetSortMenu<Album>();
             base.Init();
-            InitData();
+            IsLoading = false;
             TotalItemCount = Album.Count();
             FilterSearch();
-            IsLoading = false;
         }
 
         public override void Update(BaseModel parameter = null)
         {
             FilterSearch();
-        }
-
-        private void InitData()
-        {
-            List <FilterModel> genresFilter = FilterFactory.GetGenreFilter();
-            List<FilterModel> artistsFilter = FilterFactory.GetAlbumArtistFilter();
-            List<FilterModel> albumFilter = FilterFactory.GetAlbumTypeFilter();
-
-            List<FilterModel> temp = [.. SearchHelper.GetSelectedFilters()];
-
-            foreach (FilterModel filter in temp)
-            {
-                for (int i = 0; i < genresFilter.Count; i++)
-                {
-                    if (filter.Equals(genresFilter[i]))
-                    {
-                        filter.Name = genresFilter[i].Name;
-                        genresFilter.RemoveAt(i);
-                    }
-                }
-                for (int i = 0; i < artistsFilter.Count; i++)
-                {
-                    if (filter.Equals(artistsFilter[i]))
-                    {
-                        filter.Name = artistsFilter[i].Name;
-                        artistsFilter.RemoveAt(i);
-                    }
-                }
-                for (int i = 0; i < albumFilter.Count; i++)
-                {
-                    if (filter.Equals(albumFilter[i]))
-                    {
-                        filter.Name = albumFilter[i].Name;
-                        albumFilter.RemoveAt(i);
-                    }
-                }
-            }
-
-            SelectedFilters = new(temp);
-            GenreFilters = new(genresFilter);
-            ArtistsFilters = new(artistsFilter);
-            AlbumTypeFilters = new(albumFilter);
-
-            SortBy ??= SortOptions.First(s => s.IsSelected);
-        }
-       
+        }       
     }
 }

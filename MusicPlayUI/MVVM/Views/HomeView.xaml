@@ -15,7 +15,14 @@
              x:Name="RootView"
              d:DesignHeight="2000" 
              d:DesignWidth="800">
-
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="DataTemplates\AlbumDataTemplate.xaml"/>
+                <ResourceDictionary Source="DataTemplates\ArtistDataTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <ds:DynamicScrollViewer x:Name="RootScroll"
                             OnScrollCommand="{Binding OnScrollCommand}"
                             IsInertiaEnabled="False"
@@ -30,11 +37,8 @@
             </Grid.RowDefinitions>
 
             <!-- Hello Message -->
-            <Border Background="{DynamicResource PrimaryContainer}"
-                        CornerRadius="0">
-                <TextBlock Text="{Binding WelcomeMessage}"
-                           Style="{DynamicResource BWelcomeMessageStyle}"/>
-            </Border>
+            <TextBlock Text="{Binding WelcomeMessage}"
+                        Style="{DynamicResource BWelcomeMessageStyle}"/>
 
             <!-- Library Info Cards -->
             <Grid Grid.Row="1"
@@ -120,12 +124,22 @@
                                    Margin="10,0"
                                    Style="{DynamicResource SlistInfoStyle}"/>
                     </Border>
-
-                    <listviews:HorizontalArtistListView Artists="{Binding BindedArtists}"
-                                                            VerticalAlignment="Stretch"
-                                                            Grid.Row="1"
-                                                           Margin="20,6"
-                                                            ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                    <ItemsControl ItemsSource="{Binding BindedArtists}"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch"
+                                  Grid.Row="1"
+                                  Margin="20,6"
+                                  Style="{DynamicResource LibraryItemsControl}">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ds:DynamicScrollViewer VerticalScrollBarVisibility="Disabled"
+                                                   HorizontalAlignment="Stretch"
+                                                    HorizontalScrollBarVisibility="Hidden">
+                                    <StackPanel IsItemsHost="true" Orientation="Horizontal"/>
+                                </ds:DynamicScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
                 </Grid>
 
                 <!-- Recently Played Albums -->
@@ -141,11 +155,22 @@
                                        Style="{DynamicResource SlistInfoStyle}"/>
                     </Border>
 
-                    <listviews:HorizontalAlbumListView Albums="{Binding BindedAlbums}"
-                                             HorizontalAlignment="Stretch"
-                                             HorizontalContentAlignment="Stretch"
-                                                 Grid.Row="1"
-                                                 Margin="20,6"/>
+                    <ItemsControl ItemsSource="{Binding BindedAlbums}"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch"
+                                  Grid.Row="1"
+                                  Margin="20,6"
+                                  Style="{DynamicResource LibraryItemsControl}">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ds:DynamicScrollViewer VerticalScrollBarVisibility="Disabled"
+                                                   HorizontalAlignment="Stretch"
+                                                    HorizontalScrollBarVisibility="Hidden">
+                                    <StackPanel IsItemsHost="true" Orientation="Horizontal"/>
+                                </ds:DynamicScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
                 </Grid>
 
                 <!-- Playlists -->

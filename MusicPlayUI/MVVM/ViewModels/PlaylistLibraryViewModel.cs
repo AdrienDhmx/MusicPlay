@@ -12,11 +12,14 @@ using System.Linq;
 using MessageControl;
 using MusicPlay.Database.Models;
 using MusicPlay.Database.Enums;
+using MusicPlayUI.Core.Services;
+using DynamicScrollViewer;
+using MusicPlay.Database.Models.DataBaseModels;
 
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
-    public class PlaylistLibraryViewModel : ViewModel, IFileDragDropTarget
+    public class PlaylistLibraryViewModel : LibraryViewModel, IFileDragDropTarget
     {
         private readonly IQueueService _queueService;
         private readonly IModalService _modalService;
@@ -36,25 +39,14 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<Playlist> _bindedPlaylists = new ();
-        public ObservableCollection<Playlist> BindedPlaylists
+        private ObservableCollection<Playlist> _playlists = new ();
+        public ObservableCollection<Playlist> Playlists
         {
-            get { return _bindedPlaylists; }
+            get { return _playlists; }
             set
             {
-                _bindedPlaylists = value;
-                OnPropertyChanged(nameof(BindedPlaylists));
-            }
-        }
-
-        private string _searchText;
-        public string SearchText
-        {
-            get { return _searchText; }
-            set
-            {
-                SetField(ref _searchText, value);
-                Task.Run(Search);
+                _playlists = value;
+                OnPropertyChanged(nameof(Playlists));
             }
         }
 
@@ -75,6 +67,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             set
             {
                 SetField(ref _playlistCount, value);
+                AppBar.Subtitle = value;
             }
         }
 
@@ -95,26 +88,16 @@ namespace MusicPlayUI.MVVM.ViewModels
             
             _playlistService = playlistService;
 
-            LoadData();
-
             CreatePlaylistCommand = new RelayCommand(() =>
             {
                 _modalService.OpenModal(ViewNameEnum.CreatePlaylist, PlaylistCreated);
             });
 
-            PlayPlaylistCommand = new RelayCommand<Playlist>(async (playlist) =>
+            PlayPlaylistCommand = new RelayCommand<Playlist>((playlist) =>
             {
                 if (playlist is not null)
                 {
-                    if (playlist.PlaylistType == PlaylistTypeEnum.UserPlaylist)
-                    {
-                        //List<OrderedTrack> tracks = playlist.Tracks;
-                        //_queueService.SetNewQueue(tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
-                    }
-                    else
-                    {
-                        //_queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null, false, false, false);
-                    }
+                    _queueService.SetNewQueue(playlist.PlaylistTracks, playlist, playlist.Name, playlist.Cover, null, false, false, false);
                 }
             });
 
@@ -131,13 +114,16 @@ namespace MusicPlayUI.MVVM.ViewModels
             });
 
             OpenPlaylistPopupCommand = _commandsManager.OpenPlaylistPopupCommand;
-
         }
 
-        private async void Search()
+        internal async override void FilterSearch()
         {
-            BindedPlaylists = new ObservableCollection<Playlist>(await SearchHelper.FilterPlaylist(SearchText));
-            PlaylistCount = $"{BindedPlaylists.Count} of {_totalPlaylistCount}";
+            Playlists = new(ConstAutoPlaylist);
+            foreach(var playlist in await SearchHelper.FilterPlaylist(SearchText))
+            {
+                Playlists.Add(playlist);
+            }
+            PlaylistCount = $"{Playlists.Count - ConstAutoPlaylist.Count} of {_totalPlaylistCount}";
         }
 
         private void PlaylistCreated(bool canceled)
@@ -148,20 +134,37 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
+        public override void UpdateAppBarStyle()
+        {
+            AppBar.SetStyle(AppTheme.Palette.Background, 0, 0);
+            AppBar.SetForeground(AppTheme.Palette.OnBackground);
+        }
+
         public async override void Update(BaseModel parameter = null)
         {
             // this update method is only called when a playlist has been deleted
             List<Playlist> playlists = await Playlist.GetAll();
             _totalPlaylistCount = playlists.Count;
-            Search();
+            FilterSearch();
         }
 
-        private async void LoadData()
+        public async override void Init()
         {
-            ConstAutoPlaylist = await PlaylistsFactory.GetConstAutoPlaylists();
-            BindedPlaylists = new(await Playlist.GetAll());
-            _totalPlaylistCount = BindedPlaylists.Count;
-            PlaylistCount = $"{BindedPlaylists.Count} of {_totalPlaylistCount}";
+            AppBar.Title = "My Playlists";
+            UpdateAppBarStyle();
+
+            ConstAutoPlaylist = PlaylistsFactory.GetConstAutoPlaylists();
+            Playlists = new(ConstAutoPlaylist);
+
+            foreach (Playlist playlist in await Playlist.GetAll())
+            {
+                Playlists.Add(playlist);
+            }
+
+            _totalPlaylistCount = Playlists.Count - ConstAutoPlaylist.Count; // remove the 4 constante playlists
+            PlaylistCount = $"{Playlists.Count - ConstAutoPlaylist.Count} of {_totalPlaylistCount}";
+            IsLoading = false;
+            base.Init();
         }
 
         public async void OnFileDrop(string[] filePaths)

@@ -7,7 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicScrollViewer;
+using MusicPlay.Database.Helpers;
 using MusicPlayUI.Core.Commands;
+using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Models;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.MVVM.Models;
@@ -33,9 +36,13 @@ namespace MusicPlayUI.MVVM.ViewModels
         private int _totalItemCount = 0;
 
         private string _searchText = string.Empty;
+        private LibraryFilters _appliedFilters = null;
+        private LibraryFilters _filters = new();
         private SortModel _sortBy;
         private ObservableCollection<SortModel> _sortOptions;
 
+        private bool _isFilterMenuOpen = false;
+        private bool _isSortOptionsPopupOpen = false;
         private bool _isLoading = true;
 
         public int TotalFilteredItems
@@ -67,6 +74,18 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
+        public LibraryFilters AppliedFilters
+        {
+            get => _appliedFilters;
+            set => SetField(ref _appliedFilters, value);
+        }
+
+        public LibraryFilters Filters
+        {
+            get => _filters;
+            set => SetField(ref _filters, value);
+        }
+
         public SortModel SortBy
         {
             get { return _sortBy; }
@@ -89,7 +108,12 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private bool _isSortOptionsPopupOpen = false;
+        public bool IsFilterMenuOpen
+        {
+            get => _isFilterMenuOpen;
+            set => SetField(ref _isFilterMenuOpen, value);
+        }
+
         public bool IsSortOptionsPopupOpen
         {
             get { return _isSortOptionsPopupOpen; }
@@ -109,17 +133,52 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        public ICommand OpenSortingPopupCommand { get; }
+        public ICommand AddFilterCommand { get; }
+        public ICommand RemoveFilterCommand { get; }
+        public ICommand InverseFilterCommand { get; }
+        public ICommand ClearFiltersCommand { get; }
         public ICommand SortCommand { get; }
+        public ICommand OpenCloseFilterMenuCommand { get; }
+        public ICommand OpenSortingPopupCommand { get; }
         public LibraryViewModel()
         {
+            AddFilterCommand = new RelayCommand<FilterModel>(AddFilter);
+            RemoveFilterCommand = new RelayCommand<FilterModel>(RemoveFilter);
+            InverseFilterCommand = new RelayCommand<FilterModel>((filter) =>
+            {
+                filter.IsNegative = !filter.IsNegative;
+                FilterSearch();
+            });
+            ClearFiltersCommand = new RelayCommand(() =>
+            {
+                AppliedFilters.Filters.Clear();
+
+                Filters.AddFilters([.. AppliedFilters.TagFilters]);
+                AppliedFilters.TagFilters.Clear();
+
+                Filters.AddFilters([.. AppliedFilters.ArtistRoleFilters]);
+                AppliedFilters.ArtistRoleFilters.Clear();
+
+                Filters.AddFilters([.. AppliedFilters.PrimaryArtistFilters]);
+                AppliedFilters.PrimaryArtistFilters.Clear();
+
+                Filters.AddFilters([.. AppliedFilters.AlbumTypeFilters]);
+                AppliedFilters.AlbumTypeFilters.Clear();
+
+                FilterSearch();
+            });
+
+            SortCommand = new RelayCommand<SortModel>(UpdateSortBy);
+
+            OpenCloseFilterMenuCommand = new RelayCommand(() =>
+            {
+                IsFilterMenuOpen = !IsFilterMenuOpen;
+            });
 
             OpenSortingPopupCommand = new RelayCommand(() =>
             {
                 IsSortOptionsPopupOpen = !IsSortOptionsPopupOpen;
             });
-
-            SortCommand = new RelayCommand<SortModel>(UpdateSortBy);
         }
 
         internal virtual (bool, int, int) CanLoadNewItems(OnScrollEvent onScrollEvent)
@@ -153,7 +212,33 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void Dispose()
         {
+            GC.SuppressFinalize(this);
 
+            LibraryState.AppliedFilters = AppliedFilters;
+            LibraryState.SearchText = SearchText;
+            LibraryState.SortBy = SortBy;
+        }
+
+        internal virtual void AddFilter(FilterModel filter)
+        {
+            if (filter == null)
+                return;
+
+            AppliedFilters.AddFilter(filter);
+            Filters.RemoveFilter(filter);
+
+            FilterSearch();
+        }
+
+        internal virtual void RemoveFilter(FilterModel filter)
+        {
+            if (filter == null)
+                return;
+
+            AppliedFilters.RemoveFilter(filter);
+            Filters.AddFilter(filter);
+
+            FilterSearch();
         }
 
         internal virtual void UpdateSortBy(SortModel sortBy)
@@ -192,30 +277,80 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         }
 
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            if (e.Sender.AnimatedHeader != null)
+            {
+                double animationProgress = 1 - (e.Sender.AnimatedHeader.Height / e.Sender.AnimatedHeader.MaxHeight);
+                AppBar.ContentOpacity = animationProgress;
+            }
+            base.OnScrollEvent(e);
+        }
+
+        public virtual void InitFilters()
+        {
+            if (AppliedFilters is not null)
+            {
+                for (int i = Filters.Filters.Count - 1; i >= 0; --i)
+                {
+                    foreach (FilterModel appliedFilter in AppliedFilters.Filters)
+                    {
+                        if (Filters.Filters[i].Id == appliedFilter.Id)
+                        {
+                            Filters.RemoveFilter(Filters.Filters[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method initiliaze the following properties with <see cref="LibraryState"/>:
+        /// <br>- <see cref="SearchText"/></br>
+        /// <br>- <see cref="AppliedFilters"/></br>
+        /// <br>- <see cref="SortBy"/></br>
+        /// <br>
+        /// It also calls <see cref="InitFilters"/> right after initiliazing <see cref="AppliedFilters"/> (it can be null).
+        /// </br>
+        /// <br>
+        /// It also loop through <see cref="SortOptions"/> to set the selected SortModel it it's not null (<see cref="SortBy"/>) 
+        /// </br>
+        /// <br>
+        /// Note: <see cref="ViewModel.Init"/> is not called, nor <see cref="UpdateAppBarStyle"/>.
+        /// </br>
+        /// </summary>
         public override void Init()
         {
-            base.Init();
-
             _searchText = LibraryState.SearchText;
+
+            AppliedFilters = LibraryState.AppliedFilters;
+            InitFilters();
+
             SortBy = LibraryState.SortBy;
-
-            if (SortBy is null)
-                return;
-
-            foreach (SortModel sortOption in SortOptions)
+            if (SortBy is not null)
             {
-                if (SortBy.Type == sortOption.Type)
+                foreach (SortModel sortOption in SortOptions)
                 {
-                    sortOption.IsSelected = true;
-                    continue;
+                    if (SortBy.Type == sortOption.Type)
+                    {
+                        sortOption.IsSelected = true;
+                        continue;
+                    }
+                    sortOption.IsSelected = false;
                 }
-                sortOption.IsSelected = false;
             }
+            else if(SortOptions.IsNotNullOrEmpty() && SortBy.IsNull())
+            {
+                SortBy = SortOptions.First(s => s.IsSelected);
+            }
+
+            SearchText = LibraryState.SearchText;
         }
 
         public override void UpdateAppBarStyle()
         {
             AppBar.SetStyle(AppTheme.Palette.PrimaryContainer, 0, 0, false);
+            AppBar.SetForeground(AppTheme.Palette.OnBackground);
         }
     }
 }

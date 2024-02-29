@@ -108,10 +108,10 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             _windowService = windowService;
             _radioStationsService = radioStationsService;
             _commandsManager = commandsManager;
-
+            
             PlayNextCommand = new RelayCommand(PlayNext);
             AddToQueueCommand = new RelayCommand(AddToQueue);
-            AddToPlaylistCommand = new RelayCommand<Playlist>(async (playlist) => await AddToPlaylist(playlist));
+            AddToPlaylistCommand = new RelayCommand<Playlist>(AddToPlaylist);
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
             RemoveFromPlaylistCommand = new RelayCommand(RemoveFromPlaylist);
             ChangeArtworkCommand = new RelayCommand(async () => await ChangeArtwork());
@@ -126,7 +126,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             StartRadioCommand = new RelayCommand(async () =>
             {
                 Playlist radio = await _radioStationsService.CreateRadioStation(SelectedTrack);
-                queueService.SetNewQueue(radio.Tracks, radio, radio.Name, radio.Cover);
+                queueService.SetNewQueue(radio.PlaylistTracks, radio, radio.Name, radio.Cover);
                 ClosePopup();
             });
         }
@@ -148,9 +148,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             ClosePopup();
         }
 
-        private async Task AddToPlaylist(Playlist playlist)
+        private void AddToPlaylist(Playlist playlist)
         {
-            await Playlist.AddTrack(playlist, SelectedTrack);
+            Playlist.AddTrack(playlist, SelectedTrack);
             MessageHelper.PublishMessage(SelectedTrack.Title.TrackAddedToPlaylist(playlist.Name));
 
             UserPlaylists.Remove(playlist);
@@ -175,7 +175,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
                 playlists.ToList().Sort((x, y) => x.CreationDate.CompareTo(y.CreationDate));
 
                 Playlist createdPlaylist = playlists.LastOrDefault();
-                await AddToPlaylist(createdPlaylist);
+                AddToPlaylist(createdPlaylist);
             }
         }
 
@@ -233,7 +233,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
                 if (App.State.CurrentView.State.Parameter is Playlist playlist
                     && playlist.PlaylistType == PlaylistTypeEnum.UserPlaylist)
                 {
-                    RemoveFromPlaylistVisibility = playlist.Tracks.Any(t => t.Track.Id == SelectedTrack.Id);
+                    RemoveFromPlaylistVisibility = playlist.PlaylistTracks.Any(t => t.Track.Id == SelectedTrack.Id);
                 }
                 else
                 {

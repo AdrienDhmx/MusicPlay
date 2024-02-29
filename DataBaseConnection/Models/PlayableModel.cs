@@ -1,21 +1,34 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using MessageControl;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MusicPlay.Database.DatabaseAccess;
 using MusicPlay.Database.Helpers;
 
 namespace MusicPlay.Database.Models
 {
-    public abstract class PlayableModel : BaseModel
+    public class PlayableModel : BaseModel
     {
         private DateTime _updateDate = DateTime.MinValue;
         internal int _length = 0;
         private int _playCount = 0;
         private DateTime _lastPlayed = DateTime.MinValue;
+        private DateTime _creationDate;
 
         [Required]
         [Column(TypeName = "INTEGER")]
-        public DateTime CreationDate { get; init; }
+        public DateTime CreationDate
+        {
+            get
+            {
+                if(_creationDate.IsNull())
+                {
+                    _creationDate = DateTime.Now;
+                }
+                return _creationDate;
+            }
+            set => SetField(ref _creationDate, value);
+        }
 
         [Column(TypeName = "INTEGER")]
         public DateTime UpdateDate
@@ -76,6 +89,14 @@ namespace MusicPlay.Database.Models
             UpdateDate = updateDate;
         }
 
+        public PlayableModel(PlayableModel playableModel)
+        {
+            CreationDate  = playableModel.CreationDate;
+            UpdateDate = playableModel.UpdateDate;
+            PlayCount = playableModel.PlayCount;
+            LastPlayed = playableModel.LastPlayed;
+        }
+
         public PlayableModel()
         {
             
@@ -100,30 +121,19 @@ namespace MusicPlay.Database.Models
         public static List<T> GetLastPlayed<T>(int top) where T : PlayableModel
         {
             using DatabaseContext context = new();
-            return context.Set<T>().OrderByDescending(e => e.LastPlayed).Take(top).ToList();
+            return [.. context.Set<T>().Where(e => e.LastPlayed != DateTime.MinValue).OrderByDescending(e => e.LastPlayed).Take(top)];
         }
 
-        public static IQueryable<T> GetMostPlayed<T>(int top) where T : PlayableModel
+        public static List<T> GetMostPlayed<T>(int top) where T : PlayableModel   
         {
             using DatabaseContext context = new();
-            return context.Set<T>().OrderByDescending(e => e.PlayCount).Take(top);
+            return [.. context.Set<T>().Where(e => e.PlayCount != 0).OrderByDescending(e => e.PlayCount).Take(top)];
         }
 
-        public static async Task UpdatePlayCount<T>(T entity) where T : PlayableModel
+        public static void UpdatePlayCount<T>(T entity) where T : PlayableModel
         {
-            using DatabaseContext context = new();
-            T? dbEntity = await context.Set<T>().FindAsync(entity.Id);
-
-            if(dbEntity.IsNotNull())
-            {
-                dbEntity!.PlayCount += 1;
-                dbEntity.LastPlayed = DateTime.Now;
-                await context.SaveChangesAsync();
-            }
-            else
-            {
-                $"The entity of type {typeof(T).Name} was not find in the database !".CreateErrorMessage().Publish();
-            }
+            entity!.PlayCount += 1;
+            entity.LastPlayed = DateTime.Now;
         }
     }
 }

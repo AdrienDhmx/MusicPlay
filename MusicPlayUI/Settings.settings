@@ -57,13 +57,13 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="ArtistsFilter" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">{"Filters": [{"Id": 1, "Type":"0", "IsNegative":"0"}]}</Value>
     </Setting>
     <Setting Name="ArtistOrder" Type="System.String" Scope="User">
       <Value Profile="(Default)">0/1</Value>
     </Setting>
     <Setting Name="AlbumFilter" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">{"Filters": []}</Value>
     </Setting>
     <Setting Name="AlbumOrder" Type="System.String" Scope="User">
       <Value Profile="(Default)">0/1</Value>

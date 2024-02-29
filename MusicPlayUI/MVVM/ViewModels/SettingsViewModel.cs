@@ -97,8 +97,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             if(State?.ChildViewModel?.ViewModel != null)
             {
                 Type childViewModelType = State.ChildViewModel.ViewModel.GetType();
-                //SettingModel setting = Settings.FirstOrDefault(s => s.Type == childViewModelType);
-                //SetSelectedSetting(setting);
                 SetSelectedSetting(s => s.Type == childViewModelType);
                 IsSettingsMenuOpen = true;
                 base.Init();
@@ -123,14 +121,14 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             foreach (SettingModel setting in Settings)
             {
-                if (setting.IsSelected)
-                {
-                    setting.IsSelected = false;
-                }
-                if(predicate(setting))
+                if (predicate(setting))
                 {
                     SelectedSetting = setting;
                     setting.IsSelected = true;
+                }
+                else
+                {
+                    setting.IsSelected = false;
                 }
             }
         }

@@ -96,6 +96,7 @@ namespace MusicPlay.Database.Models
                 if(_length == 0)
                 {
                     _length = Tracks.GetTotalLength();
+                    OnPropertyChanged(nameof(Duration));
                 }
                 return _length;
             }
@@ -219,6 +220,7 @@ namespace MusicPlay.Database.Models
             set => SetField(ref _albumTags, value);
         }
 
+
         private ObservableCollection<Tag> _tags;
         [NotMapped]
         public ObservableCollection<Tag> Tags
@@ -248,6 +250,96 @@ namespace MusicPlay.Database.Models
                 return _creditedArtists;
             }
             set => SetField(ref _creditedArtists, value);
+        }
+
+        [NotMapped]
+        public string MultilineName
+        {
+            get
+            {
+                string formattedAlbumName = "";
+
+                int tokenIndex = 9999;
+                char[] tokens = ['(', '[', '\'', '\"'];
+                for (int i = 0; i < tokens.Length; ++i)
+                {
+                    int index = Name.IndexOf(tokens[i]);
+                    if (index > 0 && index < tokenIndex)
+                    {
+                        tokenIndex = index;
+                    }
+                }
+
+                if (tokenIndex < 9999 && Name.Length - tokenIndex > 6)
+                {
+                    formattedAlbumName = Name[..(tokenIndex - 1)];
+                    formattedAlbumName += "\n";
+                    formattedAlbumName += Name[tokenIndex..];
+                    return formattedAlbumName;
+                }
+
+
+                tokenIndex = Name.IndexOf(" -");
+                if (tokenIndex > 0)
+                {
+                    if (Name.LastIndexOf('-') > tokenIndex + 1)
+                    {
+                        formattedAlbumName = Name[..tokenIndex];
+                        formattedAlbumName += "\n";
+                        formattedAlbumName += Name[tokenIndex..];
+                        return formattedAlbumName;
+                    }
+                    else
+                    {
+                        if (Name[tokenIndex + 2] == ' ')
+                            tokenIndex++;
+                        formattedAlbumName = Name[..(tokenIndex + 2)];
+                        formattedAlbumName += "\n";
+                        formattedAlbumName += Name[(tokenIndex + 2)..];
+                        return formattedAlbumName;
+                    }
+                }
+
+                tokenIndex = 9999;
+                tokens = [':', ',', '/', '|'];
+                for(int i = 0; i < tokens.Length; ++i)
+                {
+                    int index = Name.IndexOf(tokens[i]);
+                    if(index > 0 && index < tokenIndex)
+                    {
+                        tokenIndex = index;
+                        if (Name[tokenIndex + 1] == ' ')
+                            tokenIndex++;
+                    }
+                }
+
+                if (tokenIndex < 9999)
+                {
+                    formattedAlbumName = Name[..(tokenIndex + 1)];
+                    formattedAlbumName += "\n";
+                    formattedAlbumName += Name[(tokenIndex + 1)..];
+                    return formattedAlbumName;
+                }
+
+                string[] words = Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                if(words.Length > 3)
+                {
+                    int indexToBreakAt = words[0].Length + words[1].Length + 2;
+
+                    // don't split after small words (the, of, on...) but before them
+                    if (words[2].Length > 3)
+                    {
+                        indexToBreakAt += words[2].Length + 1;
+                    }
+                    formattedAlbumName = Name[..indexToBreakAt];
+                    formattedAlbumName += "\n";
+                    formattedAlbumName += Name[(indexToBreakAt)..];
+                    return formattedAlbumName;
+                }
+
+                return Name;
+            }
         }
 
         public Album(string title, Artist primaryArtist, string copyright, string cover, int length)
@@ -326,31 +418,29 @@ namespace MusicPlay.Database.Models
         public static List<Album> GetLastPlayed(int top)
             => GetLastPlayed<Album>(top);
 
-        public static async Task<List<Album>> GetMostPlayed(int top)
-            => await GetMostPlayed<Album>(top)
-                        .Include(a => a.Label)
-                        .Include(a => a.PrimaryArtist)
-                        .ToListAsync();
+        public static List<Album> GetMostPlayed(int top)
+            => GetMostPlayed<Album>(top);
 
         public static int Count()
         {
-            return GetAll().Count;
+            using DatabaseContext context = new();
+            return context.Albums.Count();
         }
 
         public static async Task Update(Action<Album> update, Album album)
         {
             using DatabaseContext context = new();
-            if(!context.Albums.Local.Any(a => a.Id == album.Id)) 
-            {
-                context.Albums.Attach(album);
-
-            }
-            update(album);
+            Album albumToUpdate = context.Albums.Find(album.Id); // avoid relationship tracking issues
+            context.Albums.Update(albumToUpdate);
+            update(albumToUpdate);
             await context.SaveChangesAsync();
         }
 
         public static async Task UpdateCover(Album album, string newCover)
             => await Update(a => a.AlbumCover = newCover, album);
+
+        public static async Task UpdatePlayCount(Album album)
+            => await Update(a => PlayableModel.UpdatePlayCount(a), album);
 
         public static async Task Delete(Album album)
         {

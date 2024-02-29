@@ -14,10 +14,10 @@ namespace MusicPlayUI.Core.Enums
     {
         ArtistType = 0, // AlbumArtist, Performer, Composer...
         Artist = 1, // Only Specific Artist (Similar to searching for an Artist)
-        Genre = 3, // Album CurrentTagView
+        Tag = 3, // Album CurrentTagView
         Year = 4, // release Date
         PlayCount = 5, // can filter by specifying a min an max playcount (0 - n)
-        Rating = 6, // can filter by specifying a min and max ration (0-5)
-        AlbumType = 7, // Singles, EP, AlbumTags
+        Rating = 6, // can filter by specifying a min and max ratio (0-5)
+        AlbumType = 7, // Singles, EP, Main
     }
 }

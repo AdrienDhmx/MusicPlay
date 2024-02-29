@@ -422,7 +422,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 Artist = (Artist)baseModel;
             }
-            AppBar.Title = Artist.Name;
+            AppBar.SetData(Artist.Name, "");
 
             Genres = [..Artist.ArtistTags.Select(at => at.Tag)];
             List<Track> tracks = new();
@@ -454,45 +454,48 @@ namespace MusicPlayUI.MVVM.ViewModels
             SinglesAndEPHeader = $"Singles & EP: {SinglesAndEP.Count}";
             FeaturedInHeader = $"Featured in {FeaturedInAlbum.Count} {(FeaturedInAlbum.Count == 1 ? Resources.Album : Resources.Albums_View)}";
 
+            await Task.Run(async () =>
             {
-                IOrderedEnumerable<Track> tempTracks = Artist.Tracks.OrderBy(t => t.AlbumId);
-                tracks.AddRange(tempTracks);
-                Tracks = tracks.DistinctBy(t => t.Id).ToList();
-                List<OrderedTrack> composedTracks = new();
-                List<OrderedTrack> performedTracks = new();
-                List<OrderedTrack> lyricistTracks = new();
-                foreach (Track track in Tracks)
                 {
-                    bool isComposer = track.TrackArtistRole.Any(tar => tar.ArtistRole.Role.Name == "Composer");
-                    bool isPerformer = track.TrackArtistRole.Any(tar => tar.ArtistRole.Role.Name == "Performer");
-                    bool isLyricist = track.TrackArtistRole.Any(tar => tar.ArtistRole.Role.Name == "Lyricist");
+                    IOrderedEnumerable<Track> tempTracks = Artist.Tracks.OrderBy(t => t.AlbumId);
+                    tracks.AddRange(tempTracks);
+                    Tracks = tracks.DistinctBy(t => t.Id).ToList();
+                    List<OrderedTrack> composedTracks = new();
+                    List<OrderedTrack> performedTracks = new();
+                    List<OrderedTrack> lyricistTracks = new();
+                    foreach (Track track in Tracks)
+                    {
+                        bool isComposer = track.TrackArtistRole.Any(tar => tar.ArtistRole.Role.Name == "Composer");
+                        bool isPerformer = track.TrackArtistRole.Any(tar => tar.ArtistRole.Role.Name == "Performer");
+                        bool isLyricist = track.TrackArtistRole.Any(tar => tar.ArtistRole.Role.Name == "Lyricist");
 
-                    if (isComposer)
-                    {
-                        composedTracks.Add(new OrderedTrack(track, composedTracks.Count + 1));
+                        if (isComposer)
+                        {
+                            composedTracks.Add(new OrderedTrack(track, composedTracks.Count + 1));
+                        }
+                        else if (isPerformer)
+                        {
+                            performedTracks.Add(new OrderedTrack(track, performedTracks.Count + 1));
+                        }
+                        else if (isLyricist)
+                        {
+                            lyricistTracks.Add(new OrderedTrack(track, lyricistTracks.Count + 1));
+                        }
                     }
-                    else if (isPerformer)
-                    {
-                        performedTracks.Add(new OrderedTrack(track, performedTracks.Count + 1));
-                    }
-                    else if (isLyricist)
-                    {
-                        lyricistTracks.Add(new OrderedTrack(track, lyricistTracks.Count + 1));
-                    }
+
+                    ComposedTracks = new(composedTracks);
+                    PerformedInTracks = new(performedTracks);
+                    LyricistOfTracks = new(lyricistTracks);
                 }
 
-                ComposedTracks = new(composedTracks);
-                PerformedInTracks = new(performedTracks);
-                LyricistOfTracks = new(lyricistTracks);
-            }
+                ComposerOfHeader = $"Composer of {ComposedTracks.Count} {(ComposedTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
+                PerformedInHeader = $"Performed in {PerformedInTracks.Count} {(PerformedInTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
+                LyricistOfHeader = $"Lyricist of {LyricistOfTracks.Count} {(LyricistOfTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
 
-            ComposerOfHeader = $"Composer of {ComposedTracks.Count} {(ComposedTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
-            PerformedInHeader = $"Performed in {PerformedInTracks.Count} {(PerformedInTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
-            LyricistOfHeader = $"Lyricist of {LyricistOfTracks.Count} {(LyricistOfTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
-
-            // Fetch and update if needed with data from external sources (last.fm...)
-            await Artist.UpdateWithExternalData(await Artist.GetExternalData());
-            Biography = Artist.Biography;
+                // Fetch and update if needed with data from external sources (last.fm...)
+                await Artist.UpdateWithExternalData(await Artist.GetExternalData());
+                Biography = Artist.Biography;
+            });
         }
     }
 }

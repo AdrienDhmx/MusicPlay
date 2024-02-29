@@ -81,7 +81,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
             if (App.State.CurrentView.State.Parameter is Playlist playlistModel && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
             {
-                App.State.CurrentView.ViewModel.Update();
+                App.State.CurrentView.ViewModel.Update(); // will load the new tracks
             }
         }
 

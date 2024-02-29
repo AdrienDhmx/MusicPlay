@@ -28,6 +28,7 @@ using LastFmNamespace;
 using MusicFilesProcessor.Helpers;
 using Microsoft.EntityFrameworkCore;
 using MusicPlayUI.MVVM.ViewModels.AppBars;
+using MusicPlayUI.Controls;
 
 namespace MusicPlayUI
 {
@@ -48,7 +49,7 @@ namespace MusicPlayUI
         private IQueueService _queueService;
         protected override async void OnStartup(StartupEventArgs e)
         {
-            App.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            App.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
             // register all the services, views, windows and viewmodels
             var builder = new HostBuilder().Register();
@@ -74,6 +75,9 @@ namespace MusicPlayUI
                 // init app theme
                 AppTheme.InitializeAppTheme();
                 MessageFactory.RegisterMessagesStyles();
+
+                AsyncImage.LoadResourceImage(defaultArtistImage);
+                AsyncImage.LoadResourceImage(defaultImage);
 
                 // create and show main window
                 MainWindow window = _services.GetRequiredService<MainWindow>();
@@ -115,7 +119,7 @@ namespace MusicPlayUI
 
                 // init the storage settings and scan for new tracks
                 StorageService.Instance.FileImported += TrackImported;
-                await Task.Run(() => StorageService.Instance.ScanFolders(true));
+                //await Task.Run(() => StorageService.Instance.ScanFolders(true));
             }
             catch (Exception ex)
             {
@@ -142,7 +146,7 @@ namespace MusicPlayUI
             }
         }
 
-        protected override async void OnExit(ExitEventArgs e)
+        protected override void OnExit(ExitEventArgs e)
         {
             if (_queueService.Queue.Tracks.IsNullOrEmpty())
                 return;
@@ -150,7 +154,7 @@ namespace MusicPlayUI
             try
             {
                 // Save the playing queue in the database
-                await _queueService.SaveQueue();
+                _queueService.SaveQueue();
             }
             catch (Exception ex)
             {

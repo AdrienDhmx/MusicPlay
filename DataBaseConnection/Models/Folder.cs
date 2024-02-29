@@ -67,27 +67,6 @@ namespace MusicPlay.Database.Models
             
         }
 
-        public override Dictionary<string, object> InsertTable()
-        {
-            Dictionary<string, object> keyValues = new()
-            {
-                { nameof(Path), Path },
-                { nameof(Name), Name },
-                { nameof(IsMonitored), IsMonitored },
-            };
-            return keyValues;
-        }
-
-        public override Dictionary<string, object> UpdateTable()
-        {
-            Dictionary<string, object> keyValues = new()
-            {
-                { nameof(Name), Name },
-                { nameof(IsMonitored), IsMonitored },
-            };
-            return keyValues;
-        }
-
         public static async Task Insert(Folder folder)
         {
             using DatabaseContext context = new();
@@ -101,12 +80,13 @@ namespace MusicPlay.Database.Models
             return await context.Folders.ToListAsync();
         }
 
-        public static async Task Update(Folder folder, string newName, bool isMonitored)
+        public static void Update(Folder folder, string newName, bool isMonitored)
         {
             using DatabaseContext context = new();
+            context.Folders.Update(folder);
             folder.Name = newName;
             folder.IsMonitored = isMonitored;
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
     }
 }

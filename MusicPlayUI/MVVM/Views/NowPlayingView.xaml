@@ -11,6 +11,7 @@
              xmlns:spectrum="clr-namespace:SpectrumVisualizer;assembly=SpectrumVisualizer"
              xmlns:player="clr-namespace:MusicPlayUI.MVVM.Views.PlayerControlViews"
              xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             xmlns:enum="clr-namespace:MusicPlayUI.Core.Enums"
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -19,19 +20,9 @@
         <Border.Background>
             <ImageBrush ImageSource="{Binding BlurredCover, Converter={StaticResource ONullImageConverter}, ConverterParameter=-1}"/>
         </Border.Background>
-        <Border.Style>
-            <Style TargetType="Border">
-                <Setter Property="CornerRadius" Value="0"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding DataContext.IsFullScreen, ElementName=RootView}" Value="True">
-                        <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
         <Grid x:Name="RootGrid">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="{Binding AppBar.Height}"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -42,45 +33,53 @@
                     Background="{DynamicResource BlackTransparent}"
                     Panel.ZIndex="0"
                     IsHitTestVisible="False">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="0"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.IsFullScreen, ElementName=RootView}" Value="True">
-                                <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
             </Border>
 
-            <!-- Sub Menu for views -->
-            <Grid Visibility="Visible"
-                   Grid.Column="1"
-                    x:Name="SettingsGrid"
-                    Background="Transparent"
-                    Margin="20,0"
+            <!-- False AppBar with Sub Menu for views -->
+            <Grid x:Name="SettingsGrid"
+                  Panel.ZIndex="40"
+                  Background="{DynamicResource ScdWhiteTransparent}"
                     HorizontalAlignment="Stretch">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="6"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
 
-                <Border Background="{DynamicResource ScdWhiteTransparent}"
-                        CornerRadius="0,0,3,3"/>
-                <Border Background="{DynamicResource ScdWhiteTransparent}"
-                        Grid.Row="1"
-                        Height="50"
-                            Visibility="{Binding IsMouseOver, ElementName=SettingsGrid, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                        CornerRadius="0,0,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <customButton:IconButton Style="{DynamicResource OpacityIconButton}"
+                                             Visibility="{Binding AppState.IsMenuDrawerOpen, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                   Icon="{DynamicResource MenuIcon}"
+                                   Width="60"
+                                   Height="60"
+                                   IconWidth="22"
+                                   IconHeight="18"
+                                   Margin="0, 0, 10, 0"
+                                   FillColor="{DynamicResource WhiteForeground}"
+                                   StrokeColor="Transparent"
+                                  Command="{Binding AppBar.ToggleMenuDrawerCommand}"/>
 
-                </Border>
+                    <customButton:IconButton  Grid.Column="1"
+                                    Style="{DynamicResource NavigationButton}"
+                                    FillColor="{DynamicResource WhiteForeground}"
+                                   Icon="{DynamicResource Back}"
+                                    IsEnabled="{Binding AppState.CanNavigateBack, UpdateSourceTrigger=PropertyChanged}"
+                                  Command="{Binding AppBar.NavigateBackCommand}"/>
+
+                    <customButton:IconButton Grid.Column="2"
+                                   Style="{DynamicResource NavigationButton}"
+                                   FillColor="{DynamicResource WhiteForeground}"
+                                   Icon="{DynamicResource Forward}"
+                                   IsEnabled="{Binding AppState.CanNavigateForward, UpdateSourceTrigger=PropertyChanged}"
+                                  Command="{Binding AppBar.NavigateForwardCommand}"/>
+                </Grid>
+
                 <StackPanel Orientation="Horizontal"
-                             Grid.Row="1"
-                            Visibility="{Binding IsMouseOver, ElementName=SettingsGrid, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                            Grid.ColumnSpan="2"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center" 
-                                Margin="0,0,0,0">
+                                Margin="10, 0">
 
                     <!-- Spectrum Btn -->
                     <customButton:IconButton Icon="{DynamicResource VisualizerIcon}"
@@ -92,11 +91,13 @@
                         <customButton:IconButton.Style>
                             <Style TargetType="customButton:IconButton"
                                    BasedOn="{StaticResource NowPlayingIconButton}">
+                                <Setter Property="ToolTip" Value="Show spectrum (right click open visualizer settings)"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DataContext.SpectrumVisibility, ElementName=RootView}"
                                                          Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
                                         <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                                        <Setter Property="ToolTip" Value="Hide spectrum (right click open visualizer settings)"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -105,7 +106,7 @@
 
                     <Border Width="1"
                             Margin="8,2"
-                            Background="{DynamicResource WhiteForeground}"/>
+                            Background="{DynamicResource WhiteTransparent}"/>
 
                     <!-- Img visibility -->
                     <customButton:IconButton  Icon="{DynamicResource ImageIcon}"
@@ -114,11 +115,13 @@
                         <customButton:IconButton.Style>
                             <Style TargetType="customButton:IconButton"
                                    BasedOn="{StaticResource NowPlayingIconButton}">
+                                <Setter Property="ToolTip" Value="Show Cover"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DataContext.IsCoverOpen, ElementName=RootView}"
                                                  Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
                                         <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                                        <Setter Property="ToolTip" Value="Hide Cover"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -127,22 +130,24 @@
 
                     <Border Width="1"
                             Margin="8,2"
-                            Background="{DynamicResource WhiteForeground}"/>
+                            Background="{DynamicResource WhiteTransparent}"/>
 
                     <customButton:IconButton Icon="{DynamicResource QueueIcon}"
                                             StrokeColor="{DynamicResource WhiteForeground}"
                                             FillColor="Transparent"
                                             StrokeWidth="2"
                                             Command="{Binding OpenCloseSubViewCommand}"
-                                             CommandParameter="41">
+                                             CommandParameter="{x:Static enum:ViewNameEnum.Queue}">
                         <customButton:IconButton.Style>
                             <Style TargetType="customButton:IconButton"
                                    BasedOn="{StaticResource NowPlayingIconButton}">
+                                <Setter Property="ToolTip" Value="Show Queue"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DataContext.IsQueueOpen, ElementName=RootView}"
                                                     Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
                                         <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                                        <Setter Property="ToolTip" Value="Hide Queue"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -152,15 +157,17 @@
                     <customButton:IconButton Icon="{DynamicResource LyricsIcon}"
                                             FillColor="{DynamicResource WhiteForeground}"
                                            Command="{Binding OpenCloseSubViewCommand}"
-                                             CommandParameter="42">
+                                             CommandParameter="{x:Static enum:ViewNameEnum.Lyrics}">
                         <customButton:IconButton.Style>
                             <Style TargetType="customButton:IconButton"
                                    BasedOn="{StaticResource NowPlayingIconButton}">
+                                <Setter Property="ToolTip" Value="Show Lyrics"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DataContext.IsLyricsOpen, ElementName=RootView}"
                                                     Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
                                         <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                                        <Setter Property="ToolTip" Value="Hide Lyrics"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -170,15 +177,40 @@
                     <customButton:IconButton Icon="{DynamicResource InfoIcon}"
                                             FillColor="{DynamicResource WhiteForeground}"
                                             Command="{Binding OpenCloseSubViewCommand}"
-                                             CommandParameter="43">
+                                             CommandParameter="{x:Static enum:ViewNameEnum.TrackInfo}">
                         <customButton:IconButton.Style>
                             <Style TargetType="customButton:IconButton"
                                    BasedOn="{StaticResource NowPlayingIconButton}">
+                                <Setter Property="ToolTip" Value="Show Track Information"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding DataContext.IsTrackInfoOpen, ElementName=RootView}"
                                                     Value="true">
                                         <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
                                         <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                                        <Setter Property="ToolTip" Value="Hide Track Information"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </customButton:IconButton.Style>
+                    </customButton:IconButton>
+
+                    <Border Width="1"
+                            Margin="8,2"
+                            Background="{DynamicResource WhiteTransparent}"/>
+
+                    <customButton:IconButton FillColor="{DynamicResource WhiteForeground}"
+                                            Command="{Binding SwitchFullScreenCommand}"
+                                             CommandParameter="43">
+                        <customButton:IconButton.Style>
+                            <Style TargetType="customButton:IconButton"
+                                   BasedOn="{StaticResource NowPlayingIconButton}">
+                                <Setter Property="Icon" Value="{DynamicResource FullScreen}"/>
+                                <Setter Property="ToolTip" Value="Go fullscreen"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.IsFullScreen, ElementName=RootView}"
+                                                    Value="true">
+                                        <Setter Property="Icon" Value="{DynamicResource FullscreenExit}"/>
+                                        <Setter Property="ToolTip" Value="Escape fullscreen"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -360,7 +392,7 @@
                         <player:NowPlayingPlayerControlView DataContext="{Binding PlayerViewModel}"
                                                             Visibility="{Binding DataContext.IsFullScreen, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                        <TextBlock Text="{Binding QueueService.PlayingTrack.Title}"
+                        <TextBlock Text="{Binding QueueService.Queue.PlayingTrack.Title}"
                                    Grid.Row="1"
                                    Style="{DynamicResource SLStyle}"
                                    Foreground="{DynamicResource WhiteForeground}"
@@ -383,7 +415,7 @@
                                                    FontSize="18"
                                                    Foreground="{DynamicResource WhiteForeground}"
                                                    Command="{Binding NavigateToArtistCommand}"
-                                               Artists="{Binding QueueService.PlayingTrack.Artists}"/>
+                                               Artists="{Binding QueueService.Queue.PlayingTrack.TrackArtistRole}"/>
                     </StackPanel>
                 </Grid>
 
@@ -392,9 +424,9 @@
                 <Border Grid.Column="1"
                     x:Name="SubViewBorder"
                         HorizontalAlignment="Stretch"
-                        Panel.ZIndex="2"
+                        Panel.ZIndex="4"
                     Visibility="{Binding IsSubViewOpen, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ContentControl Content="{Binding NavigationService.SecondaryViewModel}"
+                    <ContentControl Content="{Binding State.ChildViewModel.ViewModel}"
                                     MinWidth="300"
                                     Margin="0, 0, 10, 0"
                                 HorizontalAlignment="Stretch">

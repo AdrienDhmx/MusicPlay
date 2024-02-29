@@ -90,7 +90,14 @@ namespace MusicPlayUI.Core.Helpers
             List<T> output = [];
             for (int i = 0; i < tracks.Count; i++)
             {
-                output.Add((T)new OrderedTrack(tracks[i], i));
+                if(typeof(T) == typeof(PlaylistTrack))
+                {
+                    output.Add((T)(OrderedTrack)new PlaylistTrack(tracks[i], i + 1));
+                }
+                else
+                {
+                    output.Add((T)new OrderedTrack(tracks[i], i + 1));
+                }
             }
             return output;
         }
@@ -119,6 +126,20 @@ namespace MusicPlayUI.Core.Helpers
                 }
             }
             return length;
+        }
+
+        public static bool AreEquals<T>(this List<T> list1, List<T> list2) where T : BaseModel
+        {
+            if(list1.Count != list2.Count) return false;
+
+            for (int i = 0; i < list1.Count; i++)
+            {
+                if (list1[i].Id != list2[i].Id)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

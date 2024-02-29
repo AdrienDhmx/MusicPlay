@@ -1,4 +1,5 @@
-﻿using GongSolutions.Wpf.DragDrop.Utilities;
+﻿using DynamicScrollViewer;
+using GongSolutions.Wpf.DragDrop.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,11 +27,6 @@ namespace MusicPlayUI.MVVM.Views
             InitializeComponent();
         }
 
-        private void VirtualizingGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
         private async void QueueTracks_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             await Task.Delay(300);
@@ -38,12 +34,23 @@ namespace MusicPlayUI.MVVM.Views
             int totalTracks = QueueTracks.Items.Count;
             double itemHeight = height / (double)totalTracks;
             double verticalOffset = itemHeight * ((double)QueueTracks.SelectedIndex - 2);
-            ScrollViewer QueueScroll = QueueTracks.GetVisualDescendent<ScrollViewer>();
+            DynamicScrollViewer.DynamicScrollViewer QueueScroll = QueueTracks.GetVisualDescendent<DynamicScrollViewer.DynamicScrollViewer>();
 
             if (verticalOffset is not double.NaN && QueueScroll is not null)
             {
-                QueueScroll.ScrollToVerticalOffset(verticalOffset);
+                QueueScroll.ScrollToVerticalOffsetWithAnimation(verticalOffset);
             }
+        }
+
+        private void QueueTracks_Loaded(object sender, RoutedEventArgs e)
+        {
+            DynamicScrollViewer.DynamicScrollViewer QueueScroll = QueueTracks.GetVisualDescendent<DynamicScrollViewer.DynamicScrollViewer>();
+
+            if(QueueScroll is not null)
+            {
+                QueueScroll.ScrollToItem(QueueTracks.SelectedItem);
+                QueueScroll.UpdateIsInViewPort();
+            } 
         }
     }
 }

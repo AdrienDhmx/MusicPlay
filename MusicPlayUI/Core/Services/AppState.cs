@@ -1,4 +1,5 @@
 ﻿using MessageControl;
+using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -7,6 +8,7 @@ using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.MVVM.ViewModels;
 using MusicPlayUI.MVVM.ViewModels.AppBars;
+using MusicPlayUI.MVVM.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +19,12 @@ namespace MusicPlayUI.Core.Services
     public class AppState(Func<Type, ViewModel> viewModelFactory) : ObservableObject, IAppState
     {
         private readonly Func<Type, ViewModel> _viewModelFactory = viewModelFactory;
+        private readonly int _maxHistoryCount = 20;
 
         public event Action FullScreenChanged;
         public event Action CurrentViewChanged;
 
+        private bool _wasMenuOpen = false;
         private bool _isFullScreen;
 
         private bool _isMenuDrawerOpen = true;
@@ -50,6 +54,15 @@ namespace MusicPlayUI.Core.Services
             set
             {
                 SetField(ref _isFullScreen, value);
+                if(value)
+                {
+                    _wasMenuOpen = IsMenuDrawerOpen;    
+                    IsMenuDrawerOpen = false;
+                }
+                else
+                {
+                    IsMenuDrawerOpen = _wasMenuOpen;
+                }
                 FullScreenChanged?.Invoke();
             }
         }
@@ -145,8 +158,16 @@ namespace MusicPlayUI.Core.Services
 
         public void NavigateTo<TViewModel>(NavigationState state, bool saveView = true) where TViewModel : ViewModel
         {
-            if (_savePreviousViewModel && CurrentView is not null)
+            if(CurrentView?.ViewModel.GetType() ==  typeof(TViewModel))
+            {
+                CurrentView.ViewModel.Update(); // refresh
+                return;
+            }
+
+            if (_savePreviousViewModel && CurrentView is not null && _backNavigationHistory.Count < _maxHistoryCount)
+            {
                 _backNavigationHistory.Add(CurrentView);
+            }
 
             _forwardNavigationHistory.Clear();
             CurrentView = CreateNavigationModel<TViewModel>(state);
@@ -197,7 +218,7 @@ namespace MusicPlayUI.Core.Services
             NavigationModel previousNavModel = _backNavigationHistory.Last();
             _backNavigationHistory.Remove(previousNavModel);
 
-            CurrentView = CreateNavigationModel(previousNavModel.ViewModel.GetType(), previousNavModel.State);
+            CurrentView = CreateNavigationModel(previousNavModel.ViewModelType, previousNavModel.State);
         }
 
         public void NavigateForward()
@@ -214,7 +235,7 @@ namespace MusicPlayUI.Core.Services
 
         public bool UpdateCurrentViewIfIs(List<Type> viewModels)
         {
-            if(viewModels.Any(vm => vm == CurrentView.ViewModel.GetType()))
+            if(viewModels.Any(vm => vm == CurrentView.ViewModelType))
             {
                 CurrentView.ViewModel.Update();
                 return true;

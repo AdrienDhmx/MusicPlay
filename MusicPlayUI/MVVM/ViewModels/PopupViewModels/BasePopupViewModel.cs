@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MusicPlayUI.Core.Models;
+using MusicPlayUI.Core.Services;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
@@ -21,6 +22,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
                 }
             }
         }
+
+        public static bool AreCoversEnabled => ConfigurationService.AreCoversEnabled;
 
         public PopupViewModel()
         {

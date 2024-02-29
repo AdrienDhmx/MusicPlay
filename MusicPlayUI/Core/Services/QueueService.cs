@@ -26,11 +26,15 @@ namespace MusicPlayUI.Core.Services
     {
         private readonly IAudioPlayback _audioPlayback;
 
-        private bool _isInit = false;
         public QueueService(IAudioPlayback audioPlayback)
         {
             _audioPlayback = audioPlayback;
             Queue = Queue.Get() ?? new();
+            if(Queue.PlayingTrack.IsNotNull())
+            {
+                // load without starting the playback
+                _audioPlayback.Load(Queue.PlayingTrack.Path);
+            }
         }
 
         private Queue _queue;
@@ -40,10 +44,17 @@ namespace MusicPlayUI.Core.Services
             private set => SetField(ref  _queue, value);
         }
 
+        public event Action<int> PreviewPlayingTrackChanged;
+        private void OnPreviewPlayingTrackChanged(int newPlayingTrachIndex)
+        {
+            PreviewPlayingTrackChanged?.Invoke(newPlayingTrachIndex);
+        }
+
         public event Action PlayingTrackChanged;
         private void OnPlayingTrackChanged()
         {
-            _audioPlayback.LoadAnPlay(Queue.PlayingTrack.Path);
+            if(Queue.IsNotNull() && Queue.PlayingTrack.IsNotNull())
+                _audioPlayback.LoadAnPlay(Queue.PlayingTrack.Path);
             PlayingTrackChanged?.Invoke();
         }
 
@@ -71,15 +82,7 @@ namespace MusicPlayUI.Core.Services
         private List<int> LastRemovedTrackIndex { get; set; } = new();
 
         public async void SetNewQueue(IEnumerable<OrderedTrack> tracks, PlayableModel playingFrom, string playingFromName, string cover, Track playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false)
-        {
-            Queue.Length = tracks.GetTracksTotalLength();
-            Queue.IsShuffled = isShuffled;
-            Queue.IsOnRepeat = isOnRepeat;
-            Queue.Cover = cover;
-            Queue.PlayingFrom = playingFrom;
-            Queue.PlayingFromId = playingFrom.Id;
-            Queue.PlayingFromName = playingFromName;
-            
+        {            
             ObservableCollection<QueueTrack> queueTracks = new(tracks.ToQueueTrack());
             QueueTrack playingQueueTrack = null;
             if (playingTrack is not null)
@@ -87,18 +90,32 @@ namespace MusicPlayUI.Core.Services
                 playingQueueTrack = queueTracks.ToList().Find(t => t.TrackId == playingTrack.Id);
             }
 
-            if (Queue.IsShuffled)
+            if (isShuffled)
             {
                 queueTracks = await Task.Run(() => queueTracks.Shuffle<QueueTrack>(playingQueueTrack));
             }
-            else  if (orderTracks) // for playlist the tracks can be in a specific order wanted by the user
+            else if (orderTracks) // for playlist the tracks can be in a specific order wanted by the user
             {
                 queueTracks = await Task.Run(queueTracks.Order);
             }
 
             playingQueueTrack ??= queueTracks.FirstOrDefault();
-            Queue.Tracks = queueTracks;
+
+            if (playingQueueTrack is null)
+                return;
+
+            Queue.Length = tracks.GetTracksTotalLength();
+            Queue.IsShuffled = isShuffled;
+            Queue.IsOnRepeat = isOnRepeat;
+            Queue.Cover = cover;
+            Queue.PlayingFrom = playingFrom;
+            Queue.PlayingFromId = playingFrom.Id;
+            Queue.PlayingFromName = playingFromName;
+
+            Queue.PlayingQueueTrack = playingQueueTrack;
             Queue.PlayingTrack = playingQueueTrack.Track;
+            Queue.Tracks = queueTracks;
+            OnQueueChanged();
             OnPlayingTrackChanged();
         }
 
@@ -188,7 +205,6 @@ namespace MusicPlayUI.Core.Services
         public bool NextTrack()
         {
             return ChangeTrack(1);
-
         }
 
         /// <summary>
@@ -251,6 +267,7 @@ namespace MusicPlayUI.Core.Services
         {
             if (index >= 0 && index < Queue.Tracks.Count)
             {
+                OnPreviewPlayingTrackChanged(index);
                 Queue.PlayingQueueTrack = Queue.Tracks[index];
                 OnPlayingTrackChanged();
                 return true;
@@ -378,16 +395,25 @@ namespace MusicPlayUI.Core.Services
             }
         }
 
-        public async Task SaveQueue()
+        public void ClearQueue()
         {
-            if (Queue.Tracks.IsNotNullOrEmpty() || Queue.PlayingFrom.IsNull()) return;
+            Queue.PlayingQueueTrack = null;
+            Queue.PlayingTrack = null;
+            Queue.Tracks.Clear();
+            Queue = new();
+            _audioPlayback.Stop();
+            // notify all listeners
+            OnPropertyChanged(nameof(PlayingFrom));
+            OnPropertyChanged(nameof(PlayingFromName));
+            OnQueueChanged();
+            OnPlayingTrackChanged();
+        }
 
-            foreach (OrderedTrack track in Queue.Tracks)
-            {
-                track.Track = null; // avoid EF trying to insert an existing track
-            }
+        public void SaveQueue()
+        {
+            if (Queue.Tracks.IsNullOrEmpty() || Queue.PlayingFrom.IsNull()) return;
 
-            await Queue.Insert(Queue);
+            Queue.Insert(Queue);
         }
 
         public async Task NavigateToPlayingFrom()
@@ -415,19 +441,19 @@ namespace MusicPlayUI.Core.Services
                         }
                         else if (Queue.PlayingFromName == Resources.Most_Played)
                         {
-                            parameter = await PlaylistsFactory.CreateMostPlayedPlaylist();
+                            parameter = PlaylistsFactory.CreateMostPlayedPlaylist();
                         }
                         else if (Queue.PlayingFromName == Resources.Favorite)
                         {
-                            parameter = await PlaylistsFactory.CreateFavoritePlaylist();
+                            parameter = PlaylistsFactory.CreateFavoritePlaylist();
                         }
                         else if (Queue.PlayingFromName == Resources.Last_Played)
                         {
-                            parameter = await PlaylistsFactory.CreateLastPlayedPlaylist();
+                            parameter = PlaylistsFactory.CreateLastPlayedPlaylist();
                         }
                         else // user playlist
                         {
-                            parameter = await Playlist.Get(id);
+                            parameter = Playlist.Get(id);
                         }
                         break;
                     case ModelTypeEnum.Tag:
@@ -451,7 +477,7 @@ namespace MusicPlayUI.Core.Services
 
         public void DragOver(IDropInfo dropInfo)
         {
-            if (dropInfo.Data is Track)
+            if (dropInfo.Data is Track || dropInfo.Data is QueueTrack)
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
                 dropInfo.Effects = DragDropEffects.Move;
@@ -460,9 +486,9 @@ namespace MusicPlayUI.Core.Services
 
         public void Drop(IDropInfo dropInfo)
         {
-            if(dropInfo.Data is OrderedTrack sourceItem && Queue.Tracks.Contains(sourceItem)) // track has been moved
+            if(dropInfo.Data is QueueTrack sourceItem && Queue.Tracks.Contains(sourceItem)) // track has been moved
             {
-                int originalIndex = Queue.Tracks.IndexOf((QueueTrack)sourceItem);
+                int originalIndex = Queue.Tracks.IndexOf(sourceItem);
 
                 MoveTrack(originalIndex, dropInfo.InsertIndex);
             }

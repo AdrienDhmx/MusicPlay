@@ -14,16 +14,6 @@ namespace MusicPlay.Database.Models
 
         public BaseModel() { }
 
-        public virtual Dictionary<string, object> InsertTable()
-        {
-            throw new NotSupportedException("CreateTable not supported for the base class.");
-        }
-
-        public virtual Dictionary<string, object> UpdateTable()
-        {
-            throw new NotSupportedException("UpdateTable not supported for the base class.");
-        }
-
         public override bool Equals(object obj)
         {
             return obj is BaseModel model && model.Id == Id;

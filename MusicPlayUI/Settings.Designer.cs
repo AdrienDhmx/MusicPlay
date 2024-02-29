@@ -241,7 +241,7 @@ namespace MusicPlayUI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Filters\": [{\"Id\": 1, \"Type\":\"0\", \"IsNegative\":\"0\"}]}")]
         public string ArtistsFilter {
             get {
                 return ((string)(this["ArtistsFilter"]));
@@ -265,7 +265,7 @@ namespace MusicPlayUI {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Filters\": []}")]
         public string AlbumFilter {
             get {
                 return ((string)(this["AlbumFilter"]));

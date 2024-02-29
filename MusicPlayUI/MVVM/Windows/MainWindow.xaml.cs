@@ -29,6 +29,20 @@ namespace MusicPlayUI.MVVM.Views.Windows
         {
             InitializeComponent();
             Focus();
+
+            App.State.FullScreenChanged += State_FullScreenChanged;
+        }
+
+        private void State_FullScreenChanged()
+        {
+            if(App.State.IsFullScreen)
+            {
+                this.WindowStyle = WindowStyle.None;
+            }
+            else
+            {
+                this.WindowStyle = WindowStyle.SingleBorderWindow;
+            }
         }
 
         private void WindowTopBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

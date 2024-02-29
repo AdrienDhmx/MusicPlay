@@ -81,10 +81,10 @@ namespace MusicPlay.Database.Models
         /// Get the existing play history for today or create it
         /// </summary>
         /// <returns></returns>
-        public static async Task<PlayHistory?> GetTodayHistory()
+        public static PlayHistory? GetTodayHistory()
         {
             using DatabaseContext context = new();
-            PlayHistory? mostRecent = await context.PlayHistories.OrderByDescending(x => x.Date).FirstOrDefaultAsync();
+            PlayHistory? mostRecent = context.PlayHistories.OrderByDescending(x => x.Date).FirstOrDefault();
 
             if(mostRecent?.Date == DateTime.Now.Date)
             {
@@ -94,7 +94,7 @@ namespace MusicPlay.Database.Models
             // create one for today
             PlayHistory todayHistory = new();
             context.PlayHistories.Add(todayHistory);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
             return todayHistory;
         }
 

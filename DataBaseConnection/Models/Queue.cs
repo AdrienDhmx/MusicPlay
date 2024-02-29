@@ -43,7 +43,32 @@ namespace MusicPlay.Database.Models
         [NotMapped]
         public PlayableModel PlayingFrom
         {
-            get => _playingFrom;
+            get 
+            {
+                if(PlayingFromId != 0)
+                {
+                    using DatabaseContext context = new();
+                    switch(PlayingFromModelType)
+                    {
+                        case ModelTypeEnum.Album:
+                            _playingFrom = context.Albums.Find(PlayingFromId);
+                            break;
+                        case ModelTypeEnum.Artist:
+                            _playingFrom = context.Artists.Find(PlayingFromId);
+                            break;
+                        case ModelTypeEnum.Playlist:
+                            _playingFrom = context.Playlists.Find(PlayingFromId);
+                            break;
+                        case ModelTypeEnum.Tag:
+                            _playingFrom = context.Tags.Find(PlayingFromId);
+                            break;
+                        default:
+                            return null;
+                    }
+                }
+
+                return _playingFrom;
+            }
             set
             {
                 SetField(ref _playingFrom, value);
@@ -122,17 +147,42 @@ namespace MusicPlay.Database.Models
             set
             {
                 SetField(ref _playingQueueTrack, value);
-                PlayingTrack = value.Track;
+                if (value.IsNotNull())
+                    PlayingTrack = value.Track;
+                else
+                    PlayingTrack = null;
             }
         }
 
         public ObservableCollection<QueueTrack> Tracks
         {
-            get => _tracks;
+            get
+            {
+                if(_tracks.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _tracks = [..context.QueueTracks.Where(qt => qt.QueueId == Id)
+                                .Include(qt => qt.Track)];
+                }
+                return _tracks;
+            }
             set
             {
                 SetField(ref _tracks, value);
             }
+        }
+
+        public override int Length 
+        {
+            get
+            {
+                if(_length == 0)
+                {
+                    _length = Tracks.GetTracksTotalLength();
+                }
+                return _length;
+            }
+            set => SetField(ref _length, value);
         }
 
         [Required]
@@ -166,7 +216,7 @@ namespace MusicPlay.Database.Models
             Cover = cover;
         }
 
-        public Queue(bool isShuffled, bool isOnRepeat, int length, Track playingTrack, List<Track> tracks)
+        public Queue(bool isShuffled, bool isOnRepeat, int length, Track playingTrack)
         {
             IsShuffled = isShuffled;
             IsOnRepeat = isOnRepeat;
@@ -179,20 +229,38 @@ namespace MusicPlay.Database.Models
 
         }
 
-        public static async Task Insert(Queue queue)
+        public static void Insert(Queue queue)
         {
             using DatabaseContext context = new();
-            context.Queues.FromSqlRaw("DELETE FROM Queue"); // delete all other queues before inserting the new one
-            context.Queues.Add(queue); // that way there are always only 1 queue in the db => the most recent one (currently being played)
-            await context.SaveChangesAsync();
+            // Want only 1 queue saved in the database at all time
+            context.QueueTracks.ExecuteDelete();
+            context.Queues.ExecuteDelete();
+            context.SaveChanges();
+
+            // save a the tracks in a variable for saving them later
+            ObservableCollection<QueueTrack> queueTracks = new(queue.Tracks);
+            queue.Tracks = null;
+            queue.PlayingTrackId = queue.PlayingQueueTrack.Track.Id;
+            queue.PlayingTrack = null; // avoid EF trying to insert a relation of a track, or a conflict with already tracked relation
+            context.Queues.Add(queue);
+            context.SaveChanges(); // get and Id for the queue
+
+            List<QueueTrack> tracks = [];
+            foreach (QueueTrack track in queueTracks)
+            {
+                // avoid EF trying to insert a relation of a track, or a conflict with already tracked relation
+                // by creating a new object with only the Ids
+                tracks.Add(new(queue.Id, track.TrackId, track.TrackIndex));
+            }
+
+            context.QueueTracks.AddRange(tracks);
+            context.SaveChanges();
         }
 
-        public static Queue? Get()
+        public static Queue Get()
         {
             using DatabaseContext context = new();
-            Queue queue = context.Queues
-                    .Include(q => q.Tracks)
-                    .FirstOrDefault();
+            Queue queue = context.Queues.FirstOrDefault();
 
             if(queue.IsNotNull())
                 queue.PlayingTrack = context.Tracks.Find(queue.PlayingTrackId);

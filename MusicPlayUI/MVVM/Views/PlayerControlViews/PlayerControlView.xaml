@@ -8,7 +8,7 @@
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
              xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels" 
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
-             xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" xmlns:mp="clr-namespace:ModalPopupControl;assembly=ModalPopupControl"
              d:DataContext="{d:DesignInstance Type=viewmodels:PlayerControlViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
@@ -206,7 +206,7 @@
                                 <Run Text="{Binding QueueService.Queue.PlayingTrack.Album.Name}"
                                         Style="{DynamicResource NLRun}">
                                     <Run.InputBindings>
-                                            <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToAlbumCommand}"/>
+                                            <MouseBinding Gesture="LeftClick" Command="{Binding NavigateToAlbumCommand}" CommandParameter="{Binding QueueService.Queue.PlayingTrack.Album.Id}"/>
                                     </Run.InputBindings>
                                 </Run>
                             </TextBlock>
@@ -487,13 +487,14 @@
                 </Popup>
 
                 <!-- Devices Popup -->
-                <Popup AllowsTransparency="True"
+                <mp:ModalPopup AllowsTransparency="True"
                         x:Name="DevicePopup"
                         PopupAnimation="None"
-                        IsOpen="{Binding IsDevicesPopupOpen, Mode=OneWay}"
-                        StaysOpen="True">
-                    <Popup.Style>
-                        <Style TargetType="Popup">
+                        IsOpen="{Binding IsDevicesPopupOpen, Mode=TwoWay}"
+                               Effect="{DynamicResource FilterPanelDropShadow}"
+                        StaysOpen="False">
+                    <mp:ModalPopup.Style>
+                        <Style TargetType="mp:ModalPopup">
                             <Setter Property="PlacementTarget" Value="{Binding ElementName=DeviceIconBtn}"/>
                             <Setter Property="Placement" Value="Top"/>
                             <Setter Property="IsOpen" Value="false"/>
@@ -570,8 +571,8 @@
                                 </Setter.Value>
                             </Setter>
                         </Style>
-                    </Popup.Style>
-                </Popup>
+                    </mp:ModalPopup.Style>
+                </mp:ModalPopup>
 
             </Grid>
         </Grid>

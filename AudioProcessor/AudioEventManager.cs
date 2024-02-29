@@ -42,7 +42,7 @@ namespace AudioHandler
 
         public double StreamListenTimeMs => StreamPositionMs - StreamSkippedDurationMs;
 
-        public double MaxStreamDurationMs { get; private set;} = 0;
+        public double MaxStreamDurationMs { get; set;} = 0;
         public double StreamPositionMs { get; private set; } = 0;
 
 
@@ -56,6 +56,13 @@ namespace AudioHandler
             _audioTimer = new();
             _audioTimer.Tick += AudioTimer_Tick;
             _audioTimer.Interval = TimeSpan.FromMilliseconds(TimerInterval);
+
+            // init the properties based on the stream
+            if(_audioPlayback.Stream != -1)
+            {
+                MaxStreamDurationMs = 1000 * Bass.ChannelBytes2Seconds(_audioPlayback.Stream, Bass.ChannelGetLength(_audioPlayback.Stream));
+                StreamPositionMs = _audioPlayback.Position.TotalMilliseconds;
+            }
         }
 
         private void AudioTimer_Tick(object sender, EventArgs e)

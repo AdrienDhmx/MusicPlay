@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using MusicPlay.Database.DatabaseAccess;
 using MusicPlay.Database.Helpers;
@@ -28,6 +29,9 @@ namespace MusicPlay.Database.Models
         private List<ArtistTag> _artistTags = [];
         private ObservableCollection<Track> _tracks = [];
 
+        [NotMapped]
+        public bool AreAlbumsLoaded { get; private set; } = false;
+
         public int? CountryId { get; set; }
 
         /// <summary>
@@ -36,7 +40,30 @@ namespace MusicPlay.Database.Models
         public string Name
         {
             get => _name;
-            set => SetField(ref _name, value);
+            set
+            {
+                SetField(ref _name, value);
+                OnPropertyChanged(nameof(Acronyme));
+            }
+        }
+
+        [NotMapped]
+        public string Acronyme
+        {
+            get
+            {
+                string formatedName = Regex.Replace(Name, """[-,.&_':\\/;`~!?<>%*^$#@()\["'1-9]*""", "").ToUpper();
+                string[] words = formatedName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if(words.Length > 1)
+                {
+                    return $"{words[0][0]}{words[^1][0]}";
+                } 
+                else if (words[0].Length > 1)
+                {
+                    return $"{words[0][0]}{words[0][1]}";
+                }
+                return words[0][0].ToString();
+            }
         }
 
         /// <summary>
@@ -124,10 +151,15 @@ namespace MusicPlay.Database.Models
                 if(_albums.IsNull())
                 {
                     _albums = Album.GetAllFromArtist(Id);
+                    AreAlbumsLoaded = true;
                 }
                 return _albums;
             }
-            set => SetField(ref _albums, value);
+            set
+            {
+                SetField(ref _albums, value);
+                AreAlbumsLoaded = value != null;
+            }
         }
 
         // All the tracks the artists is credited on
@@ -189,6 +221,23 @@ namespace MusicPlay.Database.Models
         public string Death
         {
             get => TimestampToDateString(_deathDate);
+        }
+
+        public override int Length 
+        {
+            get
+            {
+                if(_length == 0)
+                {
+                    _length = Tracks.GetTotalLength();
+                }
+                return _length;
+            }
+            set
+            {
+                SetField(ref _length, value);
+                OnPropertyChanged(nameof(Duration));
+            }
         }
 
         public Artist(int id, string name, string cover, string duration)
@@ -261,27 +310,31 @@ namespace MusicPlay.Database.Models
         public static List<Artist> GetLastPlayed(int top)
             => GetLastPlayed<Artist>(top);
 
-        public static async Task<List<Artist>> GetMostPlayed(int top)
-            => await GetMostPlayed<Artist>(top)
-                        .Include(a => a.ArtistRoles)
-                        .ThenInclude(ar => ar.Role)
-                        .Include(a => a.Country)
-                        .ToListAsync();
+        public static List<Artist> GetMostPlayed(int top)
+            => GetMostPlayed<Artist>(top);
 
         public static int Count()
         {
-            return GetAll().Count;
+            using DatabaseContext context = new();
+            return context.Artists.Count();
         }
 
         public static async Task Update(Action<Artist> update, Artist artist)
         {
+            var roles = artist.ArtistRoles;
+            artist.ArtistRoles = null;
             using DatabaseContext context = new();
+            context.Artists.Update(artist);
             update(artist);
             await context.SaveChangesAsync();
+            artist.ArtistRoles = roles;
         }
 
         public static async Task UpdateCover(Artist artist, string newCover)
             => await Update(a => a.Cover = newCover, artist);
+
+        public static async Task UpdatePlayCount(Artist artist)
+            => await Update(a => PlayableModel.UpdatePlayCount(a), artist);
 
         public static async Task Delete(Artist artist)
         {

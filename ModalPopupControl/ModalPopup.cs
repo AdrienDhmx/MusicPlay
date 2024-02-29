@@ -75,14 +75,13 @@ namespace ModalPopupControl
             return VisualTreeHelper.GetParent(child);
         }
 
-        protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
+        protected override void OnPreviewMouseRightButtonUp(MouseButtonEventArgs e)
         {
             if(IsOpen)
             {
                 e.Handled = true;
                 return;
             }
-            base.OnPreviewMouseUp(e);
         }
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
@@ -102,10 +101,6 @@ namespace ModalPopupControl
                 {
                     e.Handled = true; // AND DO NOT PROPAGATE THE EVENT LIKE THE DEFAULT POPUP
                 }
-            }
-            else
-            {
-                base.OnPreviewMouseDown(e);
             }
         }
 

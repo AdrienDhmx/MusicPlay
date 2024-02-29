@@ -45,13 +45,24 @@ namespace MusicPlayUI.Core.Services
             return result;
         }
 
-        public static async Task<string> ChangeCover(this Playlist playlist)
+        public static async Task<string> ChangeCover(this Playlist playlist, bool update = true)
         {
             string oldCover = playlist.Cover;
-            bool result = await CoverProcessor.ChangeCover(playlist);
-            if (result)
+            if(update)
             {
-                CoverProcessor.DeleteAllCoversVersion(oldCover);
+                bool result = await CoverProcessor.ChangeCover(playlist);
+                if (result)
+                {
+                    CoverProcessor.DeleteAllCoversVersion(oldCover);
+                }
+            } 
+            else
+            {
+                string cover = CoverProcessor.OpenFileDialog();
+                if (!string.IsNullOrWhiteSpace(cover))
+                {
+                    playlist.Cover = cover;
+                }
             }
             return playlist.Cover;
         }

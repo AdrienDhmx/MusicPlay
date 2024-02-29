@@ -47,6 +47,41 @@ namespace MusicPlayUI.Converters
                     path = track.Artwork;
                 }
             }
+            else if(value is Artist artist)
+            {
+                if(artist.Cover.IsNotNullOrWhiteSpace() && artist.Cover.ValidFilePath())
+                {
+                    path = artist.Cover;
+                }
+                else
+                {
+                    List<string> covers = artist.GetCovers();
+                    if (covers.IsNotNullOrEmpty())
+                    {
+                        path = covers[0];
+                    }
+                    else if (artist.Albums.Count > 0)
+                    {
+                        path = artist.Albums[0].AlbumCover;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+
+            }
+            else if(value is Playlist playlist)
+            {
+                if(playlist.Id > 0)
+                {
+                    path = playlist.Cover;
+                } 
+                else
+                {
+                    return null;
+                }
+            }
             else
             {
                 path = value as string;
@@ -66,11 +101,6 @@ namespace MusicPlayUI.Converters
                 path = ImageHelper.GetModifiedCoverPath(path, false);
             }
 
-            if (path.IsNullOrWhiteSpace() || !path.ValidFilePath())
-            {
-                _ = int.TryParse(parameter as string, out int defaultImage);
-                return GetDefaultImage(defaultImage);
-            }
             return path;
         }
 

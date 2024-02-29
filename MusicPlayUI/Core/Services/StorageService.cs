@@ -40,6 +40,7 @@ namespace MusicPlayUI.Core.Services
         {
             Init();
 
+            // timer used to scan folder 10 seconds after the last added/created file in a watched folder
             _timer = new()
             {
                 Interval = TimeSpan.FromSeconds(10).TotalMilliseconds,
@@ -103,7 +104,7 @@ namespace MusicPlayUI.Core.Services
 
                 fileCreatedAwaitCallBack = async () =>
                 {
-                    int newTrackCount = await ScanFolder(folder);
+                    int newTrackCount = await Task.Run(() => ScanFolder(folder));
                     FileImported?.Invoke(newTrackCount);
                 };
 
@@ -111,7 +112,7 @@ namespace MusicPlayUI.Core.Services
         }
 
 
-        public async Task UpdateFolder(Folder folder, bool monitor)
+        public void UpdateFolder(Folder folder, bool monitor, string name)
         {
             int index = Folders.FindIndex(f => f.Path == folder.Path);
             if (index == -1) return;
@@ -128,7 +129,7 @@ namespace MusicPlayUI.Core.Services
                 }
             }
 
-            await Folder.Update(folder, folder.Name, monitor);
+            Folder.Update(folder, name, monitor);
         }
 
         /// <summary>
@@ -148,7 +149,7 @@ namespace MusicPlayUI.Core.Services
             return true;
         }
 
-        public async Task<int> ScanFolders(bool onlyMonitoredFolder = false)
+        public int ScanFolders(bool onlyMonitoredFolder = false)
         {
             if (Folders.IsNullOrEmpty()) 
                 return 0;
@@ -158,7 +159,7 @@ namespace MusicPlayUI.Core.Services
             {
                 if (onlyMonitoredFolder && !folder.IsMonitored)
                     continue;
-                newTrackCount += await ScanFolder(folder);
+                newTrackCount += ScanFolder(folder);
             }
             return newTrackCount;
         }
@@ -178,7 +179,7 @@ namespace MusicPlayUI.Core.Services
             Folders.Remove(folder);
         }
 
-        public async Task<int> ScanFolder(Folder folder)
+        public int ScanFolder(Folder folder)
         {
             ClearDatabaseContext(); // avoid trying to insert existing data with embedded references
             ImportMusicLibrary filesProcessor = new(folder);
@@ -189,10 +190,9 @@ namespace MusicPlayUI.Core.Services
                 filesProcessor.ProgressChanged += () => OnProgressUpdate(filesProcessor);
                 filesProcessor.Import();
                 folder.Scanning = false;
-                _previousImportedTrackCount = 0;
-                await UpdateFolder(folder, folder.IsMonitored);
             }
             filesProcessor.ProgressChanged -= () => OnProgressUpdate(filesProcessor);
+            _previousImportedTrackCount = 0; // reset
             return filesProcessor.FileNumber;
         }
 

@@ -9,7 +9,7 @@
     <ApplicationIcon>Resources\MusicPlayIcon.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
     <ImplicitUsings>disable</ImplicitUsings>
-	<Version>3.0.0</Version>
+	<Version>4.0.0</Version>
 	<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))UI</RootNamespace>
   </PropertyGroup>
 	

@@ -34,6 +34,9 @@ namespace MusicPlay.Database.Helpers
 
         public static int GetTotalLength<T>(this ObservableCollection<T> tracks) where T : Track
         {
+            if (tracks.IsNullOrEmpty())
+                return 0;
+
             int length = 0;
             var asSpan = CollectionsMarshal.AsSpan(tracks.ToList());
             for (int i = 0; i < asSpan.Length; i++)

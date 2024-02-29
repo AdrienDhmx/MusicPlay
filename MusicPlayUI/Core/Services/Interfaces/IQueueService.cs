@@ -15,6 +15,7 @@ namespace MusicPlayUI.Core.Services.Interfaces
         Queue Queue { get; }
 
         event Action PlayingTrackChanged;
+        event Action<int> PreviewPlayingTrackChanged;
         event Action QueueChanged;
         event Action PlayingTrackInteractionChanged;
 
@@ -43,7 +44,8 @@ namespace MusicPlayUI.Core.Services.Interfaces
         void DragOver(IDropInfo dropInfo);
         void Drop(IDropInfo dropInfo);
 
-        Task SaveQueue();
+        void ClearQueue();
+        void SaveQueue();
         Task NavigateToPlayingFrom();
     }
 }

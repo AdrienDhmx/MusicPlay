@@ -33,11 +33,11 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Border CornerRadius="5"
-                        Visibility="{Binding QueueService.AreCoversEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Visibility="{Binding AreCoversEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                         VerticalAlignment="Stretch"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
                     <Border.Background>
-                        <ImageBrush ImageSource="{Binding SelectedTrack.Cover, Converter={StaticResource ONullImageConverter}}"
+                        <ImageBrush ImageSource="{Binding SelectedTrack, Converter={StaticResource ONullImageConverter}}"
                                     Stretch="UniformToFill">
                         </ImageBrush>
                     </Border.Background>
@@ -53,7 +53,7 @@
                                MaxHeight="50"
                                MaxWidth="400"/>
 
-                    <listview:TrackArtistsListView Artists="{Binding SelectedTrack.Artists}"
+                    <listview:TrackArtistsListView Artists="{Binding SelectedTrack.TrackArtistRole}"
                                                    FontSize="14"
                                                    Foreground="{DynamicResource OnBackground}"
                                                    Command="{Binding NavigateToArtistCommand}"/>
@@ -134,11 +134,6 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="VerticalOffset" Value="0"/>
                         <Setter Property="IsOpen" Value="{Binding DataContext.IsPlaylistPopupOpen, ElementName=RootView, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Setter Property="Child">
-                            <Setter.Value>
-                                <popup:AddToPlaylistPopup DataContext="{Binding DataContext, ElementName=RootView}"/>
-                            </Setter.Value>
-                        </Setter>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="IsOpen" Value="True"/>
@@ -149,6 +144,9 @@
                         </Style.Triggers>
                     </Style>
                 </Popup.Style>
+                <popup:AddToPlaylistPopup AddToPlaylistCommand="{Binding DataContext.AddToPlaylistCommand, ElementName=RootView}"
+                                        CreatePlaylistCommand="{Binding DataContext.CreatePlaylistCommand, ElementName=RootView}"
+                                        Playlists="{Binding DataContext.UserPlaylists, ElementName=RootView}"/>
             </Popup>
 
             <!-- Tag Popup -->

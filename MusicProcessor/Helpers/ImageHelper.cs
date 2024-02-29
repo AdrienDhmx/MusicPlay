@@ -117,6 +117,8 @@ namespace MusicFilesProcessor.Helpers
                 await Artist.UpdateCover(artist, path);
             else if (playableModel is Track track)
                 await Track.UpdateArtwork(track, path);
+            else if(playableModel is Playlist playlist) 
+                Playlist.UpdateCover(playlist, path);
             else
                 throw new Exception("This type doesn't support the UpdateCoverWithFile method yet!");
         }

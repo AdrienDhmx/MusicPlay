@@ -11,18 +11,11 @@ using MusicPlayUI.Core.Helpers;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
-    public class QueueViewModel : ViewModel
+    public class QueueViewModel : BaseQueueViewModel
     {
         private readonly IModalService _modalService;
         private readonly ICommandsManager _commandsManager;
         private readonly IPlaylistService _playlistService;
-
-        private IQueueService _queueService;
-        public IQueueService QueueService
-        {
-            get { return _queueService; }
-            set { SetField(ref _queueService, value); }
-        }
 
         private IAudioTimeService _audioService;
         public IAudioTimeService AudioService
@@ -39,9 +32,8 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand NavigateToArtistCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public QueueViewModel(IQueueService queueService, IAudioTimeService audioService, IModalService modalService, ICommandsManager commandsManager,
-             IPlaylistService playlistService)
+             IPlaylistService playlistService) : base(queueService)
         {
-            QueueService = queueService;
             AudioService = audioService;
             _modalService = modalService;
             _commandsManager = commandsManager;
@@ -54,6 +46,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             NavigateToPlayingFromCommand = new RelayCommand(async () => await _queueService.NavigateToPlayingFrom());
             NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
             NavigateToAlbumCommand = _commandsManager.NavigateToAlbumByIdCommand;
+
+            base.Init();
         }
 
         private void OnCreatePlaylistValidation(bool isCanceled)

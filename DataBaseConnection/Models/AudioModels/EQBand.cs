@@ -126,18 +126,5 @@ namespace AudioHandler.Models
                 Id = this.Id,
             };
         }
-
-        public override Dictionary<string, object> InsertTable()
-        {
-            Dictionary<string, object> keyValues = new Dictionary<string, object>
-            {
-                { nameof(Band), Band },
-                { nameof(BandWidth), BandWidth },
-                { nameof(CenterFrequency), CenterFrequency },
-                { nameof(Gain), Gain },
-                { nameof(BandWidth), BandWidth },
-            };
-            return keyValues;
-        }
     }
 }

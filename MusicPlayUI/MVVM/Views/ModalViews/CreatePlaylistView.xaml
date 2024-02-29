@@ -68,7 +68,7 @@
                                                         Text="{Binding PlaylistDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                       Placeholder="{x:Static lang:Resources.Playlist_Description}"
                                                       AcceptsReturn="True"
-                                                      MaxLength="150"
+                                                      MaxLength="250"
                                                       MaxHeight="200"
                                                       MaxLines="10"
                                                       MinHeight="35">
@@ -86,7 +86,7 @@
                     </customTextBox:PlaceholderTextBox>
 
                     <Border Height="30">
-                        <TextBlock Text="{Binding Text.Length, ElementName=DescriptionBox, StringFormat={}{0}/150, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBlock Text="{Binding Text.Length, ElementName=DescriptionBox, StringFormat={}{0}/250, UpdateSourceTrigger=PropertyChanged}"
                                    HorizontalAlignment="Right"
                                    Margin="0,0,5,0"
                                    Foreground="{DynamicResource OnSurfaceVariant}"
@@ -105,14 +105,15 @@
                                         Margin="0,0,20,0"
                                 CornerRadius="{DynamicResource PrimaryCornerRadius}">
                             <Border.Background>
-                                <ImageBrush ImageSource="{Binding PlaylistCover, Converter={StaticResource TNullImageConverter}}"/>
+                                <ImageBrush ImageSource="{Binding PlaylistCover, Converter={StaticResource ONullImageConverter}}"
+                                            Stretch="UniformToFill"/>
                             </Border.Background>
                             <Border.Effect>
-                                <DropShadowEffect BlurRadius="5" ShadowDepth="2" Opacity="0.8" Color="Black"/>
+                                <DropShadowEffect BlurRadius="5" ShadowDepth="2" Opacity="0.6" Color="Black"/>
                             </Border.Effect>
                         </Border>
 
-                    <card:CustomCardControl Style="{DynamicResource SimpleCardStyle}"
+                    <card:CustomCardControl Style="{DynamicResource BaseCardStyle}"
                                                 Grid.Column="1"
                                                 Icon="{DynamicResource ImageIcon}"
                                                 CardHeader="Pick a Cover"

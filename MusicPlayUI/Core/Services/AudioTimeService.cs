@@ -113,6 +113,14 @@ namespace MusicPlayUI.Core.Services
             _audioEventManager.RegisterOnHalfWayThroughCallback(async () => await UpdatePlayCounts());
             _audioEventManager.RegisterOnStreamChangedCallback(OnStreamChangedCallback);
             _audioEventManager.RegisterOnStreamEndCallback(EndOfTrackCallback);
+
+            if(_queueService.Queue.PlayingTrack.IsNotNull())
+            {
+                // init properties based on the current queue and playing track
+                _audioEventManager.MaxStreamDurationMs = _queueService.Queue.PlayingTrack.Length;
+                MaxPositionMs = (int)_audioEventManager.MaxStreamDurationMs;
+                OnQueueChanged();
+            }
         }
 
         private void OnTickCallback()

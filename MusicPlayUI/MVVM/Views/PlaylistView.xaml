@@ -14,492 +14,435 @@
              xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              xmlns:model="clr-namespace:MusicPlay.Database.Models.DataBaseModels;assembly=MusicPlay.Database" 
              xmlns:mathconv="clr-namespace:MusicPlayUI.Converters"
+            xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer" 
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="800" d:DesignWidth="800">
 
-    <Grid helper:ScrollViewerHelper.IsStickyEnabled="True"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=PlaylistScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyPart}"
-          Panel.ZIndex="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Border Style="{DynamicResource PageHeaderBackground}"/>
 
-        <Grid x:Name="StickyPart"
-                MinHeight="125"
-                Height="250"
-                Panel.ZIndex="2"
-                MaxHeight="250">
+        <ds:DynamicScrollViewer Background="Transparent"
+                             Margin="{Binding TopMargin}"
+                                OnScrollCommand="{Binding OnScrollCommand}"
+                                IsInertiaEnabled="False"   
+                                CanMouseWheel="True"
+                                x:Name="PlaylistScroll"
+                                VerticalScrollBarVisibility="Hidden">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid x:Name="StickyPart"
+                    MinHeight="125"
+                    Height="250"
+                    Panel.ZIndex="2"
+                    MaxHeight="250">
 
-            <Border Background="{DynamicResource Background}"
-                    Effect="{DynamicResource PageHeaderDropShadow}"/>
-            <Border Style="{DynamicResource PageHeaderBackground}"/>
-
-            <Border Visibility="Hidden"
-                        x:Name="BorderAnimationPercentage">
-                <Border.Opacity>
-                    <!-- Map range the height of the sticky part to a 0 - 1 scale -->
-                    <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 125) / (250 - 125)">
-                        <Binding ElementName="StickyPart" Path="ActualHeight"/>
-                    </MultiBinding>
-                </Border.Opacity>
-            </Border>
-            
-            <Grid Margin="14"
-                HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-
-                <!-- Playlist Cover -->
-                <Border Grid.RowSpan="2"
-                        Margin="0,0,14,0"
-                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                        Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverterInverted}}"
-                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
-                    <Border.Background>
-                        <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource MNullImageConverter}}"
-                                            Stretch="UniformToFill"/>
-                    </Border.Background>
-                </Border>
-                <!--  Auto playlist Cover-->
-                <Border Grid.RowSpan="2"
-                            CornerRadius="{DynamicResource SecondaryCornerRadius}"
-                            Margin="0,0,14,0"
-                            Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"
-                            Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Path Data="{Binding PathCover}"
-                                Margin="10"
-                                Fill="{DynamicResource OnPrimaryContainer}"
-                                Stretch="Uniform">
-                    </Path>
-                </Border>
-
-                <!-- Artist Name + Duration + More Opt Btn -->
-                <Grid VerticalAlignment="Top"
-                      x:Name="PlaylistInfoGrid"
-                        Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid.Height>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - 30 * b) * 0.65">
-                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                        </MultiBinding>
-                    </Grid.Height>
-                    
-                    <!--  Artist Name -->
-                    <TextBlock Text="{Binding Playlist.Name}"
-                                Style="{DynamicResource SLargeHeaderStyle}"
-                                HorizontalAlignment="Left"
-                               VerticalAlignment="Bottom"
-                                MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
-                                TextWrapping="NoWrap"
-                                Margin="0,0,0,4">
-                        <TextBlock.MaxWidth>
-                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(a - (1-b) * 182)">
-                                <Binding ElementName="PlaylistInfoGrid" Path="ActualWidth"/>
-                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            </MultiBinding>
-                        </TextBlock.MaxWidth>
-                    </TextBlock>
-
-                    <TextBlock Text="{Binding Playlist.Description}"
-                                Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Style="{DynamicResource SSubDataStyle}"
-                                HorizontalAlignment="Left"
-                               Grid.Row="1"
-                               MaxWidth="680"
-                               x:Name="description"
-                                Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}"
-                                TextTrimming="CharacterEllipsis">
-                        <TextBlock.Height>
-                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="60 &lt; (a * b)">
-                                <Binding Path="DesiredSize.Height" RelativeSource="{RelativeSource self}"/>
-                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            </MultiBinding>
-                        </TextBlock.Height>
-                    </TextBlock>
-
-                    <StackPanel Orientation="Horizontal"
-                                VerticalAlignment="Top"
-                                    Grid.Row="2"
-                                Margin="0,5, 0, 0"
-                                    Opacity="{Binding Opacity, ElementName=BorderAnimationPercentage}">
-                        <StackPanel.Height>
-                            <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="24 * a">
-                                <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            </MultiBinding>
-                        </StackPanel.Height>
-                        <TextBlock Text="{Binding PlaylistDuration}"
-                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                        <TextBlock Text="{Binding Playlist.Tracks.Count, StringFormat=- {0}}"
-                                        Margin="5,0"
-                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
-
-                        <TextBlock Text="{x:Static lang:Resources.Tracks}"
-                                        Style="{DynamicResource NLargeSecondaryStyle}"/>
-                    </StackPanel>
-                </Grid>
-
-                <Border Visibility="Hidden"
-                            MinWidth="50"
-                            x:Name="BorderButtonWidthValue">
-                    <Border.Width>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="80 * a + 48">
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                        </MultiBinding>
-                    </Border.Width>
-                </Border>
-
-                <!-- Action Buttons -->
-                <Border VerticalAlignment="Bottom"
-                            MaxWidth="{Binding ActualWidth, ElementName=PlaylistInfoGrid}"
-                            MinWidth="50"
-                        Grid.Column="1"
-                            HorizontalAlignment="Left">
-                    <Border.Width>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="(1 - a) * b + 340">
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            <Binding ElementName="PlaylistInfoGrid" Path="ActualWidth"/>
-                        </MultiBinding>
-                    </Border.Width>
-
-                    <Border.Height>
-                        <MultiBinding Converter="{mathconv:MathConverter}" ConverterParameter="48 + b / (a + 2.5) * (1-a)">
-                            <Binding ElementName="BorderAnimationPercentage" Path="Opacity"/>
-                            <Binding ElementName="StickyPart" Path="ActualHeight"/>
-                        </MultiBinding>
-                    </Border.Height>
-
-                    <StackPanel Orientation="Horizontal"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right">
-                        <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
-                                                                        Style="{DynamicResource LargePlayButton}"
-                                                Width="{Binding Width, ElementName=BorderButtonWidthValue}">
-                        </iconbtn:IconButton>
-
-                        <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
-                                                                        Style="{DynamicResource LargePlayShuffleButton}"
-                                                 Width="{Binding Width, ElementName=BorderButtonWidthValue}">
-                        </iconbtn:IconButton>
-
-                        <!-- More Option Button -->
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                    IconHeight="5"
-                                                    IconWidth="28"
-                                                        Icon="{DynamicResource MoreOptionIcon}"
-                                                        Command="{Binding OpenPlaylistPopupCommand}"
-                                                    CommandParameter="{Binding Playlist}"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Grid>
-
-        <ScrollViewer x:Name="PlaylistScroll"
-                      Grid.Row="1"
-                          VerticalScrollBarVisibility="Hidden">
-            <Border>
-                <Grid MaxWidth="1250">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <listview:ChipListView Genres="{Binding Tags}"
-                                       NavigateToGenreCommand="{Binding NavigateToTagCommand}"
-                                        Margin="0,5,0,0"
-                                        VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"/>
-
-                    <!-- Track header -->
-                    <Grid HorizontalAlignment="Stretch"
-                          VerticalAlignment="Center"
-                          Height="30"
-                          Grid.Row="1"
-                          Margin="30,20, 30, 0">
+                    <Grid HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="65"/>
-                            <ColumnDefinition Width="0.3*" />
-                            <ColumnDefinition Width="2"/>
-                            <ColumnDefinition Width="0.48*"/>
-                            <ColumnDefinition Width="2"/>
-                            <ColumnDefinition Width="0.22*"/>
-                            <ColumnDefinition  Width="90"/>
-                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="0.05*" MaxWidth="80"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="0.05*" MaxWidth="80"/>
                         </Grid.ColumnDefinitions>
 
-                        <Border BorderThickness="0,0,1,0"
-                                Padding="12,0, 0, 0"
-                                x:Name="IndexHeader"
-                                BorderBrush="{DynamicResource SurfaceVariant}">
-                            <TextBlock Text="#"
-                                       HorizontalAlignment="Left"
-                                       Style="{DynamicResource NStyle}"/>
-                        </Border>
-
+                        <Grid Grid.Column="1"
+                            Margin="0, 10"
+                            HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Playlist Cover -->
+                            <Border Margin="0,0,14,0"
+                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                    Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                    Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource MNullImageConverter}}"
+                                                Stretch="UniformToFill"/>
+                                </Border.Background>
+                            </Border>
                         
-                        <Border Width="60"
-                                BorderThickness="0,0,1,0"
-                                HorizontalAlignment="Stretch"
-                                x:Name="CoverHeader"
-                                Visibility="{Binding DataContext.QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, ElementName=RootView, Mode=OneWay}"
-                                BorderBrush="{DynamicResource SurfaceVariant}"
-                                Grid.Column="1">
-                            <TextBlock Text="Cover"
-                                       HorizontalAlignment="Stretch"
-                               TextTrimming="None"
-                                       TextAlignment="Center"
-                               Style="{DynamicResource NStyle}"/>
-                        </Border>
+                        
+                            <!--  Auto playlist Cover-->
+                            <Border  CornerRadius="{DynamicResource SecondaryCornerRadius}"
+                                        Margin="0,0,14,0"
+                                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"
+                                        Visibility="{Binding IsAutoPlaylist, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Path Data="{Binding PathCover}"
+                                    Margin="10"
+                                    Fill="{DynamicResource OnPrimaryContainer}"
+                                    Stretch="Uniform">
+                                </Path>
+                            </Border>
 
-                        <Border BorderThickness="0,0,1,0"
-                                Padding="10,0"
-                                x:Name="TitleHeader"
-                                BorderBrush="{DynamicResource SurfaceVariant}"
-                                Grid.Column="2">
-                            <TextBlock Text="Title"
-                                       Style="{DynamicResource NStyle}"/>
-                        </Border>
+                            <!-- Artist Name + Duration + More Opt Btn -->
+                            <Grid VerticalAlignment="Stretch"
+                                  x:Name="PlaylistInfoGrid"
+                                    Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="70"/>
+                                </Grid.RowDefinitions>
 
-                        <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceVariant}"/>
+                                <!--  Artist Name -->
+                                <TextBlock Text="{Binding Playlist.Name}"
+                                            Style="{DynamicResource SLargeHeaderStyle}"
+                                           MaxHeight="100"
+                                            HorizontalAlignment="Left"
+                                           VerticalAlignment="Top"
+                                           TextWrapping="Wrap"
+                                            Margin="0,0,0,4">
+                                </TextBlock>
 
-                        <Border BorderThickness="0,0,1,0"
-                                Padding="10,0"
-                                x:Name="ArtistsHeader"
-                                BorderBrush="{DynamicResource SurfaceVariant}"
-                                Grid.Column="4">
-                            <TextBlock Text="Artists"
-                                       Style="{DynamicResource NStyle}"/>
-                        </Border>
+                                <TextBlock Text="{Binding Playlist.Description}"
+                                        Visibility="{Binding DescriptionVisibility, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        Style="{DynamicResource SSubDataStyle}"
+                                        HorizontalAlignment="Left"
+                                       Grid.Row="1"
+                                       MaxWidth="750"
+                                       x:Name="description"
+                                        TextTrimming="CharacterEllipsis">
+                                </TextBlock>
 
-                        <GridSplitter Grid.Column="5" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceVariant}"/>
+                                <StackPanel Orientation="Horizontal"
+                                        Grid.Row="2"
+                                        Margin="0,5, 0, 0">
+                                    <TextBlock Text="{Binding Playlist.WrittenDuration}"
+                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
 
-                        <Border BorderThickness="0,0,1,0"
-                                Padding="10,0,0,0"
-                                x:Name="AlbumHeader"
-                                BorderBrush="{DynamicResource SurfaceVariant}"
-                                Grid.Column="6">
-                            <TextBlock Text="Album"
-                                       Style="{DynamicResource NStyle}"/>
-                        </Border>
+                                    <TextBlock Text="{Binding Playlist.Tracks.Count, StringFormat=- {0}}"
+                                            Margin="5,0"
+                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
 
-                        <Border BorderThickness="0,0,0,0"
-                                Padding="10,0, 0, 0"
-                                x:Name="DurationHeader"
-                                BorderBrush="{DynamicResource SurfaceVariant}"
-                                Grid.Column="7">
-                            <TextBlock Text="Duration"
-                               Style="{DynamicResource NStyle}"/>
-                        </Border>
+                                    <TextBlock Text="{x:Static lang:Resources.Tracks}"
+                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
+                                </StackPanel>
+                            
+                                <!-- Action Buttons -->
+                                <StackPanel Orientation="Horizontal"
+                                            Grid.Column="1"
+                                            Grid.Row="3"
+                                            Margin="0, 10"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Left">
+                                    <iconbtn:IconButton Command="{Binding PlayPlaylistCommand}"
+                                                        Style="{DynamicResource FilledPlayBtn}"/>
 
-                        <Border BorderThickness="1,0,0,0"
-                                x:Name="PlayCountHeader"
-                                Padding="10,0,0,0"
-                                Visibility="{Binding DataContext.IsMostPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
-                                BorderBrush="{DynamicResource SurfaceVariant}"
-                                Grid.Column="8">
-                            <TextBlock Text="Play Count"
-                                        Margin="10,0,0,0"
-                                        Grid.Column="6"
-                                        Style="{DynamicResource NTrackDataStyle}"/>
-                        </Border>
+                                    <iconbtn:IconButton Command="{Binding PlayShuffledPlaylistCommand}"
+                                                        Style="{DynamicResource FilledPlayShuffleBtn}"/>
 
-                        <Border BorderThickness="1,0,0,0"
-                                x:Name="LastPlayedHeader"
-                                Padding="10,0"
-                                Width="190"
-                                Visibility="{Binding DataContext.IsLastPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
-                                BorderBrush="{DynamicResource SurfaceVariant}"
-                                Grid.Column="8">
-                            <TextBlock Text="Last Played"
-                                    Margin="10, 0, 0, 0"
-                                        Grid.Column="6"
-                                        Style="{DynamicResource NTrackDataStyle}"/>
-                        </Border>
+                                    <!-- More Option Button -->
+                                    <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                                                            IconHeight="5"
+                                                            IconWidth="28"
+                                                                Icon="{DynamicResource MoreOptionIcon}"
+                                                                Command="{Binding OpenPlaylistPopupCommand}"
+                                                            CommandParameter="{Binding Playlist}"/>
+                                </StackPanel>
+                            </Grid>
+
+                        </Grid>
                     </Grid>
-
-                    <ItemsControl Grid.Row="2"
-                                    ItemsSource="{Binding Playlist.Tracks}"
-                                dd:DragDrop.IsDropTarget="True"
-                                    dd:DragDrop.IsDragSource="True"
-                                  dd:DragDrop.DropHandler="{Binding .}"
-                                   dd:DragDrop.DropScrollingMode="VerticalOnly"
-                                  dd:DragDrop.DropTargetScrollViewer="{Binding ElementName=PlaylistScroll}"
-                                  dd:DragDrop.DropTargetAdornerBrush="{DynamicResource Primary}"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                  MinHeight="200"
-                                  Margin="10, 10, 10,20">
-                        <dd:DragDrop.EffectMoveAdornerTemplate>
-                            <DataTemplate DataType="{x:Type model:OrderedTrack}">
-                                <Border Background="{DynamicResource Background}"
-                                        BorderBrush="{DynamicResource Outline}"
-                                            BorderThickness="1"
-                                           CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                                            MaxWidth="600">
-                                    <Grid Margin="2">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                                                    Height="50"
-                                                    Width="50">
-                                            <Border.Background>
-                                                <ImageBrush ImageSource="{Binding AlbumCover, Converter={StaticResource TNullImageConverter}}"/>
-                                            </Border.Background>
-                                        </Border>
-
-                                        <TextBlock Text="{Binding Title}"
-                                                               Margin="10,0"
-                                                               Grid.Column="1"
-                                                   Style="{DynamicResource NTrackDataStyle}"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </dd:DragDrop.EffectMoveAdornerTemplate>
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel VirtualizingPanel.IsVirtualizing="True"
-                                                                VirtualizingPanel.VirtualizationMode="Recycling"
-                                                                VirtualizingPanel.IsContainerVirtualizable="True"
-                                                                VirtualizingPanel.CacheLength="1,1"
-                                                                VirtualizingPanel.CacheLengthUnit="Item"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border MinHeight="60"
-                                        MaxHeight="110"
-                                        BorderThickness="0,1,0,0"
-                                        Padding="0,10"
-                                        Margin="4,0"
-                                        BorderBrush="{DynamicResource SurfaceVariant}"
-                                        CornerRadius="0"
-                                        HorizontalAlignment="Stretch"
-                                        MinWidth="550">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="Transparent"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <Border.InputBindings>
-                                        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.PlayTrackCommand, Source={x:Reference RootView}}"
-                                                                  CommandParameter="{Binding .}"/>
-                                        <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenTrackPopupCommand, ElementName=RootView}"
-                                                                  CommandParameter="{Binding .}"/>
-                                    </Border.InputBindings>
-                                    <Grid Margin="15,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="65"/>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition  Width="auto"/>
-                                            <ColumnDefinition Width="auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Border  Width="{Binding ActualWidth, ElementName=IndexHeader}"
-                                                 Padding="10,0">
-                                            <TextBlock Text="{Binding TrackIndex}"
-                                                              Style="{DynamicResource NTrackDataStyle}"/>
-                                        </Border>
-
-                                        <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                                                Grid.Column="1"
-                                                Width="50"
-                                                Visibility="{Binding DataContext.QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, ElementName=RootView, Mode=OneWay}"
-                                                Height="50">
-                                            <Border.Background>
-                                                <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource ONullImageConverter}}"
-                                                            Stretch="UniformToFill"/>
-                                            </Border.Background>
-                                        </Border>
-
-                                        <Border Width="{Binding ActualWidth, ElementName=TitleHeader}" 
-                                                Padding="10,0"
-                                                HorizontalAlignment="Stretch"
-                                                Grid.Column="2">
-                                            <TextBlock Text="{Binding Title}"
-                                                       Style="{DynamicResource NTrackDataStyle}"/>
-                                        </Border>
-
-                                        <list:ArtistsRelationListView Artists="{Binding Artists}"
-                                                                      Width="{Binding ActualWidth, ElementName=ArtistsHeader}"
-                                                                        Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootView}"
-                                                                        VerticalAlignment="Center"
-                                                                      Padding="5,0"
-                                                                        Grid.Column="3"
-                                                                        HorizontalAlignment="Stretch"/>
-
-
-                                        <Border  Grid.Column="4"
-                                                   Width="{Binding ActualWidth, ElementName=AlbumHeader}"
-                                                 Padding="5,0">
-                                            <TextBlock Text="{Binding AlbumName}"
-                                                        Style="{DynamicResource NLTrackDataStyle}">
-                                                <TextBlock.InputBindings>
-                                                    <MouseBinding Gesture="LeftClick" 
-                                                                  Command="{Binding DataContext.NavigateToAlbumByIdCommand, ElementName=RootView}"
-                                                                  CommandParameter="{Binding AlbumId}"/>
-                                                </TextBlock.InputBindings>
-                                            </TextBlock>
-                                        </Border>
-
-                                        <Border  Grid.Column="5"
-                                                   Width="{Binding ActualWidth, ElementName=DurationHeader}">
-                                            <TextBlock Text="{Binding Duration}"
-                                                       HorizontalAlignment="Stretch"
-                                                       TextAlignment="Center"
-                                                        Style="{DynamicResource NTrackDataStyle}"/>
-                                        </Border>
-
-                                        <Border  Width="{Binding ActualWidth, ElementName=PlayCountHeader}"
-                                                 Padding="10,0"
-                                                           Visibility="{Binding DataContext.IsMostPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                           Grid.Column="6">
-                                            <TextBlock Text="{Binding PlayCount}"
-                                                       TextAlignment="Center"
-                                                       HorizontalAlignment="Stretch"
-                                                               Style="{DynamicResource NTrackDataStyle}"/>
-                                        </Border>
-
-                                        <Border Width="{Binding ActualWidth, ElementName=LastPlayedHeader}"
-                                                   Padding="10, 0, 0, 0"
-                                                           Visibility="{Binding DataContext.IsLastPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                           Grid.Column="6">
-                                            <TextBlock Text="{Binding LastPlayed}"
-                                                       HorizontalAlignment="Stretch"
-                                                       TextAlignment="Center"
-                                                               Style="{DynamicResource NTrackDataStyle}"/>
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
                 </Grid>
-            </Border>
-        </ScrollViewer>
+
+                <Border Grid.Row="2"
+                        Background="{DynamicResource Background}">
+                    <Grid MaxWidth="1250">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <listview:ChipListView Genres="{Binding Playlist.Tags}"
+                                           NavigateToGenreCommand="{Binding NavigateToTagCommand}"
+                                            Margin="0,5,0,0"
+                                            VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+
+                        <!-- Track header -->
+                        <Grid HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center"
+                              Height="30"
+                              Grid.Row="1"
+                              Margin="30,20, 30, 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="65"/>
+                                <ColumnDefinition Width="0.3*" />
+                                <ColumnDefinition Width="2"/>
+                                <ColumnDefinition Width="0.48*"/>
+                                <ColumnDefinition Width="2"/>
+                                <ColumnDefinition Width="0.22*"/>
+                                <ColumnDefinition  Width="90"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border BorderThickness="0,0,1,0"
+                                    Padding="12,0, 0, 0"
+                                    x:Name="IndexHeader"
+                                    BorderBrush="{DynamicResource SurfaceVariant}">
+                                <TextBlock Text="#"
+                                           HorizontalAlignment="Left"
+                                           Style="{DynamicResource NStyle}"/>
+                            </Border>
+
+
+                            <Border Width="60"
+                                    BorderThickness="0,0,1,0"
+                                    HorizontalAlignment="Stretch"
+                                    x:Name="CoverHeader"
+                                    Visibility="{Binding DataContext.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, ElementName=RootView}"
+                                    BorderBrush="{DynamicResource SurfaceVariant}"
+                                    Grid.Column="1">
+                                <TextBlock Text="Cover"
+                                           HorizontalAlignment="Stretch"
+                                            TextTrimming="None"
+                                           TextAlignment="Center"
+                                            Style="{DynamicResource NStyle}"/>
+                            </Border>
+
+                            <Border BorderThickness="0,0,1,0"
+                                    Padding="10,0"
+                                    x:Name="TitleHeader"
+                                    BorderBrush="{DynamicResource SurfaceVariant}"
+                                    Grid.Column="2">
+                                <TextBlock Text="Title"
+                                           Style="{DynamicResource NStyle}"/>
+                            </Border>
+
+                            <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceVariant}"/>
+
+                            <Border BorderThickness="0,0,1,0"
+                                    Padding="10,0"
+                                    x:Name="ArtistsHeader"
+                                    BorderBrush="{DynamicResource SurfaceVariant}"
+                                    Grid.Column="4">
+                                <TextBlock Text="Artists"
+                                           Style="{DynamicResource NStyle}"/>
+                            </Border>
+
+                            <GridSplitter Grid.Column="5" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceVariant}"/>
+
+                            <Border BorderThickness="0,0,1,0"
+                                    Padding="10,0,0,0"
+                                    x:Name="AlbumHeader"
+                                    BorderBrush="{DynamicResource SurfaceVariant}"
+                                    Grid.Column="6">
+                                <TextBlock Text="Album"
+                                           Style="{DynamicResource NStyle}"/>
+                            </Border>
+
+                            <Border BorderThickness="0,0,0,0"
+                                    Padding="10,0, 0, 0"
+                                    x:Name="DurationHeader"
+                                    BorderBrush="{DynamicResource SurfaceVariant}"
+                                    Grid.Column="7">
+                                <TextBlock Text="Duration"
+                                   Style="{DynamicResource NStyle}"/>
+                            </Border>
+
+                            <Border BorderThickness="1,0,0,0"
+                                    x:Name="PlayCountHeader"
+                                    Padding="10,0,0,0"
+                                    Visibility="{Binding DataContext.IsMostPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    BorderBrush="{DynamicResource SurfaceVariant}"
+                                    Grid.Column="8">
+                                <TextBlock Text="Play Count"
+                                            Margin="10,0,0,0"
+                                            Grid.Column="6"
+                                            Style="{DynamicResource NTrackDataStyle}"/>
+                            </Border>
+
+                            <Border BorderThickness="1,0,0,0"
+                                    x:Name="LastPlayedHeader"
+                                    Padding="10,0"
+                                    Width="190"
+                                    Visibility="{Binding DataContext.IsLastPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    BorderBrush="{DynamicResource SurfaceVariant}"
+                                    Grid.Column="8">
+                                <TextBlock Text="Last Played"
+                                        Margin="10, 0, 0, 0"
+                                            Grid.Column="6"
+                                            Style="{DynamicResource NTrackDataStyle}"/>
+                            </Border>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="2"
+                                        ItemsSource="{Binding Playlist.PlaylistTracks}"
+                                    dd:DragDrop.IsDropTarget="True"
+                                        dd:DragDrop.IsDragSource="True"
+                                      dd:DragDrop.DropHandler="{Binding .}"
+                                       dd:DragDrop.DropScrollingMode="VerticalOnly"
+                                      dd:DragDrop.DropTargetScrollViewer="{Binding ElementName=PlaylistScroll}"
+                                      dd:DragDrop.DropTargetAdornerBrush="{DynamicResource Primary}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                      MinHeight="200"
+                                      Margin="10, 10, 10,20">
+                            <dd:DragDrop.EffectMoveAdornerTemplate>
+                                <DataTemplate DataType="{x:Type model:PlaylistTrack}">
+                                    <Border Background="{DynamicResource Background}"
+                                            BorderBrush="{DynamicResource Outline}"
+                                                BorderThickness="1"
+                                               CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                                MaxWidth="600">
+                                        <Grid Margin="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                                        Height="50"
+                                                        Width="50">
+                                                <Border.Background>
+                                                    <ImageBrush ImageSource="{Binding Track, Converter={StaticResource TNullImageConverter}}"/>
+                                                </Border.Background>
+                                            </Border>
+
+                                            <TextBlock Text="{Binding Track.Title}"
+                                                                   Margin="10,0"
+                                                                   Grid.Column="1"
+                                                       Style="{DynamicResource NTrackDataStyle}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </dd:DragDrop.EffectMoveAdornerTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel VirtualizingPanel.IsVirtualizing="True"
+                                                                    VirtualizingPanel.VirtualizationMode="Recycling"
+                                                                    VirtualizingPanel.IsContainerVirtualizable="True"
+                                                                    VirtualizingPanel.CacheLength="1,1"
+                                                                    VirtualizingPanel.CacheLengthUnit="Item"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border MinHeight="60"
+                                            MaxHeight="110"
+                                            BorderThickness="0,1,0,0"
+                                            Padding="0,10"
+                                            Margin="4,0"
+                                            BorderBrush="{DynamicResource SurfaceVariant}"
+                                            CornerRadius="0"
+                                            HorizontalAlignment="Stretch"
+                                            MinWidth="550">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Border.InputBindings>
+                                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.PlayTrackCommand, Source={x:Reference RootView}}"
+                                                                      CommandParameter="{Binding Track}"/>
+                                            <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenTrackPopupCommand, ElementName=RootView}"
+                                                                      CommandParameter="{Binding Track}"/>
+                                        </Border.InputBindings>
+                                        <Grid Margin="15,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition Width="65"/>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition  Width="auto"/>
+                                                <ColumnDefinition Width="auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border  Width="{Binding ActualWidth, ElementName=IndexHeader}"
+                                                     Padding="10,0">
+                                                <TextBlock Text="{Binding TrackIndex}"
+                                                                  Style="{DynamicResource NTrackDataStyle}"/>
+                                            </Border>
+
+                                            <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                                    Grid.Column="1"
+                                                    Width="50"
+                                                    Visibility="{Binding DataContext.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, ElementName=RootView}"
+                                                    Height="50">
+                                                <Border.Background>
+                                                    <ImageBrush ImageSource="{Binding Track, Converter={StaticResource ONullImageConverter}}"
+                                                                Stretch="UniformToFill"/>
+                                                </Border.Background>
+                                            </Border>
+
+                                            <Border Width="{Binding ActualWidth, ElementName=TitleHeader}" 
+                                                    Padding="10,0"
+                                                    HorizontalAlignment="Stretch"
+                                                    Grid.Column="2">
+                                                <TextBlock Text="{Binding Track.Title}"
+                                                           Style="{DynamicResource NTrackDataStyle}"/>
+                                            </Border>
+
+                                            <list:ArtistsRelationListView Artists="{Binding Track.TrackArtistRole}"
+                                                                          Width="{Binding ActualWidth, ElementName=ArtistsHeader}"
+                                                                            Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootView}"
+                                                                            VerticalAlignment="Center"
+                                                                          Padding="5,0"
+                                                                            Grid.Column="3"
+                                                                            HorizontalAlignment="Stretch"/>
+
+
+                                            <Border  Grid.Column="4"
+                                                       Width="{Binding ActualWidth, ElementName=AlbumHeader}"
+                                                     Padding="5,0">
+                                                <TextBlock Text="{Binding Track.Album.Name}"
+                                                            Style="{DynamicResource NLTrackDataStyle}">
+                                                    <TextBlock.InputBindings>
+                                                        <MouseBinding Gesture="LeftClick"
+                                                                      Command="{Binding DataContext.NavigateToAlbumByIdCommand, ElementName=RootView}"
+                                                                      CommandParameter="{Binding Track.Album.Id}"/>
+                                                    </TextBlock.InputBindings>
+                                                </TextBlock>
+                                            </Border>
+
+                                            <Border  Grid.Column="5"
+                                                       Width="{Binding ActualWidth, ElementName=DurationHeader}">
+                                                <TextBlock Text="{Binding Track.Duration}"
+                                                           HorizontalAlignment="Stretch"
+                                                           TextAlignment="Center"
+                                                            Style="{DynamicResource NTrackDataStyle}"/>
+                                            </Border>
+
+                                            <Border  Width="{Binding ActualWidth, ElementName=PlayCountHeader}"
+                                                     Padding="10,0"
+                                                               Visibility="{Binding DataContext.IsMostPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                               Grid.Column="6">
+                                                <TextBlock Text="{Binding Track.PlayCount}"
+                                                           TextAlignment="Center"
+                                                           HorizontalAlignment="Stretch"
+                                                                   Style="{DynamicResource NTrackDataStyle}"/>
+                                            </Border>
+
+                                            <Border Width="{Binding ActualWidth, ElementName=LastPlayedHeader}"
+                                                       Padding="10, 0, 0, 0"
+                                                               Visibility="{Binding DataContext.IsLastPlayedPlaylist, ElementName=RootView, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                               Grid.Column="6">
+                                                <TextBlock Text="{Binding Track.LastPlayed}"
+                                                           HorizontalAlignment="Stretch"
+                                                           TextAlignment="Center"
+                                                                   Style="{DynamicResource NTrackDataStyle}"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ds:DynamicScrollViewer>
     </Grid>
 </UserControl>

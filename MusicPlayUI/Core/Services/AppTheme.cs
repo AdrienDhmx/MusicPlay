@@ -59,6 +59,8 @@ namespace MusicPlayUI.Core.Services
 
             public static Brush BlackForeground => (Brush)AppThemeDic["BlackForeground"];
             public static Brush WhiteForeground => (Brush)AppThemeDic["WhiteForeground"];
+
+            public static Brush ScdWhiteTransparent = (Brush)AppThemeDic["ScdWhiteTransparent"];
         }
 
         private const int _sunrise = 8;

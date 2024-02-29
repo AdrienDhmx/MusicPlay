@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
@@ -37,6 +38,9 @@ namespace MusicPlayUI.MVVM.ViewModels.AppBars
         public static IAppState AppState => App.State;
 
         private double _height = _defaultHeight;
+        private Visibility _visibility = Visibility.Visible;
+        private bool _canScrollToTop = false;
+
         private Brush _background = _defaultBackground;
         private double _backgroundOpacity = _defaultbackgroundOpacity;
         private bool _applyDropShadow = _defaultApplyDropShadow;
@@ -53,6 +57,12 @@ namespace MusicPlayUI.MVVM.ViewModels.AppBars
         {
             get => _height;
             set => SetField(ref _height, value);
+        }
+
+        public bool CanScrollToTop
+        {
+            get => _canScrollToTop;
+            set => SetField(ref _canScrollToTop, value);
         }
 
         public Brush Background
@@ -117,7 +127,6 @@ namespace MusicPlayUI.MVVM.ViewModels.AppBars
             set => SetField(ref _titleFontSize, value);
         }
 
-
         public string Title
         {
             get => _title;
@@ -130,10 +139,17 @@ namespace MusicPlayUI.MVVM.ViewModels.AppBars
             set => SetField(ref _subTitle, value);
         }
 
+        public Visibility Visibility
+        {
+            get => _visibility;
+            set => SetField(ref _visibility, value);
+        }
+
 
         public ICommand NavigateBackCommand { get; }
         public ICommand NavigateForwardCommand { get; }
         public ICommand ToggleMenuDrawerCommand { get; }
+        public ICommand ScrollToTopCommand { get; }
         public AppBar(ICommandsManager commandsManager)
         {
             _commandsManager = commandsManager;
@@ -141,6 +157,12 @@ namespace MusicPlayUI.MVVM.ViewModels.AppBars
             NavigateBackCommand = _commandsManager.NavigateBackCommand;
             NavigateForwardCommand = _commandsManager.NavigateForwardCommand;
             ToggleMenuDrawerCommand = _commandsManager.ToggleMenuDrawerCommand;
+            ScrollToTopCommand = new RelayCommand(() => {
+                // the lambda can't be removed because the App.State being a static property 
+                // it would keep a reference and use the App.State.CurrentView.ViewModel at the creation of the app bar
+                // therefor not calling ScrollToTop() on the current viewmodel
+                App.State.CurrentView.ViewModel.ScrollToTop();
+            });
 
             AppTheme.ThemeChanged += StyleNeedUpdate;
         }

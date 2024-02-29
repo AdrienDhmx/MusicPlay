@@ -13,7 +13,6 @@
         LastPlayed = 2,
         MostPlayed = 3,
 
-
         // PlaylistTags created by the user
         UserPlaylist = 11,
     }

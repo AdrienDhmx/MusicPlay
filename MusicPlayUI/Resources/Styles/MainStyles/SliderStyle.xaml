@@ -1,5 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:converter="clr-namespace:MusicPlayUI.Converters"
+                    xmlns:viewModel="clr-namespace:MusicPlayUI.MVVM.ViewModels">
+    <converter:ToTypeConverter x:Key="ToTypeConverter"/>
+
     <Style x:Key="Basestyle" TargetType="{x:Type Control}">
         <Setter  Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
@@ -37,8 +41,19 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Border Background="{DynamicResource WhiteForeground}" Height="4"
-                            CornerRadius="2,0,0,2"/>
+                    <Border Height="4"
+                            CornerRadius="2,0,0,2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource WhiteForeground}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AppState.CurrentView, Converter={StaticResource ToTypeConverter}}" Value="True">
+                                        <Setter Property="Background" Value="{Binding AppState.CurrentView.ViewModel.VisualizerParameterService.ObjectColor, Mode=OneWay}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -134,16 +149,25 @@
         <Setter Property="OverridesDefaultStyle"
           Value="true" />
         <Setter Property="Height"
-          Value="16" />
+          Value="14" />
         <Setter Property="Width"
-          Value="16" />
+          Value="14" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Ellipse x:Name="Ellipse"
-                             Fill="{DynamicResource Primary}"
-                             Stroke="{DynamicResource WhiteTransparent}"
+                             Stroke="{DynamicResource ScdWhiteTransparent}"
                             StrokeThickness="1">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{DynamicResource WhiteForeground}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AppState.CurrentView, Converter={StaticResource ToTypeConverter}}" Value="True">
+                                        <Setter Property="Fill" Value="{Binding AppState.CurrentView.ViewModel.VisualizerParameterService.ObjectColor, Mode=OneWay}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
                     </Ellipse>
                 </ControlTemplate>
             </Setter.Value>
@@ -482,10 +506,9 @@
     </ControlTemplate>
 
     <Style x:Key="QueueProgressBar" TargetType="{x:Type ProgressBar}">
-        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
-        <Setter Property="Background" Value="{DynamicResource WhiteTransparent}"/>
+        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
         <Setter Property="IsIndeterminate" Value="False"/>
-        <Setter Property="Height" Value="12"/>
+        <Setter Property="Height" Value="10"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Template" Value="{DynamicResource ProgressBarTemplate}"/>
     </Style>

@@ -19,22 +19,6 @@ namespace MusicPlay.Database.Models.DataBaseModels
         }
 
         public NameModel() { }
-
-        public override Dictionary<string, object> InsertTable()
-        {
-            return new()
-            {
-                { nameof(Name), Name },
-            };
-        }
-
-        public override Dictionary<string, object> UpdateTable()
-        {
-            return new()
-            {
-                { nameof(Name), Name },
-            };
-        }
     }
 
     [Table("Role")]

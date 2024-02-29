@@ -585,7 +585,7 @@ namespace MusicFilesProcessor
 
                 if (album.PrimaryArtist.Cover.IsNullOrWhiteSpace())
                 {
-                    await Artist.UpdateCover(album.PrimaryArtist, album.AlbumCover);
+                    await album.PrimaryArtist.UpdateCoverWithFile(album.AlbumCover);
                 }
             }
             else if(album.Type != type) // update
@@ -598,6 +598,7 @@ namespace MusicFilesProcessor
                 await MusicPlay.Database.Models.Tag.Add(tag, album);
             }
 
+            List<TrackArtistsRole> trackArtistsRoles = [];
             foreach (var kvp in newTracks)
             {
                 kvp.Key.AlbumId = album.Id;
@@ -613,19 +614,18 @@ namespace MusicFilesProcessor
 
                 foreach (ArtistRole artistRole in kvp.Value)
                 {
-                    Artist artist = artistRole.Artist;
-                    artistRole.Artist = null;
-                    Role role = artistRole.Role;
-                    artistRole.Role = null;
                     TrackArtistsRole trackArtistsRole = new (kvp.Key.Id, artistRole.Id);
-                    using DatabaseContext context = new();
-                    context.TrackArtistRoles.Local.Add(trackArtistsRole);
-                    await context.SaveChangesAsync();
-                    artistRole.Artist = artist;
-                    artistRole.Role = role;
+                    trackArtistsRoles.Add(trackArtistsRole);
                     kvp.Key.TrackArtistRole.Add(trackArtistsRole);
                 }
             }
+            using DatabaseContext context = new();
+            for (int i = 0; i < trackArtistsRoles.Count; ++i)
+            {
+                TrackArtistsRole trackArtistsRole = trackArtistsRoles[i];
+                context.TrackArtistRoles.Local.Add(trackArtistsRole);
+            }
+            await context.SaveChangesAsync();
         }
 
         private Dictionary<string, List<string>> GetArtists(File audioTags)
@@ -702,11 +702,9 @@ namespace MusicFilesProcessor
 
                 try
                 {
-                    using (var ms = new MemoryStream(pictures[i].Data.Data))
-                    {
-                        System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
-                        image.Save(ImgPath, System.Drawing.Imaging.ImageFormat.Png);
-                    }
+                    using MemoryStream ms = new MemoryStream(pictures[i].Data.Data);
+                    System.Drawing.Image image = System.Drawing.Image.FromStream(ms);
+                    image.Save(ImgPath, System.Drawing.Imaging.ImageFormat.Png);
                 }
                 catch (Exception ex)
                 {

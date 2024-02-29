@@ -16,6 +16,14 @@ namespace MusicPlayUI.Core.Services
         public virtual string Title { get; set; }
         public virtual string OkButtonLabel { get; set; }
         public virtual string FileNameLabel { get; set; }
+        public virtual string DefaultFolder { get; protected set; }
+
+        public FolderDialogue() { }
+
+        public FolderDialogue(string defaultFolder) 
+        {
+            DefaultFolder = defaultFolder;
+        }
 
         protected virtual int SetOptions(int options)
         {
@@ -44,6 +52,13 @@ namespace MusicPlayUI.Core.Services
 
                 dialog.SetFolder(item);
             }
+            //if(!string.IsNullOrEmpty(DefaultFolder))
+            //{
+            //    if (CheckHr(SHCreateItemFromParsingName(DefaultFolder, null, typeof(IShellItem).GUID, out var item), throwOnError) != 0)
+            //        return null;
+
+            //    dialog.Set(item);
+            //}
 
             var options = FOS.FOS_PICKFOLDERS;
             options = (FOS)SetOptions((int)options);

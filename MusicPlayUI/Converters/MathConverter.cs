@@ -145,7 +145,7 @@ namespace MusicPlayUI.Converters
                     '-' => (a, b) => (a - b),
                     '*' => (a, b) => (a * b),
                     '/' => (a, b) => (a / b),
-                    '^' => (a, b) => ((decimal)Math.Pow((double)a, (int)b)),
+                    '^' => (a, b) => ((decimal)Math.Pow((double)a, (double)b)),
                     '>' => (a, b) => (a > b ? a : b),
                     '<' => (a, b) => (a < b ? a : b),
                     _ => throw new ArgumentException("Invalid operation " + operation),

@@ -132,9 +132,11 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 
             AddFolderCommand = new RelayCommand(async () =>
             {
-                FolderDialogue folderDialogue = new();
-                folderDialogue.InputPath = DirectoryHelper.MusicFolder;
-                folderDialogue.Title = "Choose a Folder";
+                FolderDialogue folderDialogue = new(DirectoryHelper.MusicFolder)
+                {
+                    InputPath = DirectoryHelper.MusicFolder,
+                    Title = "Choose a Folder"
+                };
 
                 if (folderDialogue.ShowDialog() == true)
                 {
@@ -189,7 +191,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 foreach (Folder folder in _storageSettings.Folders)
                 {
                     folder.TrackImportedCount = 0;
-                    _storageSettings.UpdateFolder(folder, folder.IsMonitored);
+                    _storageSettings.UpdateFolder(folder, folder.IsMonitored, folder.Name);
                 }
 
                 MessageHelper.PublishMessage(MessageFactory.DataBaseCleared());

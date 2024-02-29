@@ -43,49 +43,47 @@
                                                Command="{Binding AddFolderCommand}"/>
         </Grid>
 
-        <dynamicscrollviewer:DynamicScrollViewer Grid.Row="2"
-                                                 IsInertiaEnabled="True">
-
-            <ItemsControl ItemsSource="{Binding Folders}"
+        <ItemsControl ItemsSource="{Binding Folders}"
                           MaxWidth="1200"
+                      Grid.Row="1"
                           Margin="30, 10, 16, 10">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical"
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"
                                     HorizontalAlignment="Stretch"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="5, 8">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5, 8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="25"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="32"/>
-                                <RowDefinition Height="auto"/>
-                            </Grid.RowDefinitions>
 
-                            <Grid VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="25"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <Path Data="{DynamicResource Folder}"
+                            <Path Data="{DynamicResource Folder}"
                                       Fill="{DynamicResource OnBackground}"
                                       StrokeThickness="0"
                                       Width="20"
                                       Height="20"
                                       Stretch="Uniform">
-                                </Path>
+                            </Path>
 
-                                <TextBlock Text="{Binding Name}"
+                            <TextBlock Text="{Binding Name}"
                                            Grid.Column="1"
                                            Margin="8, 0"
                                            FontSize="22"
@@ -93,41 +91,41 @@
                                            FontWeight="SemiBold"
                                            VerticalAlignment="Center"
                                            Style="{DynamicResource NTrackDataStyle}"/>
-                            </Grid>
+                        </Grid>
 
-                            <StackPanel Grid.Row="1"
+                        <StackPanel Grid.Row="1"
                                         Orientation="Vertical"
                                         VerticalAlignment="Top">
 
-                                <TextBlock Text="{Binding Path, StringFormat={}({0})}"
+                            <TextBlock Text="{Binding Path, StringFormat={}({0})}"
                                             VerticalAlignment="Center"
                                                 FontWeight="SemiBold"
                                                 Style="{DynamicResource NSmallStyle}"/>
 
-                                <TextBlock Text="Watching for new files in real time"
+                            <TextBlock Text="Watching for new files in real time"
                                            Visibility="{Binding IsMonitored, Converter={StaticResource BoolToVisibilityConverter}}"
                                            Style="{DynamicResource NSmallSecondayStyle}"/>
 
-                                <TextBlock Text="{Binding TrackImportedCount, StringFormat={}{0} tracks imported}"
+                            <TextBlock Text="{Binding TrackImportedCount, StringFormat={}{0} tracks imported}"
                                        Visibility="{Binding TrackImportedCount, Converter={StaticResource BoolToVisibilityConverter}}"
                                             Margin="0, 2, 0, 0"
                                        VerticalAlignment="Top"
                                            Style="{DynamicResource NSmallSecondayStyle}"/>
-                            </StackPanel>
+                        </StackPanel>
 
-                            <StackPanel VerticalAlignment="Stretch"
+                        <StackPanel VerticalAlignment="Stretch"
                                         HorizontalAlignment="Stretch"
                                         Grid.Column="1"
                                         Grid.RowSpan="2"
                                         Visibility="{Binding Scanning, Converter={StaticResource BoolToHVisibilityConverter}}"
                                         Margin="16, 0">
 
-                                <TextBlock Text="{Binding DataContext.Percentage, ElementName=RootSetting}"
+                            <TextBlock Text="{Binding DataContext.Percentage, ElementName=RootSetting}"
                                            HorizontalAlignment="Center"
                                             FontWeight="SemiBold"
                                             Style="{DynamicResource NSmallStyle}"/>
 
-                                <ProgressBar x:Name="importProgress"
+                            <ProgressBar x:Name="importProgress"
                                              Value="{Binding DataContext.ImportValue, ElementName=RootSetting, UpdateSourceTrigger=PropertyChanged}"
                                               Maximum="{Binding DataContext.MaximumValue, ElementName=RootSetting, UpdateSourceTrigger=PropertyChanged}"
                                              Minimum="0"
@@ -135,16 +133,16 @@
                                              MaxWidth="700"
                                              Style="{DynamicResource ImportProgressBar}"/>
 
-                                <TextBlock Text="{Binding DataContext.CurrentInfo, ElementName=RootSetting, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBlock Text="{Binding DataContext.CurrentInfo, ElementName=RootSetting, UpdateSourceTrigger=PropertyChanged}"
                                            Style="{DynamicResource NSmallSecondayStyle}"
                                            HorizontalAlignment="Center"
                                            TextAlignment="Center"
                                            MaxHeight="40"
                                            MaxWidth="500"/>
-                            </StackPanel>
+                        </StackPanel>
 
 
-                            <IconBtn:IconButton Grid.Column="2"
+                        <IconBtn:IconButton Grid.Column="2"
                                                 Grid.RowSpan="2"
                                                 VerticalAlignment="Top"
                                                 Margin="0, 4"
@@ -152,9 +150,9 @@
                                                 Icon="{DynamicResource DownloadsIcon}"
                                                 Command="{Binding DataContext.ScanFolderCommand, ElementName=RootSetting}"
                                                 CommandParameter="{Binding .}">
-                            </IconBtn:IconButton>
+                        </IconBtn:IconButton>
 
-                            <IconBtn:IconButton Grid.Column="3"
+                        <IconBtn:IconButton Grid.Column="3"
                                                 Grid.RowSpan="2"
                                                 VerticalAlignment="Top"
                                                 Margin="0, 4"
@@ -162,9 +160,9 @@
                                                 Icon="{DynamicResource Edit}"
                                                 Command="{Binding DataContext.EditFolderCommand, ElementName=RootSetting}"
                                                 CommandParameter="{Binding .}">
-                            </IconBtn:IconButton>
+                        </IconBtn:IconButton>
 
-                            <IconBtn:IconButton Grid.Column="4"
+                        <IconBtn:IconButton Grid.Column="4"
                                                 Grid.RowSpan="2"
                                                 VerticalAlignment="Top"
                                                 Margin="0, 4"
@@ -174,11 +172,10 @@
                                                 Icon="{DynamicResource CircledRemoveIcon}"
                                                 Command="{Binding DataContext.RemoveFolderCommand, ElementName=RootSetting}"
                                                 CommandParameter="{Binding .}">
-                            </IconBtn:IconButton>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </dynamicscrollviewer:DynamicScrollViewer>
+                        </IconBtn:IconButton>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

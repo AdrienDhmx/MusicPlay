@@ -24,6 +24,8 @@ namespace MusicPlay.Database.DatabaseAccess
 
         public DbSet<Queue> Queues { get; set; }
 
+        public DbSet<QueueTrack> QueueTracks { get; set; }
+
         public DbSet<PlayHistory> PlayHistories { get; set; }
 
         public DbSet<PlayHistoryEntry> PlayHistoryEntries { get; set; }
@@ -49,7 +51,8 @@ namespace MusicPlay.Database.DatabaseAccess
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=.\\musicdb.db;"); // ConfigurationManager.ConnectionStrings["default"].ConnectionString
+            optionsBuilder.UseSqlite("Data Source=.\\musicdb.db;")
+                            .EnableSensitiveDataLogging(); // ConfigurationManager.ConnectionStrings["default"].ConnectionString
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -222,7 +225,7 @@ namespace MusicPlay.Database.DatabaseAccess
         private static void OnPlaylistCreated(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Playlist>()
-                .HasMany(p => p.Tracks)
+                .HasMany(p => p.PlaylistTracks)
                 .WithOne(pt => pt.Playlist)
                 .HasForeignKey(pt => pt.PlaylistId);
 
@@ -242,7 +245,7 @@ namespace MusicPlay.Database.DatabaseAccess
 
             modelBuilder.Entity<PlaylistTrack>()
                 .HasOne(pt => pt.Playlist)
-                .WithMany(p => p.Tracks)
+                .WithMany(p => p.PlaylistTracks)
                 .HasForeignKey(pt => pt.PlaylistId);
         }
 

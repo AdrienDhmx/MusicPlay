@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using DynamicScrollViewer;
 using MusicPlay.Database.Models;
+using MusicPlayUI.Controls;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {

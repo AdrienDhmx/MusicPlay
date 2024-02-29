@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             xmlns:conv="clr-namespace:MusicPlayUI.Converters"
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
              mc:Ignorable="d" 
              x:Name="AddToPlaylistUC"
@@ -30,10 +31,11 @@
                 </Grid.RowDefinitions>
                 <Border Effect="{DynamicResource PageHeaderDropShadow}"
                         Background="{DynamicResource Background}"
-                        CornerRadius="{DynamicResource PrimaryCornerRadius}"/>
-                <Border Style="{DynamicResource BottomBlackGradientBorder}"
-                        Visibility="{Binding DataContext.UserPlaylists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"
-                        Grid.Row="1"/>
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                         Visibility="{Binding Playlists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <Border Grid.Row="1"
+                        Style="{DynamicResource BottomBlackGradientBorder}"
+                        Visibility="{Binding ShowDropShadow, ElementName=AddToPlaylistUC}"/>
                 <iconbtn:IconButton Icon="{DynamicResource CircledAddIcon}"
                                     HorizontalAlignment="Stretch"
                                     Height="40"
@@ -45,11 +47,11 @@
                                     VerticalContentAlignment="Center"
                                     StrokeColor="Transparent"
                                     MouseOverBackground="{DynamicResource PrimaryHover}"
-                                    Command="{Binding DataContext.CreatePlaylistCommand, ElementName=AddToPlaylistUC}"
+                                    Command="{Binding CreatePlaylistCommand, ElementName=AddToPlaylistUC}"
                                     FillColor="{DynamicResource Primary}">
                 </iconbtn:IconButton>
-                <ItemsControl ItemsSource="{Binding DataContext.UserPlaylists, ElementName=AddToPlaylistUC, UpdateSourceTrigger=PropertyChanged}"
-                              Visibility="{Binding DataContext.UserPlaylists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"
+                <ItemsControl ItemsSource="{Binding Playlists, ElementName=AddToPlaylistUC, UpdateSourceTrigger=PropertyChanged}"
+                              Visibility="{Binding Playlists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"
                             FontSize="16"
                               Margin="0,0,0,4"
                             Grid.Row="1">
@@ -61,11 +63,9 @@
                                                 CommandParameter="{Binding .}"
                                                 Style="{DynamicResource PopupBtn}"/>
                         </DataTemplate>
-                        </ItemsControl.ItemTemplate>
+                    </ItemsControl.ItemTemplate>
                 </ItemsControl>
-
             </Grid>
-
         </Border>
     </Border>
 </UserControl>
