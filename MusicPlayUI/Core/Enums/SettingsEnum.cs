@@ -30,6 +30,7 @@ namespace MusicPlayUI.Core.Enums
         SunsetSunrise = 12, // theme is light or dark based on the time of the day (bool)
         SystemSyncTheme = 13, // theme is (light or dark) sync with the system (bool)
         ColorfulPlayerControl = 14, // (bool)
+        ColorfulUI = 15, // (bool)
 
         Language = 20,
         UserName = 21,

@@ -69,14 +69,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             _queueService = queueService;
             _commandsManager = commandsManager;
 
-            PlayArtistCommand = new RelayCommand<Artist>((artist) =>
-            {
-                if (artist is not null)
-                {
-                    _queueService.SetNewQueue(artist.Tracks, artist, artist.Name, artist.Cover);
-                }
-            });
-
+            PlayArtistCommand = _commandsManager.PlayNewQueueCommand;
             NavigateToArtistCommand = _commandsManager.NavigateToArtistCommand;
             OpenArtistPopupCommand = _commandsManager.OpenArtistPopupCommand;
         }

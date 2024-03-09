@@ -392,7 +392,7 @@ namespace DynamicScrollViewer
 
                     if((itemIsFrameworkElement && item == child) || item == child.DataContext)
                     {
-                        double spaceBeforeItem = meanItemHeight * 3;
+                        double spaceBeforeItem = meanItemHeight * 2; // show 2 items before this one
                         if(spaceBeforeItem > ViewportHeight)
                         {
                             spaceBeforeItem = ViewportHeight * 0.25;

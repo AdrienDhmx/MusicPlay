@@ -13,14 +13,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public override NavigationState State
         {
             get => App.State.CurrentPopup?.State;
-            set
-            {
-                if (App.State.CurrentPopup != null)
-                {
-                    App.State.CurrentPopup.State = value;
-                    OnPropertyChanged(nameof(State));
-                }
-            }
         }
 
         public static bool AreCoversEnabled => ConfigurationService.AreCoversEnabled;

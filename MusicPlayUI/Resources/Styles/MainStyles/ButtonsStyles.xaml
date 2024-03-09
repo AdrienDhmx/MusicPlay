@@ -152,14 +152,14 @@
         <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
         <Setter Property="StrokeColor" Value="{DynamicResource PrimaryHover}"/>
         <Setter Property="Opacity" Value="1"/>
-        <Setter Property="IconOpacity" Value="0.85"/>
+        <Setter Property="IconOpacity" Value="0.9"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Trigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Duration="0:00:0.2"
-                             To="1" From="0.85"
+                             To="1" From="0.9"
                              Storyboard.TargetProperty="IconOpacity"/>
                         </Storyboard>
                     </BeginStoryboard>
@@ -168,7 +168,7 @@
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation Duration="0:00:0.2"
-                             To="0.85" From="1"
+                             To="0.9" From="1"
                              Storyboard.TargetProperty="IconOpacity"/>
                         </Storyboard>
                     </BeginStoryboard>
@@ -340,7 +340,7 @@
     <Style x:Key="PlayBackButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource BaseIconButton}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+        <Setter Property="FillColor" Value="{Binding DataContext.AccentColor, ElementName=RootPlayerControl}"/>
         <Setter Property="IconWidth" Value="30"/>
         <Setter Property="IconHeight" Value="32"/>
         <Setter Property="Margin" Value="18,0"/>
@@ -349,7 +349,7 @@
     <Style x:Key="ScdPlayBackButton" TargetType="IconButton:IconButton"
            BasedOn="{StaticResource BaseIconButton}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
+        <Setter Property="FillColor" Value="{Binding DataContext.AccentColor, ElementName=RootPlayerControl}"/>
         <Setter Property="IconWidth" Value="28"/>
         <Setter Property="IconHeight" Value="28"/>
     </Style>

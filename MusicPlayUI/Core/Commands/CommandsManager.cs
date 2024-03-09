@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using AudioHandler;
 using MessageControl;
+using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
@@ -33,6 +35,8 @@ namespace MusicPlayUI.Core.Commands
         public ICommand ShuffleCommand { get; }
         public ICommand RepeatCommand { get; }
         public ICommand ToggleQueueDrawerCommand { get; }
+        public ICommand PlayNewQueueCommand { get; }
+        public ICommand PlayNewQueueShuffledCommand { get; }
 
         // navigation
         public ICommand NavigateCommand { get; }
@@ -113,6 +117,10 @@ namespace MusicPlayUI.Core.Commands
                     queueService.Repeat(); // repeat on/off
                 }
             });
+
+            PlayNewQueueCommand = new RelayCommand<PlayableModel>(model => SetNewQueue(model));
+
+            PlayNewQueueShuffledCommand = new RelayCommand<PlayableModel>(model => SetNewQueue(model, true));
 
             FavoriteCommand = new RelayCommand(() =>
             {
@@ -246,6 +254,32 @@ namespace MusicPlayUI.Core.Commands
                 } else
                 {
                     ChangeTheme(true);
+                }
+            });
+        }
+
+        private async void SetNewQueue(PlayableModel model, bool shuffled = false)
+        {
+            if (model.IsNull())
+                return;
+
+            await Task.Run(() =>
+            {
+                if (model is Artist artist)
+                {
+                    _queueService.SetNewQueue(artist.Tracks, artist, artist.Name, artist.Cover, null, shuffled);
+                }
+                else if (model is Album album)
+                {
+                    _queueService.SetNewQueue(album.Tracks, album, album.Name, album.AlbumCover, null, shuffled);
+                }
+                else if (model is Playlist playlist)
+                {
+                    _queueService.SetNewQueue(playlist.Tracks, playlist, playlist.Name, playlist.Cover, null, shuffled);
+                }
+                else if (model is Tag tag)
+                {
+                    _queueService.SetNewQueue(tag.Tracks, tag, tag.Name, "", null, shuffled);
                 }
             });
         }

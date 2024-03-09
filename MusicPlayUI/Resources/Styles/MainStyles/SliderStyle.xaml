@@ -21,7 +21,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Border Background="{DynamicResource Primary}" Height="4"
+                    <Border Background="{Binding DataContext.AccentColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}" Height="4"
+                            Opacity="0.6"
                             CornerRadius="2,0,0,2"/>
                 </ControlTemplate>
             </Setter.Value>
@@ -42,17 +43,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                     <Border Height="4"
+                            Background="{Binding DataContext.VisualizerParameterStore.ObjectColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
                             CornerRadius="2,0,0,2">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Background" Value="{DynamicResource WhiteForeground}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding AppState.CurrentView, Converter={StaticResource ToTypeConverter}}" Value="True">
-                                        <Setter Property="Background" Value="{Binding AppState.CurrentView.ViewModel.VisualizerParameterService.ObjectColor, Mode=OneWay}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -134,8 +126,10 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Ellipse x:Name="Ellipse"
-                             Fill="{DynamicResource Primary}"
-                            StrokeThickness="0">
+                             Fill="{Binding DataContext.AccentColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
+                             Opacity="0.9"
+                             Stroke="{DynamicResource ScdWhiteTransparent}"
+                            StrokeThickness="1">
                     </Ellipse>
                 </ControlTemplate>
             </Setter.Value>
@@ -157,17 +151,8 @@
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Ellipse x:Name="Ellipse"
                              Stroke="{DynamicResource ScdWhiteTransparent}"
+                             Fill="{Binding DataContext.VisualizerParameterStore.ObjectColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
                             StrokeThickness="1">
-                        <Ellipse.Style>
-                            <Style TargetType="Ellipse">
-                                <Setter Property="Fill" Value="{DynamicResource WhiteForeground}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding AppState.CurrentView, Converter={StaticResource ToTypeConverter}}" Value="True">
-                                        <Setter Property="Fill" Value="{Binding AppState.CurrentView.ViewModel.VisualizerParameterService.ObjectColor, Mode=OneWay}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Ellipse.Style>
                     </Ellipse>
                 </ControlTemplate>
             </Setter.Value>
@@ -215,8 +200,9 @@
             </TickBar>
             <Border x:Name="TrackBackground"
                     BorderBrush="Transparent"
-                    Background="{DynamicResource SurfaceVariant}"
+                    Background="{Binding DataContext.AccentColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
                     Margin="0"
+                    Opacity="0.3"
                     CornerRadius="2.5"
                     Height="5"
                     Grid.Row="1"
@@ -238,12 +224,12 @@
                 </Track.IncreaseRepeatButton>
             </Track>
             <TickBar x:Name="BottomTick"
-             SnapsToDevicePixels="True"
-             Grid.Row="2"
-             Fill="{TemplateBinding Foreground}"
-             Placement="Bottom"
-             Height="4"
-             Visibility="Collapsed" />
+                     SnapsToDevicePixels="True"
+                     Grid.Row="2"
+                     Fill="{TemplateBinding Foreground}"
+                     Placement="Bottom"
+                     Height="4"
+                     Visibility="Collapsed" />
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="TickPlacement"
@@ -296,7 +282,7 @@
                 
             </Border>
             <Track Grid.Row="1"
-           x:Name="PART_Track">
+                    x:Name="PART_Track">
                 <Track.DecreaseRepeatButton>
                     <RepeatButton Style="{DynamicResource SliderNPButtonStyle}"
                       Command="Slider.DecreaseLarge" />
@@ -416,6 +402,7 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type Slider}"
+           x:Key="DefaultSlider"
            BasedOn="{StaticResource Basestyle}">
         <Setter Property="SnapsToDevicePixels"
           Value="true" />

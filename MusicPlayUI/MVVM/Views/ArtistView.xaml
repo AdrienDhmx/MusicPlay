@@ -86,9 +86,11 @@
                                             VerticalAlignment="Center"
                                             HorizontalAlignment="Left">
                                 <iconbtn:IconButton Command="{Binding PlayArtistCommand}"
+                                                    CommandParameter="{Binding Artist}"
                                                     Style="{DynamicResource FilledPlayBtn}"/>
 
                                 <iconbtn:IconButton Command="{Binding PlayArtistShuffledCommand}"
+                                                    CommandParameter="{Binding Artist}"
                                                     Style="{DynamicResource FilledPlayShuffleBtn}"/>
 
                                 <!-- More Option Button -->

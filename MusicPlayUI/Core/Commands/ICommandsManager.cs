@@ -15,6 +15,9 @@ namespace MusicPlayUI.Core.Commands
         ICommand MinimizeCommand { get; }
         ICommand MuteVolumeCommand { get; }
 
+        ICommand PlayNewQueueCommand { get; }
+        ICommand PlayNewQueueShuffledCommand { get; }
+
         ICommand NavigateCommand { get; }
         ICommand NavigateBackCommand { get; }
         ICommand NavigateForwardCommand { get; }

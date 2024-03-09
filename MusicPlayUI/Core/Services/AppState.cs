@@ -139,6 +139,7 @@ namespace MusicPlayUI.Core.Services
 
         public NavigationModel CreateNavigationModel<TViewModel>(NavigationState state = null) where TViewModel : ViewModel
         {
+            state ??= new NavigationState(null);
             return new NavigationModel((TViewModel)_viewModelFactory.Invoke(typeof(TViewModel)), state);
         }
 
@@ -218,7 +219,7 @@ namespace MusicPlayUI.Core.Services
             NavigationModel previousNavModel = _backNavigationHistory.Last();
             _backNavigationHistory.Remove(previousNavModel);
 
-            CurrentView = CreateNavigationModel(previousNavModel.ViewModelType, previousNavModel.State);
+            CurrentView = CreateNavigationModel(previousNavModel.ViewModel.GetType(), previousNavModel.State);
         }
 
         public void NavigateForward()
@@ -235,7 +236,7 @@ namespace MusicPlayUI.Core.Services
 
         public bool UpdateCurrentViewIfIs(List<Type> viewModels)
         {
-            if(viewModels.Any(vm => vm == CurrentView.ViewModelType))
+            if(viewModels.Any(vm => vm == CurrentView.ViewModel.GetType()))
             {
                 CurrentView.ViewModel.Update();
                 return true;

@@ -26,10 +26,9 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (base.State is LibraryNavigationState libraryNavigationState)
                     return libraryNavigationState;
                 LibraryNavigationState navigationState = new LibraryNavigationState(base.State);
-                base.State = navigationState;
+                AppState.CurrentView.State = navigationState;
                 return navigationState;
             }
-            set => base.State = value;
         }
 
         private int _totalFilteredItems = 0;

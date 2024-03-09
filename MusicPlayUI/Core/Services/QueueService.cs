@@ -115,8 +115,12 @@ namespace MusicPlayUI.Core.Services
             Queue.PlayingQueueTrack = playingQueueTrack;
             Queue.PlayingTrack = playingQueueTrack.Track;
             Queue.Tracks = queueTracks;
-            OnQueueChanged();
-            OnPlayingTrackChanged();
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                OnQueueChanged();
+                OnPlayingTrackChanged();
+            });
         }
 
         public void SetNewQueue(IEnumerable<Track> tracks, PlayableModel playingFrom, string playingFromName, string cover, Track playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false)
@@ -140,6 +144,7 @@ namespace MusicPlayUI.Core.Services
             {
                 Queue.Tracks = Queue.Tracks.Order();
             }
+            OnQueueChanged();
         }
 
         public void Repeat()

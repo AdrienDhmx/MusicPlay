@@ -24,7 +24,7 @@
                           VerticalAlignment="Top"
                           Height="auto"
                           Width="auto"
-                          MinWidth="150"
+                          MinWidth="120"
                           BorderBrush="{DynamicResource Primary}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

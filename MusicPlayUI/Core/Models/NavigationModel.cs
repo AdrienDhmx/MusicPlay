@@ -14,39 +14,21 @@ namespace MusicPlayUI.Core.Models
     public class NavigationModel : ObservableObject
     {
         public ViewModel ViewModel { get; private set; }
-        public Type ViewModelType { get; set; } = typeof(ViewModel);
 
         private NavigationState _state;
         public NavigationState State
         {
             get => _state;
             set 
-            { 
-                if(_state is not null)
-                {
-                    _state.PropertyChanged -= State_PropertyChanged;
-                }
-
+            {
                 SetField(ref _state, value); 
-
-                if(_state is not null)
-                {
-                    _state.PropertyChanged += State_PropertyChanged;
-                }
             }
         }
 
         public NavigationModel(ViewModel viewModel, NavigationState state)
         {
             ViewModel = viewModel;
-            _state = state;
-            if(state != null)
-                _state.PropertyChanged += State_PropertyChanged;
-        }
-
-        private void State_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            UpdateState();
+            State = state;
         }
 
         public void UpdateState()

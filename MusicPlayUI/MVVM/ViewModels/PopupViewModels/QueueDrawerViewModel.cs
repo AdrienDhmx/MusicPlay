@@ -27,8 +27,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand NavigateToPlayingFromCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
         public ICommand ClearQueueCommand { get; }
-        public QueueDrawerViewModel(IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager)
-            : base(queueService)
+        public QueueDrawerViewModel(IQueueService queueService, IModalService modalService, IPlaylistService playlistService, ICommandsManager commandsManager, IAudioTimeService audioTimeService)
+            : base(queueService, audioTimeService)
         {
             _modalService = modalService;
             _playlistService = playlistService;
@@ -44,6 +44,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             NavigateToPlayingFromCommand = new RelayCommand(async () => await _queueService.NavigateToPlayingFrom());
             NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
 
+            // this does not have a state
+            base._saveScrollOffset = false;
             base.Init();
         }
 

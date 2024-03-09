@@ -12,10 +12,6 @@ using MusicPlayUI.Core.Services.Interfaces;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using MusicFilesProcessor;
-using System.Windows.Documents;
-using MusicPlay.Database.Models;
-using MusicPlay.Database.Models.AudioModels;
-using MusicPlayUI.Converters;
 using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.MVVM.ViewModels.PopupViewModels;
 
@@ -24,6 +20,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 {
     public class PlayerControlViewModel : ViewModel
     {
+        private readonly ICommandsManager _commandsManager;
+
         private IAudioTimeService _audioService;
         public IAudioTimeService AudioService
         {
@@ -45,6 +43,12 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             set { SetField(ref _queueService, value); }
         }
 
+        private readonly IVisualizerParameterStore _visualizerParameterStore;
+        public IVisualizerParameterStore VisualizerParameterStore
+        {
+            get => _visualizerParameterStore;
+        }
+
         private bool _colorfulPlayerControl = ConfigurationService.GetPreference(SettingsEnum.ColorfulPlayerControl) == 1;
         public bool ColorfulPlayerControl
         {
@@ -53,6 +57,47 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             {
                 _colorfulPlayerControl = value;
                 OnPropertyChanged(nameof(ColorfulPlayerControl));
+            }
+        }
+
+        private bool _colorfulUI = ConfigurationService.GetPreference(SettingsEnum.ColorfulUI) == 1;
+        public bool ColorfulUI
+        {
+            get { return _colorfulUI; }
+            set
+            {
+                _colorfulUI = value;
+                OnPropertyChanged(nameof(_colorfulUI));
+                OnPropertyChanged(nameof(AccentColor));
+                OnPropertyChanged(nameof(AccentHoverColor));
+            }
+        }
+
+        public SolidColorBrush AccentColor
+        {
+            get
+            {
+                if(ColorfulUI)
+                {
+                    return MeanColor.GetEmphasizedColor();
+
+                }
+                return (SolidColorBrush)AppTheme.Palette.Primary;
+            }
+        }
+
+        public SolidColorBrush AccentHoverColor
+        {
+            get
+            {
+                if (ColorfulUI)
+                {
+                    SolidColorBrush color = AccentColor;
+                    color.Color = Color.FromArgb(60, AccentColor.Color.R, AccentColor.Color.G, AccentColor.Color.B);
+                    return color;
+
+                }
+                return (SolidColorBrush)AppTheme.Palette.PrimaryHover;
             }
         }
 
@@ -162,8 +207,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         }
 
         private bool _isFavorite;
-        private readonly ICommandsManager _commandsManager;
-
         public bool IsFavorite
         {
             get { return _isFavorite; }
@@ -189,12 +232,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         public ICommand MuteCommand { get; }
         public ICommand OpenCloseQueuePopupCommand { get; }
         public ICommand NavigateToPlayingFromCommand { get; }
-        public PlayerControlViewModel(IAudioTimeService audioService, IAudioPlayback audioPlayback, IQueueService queueService, ICommandsManager commandsManager)
+        public PlayerControlViewModel(IAudioTimeService audioService, IAudioPlayback audioPlayback, IQueueService queueService, ICommandsManager commandsManager, IVisualizerParameterStore visualizerParameterStore)
         {
             AudioService = audioService;
             AudioPlayback = audioPlayback;
             QueueService = queueService;
             _commandsManager = commandsManager;
+            _visualizerParameterStore = visualizerParameterStore;
 
             // same prop to update in both cases
             QueueService.PlayingTrackChanged += OnPlayingTrackChanged;
@@ -204,6 +248,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             _audioPlayback.DeviceChanged += OnDeviceChanged;
 
             ConfigurationService.ColorfulPlayerControlChange += OnColorfulPlayerChanged;
+            ConfigurationService.ColorfulUIChange += OnColorfulUIChanged;
             AppTheme.ThemeChanged += UpdateBlurredCover;
 
             Volume = ConfigurationService.GetPreference(SettingsEnum.Volume);
@@ -292,7 +337,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             };
  
             GradientStopCollection offsets = new GradientStopCollection();
-            MeanColor = BlurredCover.CalculateMeanColor();
             double meanChannelsValue = MeanColor.CalculateBrightness();
             ShowMeanColor = MeanColor.IsGrey(margin: 14);
 
@@ -348,10 +392,21 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
         private void UpdateBlurredCover()
         {
-            if (QueueService.Queue.PlayingTrack != null && ColorfulPlayerControl)
+            if (QueueService.Queue.PlayingTrack != null && (ColorfulPlayerControl || ColorfulUI))
             {
-                BlurredCover = QueueService.Queue.PlayingTrack.GetCover().GetBlurredImage(20);
-                UpdateRadialGradient();
+                string newBlurredCover = QueueService.Queue.PlayingTrack.GetCover().GetBlurredImage(20);
+                if(newBlurredCover != BlurredCover)
+                {
+                    BlurredCover = newBlurredCover;
+                    MeanColor = BlurredCover.CalculateMeanColor();
+                    if(ColorfulPlayerControl)
+                    {
+                        UpdateRadialGradient();
+                    }
+
+                    OnPropertyChanged(nameof(AccentColor));
+                    OnPropertyChanged(nameof(AccentHoverColor));
+                }
             }
         }
 
@@ -420,12 +475,21 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
         private void OnDeviceChanged()
         {
-             CurrentDevice = _audioPlayback.Device.CreateDeviceModal();
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                CurrentDevice = _audioPlayback.Device.CreateDeviceModal();
+            });
         }
 
         private void OnColorfulPlayerChanged()
         {
             ColorfulPlayerControl = ConfigurationService.GetPreference(SettingsEnum.ColorfulPlayerControl) == 1;
+            UpdateBlurredCover();
+        }
+
+        private void OnColorfulUIChanged()
+        {
+            ColorfulUI = ConfigurationService.GetPreference(SettingsEnum.ColorfulUI) == 1;
             UpdateBlurredCover();
         }
     }

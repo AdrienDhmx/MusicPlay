@@ -19,14 +19,6 @@ namespace MusicPlayUI.MVVM.ViewModels
         public virtual NavigationState State
         {
             get => AppState.CurrentView?.State;
-            set
-            {
-                if(AppState.CurrentView != null)
-                {
-                    AppState.CurrentView.State = value;
-                    OnPropertyChanged(nameof(State));
-                }
-            }
         }
 
         public static IAppState AppState => App.State;
@@ -68,7 +60,10 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         }
 
-        public void ScrollToTop()
+        /// <summary>
+        /// This scroll to the top of this <see cref="_scrollViewer"/>, to scroll to the top of a child view you have to override this
+        /// </summary>
+        public virtual void ScrollToTop()
         {
             _scrollViewer?.ScrollToVerticalOffsetWithAnimation(0, 500);
         }
@@ -117,7 +112,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public virtual void OnStateChanged()
         {
-            OnPropertyChanged(nameof(State));
+            //OnPropertyChanged(nameof(State));
         }
     }
 }

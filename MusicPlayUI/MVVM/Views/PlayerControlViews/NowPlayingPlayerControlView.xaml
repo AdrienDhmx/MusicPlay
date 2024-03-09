@@ -9,7 +9,7 @@
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" 
              xmlns:playercontrolviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels" 
              d:DataContext="{d:DesignInstance Type=playercontrolviewmodels:NowPlayingPlayerControlViewModel}"
-             x:Name="RootView"
+             x:Name="RootPlayerControl"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
@@ -35,7 +35,7 @@
                                    BasedOn="{StaticResource ThirdPlayBackButton}">
                         <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsShuffled, ElementName=RootView}" Value="true">
+                            <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsShuffled, ElementName=RootPlayerControl}" Value="true">
                                 <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -58,7 +58,7 @@
                                    TargetType="iconbtn:IconButton">
                         <Setter Property="Icon" Value="{DynamicResource PlayIcon}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsPlaying, ElementName=RootView}" Value="true">
+                            <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsPlaying, ElementName=RootPlayerControl}" Value="true">
                                 <Setter Property="Icon" Value="{DynamicResource PauseIcon}"/>
                                 <Setter Property="ToolTip" Value="{x:Static lang:Resources.Pause}"/>
                             </DataTrigger>
@@ -82,10 +82,10 @@
                         <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
                         <Setter Property="Icon" Value="{DynamicResource RepeatIcon}"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsOnRepeat, ElementName=RootView}" Value="true">
+                            <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsOnRepeat, ElementName=RootPlayerControl}" Value="true">
                                 <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootView}" Value="true">
+                            <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootPlayerControl}" Value="true">
                                 <Setter Property="Icon" Value="{DynamicResource RepeatOneIcon}"/>
                                 <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
                             </DataTrigger>

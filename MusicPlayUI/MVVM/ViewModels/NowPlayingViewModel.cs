@@ -34,11 +34,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        public static IAppState AppState
-        {
-            get => App.State;
-        }
-
         private IVisualizerParameterStore _visualizerParameterService;
         public IVisualizerParameterStore VisualizerParameterService
         {
@@ -46,8 +41,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             set { SetField(ref _visualizerParameterService, value); }
         }
 
-        private NowPlayingPlayerControlViewModel _playerViewModel;
-        public NowPlayingPlayerControlViewModel PlayerViewModel
+        private PlayerControlViewModel _playerViewModel;
+        public PlayerControlViewModel PlayerViewModel
         {
             get { return _playerViewModel; }
             set
@@ -235,13 +230,13 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand NavigateToAlbumCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
         public NowPlayingViewModel(IQueueService queueService,  IAudioPlayback audioPlayback, IVisualizerParameterStore visualizerParameterStore, 
-            IWindowService windowService, NowPlayingPlayerControlViewModel nowPlayingPlayerControlViewModel, ICommandsManager commandsManager)
+            IWindowService windowService, PlayerControlViewModel playerControlViewModel, ICommandsManager commandsManager)
         {
             QueueService = queueService;
             _audioPlayback = audioPlayback;
             VisualizerParameterService = visualizerParameterStore;
             _windowService = windowService;
-            PlayerViewModel = nowPlayingPlayerControlViewModel;
+            PlayerViewModel = playerControlViewModel;
             _commandsManager = commandsManager;
 
             AppState.FullScreenChanged += IsFullScreenChanged;
@@ -312,13 +307,17 @@ namespace MusicPlayUI.MVVM.ViewModels
             _visualizerParameterService.RepresentationChanged -= VRepresentationChanged;
             _audioPlayback.StreamChanged -= OnStreamChanged;
             AppState.FullScreenChanged -= IsFullScreenChanged;
-            PlayerViewModel.Dispose();
 
             // dispose of the subview if opened
             if (IsSubViewOpen)
             {
                 AppState.CurrentView.State.ChildViewModel.ViewModel?.Dispose();
             }
+        }
+
+        public override void ScrollToTop()
+        {
+            State.ChildViewModel?.ViewModel?.ScrollToTop();
         }
 
         public override void UpdateAppBarStyle()

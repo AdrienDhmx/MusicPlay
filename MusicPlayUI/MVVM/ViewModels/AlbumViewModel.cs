@@ -42,14 +42,11 @@ namespace MusicPlayUI.MVVM.ViewModels
             _commandsManager = commandsManager;
 
             // play
-            PlayAlbumCommand = new RelayCommand(() =>
-                this.QueueService.SetNewQueue(Album.Tracks, Album, Album.Name, Album.AlbumCover));
-            PlayShuffledAlbumCommand = new RelayCommand(() =>
-                this.QueueService.SetNewQueue(Album.Tracks, Album, Album.Name, Album.AlbumCover, isShuffled: true));
+            PlayAlbumCommand = _commandsManager.PlayNewQueueCommand;
+            PlayShuffledAlbumCommand = _commandsManager.PlayNewQueueShuffledCommand;
             PlayTrackCommand = new RelayCommand<OrderedTrack>((track) =>
                 this.QueueService.SetNewQueue(Album.Tracks, Album, Album.Name, Album.AlbumCover, track.Track, false));
-            PlayArtistCommand = new RelayCommand<Artist>((artist) =>
-                this.QueueService.SetNewQueue(artist.Tracks, artist, artist.Name, artist.Cover));
+            PlayArtistCommand = _commandsManager.PlayNewQueueCommand;
 
             // navigate
             NavigateToArtistCommand = _commandsManager.NavigateToArtistCommand;

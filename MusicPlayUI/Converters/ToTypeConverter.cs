@@ -19,7 +19,7 @@ namespace MusicPlayUI.Converters
             {
                 return navigationModel.ViewModel.GetType() == typeof(NowPlayingViewModel);
             }
-            return value.GetType();
+            return value?.GetType();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

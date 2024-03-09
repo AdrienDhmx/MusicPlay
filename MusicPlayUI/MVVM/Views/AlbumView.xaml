@@ -149,10 +149,12 @@
                                             VerticalAlignment="Center"
                                             HorizontalAlignment="Left">
                                 <iconbtn:IconButton Command="{Binding PlayAlbumCommand}"
+                                                    CommandParameter="{Binding Album}"
                                                         Style="{DynamicResource FilledPlayBtn}">
                                 </iconbtn:IconButton>
 
                                 <iconbtn:IconButton Command="{Binding PlayShuffledAlbumCommand}"
+                                                    CommandParameter="{Binding Album}"
                                                         Style="{DynamicResource FilledPlayShuffleBtn}">
                                 </iconbtn:IconButton>
 

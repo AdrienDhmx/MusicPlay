@@ -159,18 +159,12 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PlayPlaylistCommand { get; }
         public ICommand NavigateToPlaylistCommand { get; }
         public ICommand OpenPlaylistPopupCommand { get; }
-        public ICommand OnScrollCommand { get; }
         public HomeViewModel(IQueueService queueService, IRadioStationsService radioStationsServices, IHistoryServices historyServices, ICommandsManager commandsManager)
         {
             _queueService = queueService;
             _radioStationsServices = radioStationsServices;
             _historyServices = historyServices;
             _commandsManager = commandsManager;
-
-            OnScrollCommand = new RelayCommand<OnScrollEvent>(e =>
-            {
-                AppBar.AnimateElevation(e.VerticalOffset, true);
-            });
 
             // Cards navigation Commands
             NavigateToArtistsCommand = new RelayCommand(() => App.State.NavigateTo<ArtistLibraryViewModel>());
@@ -182,14 +176,20 @@ namespace MusicPlayUI.MVVM.ViewModels
             NavigateToPlaylistCommand = _commandsManager.NavigateToPlaylistCommand;
 
             // play commands
-            PlayArtistCommand = new RelayCommand<Artist>((artist) => PlayArtist(artist));
-            PlayAlbumCommand = new RelayCommand<Album>((album) => PlayAlbum(album));
-            PlayPlaylistCommand = new RelayCommand<Playlist>((playlist) => PlayPlaylist(playlist));
+            PlayArtistCommand = _commandsManager.PlayNewQueueCommand;
+            PlayAlbumCommand = _commandsManager.PlayNewQueueCommand;
+            PlayPlaylistCommand = _commandsManager.PlayNewQueueCommand;
 
             // open popup commands
             OpenArtistPopupCommand = _commandsManager.OpenArtistPopupCommand;
             OpenAlbumPopupCommand = _commandsManager.OpenAlbumPopupCommand;
             OpenPlaylistPopupCommand = _commandsManager.OpenPlaylistPopupCommand;
+        }
+
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            AppBar.AnimateElevation(e.VerticalOffset, true);
+            base.OnScrollEvent(e);
         }
 
         public override void UpdateAppBarStyle()
@@ -234,7 +234,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private async void GetRecentData()
+        private void GetRecentData()
         {
             BindedAlbums = new(Album.GetLastPlayed(TopLastPlayedAlbums));
             BindedArtists = new(Artist.GetLastPlayed(TopLastPlayedArtists));
@@ -243,20 +243,6 @@ namespace MusicPlayUI.MVVM.ViewModels
         private async void GetRadioStations()
         {
             BindedPlaylists = await _radioStationsServices.CreateRadioStations(4);
-        }
-
-        // Play methods
-        private async void PlayArtist(Artist artist)
-        {
-            _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), artist, artist.Name, artist.Cover);
-        }
-        private void PlayAlbum(Album album)
-        {
-            _queueService.SetNewQueue(album.Tracks, album, album.Name, album.AlbumCover, null, false, false, true);
-        }
-        private void PlayPlaylist(Playlist playlist)
-        {
-            _queueService.SetNewQueue(playlist.PlaylistTracks, playlist, playlist.Name, playlist.Cover);
         }
     }
 }

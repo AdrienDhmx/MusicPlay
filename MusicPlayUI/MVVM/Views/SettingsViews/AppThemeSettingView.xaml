@@ -7,14 +7,14 @@
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language" 
              xmlns:settingsviewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" xmlns:switch="clr-namespace:ToggleSwitch;assembly=ToggleSwitch"
              d:DataContext="{d:DesignInstance Type=settingsviewmodel:AppThemeSettingViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid Margin="10,0"
-                   Grid.Row="1">
+    <Grid Margin="30,0"
+          Grid.Row="1">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -22,40 +22,97 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid HorizontalAlignment="Center"
-                      Margin="0,40, 0, 20">
+        <Grid Margin="0, 20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <CheckBox IsChecked="{Binding LightTheme, Converter={StaticResource InverseBoolConverter}}"
-                              Style="{DynamicResource SettingsCheckBox}"
-                              Content=" Dark theme"/>
+            <Border Grid.ColumnSpan="2"
+                    Background="{DynamicResource TertiaryContainer}"
+                    Opacity="0.2"
+                    CornerRadius="{DynamicResource SecondaryCornerRadius}">
+            </Border>
 
-            <CheckBox IsChecked="{Binding SunsetSunrise}"
-                              Style="{DynamicResource SettingsCheckBox}"
-                              Content=" Sunset / Sunrise"
-                              Margin="20,0"
-                              ToolTip="Switch based on time of day."
-                              Grid.Column="1"/>
+            <TextBlock Text="Switch between dark and light modes manually or automatically based on system preferences or time."
+                        FontSize="20"
+                       MaxWidth="650"
+                       Margin="20"
+                        Style="{DynamicResource NLargeStyle}"/>
 
-            <CheckBox IsChecked="{Binding SystemSync}"
-                              Style="{DynamicResource SettingsCheckBox}"
-                              Content=" System Sync"
-                              Grid.Column="2"/>
+            <StackPanel HorizontalAlignment="Right"
+                         VerticalAlignment="Center"
+                        Orientation="Vertical"
+                         Margin="0, 10, 20, 10"
+                        Grid.Column="1">
+
+                <switch:ToggleSwitch IsChecked="{Binding LightTheme, Converter={StaticResource InverseBoolConverter}}"
+                            CheckedText="Dark theme"
+                            UncheckedText="Dark theme"
+                             HorizontalAlignment="Right"
+                             Margin="0"/>
+
+                <switch:ToggleSwitch IsChecked="{Binding SunsetSunrise}"
+                            CheckedText="Sunset / Sunrise"
+                            UncheckedText="Sunset / Sunrise"
+                             HorizontalAlignment="Right"
+                             Margin="0"/>
+
+                <switch:ToggleSwitch IsChecked="{Binding SystemSync}"
+                            CheckedText="Sync with the system"
+                            UncheckedText="Sync with the system"
+                             HorizontalAlignment="Right"
+                             Margin="0"/>
+            </StackPanel>
         </Grid>
 
-        <CheckBox IsChecked="{Binding ColorfulPlayerControl}"
-                      Style="{DynamicResource SettingsCheckBox}"
-                      Content=" Colorful player control"
-                          HorizontalAlignment="Center"
-                          Margin="0, 0, 0, 6"
-                          Grid.Row="1"
-                      Grid.Column="2"/>
 
-        <Border Margin="40,10,40,0"
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.ColumnSpan="2"
+                    Background="{DynamicResource TertiaryContainer}"
+                    Opacity="0.2"
+                    CornerRadius="{DynamicResource SecondaryCornerRadius}">
+            </Border>
+
+            <StackPanel Margin="20"
+                        Orientation="Vertical"
+                        HorizontalAlignment="Left"
+                        MaxWidth="650"
+                        MinWidth="400"> 
+                <TextBlock Text="Harmonize certain elements of the app's color scheme with the cover of the currently playing track."
+                            FontSize="20"
+                           Margin="0, 0, 0, 10"
+                            Style="{DynamicResource NLargeStyle}"/>
+                <TextBlock Text="Note: this works better in dark mode."
+                            FontSize="16"
+                            Style="{DynamicResource NLargeSecondaryStyle}"/>                
+            </StackPanel>
+            
+            <StackPanel  HorizontalAlignment="Left"
+                         VerticalAlignment="Center"
+                        Orientation="Vertical"
+                         Margin="0, 10, 20, 10"
+                        Grid.Column="1">
+
+                <switch:ToggleSwitch IsChecked="{Binding ColorfulPlayerControl}"
+                                    CheckedText="Background of the player control"
+                                    UncheckedText="Background of the player control"
+                                     HorizontalAlignment="Right"
+                                     Margin="0"/>
+
+                <switch:ToggleSwitch IsChecked="{Binding ColorfulUI}"
+                                    CheckedText="UI of the player control"
+                                      HorizontalAlignment="Right"
+                                    UncheckedText="UI of the player control"
+                                     Margin="0"/>
+            </StackPanel>
+        </Grid>
+
+        <Border Margin="0,20,0,0"
                         Grid.Row="2"
                         BorderBrush="{DynamicResource Primary}"
                         BorderThickness="0,0,0,1"

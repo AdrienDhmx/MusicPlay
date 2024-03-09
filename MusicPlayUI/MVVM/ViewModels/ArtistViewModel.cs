@@ -300,55 +300,58 @@ namespace MusicPlayUI.MVVM.ViewModels
             _commandsManager = commandsManager;
 
             // play
-            PlayArtistCommand = new RelayCommand(() => PlayArtist());
-            PlayArtistShuffledCommand = new RelayCommand(() => PlayArtist(true));
+            PlayArtistCommand = _commandsManager.PlayNewQueueCommand;
+            PlayArtistShuffledCommand = _commandsManager.PlayNewQueueShuffledCommand;
             PlayTrackCommand = new RelayCommand<Track>((track) => PlayArtist(false, track));
-            PlayAlbumCommand = new RelayCommand<Album>((album) =>
+            PlayAlbumCommand = _commandsManager.PlayNewQueueCommand;
+            PlayAlbumsOnlyCommand = new RelayCommand<string>(async (string shuffled) =>
             {
-                if (album is not null)
+                await Task.Run(() =>
                 {
-                    this.QueueService.SetNewQueue(album.Tracks, album, album.Name, album.AlbumCover, null, false, false, true);
-                }
-            });
-            PlayAlbumsOnlyCommand = new RelayCommand<string>((string shuffled) =>
-            {
-                List<Track> tracks = [];
-                foreach (Album album in MainAlbums)
-                {
-                    tracks.AddRange(album.Tracks);
-                }
+                    List<Track> tracks = [];
+                    foreach (Album album in MainAlbums)
+                    {
+                        tracks.AddRange(album.Tracks);
+                    }
 
-                this.QueueService.SetNewQueue(tracks, Artist, Artist.Name, Artist.Cover, null, shuffled == "1", false, false);
+                    QueueService.SetNewQueue(tracks, Artist, Artist.Name, Artist.Cover, null, shuffled == "1", false, false);
+                });
             });
-            PlaySinglesAndEpCommand = new RelayCommand<string>((string shuffled) =>
+            PlaySinglesAndEpCommand = new RelayCommand<string>(async (string shuffled) =>
             {
-                List<Track> tracks = new();
-                foreach (Album album in SinglesAndEP)
+                await Task.Run(() =>
                 {
-                    tracks.AddRange(album.Tracks);
-                }
+                    List<Track> tracks = new();
+                    foreach (Album album in SinglesAndEP)
+                    {
+                        tracks.AddRange(album.Tracks);
+                    }
 
-                this.QueueService.SetNewQueue(tracks, Artist, Artist.Name, Artist.Cover, null, shuffled == "1", false, false);
+                    this.QueueService.SetNewQueue(tracks, Artist, Artist.Name, Artist.Cover, null, shuffled == "1", false, false);
+                });
             });
-            PlayFeaturedInAlbumsCommand = new RelayCommand<string>((string shuffled) =>
+            PlayFeaturedInAlbumsCommand = new RelayCommand<string>(async (string shuffled) =>
             {
-                List<Track> tracks = new();
-                foreach (Album album in FeaturedInAlbum)
+                await Task.Run(() =>
                 {
-                    tracks.AddRange(album.Tracks);
-                }
+                    List<Track> tracks = new();
+                    foreach (Album album in FeaturedInAlbum)
+                    {
+                        tracks.AddRange(album.Tracks);
+                    }
 
-                this.QueueService.SetNewQueue(tracks, Artist, Artist.Name, Artist.Cover, null, shuffled == "1", false, false);
+                    this.QueueService.SetNewQueue(tracks, Artist, Artist.Name, Artist.Cover, null, shuffled == "1", false, false);
+                });
             });
             PlayComposedTracksCommand = new RelayCommand<string>((string shuffled) =>
             {
-                this.QueueService.SetNewQueue(ComposedTracks.ToList(), Artist, Artist.Name, Artist.Cover, null, shuffled == "1", shuffled == "1");
+                Task.Run(() => QueueService.SetNewQueue(ComposedTracks.ToList(), Artist, Artist.Name, Artist.Cover, null, shuffled == "1", shuffled == "1"));
             });
             PlayPerformedTracksCommand = new RelayCommand<string>((string shuffled) =>
             {
-                this.QueueService.SetNewQueue(PerformedInTracks.ToList(), Artist, Artist.Name, Artist.Cover, null, shuffled == "1", shuffled == "1");
+                Task.Run(() => QueueService.SetNewQueue(PerformedInTracks.ToList(), Artist, Artist.Name, Artist.Cover, null, shuffled == "1", shuffled == "1"));
             });
-            PlayLyricistOfTracksCommand = new RelayCommand<string>((string shuffled) => { this.QueueService.SetNewQueue(LyricistOfTracks.ToList(), Artist, Artist.Name, Artist.Cover, null, shuffled == "1", shuffled == "1"); });
+            PlayLyricistOfTracksCommand = new RelayCommand<string>((string shuffled) => { Task.Run(() => QueueService.SetNewQueue(LyricistOfTracks.ToList(), Artist, Artist.Name, Artist.Cover, null, shuffled == "1", shuffled == "1"));});
 
             // lists visibility
             ShowHideMainAlbumsCommand = new RelayCommand(() =>

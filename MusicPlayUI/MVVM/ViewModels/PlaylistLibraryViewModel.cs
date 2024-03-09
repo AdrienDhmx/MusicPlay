@@ -85,23 +85,15 @@ namespace MusicPlayUI.MVVM.ViewModels
             _modalService = modalService;
             _commandsManager = commandsManager;
             _radioStationsServices = radioStationsServices;
-            
             _playlistService = playlistService;
+
+            PlayPlaylistCommand = _commandsManager.PlayNewQueueCommand;
+            NavigateToPlaylistCommand = _commandsManager.NavigateToPlaylistCommand;
 
             CreatePlaylistCommand = new RelayCommand(() =>
             {
                 _modalService.OpenModal(ViewNameEnum.CreatePlaylist, PlaylistCreated);
             });
-
-            PlayPlaylistCommand = new RelayCommand<Playlist>((playlist) =>
-            {
-                if (playlist is not null)
-                {
-                    _queueService.SetNewQueue(playlist.PlaylistTracks, playlist, playlist.Name, playlist.Cover, null, false, false, false);
-                }
-            });
-
-            NavigateToPlaylistCommand = _commandsManager.NavigateToPlaylistCommand;
 
             CreateAutoPlaylistCommand = new RelayCommand(async () =>
             {

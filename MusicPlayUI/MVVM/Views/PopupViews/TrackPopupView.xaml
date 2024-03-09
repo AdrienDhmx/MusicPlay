@@ -16,9 +16,7 @@
             Padding="0,5,0,0"
             MinWidth="200"
             MaxWidth="400"
-            CornerRadius="4"
-            BorderThickness="1"
-            BorderBrush="{DynamicResource Outline}">
+            CornerRadius="{DynamicResource PrimaryCornerRadius}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" MinHeight="70"/>

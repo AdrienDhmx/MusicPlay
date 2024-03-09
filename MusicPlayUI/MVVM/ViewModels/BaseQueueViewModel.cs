@@ -14,6 +14,16 @@ namespace MusicPlayUI.MVVM.ViewModels
     public class BaseQueueViewModel : ViewModel
     {
         const int _trackPerPage = 25;
+
+        internal bool _saveScrollOffset { get; set;} = true;
+
+        private IAudioTimeService _audioTimeService;
+        public IAudioTimeService AudioTimeService
+        {
+            get => _audioTimeService;
+            set => SetField(ref  _audioTimeService, value);
+        }
+
         internal IQueueService _queueService;
         public IQueueService QueueService
         {
@@ -28,9 +38,10 @@ namespace MusicPlayUI.MVVM.ViewModels
             set => SetField(ref _queueTracks, value);
         }
 
-        public BaseQueueViewModel(IQueueService queueService)
+        public BaseQueueViewModel(IQueueService queueService, IAudioTimeService audioTimeService)
         {
             QueueService = queueService;
+            _audioTimeService = audioTimeService;
 
             QueueService.QueueChanged += QueueService_QueueChanged;
             QueueService.PreviewPlayingTrackChanged += QueueService_PlayingTrackChanged;
@@ -62,7 +73,10 @@ namespace MusicPlayUI.MVVM.ViewModels
                 AddTracks(lastTrackIndex, newEndIndex);
             }
 
-            base.OnScrollEvent(e);
+            if (_saveScrollOffset)
+            {
+                base.OnScrollEvent(e);
+            }
         }
 
         internal void AddTracks(int start, int end)
@@ -81,7 +95,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 int newEndIndex = index + _trackPerPage / 2;
                 if (newEndIndex > _queueService.Queue.Tracks.Count - 1)
                 {
-                    newEndIndex = _queueTracks.Count - 1;
+                    newEndIndex = _queueService.Queue.Tracks.Count - 1;
                 }
                 AddTracks(lastTrackIndex, newEndIndex);
             }
@@ -89,11 +103,16 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void QueueService_QueueChanged()
         {
+            QueueTracks = new();
             if (_queueService.Queue.PlayingTrack.IsNotNull())
             {
                 int playingTrackIndex = _queueService.GetPlayingTrackIndex();
-                _queueTracks = new();
-                AddTracks(0, playingTrackIndex + _trackPerPage / 2);
+                int endIndex = playingTrackIndex + _trackPerPage / 2;
+                if(endIndex > _queueService.Queue.Tracks.Count - 1)
+                {
+                    endIndex = _queueService.Queue.Tracks.Count - 1;
+                }
+                AddTracks(0, endIndex);
             }
         }
 

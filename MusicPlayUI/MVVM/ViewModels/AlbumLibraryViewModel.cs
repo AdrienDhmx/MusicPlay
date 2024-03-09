@@ -23,7 +23,7 @@ namespace MusicPlayUI.MVVM.ViewModels
     public class AlbumLibraryViewModel : LibraryViewModel
     {
         private readonly IQueueService _queueService;
-
+        private readonly ICommandsManager _commandsManager;
         private bool _noAlbumFoundVisibility = false;
         public bool NoAlbumFoundVisibility
         {
@@ -116,30 +116,14 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PlayAlbumCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public ICommand OpenAlbumPopupCommand { get; }
-        public AlbumLibraryViewModel(IQueueService queueService)
+        public AlbumLibraryViewModel(IQueueService queueService, ICommandsManager commandsManager)
         {
             _queueService = queueService;
+            _commandsManager = commandsManager;
 
-            PlayAlbumCommand = new RelayCommand<Album>((album) =>
-            {
-                if (album is not null)
-                {
-                    _queueService.SetNewQueue(album.Tracks, album, album.Name, album.AlbumCover, orderTracks: true);
-                }
-            });
-
-            NavigateToAlbumCommand = new RelayCommand<Album>((album) =>
-            {
-                App.State.NavigateTo<AlbumViewModel>(album);
-            });
-
-            OpenAlbumPopupCommand = new RelayCommand<Album>((album) =>
-            {
-                if (album is not null)
-                {
-                    App.State.OpenPopup<AlbumPopupViewModel>(album);
-                }
-            });
+            PlayAlbumCommand = _commandsManager.PlayNewQueueCommand;
+            NavigateToAlbumCommand = _commandsManager.NavigateToAlbumCommand;
+            OpenAlbumPopupCommand = _commandsManager.OpenAlbumPopupCommand;
         }
 
         public override void Dispose()

@@ -174,6 +174,7 @@ namespace MusicPlay.Database.Models
                     _tracks = [.. context.Tracks.Where(t => t.TrackArtistRole
                                                     .Any(tar => tar.ArtistRole.ArtistId == Id)
                                                 )
+                                                .Where(t => t.Album.PrimaryArtistId == Id)
                                                 .OrderBy(t => t.AlbumId)
                                                 .ThenBy(t => t.TrackNumber)
                             ];

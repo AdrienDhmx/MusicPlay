@@ -11,7 +11,7 @@
              xmlns:list="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" xmlns:mp="clr-namespace:ModalPopupControl;assembly=ModalPopupControl"
              d:DataContext="{d:DesignInstance Type=viewmodels:PlayerControlViewModel}"
              mc:Ignorable="d" 
-             x:Name="RootView"
+             x:Name="RootPlayerControl"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <!-- Root Border -->
@@ -143,7 +143,7 @@
                                                     Cursor="Hand"
                                             Command="{Binding IsFavoriteCommand}"
                                             MouseOverBackground="Transparent"
-                                            FillColor="{DynamicResource Primary}">
+                                            FillColor="{Binding AccentColor}">
                                     <iconbtn:IconButton.Style>
                                         <Style TargetType="iconbtn:IconButton">
                                             <Setter Property="Icon" Value="{DynamicResource HeartIcon}"/>
@@ -171,13 +171,13 @@
                                             IconStretch="Fill"
                                             MouseOverBackground="Transparent"
                                             Command="{Binding IsFavoriteCommand}"
-                                            StrokeColor="{DynamicResource Primary}">
+                                            StrokeColor="{Binding AccentColor}">
                                     <iconbtn:IconButton.Style>
                                         <Style TargetType="iconbtn:IconButton">
                                             <Setter Property="FillColor" Value="Transparent"/>
                                             <Style.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="true">
-                                                    <Setter Property="FillColor" Value="{DynamicResource PrimaryHover}"/>
+                                                    <Setter Property="FillColor" Value="{Binding AccentHoverColor}"/>
                                                 </Trigger>
                                             </Style.Triggers>
                                         </Style>
@@ -256,15 +256,14 @@
                                 HorizontalAlignment="Center">
                         <!-- Shuffle -->
                         <iconbtn:IconButton Icon="{DynamicResource ShuffleIcon}"
-                                            Command="{Binding ShuffleCommand}">
+                                            Command="{Binding ShuffleCommand}"
+                                            FillColor="{Binding DataContext.AccentColor, ElementName=RootPlayerControl}">
                             <iconbtn:IconButton.Style>
                                 <Style TargetType="iconbtn:IconButton"
                                         BasedOn="{StaticResource ThirdPlayBackButton}">
-                                    <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsShuffled, ElementName=RootView}" Value="true">
-                                            <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-                                            <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                        <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsShuffled, ElementName=RootPlayerControl}" Value="true">
+                                            <Setter Property="Background" Value="{Binding AccentHoverColor}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -284,7 +283,7 @@
                                         TargetType="iconbtn:IconButton">
                                     <Setter Property="Icon" Value="{DynamicResource PlayIcon}"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsPlaying, ElementName=RootView}" Value="true">
+                                        <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsPlaying, ElementName=RootPlayerControl}" Value="true">
                                             <Setter Property="Icon" Value="{DynamicResource PauseIcon}"/>
                                             <Setter Property="ToolTip" Value="{x:Static lang:Resources.Pause}"/>
                                         </DataTrigger>
@@ -304,18 +303,16 @@
                             <iconbtn:IconButton.Style>
                                 <Style TargetType="iconbtn:IconButton"
                                         BasedOn="{StaticResource ThirdPlayBackButton}">
-                                    <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-                                    <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                    <Setter Property="FillColor" Value="{Binding DataContext.AccentColor, ElementName=RootPlayerControl}"/>
+                                    <Setter Property="Background" Value="{Binding AccentHoverColor}"/>
                                     <Setter Property="Icon" Value="{DynamicResource RepeatIcon}"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsOnRepeat, ElementName=RootView}" Value="false">
-                                            <Setter Property="FillColor" Value="{DynamicResource OnPrimaryContainer}"/>
+                                        <DataTrigger Binding="{Binding DataContext.QueueService.Queue.IsOnRepeat, ElementName=RootPlayerControl}" Value="false">
                                             <Setter Property="Background" Value="Transparent"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootView}" Value="true">
+                                        <DataTrigger Binding="{Binding DataContext.AudioPlayback.IsLooping, ElementName=RootPlayerControl}" Value="true">
                                             <Setter Property="Icon" Value="{DynamicResource RepeatOneIcon}"/>
-                                            <Setter Property="FillColor" Value="{DynamicResource Primary}"/>
-                                            <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
+                                            <Setter Property="Background" Value="{Binding AccentHoverColor}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -342,6 +339,7 @@
                         <Slider Grid.Column="1"
                                 HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
+                                Style="{DynamicResource DefaultSlider}"
                                 Value="{Binding AudioService.CurrentPositionMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Minimum="0"
                                 Maximum="{Binding AudioService.MaxPositionMs}"
@@ -380,7 +378,7 @@
                                                 IconWidth="25"
                                                 IconHeight="25"
                                                 Width="28"
-                                                    FillColor="{DynamicResource OnPrimaryContainer}"
+                                                FillColor="{Binding AccentColor}"
                                                     Command="{Binding MuteCommand}">
                                 <iconbtn:IconButton.Style>
                                     <Style TargetType="iconbtn:IconButton"
@@ -407,14 +405,16 @@
                                         Style="{DynamicResource NormalIconBtn}"
                                         x:Name="DeviceIconBtn"
                                         Icon="{Binding CurrentDeviceIcon}"
+                                        StrokeColor="{Binding AccentHoverColor}"
+                                        FillColor="{Binding AccentColor}"
                                         Command="{Binding OpenDevicesPopupCommand}"/>
 
 
                     <iconbtn:IconButton Grid.Column="3"
                                         Style="{DynamicResource NormalIconBtn}"
                                             Icon="{DynamicResource QueueIcon}"
-                                        StrokeColor="{DynamicResource OnPrimaryContainer}"
-                                        FillColor="{DynamicResource PrimaryHover}"
+                                        StrokeColor="{Binding AccentColor}"
+                                        FillColor="{Binding AccentColor}"
                                         StrokeWidth="2"
                                         Command="{Binding OpenCloseQueuePopupCommand}">
                     </iconbtn:IconButton>
@@ -455,6 +455,7 @@
                                                         Maximum="10000"
                                                         Cursor="Hand"
                                                         Minimum="0"
+                                                        Style="{DynamicResource DefaultSlider}"
                                                         Orientation="Vertical"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
@@ -518,10 +519,11 @@
                                                     <Border Height="50"
                                                             x:Name="border"
                                                             CornerRadius="5"
+                                                            Cursor="Hand"
                                                             Background="Transparent">
                                                         <Border.InputBindings>
                                                             <MouseBinding Gesture="LeftClick"
-                                                                            Command="{Binding DataContext.ChangeOutputDeviceCommand, ElementName=RootView}"
+                                                                            Command="{Binding DataContext.ChangeOutputDeviceCommand, ElementName=RootPlayerControl}"
                                                                             CommandParameter="{Binding .}"/>
                                                         </Border.InputBindings>
                                                         <Grid>
@@ -555,13 +557,11 @@
                                                         <Trigger Property="IsMouseOver" Value="True"
                                                                     SourceName="border">
                                                             <Setter Property="Background" TargetName="border"
-                                                                    Value="{DynamicResource PrimaryHover}"/>
+                                                                    Value="{Binding DataContext.AccentHoverColor, ElementName=RootPlayerControl}"/>
                                                         </Trigger>
                                                         <DataTrigger Binding="{Binding IsInitialized}"
                                                                         Value="true">
-                                                            <Setter Property="TextElement.Foreground" Value="{DynamicResource Primary}"
-                                                                    TargetName="Name"/>
-                                                            <Setter Property="Fill" Value="{DynamicResource Primary}" TargetName="DeviceIcon"/>
+                                                            <Setter Property="Fill" Value="{Binding DataContext.AccentColor, ElementName=RootPlayerControl}" TargetName="DeviceIcon"/>
                                                         </DataTrigger>
                                                     </DataTemplate.Triggers>
                                                 </DataTemplate>

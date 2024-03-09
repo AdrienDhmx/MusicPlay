@@ -19,6 +19,12 @@ namespace MusicPlayUI.Core.Services
             ColorfulPlayerControlChange?.Invoke();
         }
 
+        public static event Action ColorfulUIChange;
+        private static void OnColorfulUIChanged()
+        {
+            ColorfulUIChange?.Invoke();
+        }
+
         public static bool AreCoversEnabled { get; private set; } = true;
 
         public static bool AlbumCoverOnly { get; private set; } = false;
@@ -43,6 +49,7 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.SunsetSunrise => Settings.Default.SunsetSunrise,
                 SettingsEnum.SystemSyncTheme => Settings.Default.SystemSyncTheme,
                 SettingsEnum.ColorfulPlayerControl => Settings.Default.ColorfulPlayerControl,
+                SettingsEnum.ColorfulUI => Settings.Default.ColorfulUI,
                 SettingsEnum.Language => Settings.Default.Language,
                 SettingsEnum.TimerInterval => Settings.Default.TimerInterval,
                 SettingsEnum.NowPlayingStartingSubView => Settings.Default.NowPlayingStartingSubView,
@@ -158,6 +165,10 @@ namespace MusicPlayUI.Core.Services
                 case SettingsEnum.ColorfulPlayerControl:
                     Settings.Default.ColorfulPlayerControl = value;
                     OnColorfulPlayerControlChanged();
+                    break;
+                case SettingsEnum.ColorfulUI:
+                    Settings.Default.ColorfulUI = value;
+                    OnColorfulUIChanged();
                     break;
                 case SettingsEnum.Language:
                     Settings.Default.Language = value;

@@ -17,11 +17,11 @@ namespace MusicPlayUI.MVVM.ViewModels
         private readonly ICommandsManager _commandsManager;
         private readonly IPlaylistService _playlistService;
 
-        private IAudioTimeService _audioService;
-        public IAudioTimeService AudioService
+        private IVisualizerParameterStore _visualizerParameterService;
+        public IVisualizerParameterStore VisualizerParameterService
         {
-            get => _audioService;
-            set { SetField(ref _audioService, value); }
+            get => _visualizerParameterService;
+            set { SetField(ref _visualizerParameterService, value); }
         }
 
         public ICommand RemoveTrackCommand { get; }
@@ -32,15 +32,15 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand NavigateToArtistCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public QueueViewModel(IQueueService queueService, IAudioTimeService audioService, IModalService modalService, ICommandsManager commandsManager,
-             IPlaylistService playlistService) : base(queueService)
+             IPlaylistService playlistService, IVisualizerParameterStore visualizerParameterStore) : base(queueService, audioService)
         {
-            AudioService = audioService;
             _modalService = modalService;
             _commandsManager = commandsManager;
             _playlistService = playlistService;
+            _visualizerParameterService = visualizerParameterStore;
 
-            RemoveTrackCommand = new RelayCommand<Track>((track) => QueueService.RemoveTrack(track));
-            PlayTrackCommand = new RelayCommand<Track>((track) =>  QueueService.PlayTrack(track));
+            RemoveTrackCommand = new RelayCommand<Track>(QueueService.RemoveTrack);
+            PlayTrackCommand = new RelayCommand<Track>(QueueService.PlayTrack);
             OpenTrackPopupCommand = _commandsManager.OpenTrackPopupCommand;
             SaveQueueAsPlaylistCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.CreatePlaylist, OnCreatePlaylistValidation));
             NavigateToPlayingFromCommand = new RelayCommand(async () => await _queueService.NavigateToPlayingFrom());

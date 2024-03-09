@@ -1,4 +1,5 @@
 ﻿using GongSolutions.Wpf.DragDrop.Utilities;
+using MusicPlayUI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,15 +30,19 @@ namespace MusicPlayUI.MVVM.Views.PopupViews
         private async void QueueTracks_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             await Task.Delay(300);
-            double height = QueueTracks.ActualHeight;
-            int totalTracks = QueueTracks.Items.Count;
-            double itemHeight = height / (double)totalTracks;
-            double verticalOffset = itemHeight * ((double)QueueTracks.SelectedIndex - 2);
-            ScrollViewer QueueScroll = QueueTracks.GetVisualDescendent<ScrollViewer>();
 
-            if (verticalOffset is not double.NaN && QueueScroll is not null)
+            if(QueueTracks.Items.Count < QueueTracks.SelectedIndex && QueueTracks.Items.GetItemAt(QueueTracks.SelectedIndex) is UIElement element)
             {
-                QueueScroll.ScrollToVerticalOffset(verticalOffset);
+                AsyncImage image = element.GetVisualDescendent<AsyncImage>();
+                if(image is not null && image.IsInViewport)
+                {
+                    return;
+                }
+            }
+            
+            if (QueueTracks.Template.FindName("PART_ContentHost", QueueTracks) is DynamicScrollViewer.DynamicScrollViewer scrollViewer)
+            {
+                scrollViewer.ScrollToItem(QueueTracks.SelectedItem);
             }
         }
 
@@ -48,5 +53,7 @@ namespace MusicPlayUI.MVVM.Views.PopupViews
                 scrollViewer.ScrollToItem(QueueTracks.SelectedItem);
             }
         }
+
+
     }
 }

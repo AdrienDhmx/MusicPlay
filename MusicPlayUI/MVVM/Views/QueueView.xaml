@@ -58,7 +58,7 @@
                             Orientation="Horizontal">
 
                     <!-- Current time -->
-                    <TextBlock Text="{Binding AudioService.CurrentQueuePosition, Mode=OneWay}"
+                    <TextBlock Text="{Binding AudioTimeService.CurrentQueuePosition, Mode=OneWay}"
                                Foreground="{DynamicResource WhiteForeground}"
                                Style="{DynamicResource NTrackDataStyle }"/>
 
@@ -82,22 +82,13 @@
                 </StackPanel>
 
                 <!-- Audio Queue position (progress bar) -->
-                <ProgressBar Value="{Binding AudioService.CurrentQueuePositionMs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                <ProgressBar Style="{DynamicResource QueueProgressBar}"
+                             Value="{Binding AudioTimeService.CurrentQueuePositionMs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                              Maximum="{Binding QueueService.Queue.Length, Mode=OneWay}"
+                             Foreground="{Binding VisualizerParameterService.ObjectColor}"
                              Minimum="0"
                              Grid.Row="2"
-                             Margin="0,5, 0, 0">
-                    <ProgressBar.Style>
-                        <Style TargetType="ProgressBar" BasedOn="{StaticResource QueueProgressBar}">
-                            <Setter Property="Foreground" Value="{DynamicResource WhiteForeground}"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding AppState.CurrentView, Converter={StaticResource ToTypeConverter}, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                                    <Setter Property="Foreground" Value="{Binding AppState.CurrentView.ViewModel.VisualizerParameterService.ObjectColor, Mode=OneWay}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ProgressBar.Style>
-                </ProgressBar>
+                             Margin="0,5, 0, 0"/>
             </Grid>
 
             <!-- Queue Tracks -->
@@ -153,7 +144,7 @@
                             <Border.InputBindings>
                                 <MouseBinding Gesture="RightClick"
                                                   Command="{Binding DataContext.OpenTrackPopupCommand, ElementName=RootView}"
-                                                  CommandParameter="{Binding .}"/>
+                                                  CommandParameter="{Binding Track}"/>
                             </Border.InputBindings>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -186,11 +177,6 @@
                                             <Border.Style>
                                                 <Style TargetType="Border">
                                                     <Setter Property="Background" Value="{DynamicResource WhiteForeground}"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding DataContext.AppState.CurrentView, Converter={StaticResource ToTypeConverter}, UpdateSourceTrigger=PropertyChanged, ElementName=RootView}" Value="True">
-                                                            <Setter Property="Background" Value="{Binding DataContext.AppState.CurrentView.ViewModel.VisualizerParameterService.ObjectColor, Mode=OneWay, ElementName=RootView}"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
                                         </Border>

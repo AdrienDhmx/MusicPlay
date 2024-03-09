@@ -153,8 +153,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             _commandsManager = commandsManager;
 
             // play
-            PlayPlaylistCommand = new RelayCommand(() => PlayPlaylist());
-            PlayShuffledPlaylistCommand = new RelayCommand(() => PlayPlaylist(true));
+            PlayPlaylistCommand = _commandsManager.PlayNewQueueCommand;
+            PlayShuffledPlaylistCommand = _commandsManager.PlayNewQueueShuffledCommand;
             PlayTrackCommand = new RelayCommand<Track>((track) => PlayPlaylist(false, track));
 
             // navigate
