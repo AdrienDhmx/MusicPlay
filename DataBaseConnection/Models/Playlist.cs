@@ -145,6 +145,12 @@ namespace MusicPlay.Database.Models
             }
         }
 
+        public void ClearTracks()
+        {
+            PlaylistTracks = null;
+            _tracks = null;
+        }
+
         public Playlist(int id, string name, string description, string cover, string duration)
         {
             Id = id;
@@ -184,6 +190,12 @@ namespace MusicPlay.Database.Models
             return await context.Playlists.ToListAsync();
         }
 
+        public static async Task<List<Playlist>> GetAllWhereNotTrack(Track track)
+        {
+            using DatabaseContext context = new();
+            return await context.Playlists.Where(p => !p.PlaylistTracks.Select(t => t.TrackId).Contains(track.Id)).ToListAsync();
+        }
+
         public static List<Playlist> GetLastPlayed(int top)
             => GetLastPlayed<Playlist>(top);
 
@@ -214,13 +226,14 @@ namespace MusicPlay.Database.Models
         public static async Task InsertTrack(Playlist playlist, Track track, int index)
         {
             using DatabaseContext context = new();
-            PlaylistTrack playlistTrack = new PlaylistTrack(playlist.Id, track.Id, index);
+            PlaylistTrack playlistTrack = new PlaylistTrack(playlist.Id, track.Id, index + 1);
             context.PlaylistTracks.Add(playlistTrack);
             context.SaveChanges();
 
             playlist.PlaylistTracks.Insert(index, playlistTrack);
-            UpdateTrackIndexes(playlist.PlaylistTracks, playlist.Id, context, index);
+            UpdateTrackIndexes(playlist.PlaylistTracks, playlist.Id, context, 0);
             await context.SaveChangesAsync();
+            playlistTrack.Track = track;
         }
 
         public static async Task AddTracks(Playlist playlist, List<Track> tracks)
@@ -254,8 +267,16 @@ namespace MusicPlay.Database.Models
 
         public static async Task RemoveTrack(Playlist playlist, PlaylistTrack track)
         {
+            await RemoveTrack(playlist, track.Track);
+        }
+
+        public static async Task RemoveTrack(Playlist playlist, Track track)
+        {
             using DatabaseContext context = new();
-            playlist.PlaylistTracks.Remove(track);
+            PlaylistTrack playlistTrack = context.PlaylistTracks.Find(playlist.Id, track.Id);
+            context.PlaylistTracks.Remove(playlistTrack);
+            playlist.PlaylistTracks.RemoveAt(playlistTrack.TrackIndex - 1);
+            UpdateTrackIndexes(playlist.PlaylistTracks, playlist.Id, context, 0);
             await context.SaveChangesAsync();
         }
 

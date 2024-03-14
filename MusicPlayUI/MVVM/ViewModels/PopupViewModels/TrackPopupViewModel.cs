@@ -113,7 +113,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             AddToQueueCommand = new RelayCommand(AddToQueue);
             AddToPlaylistCommand = new RelayCommand<Playlist>(AddToPlaylist);
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
-            RemoveFromPlaylistCommand = new RelayCommand(RemoveFromPlaylist);
+            RemoveFromPlaylistCommand = new RelayCommand(async () => await RemoveFromPlaylistAsync());
             ChangeArtworkCommand = new RelayCommand(async () => await ChangeArtwork());
             AddToTagCommand = new RelayCommand<Tag>(async (tag) => await AddToTag(tag, SelectedTrack));
             CreateTagCommand = new RelayCommand(() => CreateTag(SelectedTrack));
@@ -179,24 +179,18 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private void RemoveFromPlaylist()
+        private async Task RemoveFromPlaylistAsync()
         {
-            Playlist playlist = (Playlist)App.State.CurrentPopup.State.Parameter;
+            Playlist playlist = (Playlist)App.State.CurrentView.State.Parameter;
             if (playlist is not null)
             {
-                //await DataAccess.Connection.RemoveTrackFromPlaylist(playlist, SelectedTrack);
-                //List<OrderedTrack> playlistTracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
-
-                //playlistTracks = playlistTracks.ToOrderedTrackModel(); // update all index correctly
-                //await DataAccess.Connection.UpdatePlaylistTracks(playlist.Id, playlistTracks);
-
-                //MessageHelper.PublishMessage(SelectedTrack.Title.TrackRemovedFromPlaylist(playlist.Name));
+                await Playlist.RemoveTrack(playlist, SelectedTrack);
 
                 // not in the playlist anymore
                 RemoveFromPlaylistVisibility = false;
                 UserPlaylists.Add(playlist);
 
-                // if the button to remove from playlist is visible then the view is a the playlist the tracks has been removed from
+                // update the playlist
                 App.State.CurrentView.ViewModel.Update();
                 ClosePopup();
             }
@@ -210,8 +204,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private async Task GetUserPlaylists()
         {
-            var playlists = await Playlist.GetAll();
-            UserPlaylists = new(playlists.ExceptBy(SelectedTrack.PlaylistTracks.Select(pt => pt.PlaylistId), p => p.Id));
+            UserPlaylists = new(await Playlist.GetAllWhereNotTrack(SelectedTrack));
         }
 
         public override void Init()
@@ -224,7 +217,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             Track track = (Track)State.Parameter;
             if(track is not null)
             {
-                SelectedTrack = new(track);
+                SelectedTrack = track;
 
                 await GetUserPlaylists();
                 GetTags(SelectedTrack.TrackTags.Select(t => t.Tag.Id));

@@ -166,7 +166,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             IsFavoriteCommand = new RelayCommand(async () =>
             {
                 IsFavorite = !IsFavorite;
-                _queueService.UpdateFavorite(IsFavorite);
+                await _queueService.UpdateFavorite();
             });
         }
 

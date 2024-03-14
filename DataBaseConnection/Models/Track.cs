@@ -339,8 +339,8 @@ namespace MusicPlay.Database.Models
             Track track = context.Tracks.Find(id);
             if (track == null)
                 return;
-            context.Tracks.Update(track);
             update(track);
+            context.Tracks.Update(track);
             await context.SaveChangesAsync();
         }
 

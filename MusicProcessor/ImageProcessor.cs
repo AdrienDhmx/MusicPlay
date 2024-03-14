@@ -12,6 +12,8 @@ using System.Windows;
 using MessageControl;
 using System.Drawing.Imaging;
 using MusicPlay.Database.Helpers;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace MusicFilesProcessor
 {
@@ -362,12 +364,12 @@ namespace MusicFilesProcessor
                         if (image.Width > thumbnailSizeThreshold && image.Height > thumbnailSizeThreshold)
                             ResizeAndCompressImage(image, thumbnailSized, thumbnailSizeThreshold, pngEncoder);
                         else
-                            image.Save(thumbnailSized);
+                            image.SaveAsync(thumbnailSized);
                     }
                     else
                     {
-                        image.Save(mediumSized);
-                        image.Save(thumbnailSized);
+                        image.SaveAsync(mediumSized);
+                        image.SaveAsync(thumbnailSized);
                     }
                 }
             }
@@ -438,7 +440,7 @@ namespace MusicFilesProcessor
 
             image.Mutate(x => x.Resize(width, height, KnownResamplers.Bicubic));
 
-            image.Save(newPath, pngEncoder);
+            image.SaveAsync(newPath, pngEncoder);
         }
 
         private static (int, int) GetNewSize(int desiredSize, int originalWidth, int originalHeight)

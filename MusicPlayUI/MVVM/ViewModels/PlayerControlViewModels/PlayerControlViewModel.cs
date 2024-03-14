@@ -206,17 +206,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             }
         }
 
-        private bool _isFavorite;
-        public bool IsFavorite
-        {
-            get { return _isFavorite; }
-            set
-            {
-                _isFavorite = value;
-                OnPropertyChanged(nameof(IsFavorite));
-            }
-        }
-
         public ICommand ShuffleCommand { get; }
         public ICommand RepeatCommand { get; }
         public ICommand PlayPauseCommand { get; }
@@ -295,7 +284,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             IsFavoriteCommand = new RelayCommand(async () =>
             {
-                await _queueService.UpdateFavorite(IsFavorite);
+                await _queueService.UpdateFavorite();
             });
 
             OpenTrackPopupCommand = new RelayCommand(OpenTrackPopup);
@@ -467,7 +456,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         {
             if (QueueService.Queue.PlayingTrack is not null) 
             {
-                IsFavorite = QueueService.Queue.PlayingTrack.IsFavorite;
                 OnPropertyChanged(nameof(Rating));
                 UpdateBlurredCover();
             }

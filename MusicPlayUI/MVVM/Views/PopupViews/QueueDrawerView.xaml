@@ -46,9 +46,6 @@
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left">
-                    <TextBlock Style="{DynamicResource NLargeStyle}"
-                               Margin="0, 0, 10, 0"
-                               Text="{Binding QueueService.Queue.Duration}"/>
                     <TextBlock  Style="{DynamicResource NLargeStyle}"
                                 Text="{Binding SelectedIndex, ElementName=QueueTracks, Converter={StaticResource  AdditionConverter}, ConverterParameter=1}"/>
                     <TextBlock  Style="{DynamicResource NLargeStyle}"

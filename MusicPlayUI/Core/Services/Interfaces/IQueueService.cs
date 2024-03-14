@@ -38,7 +38,7 @@ namespace MusicPlayUI.Core.Services.Interfaces
         int GetPlayingTrackIndex();
         int GetTrackIndex(Track track);
         Task IncreasePlayCount(int increaseValue);
-        Task UpdateFavorite(bool isFavorite);
+        Task UpdateFavorite();
         Task UpdateRating(int rating);
 
         void DragOver(IDropInfo dropInfo);

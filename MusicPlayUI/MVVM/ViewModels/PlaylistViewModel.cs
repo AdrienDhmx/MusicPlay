@@ -19,6 +19,7 @@ using MusicPlayUI.Core.Services;
 using DynamicScrollViewer;
 using MusicPlay.Database.Models.DataBaseModels;
 using MusicPlay.Database.DatabaseAccess;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 namespace MusicPlayUI.MVVM.ViewModels
@@ -242,6 +243,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             else // user playlists
             {
                 Cover = Playlist.Cover;
+                Playlist.ClearTracks();
+                OnPropertyChanged(nameof(Playlist.Tracks));
             }
         }
 
@@ -254,13 +257,6 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             Playlist.PlaylistTracks.Move(originalIndex, targetIndex);
             UpdateTrackIndex();
-        }
-
-        private async Task InsertTrack(Track track, int index)
-        {
-            await Playlist.InsertTrack(Playlist, track, index + 1);
-            //Tracks.Insert(index, playlistTrack);
-            //UpdateTrackIndex();
         }
 
         private void UpdateTrackIndex()
@@ -286,13 +282,15 @@ namespace MusicPlayUI.MVVM.ViewModels
             PlaylistTrack FoundPlaylistTrack = Playlist.PlaylistTracks.Where(pt => pt.TrackId == track.Id).FirstOrDefault();
             if (FoundPlaylistTrack.IsNull()) // new track inserted
             {
-                await InsertTrack(track, dropInfo.InsertIndex);
+                await Playlist.InsertTrack(Playlist, track, dropInfo.InsertIndex);
+                Playlist.ClearTracks();
+                OnPropertyChanged(nameof(Playlist.Tracks));
             }
             else // track moved
             {
                 int originalIndex = FoundPlaylistTrack.TrackIndex - 1;
 
-                // when the original index is lower than the insert one, the track gets inserted one index to high
+                // when the original index is lower than the insert one, the track gets inserted one index too high
                 MoveTrack(originalIndex, dropInfo.InsertIndex > originalIndex ? dropInfo.InsertIndex - 1 : dropInfo.InsertIndex);
             }
         }

@@ -124,7 +124,7 @@ namespace MusicPlayUI.Core.Commands
 
             FavoriteCommand = new RelayCommand(() =>
             {
-                queueService.UpdateFavorite(!_queueService.Queue.PlayingTrack.IsFavorite);
+                queueService.UpdateFavorite();
             });
 
             RatingCommand = new RelayCommand<string>((value) =>

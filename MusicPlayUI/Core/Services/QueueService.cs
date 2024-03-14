@@ -243,9 +243,10 @@ namespace MusicPlayUI.Core.Services
             OnPlayingTrackInteractionChanged();
         }
 
-        public async Task UpdateFavorite(bool isFavorite)
+        public async Task UpdateFavorite()
         {
             await Track.UpdateIsFavorite(Queue.PlayingTrack);
+            Queue.PlayingTrack.IsFavorite = !Queue.PlayingTrack.IsFavorite;
             OnPlayingTrackInteractionChanged();
         }
 

@@ -66,6 +66,7 @@
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Center"
                                 x:Name="Cover"
+                                Cursor="Hand"
                                 Visibility="Visible">
                             <Border.Background>
                                 <ImageBrush Stretch="Uniform"
@@ -130,7 +131,7 @@
 
                                 <!-- Favorite -->
                                 <iconbtn:IconButton Grid.Column="1"
-                                            Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            Visibility="{Binding QueueService.Queue.PlayingTrack.IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"
                                             Width="20"
                                             Height="20"
                                             IconWidth="16"
@@ -158,7 +159,7 @@
 
                                 <!-- Favorite -->
                                 <iconbtn:IconButton Grid.Column="1"
-                                            Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                                            Visibility="{Binding QueueService.Queue.PlayingTrack.IsFavorite, Converter={StaticResource BoolToVisibilityConverterInverted}}"
                                             Icon="{DynamicResource HeartIcon}"
                                             HorizontalContentAlignment="Center"
                                             VerticalContentAlignment="Center"

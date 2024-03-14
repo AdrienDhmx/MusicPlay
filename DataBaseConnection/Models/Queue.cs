@@ -179,6 +179,7 @@ namespace MusicPlay.Database.Models
                 if(_length == 0)
                 {
                     _length = Tracks.GetTracksTotalLength();
+                    OnPropertyChanged(nameof(Duration));
                 }
                 return _length;
             }
