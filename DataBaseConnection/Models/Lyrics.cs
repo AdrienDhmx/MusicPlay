@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,12 +39,19 @@ namespace MusicPlay.Database.Models
 
         public ObservableCollection<TimedLyricsLine> TimedLines
         {
-            get => _timedLines;
+            get
+            {
+                if(_timedLines.IsNullOrEmpty())
+                {
+                    using DatabaseContext context = new();
+                    _timedLines = [..context.TimedLyricsLine.Where(tl => tl.LyricsId == Id)];
+                }
+                return _timedLines;
+            }
             set => SetField(ref _timedLines, value);
         }
 
-        [NotMapped]
-        public string WebSiteSource
+        public string WebsiteSource
         {
             get => _webSiteSource;
             set => SetField(ref _webSiteSource, value);
@@ -64,11 +72,37 @@ namespace MusicPlay.Database.Models
 
         }
 
-        public static async Task Insert(Lyrics lyrics)
+        /// <summary>
+        /// Insert the lyrics to the database, but don't link it the any track !
+        /// </summary>
+        /// <param name="lyrics">Thye lyrics to insert</param>
+        public static void Insert(Lyrics lyrics)
         {
             using DatabaseContext context = new();
             context.Lyrics.Add(lyrics);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Insert the lyrics to the database AND link it to the track
+        /// </summary>
+        /// <param name="lyrics">Thye lyrics to insert</param>
+        /// <param name="track">The track to link to</param>
+        public static void Insert(Lyrics lyrics, Track track)
+        {
+            using DatabaseContext context = new();
+            context.Lyrics.Add(lyrics);
+            context.SaveChanges();
+
+            // get the track from the db with no relation to avoid tracking issues
+            Track trackToLinkTo = context.Tracks.Find(track.Id);
+            trackToLinkTo.Lyrics = lyrics;
+            trackToLinkTo.LyricsId = lyrics.Id;
+            context.SaveChanges();
+
+            // update the passed track for UI or further processing with it 
+            track.Lyrics = lyrics;
+            track.LyricsId = lyrics.Id;
         }
 
         /// <summary>
@@ -76,19 +110,37 @@ namespace MusicPlay.Database.Models
         /// </summary>
         /// <param name="lyrics"></param>
         /// <returns></returns>
-        public static async Task InsertTimedLyrics(Lyrics lyrics)
+        public static void InsertUpdateTimedLyrics(Lyrics lyrics)
         {
-            if (lyrics.HasTimedLyrics)
+            if (!lyrics.HasTimedLyrics)
             {
-                await Task.Run(() =>
-                {
-                    foreach (TimedLyricsLine timedLine in lyrics.TimedLines)
-                    {
-                        timedLine.LyricsId = lyrics.Id;
-                        //timedLine.Id = DataAccess.Connection.InsertOne(timedLine);
-                    }
-                });
+                return;
             }
+
+            using DatabaseContext context = new();
+
+            foreach (TimedLyricsLine timedLine in lyrics.TimedLines)
+            {
+                timedLine.LyricsId = lyrics.Id;
+                if(timedLine.Id == 0)
+                {
+                    context.TimedLyricsLine.Add(timedLine);
+                }
+                else
+                {
+                    context.Update(timedLine);
+                }
+            }
+
+            context.SaveChanges(true);
+        }
+
+        public static void Update(Lyrics lyrics)
+        {
+            using DatabaseContext context = new();
+            Lyrics savedLyrics = context.Lyrics.Find(lyrics.Id);
+            savedLyrics.LyricsText = lyrics.LyricsText;
+            context.SaveChanges(true);
         }
 
         /// <summary>

@@ -4,50 +4,22 @@
                     xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls">
 
     <Style x:Key="LyricsListView" TargetType="{x:Type ListView}">
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
-            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="ItemsPanel">
                 <Setter.Value>
                     <ItemsPanelTemplate>
-                        <VirtualizingStackPanel IsVirtualizing="{TemplateBinding VirtualizingPanel.IsVirtualizing}" VirtualizationMode="{TemplateBinding VirtualizingPanel.VirtualizationMode}" />
+                        <StackPanel Orientation="Vertical"/>
                     </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListView}">
-                        <Grid>
-                            <ScrollViewer
-                            x:Name="PART_ContentHost"
-                            CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
-                            HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        <Rectangle x:Name="PART_DisabledVisual"
-                                    Opacity="0"
-                                    RadiusX="2"
-                                    RadiusY="2"
-                                    Stretch="Fill"
-                                    Stroke="Transparent"
-                                    StrokeThickness="0"
-                                    Visibility="Collapsed">
-                        </Rectangle>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsGrouping" Value="True">
-                                <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="PART_DisabledVisual" Property="Visibility" Value="Visible" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
+                    <Grid>
+                        <ItemsPresenter />
+                    </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

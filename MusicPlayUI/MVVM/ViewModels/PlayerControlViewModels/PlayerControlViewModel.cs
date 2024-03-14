@@ -77,7 +77,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         {
             get
             {
-                if(ColorfulUI)
+                if(ColorfulUI && MeanColor != null)
                 {
                     return MeanColor.GetEmphasizedColor();
 
@@ -90,7 +90,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
         {
             get
             {
-                if (ColorfulUI)
+                if (ColorfulUI && AccentColor != null)
                 {
                     SolidColorBrush color = AccentColor;
                     color.Color = Color.FromArgb(60, AccentColor.Color.R, AccentColor.Color.G, AccentColor.Color.B);

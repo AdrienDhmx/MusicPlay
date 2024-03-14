@@ -424,7 +424,7 @@ namespace MusicFilesProcessor
                 string lyrics = fileMetadata.Tag.Lyrics;
                 if(lyrics.IsNotNullOrWhiteSpace())
                 {
-                    string url = LyricsProcessor.Instance.GetFileName(currentTrack.Title, CurrentAlbum.PrimaryArtist.Name);
+                    string url = LyricsProcessor.Instance.GetPotentialUrl(currentTrack.Title, CurrentAlbum.PrimaryArtist.Name);
 
                     MusicPlay.Database.Models.Lyrics lyricsModel = await MusicPlay.Database.Models.Lyrics.TryToGetByUrl(url);
 
@@ -433,13 +433,12 @@ namespace MusicFilesProcessor
                         lyricsModel ??= new()
                         {
                             LyricsText = lyrics,
-                            IsSaved = true,
                             Url = url,
                         };
-                        await MusicPlay.Database.Models.Lyrics.Insert(lyricsModel);
+                        MusicPlay.Database.Models.Lyrics.Insert(lyricsModel);
+                        currentTrack.Lyrics = lyricsModel;
+                        currentTrack.LyricsId = lyricsModel.Id;
                     }
-                    currentTrack.Lyrics = lyricsModel;
-                    currentTrack.LyricsId = lyricsModel.Id;
                 }
 
                 CurrentAlbumNewTracks.Add(currentTrack, artistsCreditedInTrack);

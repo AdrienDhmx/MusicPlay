@@ -42,5 +42,8 @@ namespace MusicPlay.Database.Models
             get => _isPlaying;
             set => SetField(ref _isPlaying, value);
         }
+
+        [NotMapped]
+        public string Time => TimeSpan.FromMilliseconds(TimestampMs).ToShortString();
     }
 }

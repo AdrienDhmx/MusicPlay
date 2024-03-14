@@ -114,12 +114,12 @@ namespace MusicFilesProcessor.Lyrics
                     }
                     catch (Exception)
                     {
-                        return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
+                        return CreateLyricsModel("", "", "");
                     }
                 }
                 else
                 {
-                    return CreateLyricsModel(lyrics, "", "", GetFileName(title, artist), true, false);
+                    return CreateLyricsModel(lyrics, "", "");
                 }
             }
         }
@@ -129,40 +129,54 @@ namespace MusicFilesProcessor.Lyrics
             if (ConnectivityHelper.Instance.CheckInternetAccess())
             {
                 string url = _lyricsHelper.GetUrl(title, artist);
+                string lyrics = await GetLyricsWithUrl(url);
 
-                HttpResponseMessage response = await _connectivityHelper.GetAsync(url);
-                string lyrics = _lyricsHelper.ReadWebPage(await response.Content.ReadAsStringAsync());
-
-                if (response.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(lyrics))
+                if(lyrics.IsNotNullOrWhiteSpace())
                 {
-                    CurrentURL = url;
-                    MusicPlay.Database.Models.Lyrics lyricsModel = CreateLyricsModel(lyrics, url, CurrentWebSite, GetFileName(title, artist));
-                    return lyricsModel;
+                    return CreateLyricsModel(lyrics, url, CurrentWebSite);
                 }
-                else
-                {
-                    // if the resource was not found don't trigger a msg notification
-                    if(response.StatusCode != System.Net.HttpStatusCode.NotFound)
-                        _connectivityHelper.HandleHttpError(response.StatusCode);
 
-                    return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
-                }
+                return CreateLyricsModel("", "", "");
             }
             else
             {
                 ConnectivityHelper.PublishNoConnectionMsg();
-                return CreateLyricsModel("", "", "", GetFileName(title, artist), true, false);
+                return CreateLyricsModel("", "", "");
             }
         }
 
+        public string GetPotentialUrl(string title, string artistName)
+        {
+            return _lyricsHelper.GetUrl(title, artistName);
+        }
 
-        private MusicPlay.Database.Models.Lyrics CreateLyricsModel(string lyrics, string url, string website, string fileName = "", bool isFromUser = false, bool isTimed = false)
+        public async Task<string> GetLyricsWithUrl(string url)
+        {
+            HttpResponseMessage response = await _connectivityHelper.GetAsync(url);
+            string lyrics = _lyricsHelper.ReadWebPage(await response.Content.ReadAsStringAsync());
+
+            if (response.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(lyrics))
+            {
+                CurrentURL = url;
+                return lyrics;
+            }
+            else
+            {
+                // if the resource was not found don't trigger a msg notification
+                if (response.StatusCode != System.Net.HttpStatusCode.NotFound)
+                    _connectivityHelper.HandleHttpError(response.StatusCode);
+
+                return "";
+            }
+        }
+
+        private MusicPlay.Database.Models.Lyrics CreateLyricsModel(string lyrics, string url, string website)
         {
             MusicPlay.Database.Models.Lyrics lyricsModel = new()
             {
                 LyricsText = lyrics,
                 Url = url,
-                WebSiteSource = website
+                WebsiteSource = website
             };
             return lyricsModel;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -109,7 +110,7 @@ namespace DynamicScrollViewer
             DependencyProperty.Register("AnimatedHeader", typeof(FrameworkElement), typeof(DynamicScrollViewer), new PropertyMetadata(null));
 
         public static readonly DependencyProperty OnScrollCommandProperty =
-            DependencyProperty.Register("OnScrollCommand", typeof(ICommand), typeof(DynamicScrollViewer), new PropertyMetadata(null));
+            DependencyProperty.Register("OnScrollCommand", typeof(ICommand), typeof(DynamicScrollViewer), new PropertyMetadata(null, OnScrollCommandPropertyChanged));
 
         public static readonly DependencyProperty CanMouseWheelProperty = DependencyProperty.Register(
             nameof(CanMouseWheel), typeof(bool), typeof(ScrollViewer), new PropertyMetadata(true));
@@ -157,6 +158,15 @@ namespace DynamicScrollViewer
             if (EnableLazyLoading)
             {
                 UpdateIsInViewPort();
+            }
+        }
+
+        private static void OnScrollCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is DynamicScrollViewer ctl && !ctl.IsInit && e.NewValue is ICommand)
+            {
+                // trigger the OnScrollCommand once before any scroll to poetentially let the receiver get a reference to this DynamicScrollviewer instance
+                ctl.OnScrollCommand?.Execute(new OnScrollEvent(0, ctl.VerticalOffset, ctl.HorizontalOffset, ScrollViewerAttach.GetOrientation(ctl) == Orientation.Vertical, false, true, ctl));
             }
         }
 
@@ -244,7 +254,7 @@ namespace DynamicScrollViewer
             }
 
             if(delta != 0)
-                this.OnScrollCommand?.Execute(new OnScrollEvent(delta, e.VerticalOffset, e.HorizontalOffset, isVertical, isForward, this));
+                this.OnScrollCommand?.Execute(new OnScrollEvent(delta, e.VerticalOffset, e.HorizontalOffset, isVertical, isForward, _isRunning, this));
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
@@ -258,7 +268,7 @@ namespace DynamicScrollViewer
                 double verticalOffset = vertical ? Math.Min(Math.Max(0, _totalVerticalOffset - e.Delta), ScrollableHeight) : 0;
                 double horizontalOffset = vertical ? 0 : Math.Min(Math.Max(0, _totalHorizontalOffset - e.Delta), ScrollableWidth); ;
 
-                this.OnScrollCommand?.Execute(new OnScrollEvent(e.Delta, verticalOffset, horizontalOffset, vertical, e.Delta > 0, this));
+                this.OnScrollCommand?.Execute(new OnScrollEvent(e.Delta, verticalOffset, horizontalOffset, vertical, e.Delta > 0, _isRunning, this));
                 return;
             }
 
@@ -303,7 +313,7 @@ namespace DynamicScrollViewer
 
                 if(_totalVerticalOffset == 0)
                 {
-                    this.OnScrollCommand?.Execute(new OnScrollEvent(-e.Delta, _totalVerticalOffset, 0, true, e.Delta < 0, this));
+                    this.OnScrollCommand?.Execute(new OnScrollEvent(-e.Delta, _totalVerticalOffset, 0, true, e.Delta < 0, _isRunning, this));
                 }
                 else
                 {
@@ -374,15 +384,30 @@ namespace DynamicScrollViewer
             BeginAnimation(CurrentHorizontalOffsetProperty, animation, HandoffBehavior.Compose);
         }
 
-        public void ScrollToItem(object item)
+        public void ScrollToItem(object item, bool lookForItemsControl = false)
         {
             Panel? panel = Content as Panel;
+
+            if(lookForItemsControl)
+            {
+                ItemsControl? itemsControl = FindChild<ItemsControl>(this);
+                if(itemsControl != null)
+                {
+                    StackPanel? stackPanel = FindChild<StackPanel>(itemsControl);
+                    if(stackPanel != null)
+                    {
+                        panel = stackPanel;
+                    }
+                }
+            }
+
             if (panel != null)
             {
                 double totalHeightUntilItem = 0;
                 double meanItemHeight = 0;
                 int itemIndex = 0;
                 bool itemIsFrameworkElement = item is FrameworkElement;
+
                 foreach (FrameworkElement child in panel.Children)
                 {
                     if (child.ActualHeight == 0 || double.IsNaN(child.ActualHeight))
@@ -500,7 +525,7 @@ namespace DynamicScrollViewer
                     double progress = AnimatedHeader.Height / AnimatedHeader.MaxHeight;
                     AnimatedHeader.Opacity = progress;
                 }
-                this.OnScrollCommand?.Execute(new OnScrollEvent(0, VerticalOffset, HorizontalOffset, true, to < AnimatedHeader.Height, this));
+                this.OnScrollCommand?.Execute(new OnScrollEvent(0, VerticalOffset, HorizontalOffset, true, to < AnimatedHeader.Height, _isRunning, this));
             };
 
             storyboard.Begin();
@@ -537,7 +562,7 @@ namespace DynamicScrollViewer
                     double progress = AnimatedHeader.Height / AnimatedHeader.MaxHeight;
                     AnimatedHeader.Opacity = progress;
                 }
-                this.OnScrollCommand?.Execute(new OnScrollEvent(0, VerticalOffset, HorizontalOffset, true, scrollForward, this));
+                this.OnScrollCommand?.Execute(new OnScrollEvent(0, VerticalOffset, HorizontalOffset, true, scrollForward, _isRunning, this));
             }
             return animated;
         }

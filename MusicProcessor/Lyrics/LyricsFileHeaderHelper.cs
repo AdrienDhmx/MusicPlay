@@ -14,9 +14,9 @@ namespace MusicFilesProcessor.Lyrics.Helper
         /// </summary>
         /// <param name="lyrics"></param>
         /// <returns> the website, the URL, if the lyrics are from the user </returns>
-        public static (string, string, bool) GetHeader(this string lyrics)
+        public static (string, string) GetHeader(this string lyrics)
         {
-            List<string> lines = lyrics.Trim().Split("\n").ToList();
+            List<string> lines = [.. lyrics.Trim().Split("\n")];
             return GetHeader(lines);
         }
 
@@ -25,18 +25,16 @@ namespace MusicFilesProcessor.Lyrics.Helper
         /// </summary>
         /// <param name="lyrics"></param>
         /// <returns> the website, the URL, if the lyrics are from the user </returns>
-        public static (string, string, bool) GetHeader(this List<string> lyrics)
+        public static (string, string) GetHeader(this List<string> lyrics)
         {
             string website = "";
             string url = "";
-            bool IsFromUser = false;
             if (lyrics[0] == header) // Footer start
             {
-                IsFromUser = lyrics[1].Trim() == "1" ? true : false;
                 website = lyrics[2].Trim();
                 url = lyrics[3].Trim();
             }
-            return (website, url, IsFromUser);
+            return (website, url);
         }
 
         /// <summary>

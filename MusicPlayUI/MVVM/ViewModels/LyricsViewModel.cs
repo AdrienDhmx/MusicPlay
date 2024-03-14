@@ -1,6 +1,8 @@
-﻿using MessageControl;
+﻿using DynamicScrollViewer;
+using MessageControl;
 using MusicFilesProcessor.Helpers;
 using MusicFilesProcessor.Lyrics;
+using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
 using MusicPlay.Language;
 using MusicPlayUI.Core.Commands;
@@ -269,6 +271,15 @@ namespace MusicPlayUI.MVVM.ViewModels
             get => _audioService.CurrentPositionMs;
         }
 
+        private int _wasControlledScrolling = 0;
+
+        private bool _controlledScrolling = false;
+        public bool ControlledScrolling
+        {
+            get => _controlledScrolling;
+            set => SetField(ref _controlledScrolling, value);
+        }
+
         public ICommand SaveCommand { get; }
         public ICommand EnterLeaveEditModeCommand { get; }
         public ICommand EnterLeaveTimedLyricsCommand { get; }
@@ -281,6 +292,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand OpenLyricsWebPageCommand { get; }
         public ICommand ToggleAutoForegroundCommand { get; }
         public ICommand ToggleSettingsVisibilityCommand { get; }
+        public ICommand SyncScrollWithLyricsCommand { get; }
         public LyricsViewModel(IQueueService queueService, IAudioTimeService audioService, IVisualizerParameterStore visualizerParameterStore)
         {
             _queueService = queueService;
@@ -297,7 +309,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             EnterLeaveEditModeCommand = new RelayCommand(EnterLeaveEditMode);
 
-            EnterLeaveTimedLyricsCommand = new RelayCommand(() =>
+            EnterLeaveTimedLyricsCommand = new RelayCommand(async () =>
             {
                 IsTimed = !IsTimed; // Enter or leave timed lyrics
                 if (IsEditMode) // Leave edit mode
@@ -314,7 +326,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                         // we don't have the normal lyrics, try to get them
                         if(string.IsNullOrWhiteSpace(LyricsModel.LyricsText))
                         {
-                            GetLyrics();
+                            await GetLyrics();
                         }
                         
                         return;
@@ -413,6 +425,12 @@ namespace MusicPlayUI.MVVM.ViewModels
                 SettingsVisibility = !SettingsVisibility;
             });
 
+            SyncScrollWithLyricsCommand = new RelayCommand(() =>
+            {
+                _scrollViewer?.ScrollToItem(PlayingTimedLyrics, true);
+                ControlledScrolling = false;
+            });
+
             OnPlayingTrackChanged();
         }
 
@@ -427,6 +445,41 @@ namespace MusicPlayUI.MVVM.ViewModels
             _audioService.CurrentPositionChanged -= OnCurrentAudioPositionChanged;
             _queueService.PlayingTrackChanged -= OnPlayingTrackChanged;
             GC.SuppressFinalize(this);
+        }
+
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            _scrollViewer = e.Sender;
+            if(IsTimed && !IsTimedEditMode)
+            {
+                if(!e.ScrollInitiatedByAnimation)
+                {
+                    _wasControlledScrolling++;
+                    if(_wasControlledScrolling > 10)
+                    {
+                        ControlledScrolling = true;
+                    }
+                } 
+                else
+                {
+                    _wasControlledScrolling--;
+                    if(_wasControlledScrolling <= 0)
+                    {
+                        ControlledScrolling = false;
+                        _wasControlledScrolling = 0;
+                    }
+                }                
+            } 
+            else
+            {
+                ControlledScrolling = true;
+                _wasControlledScrolling = 11;
+            }
+        }
+
+        public override void Init()
+        {
+            base.Init();
         }
 
         private void EnterLeaveEditMode()
@@ -464,9 +517,25 @@ namespace MusicPlayUI.MVVM.ViewModels
                 return;
             }
 
+            RemoveEmptyLineToLyrics();
+
             LyricsModel.LyricsText = Lyrics;
-            //Lyrics.Insert(LyricsModel);
             SavedLyrics = Lyrics;
+
+            if(IsTimed)
+            {
+                if(LyricsModel.Id == 0)
+                {
+                    MusicPlay.Database.Models.Lyrics.Insert(LyricsModel, _queueService.Queue.PlayingTrack);
+                }
+
+                LyricsModel.TimedLines = TimedLyrics;
+                MusicPlay.Database.Models.Lyrics.InsertUpdateTimedLyrics(LyricsModel);
+            }
+            else
+            {
+                MusicPlay.Database.Models.Lyrics.Update(LyricsModel);
+            }
 
             if (IsEditMode)
             {
@@ -477,29 +546,83 @@ namespace MusicPlayUI.MVVM.ViewModels
             IsEditMode = false; // Escape edit mode
         }
 
-        private async void GetLyrics(bool acceptTimedLyrics = true)
+        private async Task InitPropertiesWithLyrics(Lyrics lyrics, bool needSaving = false)
         {
-            if (_queueService.Queue.PlayingTrack is null) return;
+            if(lyrics == null)
+            {
+                LyricsModel = null;
+                IsTimed = false;
+                IsSaved = false;
+                IsURLValid = false;
+                WebsiteSource = "";
+                URL = "";
+                _lyrics = "";
+                TimedLyrics = [];
+                CanSave = false;
+                CanCopy = false;
+                OnPropertyChanged(nameof(Lyrics));
+                LyricsFound = false;
+                return;
+            }
 
-            LyricsModel = _queueService.Queue.PlayingTrack.Lyrics;
+            LyricsModel = lyrics;
 
-            IsTimed = LyricsModel.HasTimedLyrics;
-            IsSaved = LyricsModel.IsSaved;
-            OnPropertyChanged(nameof(IsSaved));
-            IsURLValid = !string.IsNullOrWhiteSpace(LyricsModel.Url);
+            IsTimed = lyrics.HasTimedLyrics;
+            IsSaved = lyrics.IsSaved || !needSaving;
+            IsURLValid = !string.IsNullOrWhiteSpace(lyrics.Url);
 
-            WebsiteSource = LyricsModel.WebSiteSource;
-            URL = LyricsModel.Url;
+            WebsiteSource = lyrics.WebsiteSource;
+            URL = lyrics.Url;
 
-            _lyrics = LyricsModel.LyricsText;
+            _lyrics = lyrics.LyricsText;
+
+            IsTimed = lyrics.HasTimedLyrics;
+            if (_lyrics.IsNullOrWhiteSpace() && IsTimed)
+            {
+                Lyrics NonTimedLyrics = await _lyricsProcessor.GetLyrics(_queueService.Queue.PlayingTrack.Title, _queueService.Queue.PlayingTrack.Album.PrimaryArtist.Name, _queueService.Queue.PlayingTrack.Path,  false);
+                _lyrics = NonTimedLyrics.LyricsText;
+
+                if(_lyrics.IsNullOrWhiteSpace() && URL.IsNotNullOrWhiteSpace())
+                {
+                    _lyrics = await _lyricsProcessor.GetLyricsWithUrl(URL);
+                }
+            }
+
             SavedLyrics = Lyrics;
-            TimedLyrics = new(LyricsModel.TimedLines);
+            TimedLyrics = new(lyrics.TimedLines);
             AddEmptyLineToLyrics();
             OnPropertyChanged(nameof(Lyrics));
 
             LyricsFound = IsSaved || IsURLValid;
             CanSave = LyricsFound;
             CanCopy = !string.IsNullOrWhiteSpace(Lyrics);
+
+            if(!IsSaved && _lyrics.IsNotNullOrWhiteSpace() && needSaving)
+            {
+                MusicPlay.Database.Models.Lyrics.Insert(lyrics, _queueService.Queue.PlayingTrack);
+
+                if(IsTimed)
+                {
+                    MusicPlay.Database.Models.Lyrics.InsertUpdateTimedLyrics(lyrics);
+                }
+
+                IsSaved = true;
+            }
+        }
+
+        private async Task GetLyrics(bool acceptTimedLyrics = true)
+        {
+            if (_queueService.Queue?.PlayingTrack is null) return;
+
+            await InitPropertiesWithLyrics(_queueService.Queue.PlayingTrack.Lyrics);
+
+            if(!LyricsFound)
+            {
+                Track currentTrack = _queueService.Queue.PlayingTrack;
+                Lyrics lyrics  = await _lyricsProcessor.GetLyrics(currentTrack.Title, currentTrack.Album.PrimaryArtist.Name, currentTrack.Path, acceptTimedLyrics);
+
+                await InitPropertiesWithLyrics(lyrics, true);
+            }
         }
 
         private void AddEmptyLineToLyrics()
@@ -512,13 +635,13 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 nbLineToAdd = 4;
 
-                //TimedLyrics.Insert(0, new()
-                //{
-                //    Lyrics = "",
-                //    index = 0,
-                //    LengthInMilliseconds = 0,
-                //    IsPlaying = false,
-                //});
+                TimedLyrics.Insert(0, new()
+                {
+                    Line = "",
+                    Index = 0,
+                    TimestampMs = 0,
+                    IsPlaying = false,
+                });
             }
 
             for (int i = 0; i < nbLineToAdd; i++)
@@ -526,13 +649,13 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (IsTimed)
                 {
                     int index = TimedLyrics.Count + 1;
-                    //TimedLyrics.Add(new()
-                    //{
-                    //    Lyrics = "",
-                    //    index = index,
-                    //    LengthInMilliseconds = TimedLyrics.Last().LengthInMilliseconds + index * 2000,
-                    //    IsPlaying = false,
-                    //});
+                    TimedLyrics.Add(new()
+                    {
+                        Line = "",
+                        Index = index,
+                        TimestampMs = TimedLyrics.Last().TimestampMs + index * 2000,
+                        IsPlaying = false,
+                    });
                 } 
                 else
                 {
@@ -571,12 +694,12 @@ namespace MusicPlayUI.MVVM.ViewModels
                 } 
                 else
                 {
-                    if (_lyrics.StartsWith("\n"))
+                    if (_lyrics.StartsWith('\n'))
                     {
                         _lyrics = _lyrics.Remove(0, 1);
                     }
 
-                    if (_lyrics.EndsWith("\n"))
+                    if (_lyrics.EndsWith('\n'))
                     {
                         _lyrics = _lyrics.Remove(_lyrics.Length - 1);
                     }
@@ -592,40 +715,46 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 int currentLength = CurrentPosition;
                 bool found = false;
+                TimedLyricsLine previousPlayingLine = PlayingTimedLyrics;
                 for (int i = 0; i < TimedLyrics.Count; i++)
                 {
-                    //TimedLyrics[i].IsPlaying = false;
+                    TimedLyrics[i].IsPlaying = false;
                     if (!found)
                     {
                         if (i < TimedLyrics.Count - 1 && currentLength > TimedLyrics[i].TimestampMs && 
                             currentLength < TimedLyrics[i + 1].TimestampMs)
                         {
                             PlayingTimedLyrics = TimedLyrics[i];
-                            // TimedLyrics[i].IsPlaying = true;
+                            TimedLyrics[i].IsPlaying = true;
                             found = true;
                         }
                         else if (i == 0 && CurrentPosition <= TimedLyrics[0].TimestampMs)
                         {
                             PlayingTimedLyrics = TimedLyrics[i];
-                            //TimedLyrics[i].IsPlaying = true;
+                            TimedLyrics[i].IsPlaying = true;
                             found = true;
                         }
                         else if (i == TimedLyrics.Count - 1 && CurrentPosition >= TimedLyrics[i].TimestampMs)
                         {
                             PlayingTimedLyrics = TimedLyrics[i];
-                            //TimedLyrics[i].IsPlaying = true;
+                            TimedLyrics[i].IsPlaying = true;
+                        }
+
+                        if(found && previousPlayingLine != PlayingTimedLyrics && !ControlledScrolling)
+                        {
+                            _scrollViewer?.ScrollToItem(TimedLyrics[i], true);
                         }
                     }
                 }
             }
         }
 
-        private void OnPlayingTrackChanged()
+        private async void OnPlayingTrackChanged()
         {
             if (!IsEditMode)
             {
                 IsTimedEditMode = false;
-                Task.Run(() => GetLyrics());
+                await GetLyrics();
             }
         }
     }

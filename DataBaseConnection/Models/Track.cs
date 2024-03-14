@@ -105,7 +105,16 @@ namespace MusicPlay.Database.Models
 
         public Lyrics Lyrics
         {
-            get => _lyrics ?? new();
+            get
+            {
+                if(_lyrics == null)
+                {
+                    using DatabaseContext context = new();
+                    _lyrics = context.Lyrics.Find(LyricsId);
+                    _ = _lyrics?.TimedLines;
+                }
+                return _lyrics;
+            }
             set => SetField(ref _lyrics, value);
         }
 

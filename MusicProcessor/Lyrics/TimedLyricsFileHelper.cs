@@ -21,11 +21,11 @@ namespace MusicFilesProcessor.Lyrics
         public MusicPlay.Database.Models.Lyrics GetLyrics(string filePath)
         {
             MusicPlay.Database.Models.Lyrics lyricsModel = new MusicPlay.Database.Models.Lyrics();
-            lyricsModel.IsSaved = true;
+            lyricsModel.IsSaved = false;
 
             List<string> lines = File.ReadAllLines(filePath).ToList();
-            (string website, string url, bool isFromUser) = lines.GetHeader();
-            lyricsModel.WebSiteSource = website;
+            (string website, string url) = lines.GetHeader();
+            lyricsModel.WebsiteSource = website;
             lyricsModel.Url = url;
 
             // remove the header
@@ -56,7 +56,7 @@ namespace MusicFilesProcessor.Lyrics
         {
             List<string> lines = lyrics.TimedLines.Select(l => l.Line).ToList();
             DirectoryHelper.CheckDirectory(DirectoryHelper.TimedLyricsDirectory);
-            File.WriteAllLines(filePath, lines.WriteHeader(lyrics.WebSiteSource, lyrics.Url));
+            File.WriteAllLines(filePath, lines.WriteHeader(lyrics.WebsiteSource, lyrics.Url));
         }
     }
 }

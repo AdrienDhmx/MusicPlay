@@ -20,6 +20,8 @@ namespace MusicPlay.Database.DatabaseAccess
 
         public DbSet<Lyrics> Lyrics { get; set; }
 
+        public DbSet<TimedLyricsLine> TimedLyricsLine { get; set; }
+
         public DbSet<Folder> Folders { get; set; }
 
         public DbSet<Queue> Queues { get; set; }

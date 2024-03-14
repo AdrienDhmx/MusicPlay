@@ -13,16 +13,16 @@ namespace MusicFilesProcessor.Lyrics.Helper
 
         public MusicPlay.Database.Models.Lyrics GetLyrics(string filePath)
         {
+            string lyrics = File.ReadAllText(filePath).Replace("\r", string.Empty);
+            (string website, string url) = lyrics.GetHeader();
+
             MusicPlay.Database.Models.Lyrics lyricsModel = new()
             {
-                IsSaved = true
+                IsSaved = false,
+                WebsiteSource = website,
+                Url = url,
+                LyricsText = lyrics.RemoveHeader(),
             };
-            string l = File.ReadAllText(filePath);
-            lyricsModel.LyricsText = l.Replace("\r", string.Empty);
-            (string website, string url, bool isFromUser) = lyricsModel.LyricsText.GetHeader();
-            lyricsModel.WebSiteSource = website;
-            lyricsModel.Url = url;
-            lyricsModel.LyricsText = lyricsModel.LyricsText.RemoveHeader();
             return lyricsModel;
         }
 
@@ -41,7 +41,7 @@ namespace MusicFilesProcessor.Lyrics.Helper
 
         public void SaveLyrics(string filePath, MusicPlay.Database.Models.Lyrics lyrics)
         {
-            File.WriteAllLines(filePath, lyrics.LyricsText.WriteHeader(lyrics.WebSiteSource, lyrics.Url));
+            File.WriteAllLines(filePath, lyrics.LyricsText.WriteHeader(lyrics.WebsiteSource, lyrics.Url));
         }
     }
 }
