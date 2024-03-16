@@ -12,15 +12,10 @@
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Background="{DynamicResource Background}"
-            MinWidth="200"
-            MaxWidth="350"
-            CornerRadius="4"
-            BorderThickness="1"
-            BorderBrush="{DynamicResource Outline}">
+    <Border Style="{DynamicResource PopupBorder}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" MinHeight="70"/>
+                <RowDefinition Height="82"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -31,32 +26,27 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.ColumnSpan="2"
-                        Opacity="0.5"
-                        BorderBrush="{DynamicResource Outline}"
-                        BorderThickness="0, 0, 0, 1"/>
-
                 <!-- Cover -->
                 <controls:AsyncImage  IsInViewport="True"
-                                        Height="70"
-                                        Width="70"
+                                    Height="65"
+                                    Width="65"
                                       Margin="8"
-                                            CornerRadius="35"
-                                            PlaceholderAnimationEnabled="false"
-                                            ImagePath="{Binding Artist, Converter={StaticResource MNullImageConverter}}">
+                                    CornerRadius="33"
+                                    PlaceholderAnimationEnabled="false"
+                                    ImagePath="{Binding Artist, Converter={StaticResource MNullImageConverter}}">
                     <controls:AsyncImage.Placeholder>
                         <Border Background="{DynamicResource SecondaryContainer}">
                             <TextBlock Text="{Binding Artist.Acronyme}"
-                                                       Foreground="{DynamicResource OnSecondaryContainer}"
-                                                       Style="{DynamicResource BWelcomeMessageStyle}"
-                                                   FontSize="22"/>
+                                        Foreground="{DynamicResource OnSecondaryContainer}"
+                                        Style="{DynamicResource BWelcomeMessageStyle}"
+                                        FontSize="22"/>
                         </Border>
                     </controls:AsyncImage.Placeholder>
                 </controls:AsyncImage>
 
                 <TextBlock Text="{Binding Artist.Name}"
                                Grid.Column="1"
-                               Margin="4, 0, 12, 0"
+                               Margin="8, 4"
                            VerticalAlignment="Center"
                                  Style="{DynamicResource SStyle}"
                                    MaxHeight="60"/>

@@ -14,6 +14,8 @@ namespace MusicPlayUI.MVVM.ViewModels
 {
     public class ViewModel : ObservableObject, IDisposable
     {
+        internal bool IsActive {get; set;} = true;
+
         protected DynamicScrollViewer.DynamicScrollViewer _scrollViewer;
 
         public virtual NavigationState State
@@ -65,6 +67,10 @@ namespace MusicPlayUI.MVVM.ViewModels
         /// </summary>
         public virtual void ScrollToTop()
         {
+            if (!IsActive)
+            {
+                return;
+            }
             _scrollViewer?.ScrollToVerticalOffsetWithAnimation(0, 500);
         }
 
@@ -78,6 +84,11 @@ namespace MusicPlayUI.MVVM.ViewModels
         /// <param name="e"></param>
         public virtual void OnScrollEvent(OnScrollEvent e)
         {
+            if(!IsActive)
+            {
+                return;
+            }
+
             _scrollViewer = e.Sender;
             OnPropertyChanged(nameof(CanScroll));
             // save the scroll offset
@@ -98,6 +109,10 @@ namespace MusicPlayUI.MVVM.ViewModels
         /// </summary>
         public virtual void Init()
         {
+            if (!IsActive)
+            {
+                return;
+            }
             UpdateAppBarStyle();
             if(AppBar != null)
             {

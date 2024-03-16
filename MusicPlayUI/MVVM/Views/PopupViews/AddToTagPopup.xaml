@@ -15,59 +15,51 @@
             x:Name="PopupRootBorder">
         <Border Height="auto"
                 x:Name="PopupContentBorder"
-                Effect="{DynamicResource PopupSmallDropShadow}"
-                Background="{DynamicResource Background}"
-                BorderBrush="{DynamicResource Outline}"
-                BorderThickness="1"
-                Width="200"
-                MaxHeight="364"
-                    Margin="5, 8, 8, 8"
-                CornerRadius="{DynamicResource PrimaryCornerRadius}">
+                Style="{DynamicResource SecondaryPopupBorder}">
                 <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Border Effect="{DynamicResource PageHeaderDropShadow}"
-                        Background="{DynamicResource Background}"
-                        CornerRadius="{DynamicResource PrimaryCornerRadius}"/>
-                    
-                <Border Style="{DynamicResource BottomBlackGradientBorder}"
-                        Visibility="{Binding DataContext.AllTags.Count, ElementName=TagRootPopup, Converter={StaticResource BoolToVisibilityConverter}}"
-                        Grid.Row="1"/>
-                    
-                <iconbtn:IconButton Icon="{DynamicResource CircledAddIcon}"
-                                    HorizontalAlignment="Stretch"
-                                    Height="40"
-                                    IconWidth="25"
-                                    IconHeight="25"
-                                    IconStretch="Fill"
-                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    StrokeColor="Transparent"
-                                    MouseOverBackground="{DynamicResource PrimaryHover}"
-                                    Command="{Binding DataContext.CreateTagCommand, ElementName=TagRootPopup}"
-                                    FillColor="{DynamicResource Primary}">
-                </iconbtn:IconButton>
-                <ds:DynamicScrollViewer VerticalScrollBarVisibility="Hidden"
-                                Grid.Row="1">
-                    <ItemsControl ItemsSource="{Binding DataContext.AllTags, ElementName=TagRootPopup, UpdateSourceTrigger=PropertyChanged}"
-                                  Visibility="{Binding DataContext.AllTags.Count, ElementName=TagRootPopup, Converter={StaticResource BoolToVisibilityConverter}}"
-                                FontSize="16">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <textbtn:TextButton Height="34"
-                                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                                                    Text="{Binding Name}"
-                                                    Command="{Binding DataContext.AddToTagCommand, ElementName=TagRootPopup}"
-                                                    CommandParameter="{Binding .}"
-                                                    Style="{DynamicResource PopupBtn}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
 
-                </ds:DynamicScrollViewer>
+                    <Border Effect="{DynamicResource PopupSmallDropShadow}"
+                           Background="{DynamicResource Background}"
+                            CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                           Grid.RowSpan="2"/>
+                    
+                    <iconbtn:IconButton Icon="{DynamicResource CircledAddIcon}"
+                                        HorizontalAlignment="Stretch"
+                                        Height="40"
+                                        IconWidth="25"
+                                        Cursor="Hand"
+                                        IconHeight="25"
+                                        IconStretch="Fill"
+                                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        StrokeColor="Transparent"
+                                        MouseOverBackground="{DynamicResource PrimaryHover}"
+                                        Command="{Binding DataContext.CreateTagCommand, ElementName=TagRootPopup}"
+                                        FillColor="{DynamicResource Primary}">
+                    </iconbtn:IconButton>
+                    <ds:DynamicScrollViewer VerticalScrollBarVisibility="Hidden"
+                                    Grid.Row="1">
+                        <ItemsControl ItemsSource="{Binding DataContext.AllTags, ElementName=TagRootPopup, UpdateSourceTrigger=PropertyChanged}"
+                                      Visibility="{Binding DataContext.AllTags.Count, ElementName=TagRootPopup, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    FontSize="16">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <textbtn:TextButton Height="34"
+                                                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                                        Text="{Binding Name}"
+                                                        Command="{Binding DataContext.AddToTagCommand, ElementName=TagRootPopup}"
+                                                        CommandParameter="{Binding .}"
+                                                        Style="{DynamicResource PopupBtn}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </ds:DynamicScrollViewer>
             </Grid>
         </Border>
     </Border>

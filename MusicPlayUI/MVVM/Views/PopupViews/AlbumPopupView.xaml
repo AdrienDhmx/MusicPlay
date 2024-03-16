@@ -14,42 +14,35 @@
              x:Name="RootView"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Background="{DynamicResource Background}"
-            Padding="0,5,0,0"
-            MinWidth="200"
-            MaxWidth="400"
-            CornerRadius="4"
-            BorderThickness="1"
-            ClipToBounds="false"
-            BorderBrush="{DynamicResource Outline}">
+    <Border Style="{DynamicResource PopupBorder}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" MinHeight="70"/>
+                <RowDefinition Height="80"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <!-- Album Info -->
             <StackPanel Grid.Column="1"
-                        Margin="5,0,5,5"
+                        Margin="8"
                             VerticalAlignment="Stretch"
                             HorizontalAlignment="Stretch"
                         Orientation="Horizontal">
 
                 <!-- Album Cover-->
                 <Border Grid.Row="1"
-                                CornerRadius="5"
+                                CornerRadius="{DynamicResource PrimaryCornerRadius}"
                       VerticalAlignment="Stretch"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
                     <Border.Background>
                         <ImageBrush ImageSource="{Binding Album.AlbumCover, Converter={StaticResource TNullImageConverter}}"
-                                            Stretch="UniformToFill"/>
+                                    Stretch="UniformToFill"/>
                     </Border.Background>
                 </Border>
 
                 <StackPanel Orientation="Vertical"
                             VerticalAlignment="Top"
                             MaxWidth="210"
-                            Margin="10,4">
+                            Margin="8, 4">
                     <TextBlock Text="{Binding Album.Name}"
                                Style="{DynamicResource SStyle}"
                                MaxHeight="50"

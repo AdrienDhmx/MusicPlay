@@ -126,6 +126,7 @@ namespace MusicPlay.Database.Models
                 {
                     using DatabaseContext context = new();
                     _album = context.Albums.Find(AlbumId);
+                    _album ??= new();
                 }
                 return _album;
             }

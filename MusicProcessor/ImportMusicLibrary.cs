@@ -415,9 +415,9 @@ namespace MusicFilesProcessor
 
                 // STEP 3: Handle Track related metadata
                 //  - Create the new kvp model
-                //      -> Try to find an artwork specific for this kvp in the folder
-                //      -> Try to get the lyrics embedded in the kvp
-                //  - Add the kvp to the lists and update the CurrentAlbum Length
+                //      -> Try to find an artwork specific for this file in the folder
+                //      -> Try to get the lyrics embedded in the file
+                //  - Add the track to the lists and update the CurrentAlbum Length
 
                 Track currentTrack = CreateTrackModel(fileMetadata);
                 currentTrack.Artwork = ImageHelper.GetTrackCoverFromDirectory(DirectoryHelper.GetDirectory(CurrentFile), currentTrack.Title, CurrentAlbum.Name);
@@ -434,6 +434,7 @@ namespace MusicFilesProcessor
                         {
                             LyricsText = lyrics,
                             Url = url,
+                            WebsiteSource = LyricsProcessor.Instance.CurrentWebSite,
                         };
                         MusicPlay.Database.Models.Lyrics.Insert(lyricsModel);
                         currentTrack.Lyrics = lyricsModel;

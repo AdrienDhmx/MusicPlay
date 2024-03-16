@@ -7,32 +7,32 @@
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:popup="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
+             xmlns:cardcontrol="clr-namespace:CustomCardControl;assembly=CustomCardControl" 
              d:DataContext="{d:DesignInstance Type=viewmodels:TrackPopupViewModel}"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              mc:Ignorable="d"
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Background="{DynamicResource Background}"
-            Padding="0,5,0,0"
-            MinWidth="200"
-            MaxWidth="400"
-            CornerRadius="{DynamicResource PrimaryCornerRadius}">
+    
+    <Border Style="{DynamicResource PopupBorder}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" MinHeight="70"/>
+                <RowDefinition Height="90"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <!-- Track Info Card -->
             <Grid Grid.Column="1"
-                  Margin="5,0,5,5">
+                  Margin="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Border CornerRadius="5"
+                
+                <Border CornerRadius="{DynamicResource PrimaryCornerRadius}"
                         Visibility="{Binding AreCoversEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                         VerticalAlignment="Stretch"
+                        Margin="2"
                         Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
                     <Border.Background>
                         <ImageBrush ImageSource="{Binding SelectedTrack, Converter={StaticResource ONullImageConverter}}"
@@ -43,18 +43,17 @@
 
                 <StackPanel Orientation="Vertical"
                             Grid.Column="1"
-                            VerticalAlignment="Top"
+                            VerticalAlignment="Center"
                             MaxWidth="210"
-                            Margin="10,4">
+                            Margin="8, 0">
                     <TextBlock Text="{Binding SelectedTrack.Title}"
                                Style="{DynamicResource SStyle}"
+                               FontSize="18"
                                MaxHeight="50"
-                               MaxWidth="400"/>
+                               MaxWidth="400" />
 
-                    <listview:TrackArtistsListView Artists="{Binding SelectedTrack.TrackArtistRole}"
-                                                   FontSize="14"
-                                                   Foreground="{DynamicResource OnBackground}"
-                                                   Command="{Binding NavigateToArtistCommand}"/>
+                    <TextBlock Text="{Binding SelectedTrack.Album.PrimaryArtist.Name}"
+                               Style="{DynamicResource NLSmallSecondaryStyle}"/>
 
                 </StackPanel>
             </Grid>
@@ -79,7 +78,7 @@
                                     Grid.Row="1"
                                    Style="{DynamicResource PopupBtn}"
                                     Command="{Binding AddToQueueCommand}"/>
-
+                
                 <textbtn:TextButton Text="{x:Static lang:Resources.Add_To_Playlist}"
                                     Grid.Row="2"
                                     x:Name="AddToPlaylistBorder"
@@ -101,7 +100,6 @@
 
                 <textbtn:TextButton Text="Start radio"
                                     Grid.Row="5"
-                                    CornerRadius="0,0,4,4"
                                    Style="{DynamicResource PopupBtn}"
                                     Command="{Binding StartRadioCommand}"/>
 

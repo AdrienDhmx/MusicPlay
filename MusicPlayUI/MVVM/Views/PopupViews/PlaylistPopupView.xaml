@@ -12,13 +12,7 @@
              mc:Ignorable="d" 
              x:Name="RootPopup"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Background="{DynamicResource Background}"
-                        Padding="0,5,0,0"
-            MinWidth="200"
-            MaxWidth="350"
-            CornerRadius="4"
-            BorderThickness="1"
-            BorderBrush="{DynamicResource Outline}">
+    <Border Style="{DynamicResource PopupBorder}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" MinHeight="60"/>

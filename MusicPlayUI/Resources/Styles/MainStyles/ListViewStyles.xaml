@@ -78,13 +78,6 @@
                             <Setter Property="Background" TargetName="Border"  Value="{DynamicResource PrimaryHover}"/>
                             <Setter Property="BorderThickness" TargetName="Border"  Value="1"/>
                         </Trigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Value="False" Binding="{Binding IsSelected, RelativeSource={RelativeSource self}}"/>
-                                <Condition Binding="{Binding IsMouseOver, ElementName=Border}" Value="True"/>
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource PrimaryHover}"/>
-                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

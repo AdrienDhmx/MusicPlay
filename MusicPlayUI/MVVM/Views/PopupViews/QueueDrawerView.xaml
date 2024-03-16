@@ -87,7 +87,7 @@
                           dd:DragDrop.DropTargetScrollViewer="{Binding ElementName=QueueTracks, Converter={StaticResource FindScrollViewerConverter}}"
                           dd:DragDrop.DropTargetAdornerBrush="{DynamicResource Primary}"
                           HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding QueueTracks, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding QueueService.Queue.Tracks, UpdateSourceTrigger=PropertyChanged}"
                         SelectedItem="{Binding QueueService.Queue.PlayingQueueTrack, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                           ItemContainerStyle="{DynamicResource QueuePopupListViewItem}"
                         SelectionMode="Single">
@@ -132,7 +132,7 @@
                     </dd:DragDrop.EffectMoveAdornerTemplate>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border x:Name="RootItemBorder"
+                            <asyncImage:IsInViewportBorder x:Name="RootItemBorder"
                                     Padding="2"
                                     Background="Transparent">
                                 <Border.InputBindings>
@@ -144,6 +144,7 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto"/>
                                         <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="auto"/>
                                     </Grid.ColumnDefinitions>   
 
                                     <customButton:IconButton Style="{DynamicResource QueueQuickPlayButton}"
@@ -189,11 +190,18 @@
                                                                     CommandParameter="{Binding Track.Album.PrimaryArtist.Name}"/>
                                             </TextBlock.InputBindings>
                                         </TextBlock>
-                                    </StackPanel>   
+                                    </StackPanel>
 
-
-                                </Grid>
-                            </Border>
+                                <customButton:IconButton Style="{DynamicResource OpacityIconButton}"
+                                                         Icon="{DynamicResource Delete}"
+                                                         IconHeight="14"
+                                                         IconWidth="14"
+                                                         FillColor="{DynamicResource Error}"
+                                                         Command="{Binding DataContext.RemoveTrackCommand, ElementName=RootQueuePopupView}"
+                                                         CommandParameter="{Binding Track}"
+                                                         Grid.Column="2"/>
+                            </Grid>
+                            </asyncImage:IsInViewportBorder>
                             <DataTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True" SourceName="RootItemBorder">
                                     <Setter Property="Opacity" Value="0.6" TargetName="CoverBorder"/>

@@ -39,7 +39,7 @@
                     Color="#101010"
                     BlurRadius="12"
                     ShadowDepth="2"
-                    Opacity="0.8"
+                    Opacity="0.6"
                     Direction="-80"/>
 
     <DropShadowEffect x:Key="MouseOverDropShadow" 
@@ -718,6 +718,21 @@
         <Setter Property="Margin" Value="10, 5, 10, 0"/>
         <Setter Property="Padding" Value="10, 0"/>
         <Setter Property="ClipToBounds" Value="false"/>
+    </Style>
+
+    <Style x:Key="PopupBorder" TargetType="Border">
+        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="MaxWidth" Value="450"/>
+        <Setter Property="Background" Value="{DynamicResource Background}"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
+    </Style>
+
+    <Style x:Key="SecondaryPopupBorder" TargetType="Border"
+           BasedOn="{StaticResource PopupBorder}">
+        <Setter Property="MaxHeight" Value="350"/>
+        <Setter Property="MinWidth" Value="250"/>
+        <Setter Property="Width" Value="250"/>
+        <Setter Property="Margin" Value="5, 8, 8, 8"/>
     </Style>
 
     <Style x:Key="BorderImage" TargetType="Border">

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -142,13 +143,28 @@ namespace DynamicScrollViewer
         public static readonly DependencyProperty StartingVerticalOffsetProperty =
             DependencyProperty.Register("StartingVerticalOffset", typeof(double), typeof(DynamicScrollViewer), new PropertyMetadata(0d, OnStartingVerticalOffsetChanged));
 
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+
+            if(FindParent<ItemsControl>(this) is ItemsControl itemsControl)
+            { 
+                ((INotifyCollectionChanged)itemsControl.Items).CollectionChanged += DynamicScrollViewer_CollectionChanged;
+            }
+        }
+
+        private void DynamicScrollViewer_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (ItemToKeepInView is not null)
+            {
+                _needToScrollToItem = true;
+            }
+        }
+
         protected override void OnContentChanged(object oldContent, object newContent)
         {
             base.OnContentChanged(oldContent, newContent);
-
-            Panel? panel = Content as Panel;
-            if (panel == null)
-                return;
 
             if(_needToScrollToItem)
             {
@@ -158,6 +174,27 @@ namespace DynamicScrollViewer
             if (EnableLazyLoading)
             {
                 UpdateIsInViewPort();
+
+                if(oldContent is Panel oldPanel)
+                {
+                    oldPanel.LayoutUpdated -= Panel_LayoutUpdated;
+                }
+                if (newContent is Panel panel)
+                {
+                    panel.LayoutUpdated += Panel_LayoutUpdated;
+                }
+            }
+        }
+
+        private void Panel_LayoutUpdated(object? sender, EventArgs e)
+        {
+            if(_needToScrollToItem)
+            {
+                _needToScrollToItem = false;
+                if(!ScrollToItem(ItemToKeepInView) && EnableLazyLoading)
+                {
+                    UpdateIsInViewPort();
+                }
             }
         }
 
@@ -384,7 +421,7 @@ namespace DynamicScrollViewer
             BeginAnimation(CurrentHorizontalOffsetProperty, animation, HandoffBehavior.Compose);
         }
 
-        public void ScrollToItem(object item, bool lookForItemsControl = false)
+        public bool ScrollToItem(object item, bool lookForItemsControl = false)
         {
             Panel? panel = Content as Panel;
 
@@ -423,9 +460,15 @@ namespace DynamicScrollViewer
                             spaceBeforeItem = ViewportHeight * 0.25;
                         }
 
+                        double offset = itemIndex * meanItemHeight - spaceBeforeItem;
+                        if(offset <= 0 && VerticalOffset <= meanItemHeight * 3)
+                        {
+                            return false;
+                        }
+
                         _needToScrollToItem = false;
-                        ScrollToVerticalOffsetWithAnimation(itemIndex * meanItemHeight - spaceBeforeItem, 400);
-                        return;
+                        ScrollToVerticalOffsetWithAnimation(offset, 400);
+                        return true;
                     }
                     totalHeightUntilItem += child.ActualHeight;
                     itemIndex++;
@@ -433,6 +476,7 @@ namespace DynamicScrollViewer
                 }
                 _needToScrollToItem = true;
             }
+            return false;
         }
 
         public void UpdateIsInViewPort()
@@ -623,6 +667,20 @@ namespace DynamicScrollViewer
             }
 
             return null;
+        }
+
+        public static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+
+            if (parentObject == null)
+                return null;
+
+            T parent = parentObject as T;
+            if (parent != null)
+                return parent;
+            else
+                return FindParent<T>(parentObject);
         }
     }
 }

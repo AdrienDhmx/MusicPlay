@@ -12,31 +12,23 @@
              x:Name="AddToPlaylistUC"
              d:DesignHeight="450" d:DesignWidth="800">
     <Border Background="#01ffffff"
-        IsHitTestVisible="True"
+            IsHitTestVisible="True"
             x:Name="PopupRootBorder">
         <Border Height="auto"
                 x:Name="PopupContentBorder"
-                Effect="{DynamicResource PopupSmallDropShadow}"
-                Background="{DynamicResource Background}"
-                BorderBrush="{DynamicResource Outline}"
-                BorderThickness="1"
-                Width="200"
-                MaxHeight="350"
-                Margin="5, 8, 8, 8"
-                CornerRadius="{DynamicResource PrimaryCornerRadius}">
+                Style="{DynamicResource SecondaryPopupBorder}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Border Effect="{DynamicResource PageHeaderDropShadow}"
+                <Border Effect="{DynamicResource PopupSmallDropShadow}"
                         Background="{DynamicResource Background}"
                         CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                         Visibility="{Binding Playlists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <Border Grid.Row="1"
-                        Style="{DynamicResource BottomBlackGradientBorder}"
-                        Visibility="{Binding ShowDropShadow, ElementName=AddToPlaylistUC}"/>
+                        Grid.RowSpan="2"/>
+
                 <iconbtn:IconButton Icon="{DynamicResource CircledAddIcon}"
+                                    Cursor="Hand"
                                     HorizontalAlignment="Stretch"
                                     Height="40"
                                     IconWidth="25"

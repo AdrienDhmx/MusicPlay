@@ -35,6 +35,12 @@ namespace MusicPlayUI.Core.Services
                 // load without starting the playback
                 _audioPlayback.Load(Queue.PlayingTrack.Path);
             }
+
+            if(Queue.IsShuffled)
+            {
+                Task.Run(() => Queue.Tracks = Queue.Tracks.Shuffle(Queue.PlayingQueueTrack));
+                OnQueueChanged();
+            }
         }
 
         private Queue _queue;
@@ -67,6 +73,11 @@ namespace MusicPlayUI.Core.Services
         public event Action QueueChanged;
         private void OnQueueChanged()
         {
+            OnPropertyChanged(nameof(QueueDuration));
+            OnPropertyChanged(nameof(QueueLength));
+            OnPropertyChanged(nameof(QueueCover));
+            OnPropertyChanged(nameof(PlayingFrom));
+            OnPropertyChanged(nameof(PlayingFromName));
             QueueChanged?.Invoke();
         }
 
@@ -133,17 +144,37 @@ namespace MusicPlayUI.Core.Services
             //DataAccess.Connection.DeleteOne(Queue);
         }
 
+        private void ShuffleTracks()
+        {
+            List<QueueTrack> tracks = new(Queue.Tracks.ToList());
+            Queue.Tracks = [];
+            if(Queue.PlayingQueueTrack is not null)
+            {
+                Queue.Tracks.Add(Queue.PlayingQueueTrack);
+            }
+            foreach (QueueTrack queueTrack in tracks.YieldShuffle())
+            {
+                if(queueTrack.Track.Id != Queue.PlayingQueueTrack?.Track.Id)
+                {
+                    Queue.Tracks.Add(queueTrack);
+                }
+            }
+        }
+
         public async Task Shuffle()
         {
             Queue.IsShuffled = !Queue.IsShuffled;
-            if (Queue.IsShuffled)
+            await Task.Run(() =>
             {
-                Queue.Tracks = await Task.Run(() => Queue.Tracks.Shuffle(new QueueTrack() { Track = Queue.PlayingTrack }));
-            }
-            else
-            {
-                Queue.Tracks = Queue.Tracks.Order();
-            }
+                if (Queue.IsShuffled)
+                {
+                    ShuffleTracks();
+                }
+                else
+                {
+                    Queue.Tracks = Queue.Tracks.Order();
+                }
+            });
             OnQueueChanged();
         }
 

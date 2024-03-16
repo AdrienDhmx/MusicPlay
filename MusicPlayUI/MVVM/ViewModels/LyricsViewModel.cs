@@ -711,6 +711,10 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void OnCurrentAudioPositionChanged()
         {
+            if (!IsActive)
+            {
+                return;
+            }
             if (IsTimed && !IsTimedEditMode)
             {
                 int currentLength = CurrentPosition;
@@ -751,6 +755,11 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private async void OnPlayingTrackChanged()
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
             if (!IsEditMode)
             {
                 IsTimedEditMode = false;

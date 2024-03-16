@@ -96,7 +96,7 @@
                           Grid.Row="1"
                           HorizontalAlignment="Stretch"
                       Style="{DynamicResource QueueListView}"
-                        ItemsSource="{Binding QueueTracks, Mode=OneWay}"
+                        ItemsSource="{Binding QueueService.Queue.Tracks, Mode=OneWay}"
                         SelectedItem="{Binding QueueService.Queue.PlayingQueueTrack, Mode=OneWay}"
                         SelectionMode="Single"
                         Background="Transparent"
@@ -138,7 +138,7 @@
                 </dd:DragDrop.EffectMoveAdornerTemplate>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border x:Name="RootItemBorder"
+                        <asyncImage:IsInViewportBorder x:Name="RootItemBorder"
                                                    Height="60"
                                                     Background="Transparent">
                             <Border.InputBindings>
@@ -163,7 +163,7 @@
                                                             VerticalAlignment="Center"
                                                             HorizontalAlignment="Center"
                                                             Visibility="{Binding IsMouseOver, ElementName=RootItemBorder, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                            x:Name="PlayBtn"/>
+                                                            x:Name="PlayBtn" />
 
                                 <!-- Cover -->
                                 <asyncImage:AsyncImage CornerRadius="4"
@@ -176,7 +176,7 @@
                                         <Border ClipToBounds="True">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="{DynamicResource WhiteForeground}"/>
+                                                    <Setter Property="Background" Value="{DynamicResource WhiteTransparent}"/>
                                                 </Style>
                                             </Border.Style>
                                         </Border>
@@ -185,9 +185,9 @@
 
                                 <!-- Title & Album -->
                                 <StackPanel HorizontalAlignment="Stretch"
-                                                VerticalAlignment="Center"
-                                                Margin="10,0"
-                                                Grid.Column="1">
+                                            VerticalAlignment="Center"
+                                            Margin="10,0"
+                                            Grid.Column="1">
 
                                     <TextBlock Text="{Binding Track.Title}"
                                                    FontSize="18"
@@ -209,12 +209,12 @@
                                 </StackPanel>
 
                                 <!-- Performer -->
-                                <ListView:TrackArtistsListView Artists="{Binding Track.TrackArtistRole}"
+                                <ListView:TrackArtistsListView Track="{Binding Track}"
                                                                Grid.Column="2"
                                                                Foreground="{StaticResource WhiteForeground}"
                                                                FontSize="16"
                                                                Margin="6,0"
-                                                                   Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootView}"/>
+                                                               Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootView}"/>
 
 
                                 <!-- Track Duration -->
@@ -247,16 +247,15 @@
                                             <Setter Property="Opacity" Value="0.6"/>
                                             <Style.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="FillColor" Value="{DynamicResource WhiteForeground}"/>
+                                                    <Setter Property="FillColor" Value="{DynamicResource WhiteTransparent}"/>
                                                     <Setter Property="Opacity" Value="1"/>
                                                 </Trigger>
                                             </Style.Triggers>
                                         </Style>
                                     </customButton:IconButton.Style>
                                 </customButton:IconButton>
-
                             </Grid>
-                        </Border>
+                        </asyncImage:IsInViewportBorder>
                         <DataTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True" SourceName="RootItemBorder">
                                 <Setter Property="Opacity" Value="0.5" TargetName="CoverBorder"/>

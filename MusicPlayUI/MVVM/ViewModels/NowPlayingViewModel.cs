@@ -16,6 +16,7 @@ using MessageControl;
 
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Models;
+using System.Threading.Tasks;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -40,6 +41,11 @@ namespace MusicPlayUI.MVVM.ViewModels
             get => _visualizerParameterService;
             set { SetField(ref _visualizerParameterService, value); }
         }
+
+        // cache the subview
+        private NavigationModel LyricsNavigationModel { get; set; } = null;
+        private NavigationModel QueueNavigationModel { get; set; } = null;
+        private NavigationModel TrackInfoNavigationModel { get; set; } = null;
 
         private PlayerControlViewModel _playerViewModel;
         public PlayerControlViewModel PlayerViewModel
@@ -334,26 +340,30 @@ namespace MusicPlayUI.MVVM.ViewModels
 
             if (!IsSubViewOpen)
             {
-                if(State.ChildViewModel != null)
+
+                Task.Run(() =>
                 {
-                    Type childViewType = State.ChildViewModel.ViewModel.GetType();
-                    if (childViewType == typeof(QueueViewModel))
+                    if (State.ChildViewModel != null)
                     {
-                        OpenCloseSubView(ViewNameEnum.Queue);
+                        Type childViewType = State.ChildViewModel.ViewModel.GetType();
+                        if (childViewType == typeof(QueueViewModel))
+                        {
+                            OpenCloseSubView(ViewNameEnum.Queue);
+                        }
+                        else if (childViewType == typeof(LyricsViewModel))
+                        {
+                            OpenCloseSubView(ViewNameEnum.Lyrics);
+                        }
+                        else if (childViewType == typeof(TrackInfoViewModel))
+                        {
+                            OpenCloseSubView(ViewNameEnum.TrackInfo);
+                        }
                     }
-                    else if (childViewType == typeof(LyricsViewModel))
+                    else
                     {
-                        OpenCloseSubView(ViewNameEnum.Lyrics);
+                        InitSubView();
                     }
-                    else if (childViewType == typeof(TrackInfoViewModel))
-                    {
-                        OpenCloseSubView(ViewNameEnum.TrackInfo);
-                    }
-                }
-                else
-                {
-                    InitSubView();
-                }
+                });
             }
         }
 
@@ -376,7 +386,8 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (IsQueueOpen)
                 {
                     selectedView = ViewNameEnum.Queue;
-                    navigationModel = App.State.CreateNavigationModel<QueueViewModel>();
+                    QueueNavigationModel ??= App.State.CreateNavigationModel<QueueViewModel>();
+                    navigationModel = QueueNavigationModel;
                 }
             }
             else if (view == ViewNameEnum.Lyrics) // lyrics
@@ -388,7 +399,8 @@ namespace MusicPlayUI.MVVM.ViewModels
                 if (IsLyricsOpen)
                 {
                     selectedView = ViewNameEnum.Lyrics;
-                    navigationModel = App.State.CreateNavigationModel<LyricsViewModel>();
+                    LyricsNavigationModel ??= App.State.CreateNavigationModel<LyricsViewModel>();
+                    navigationModel = LyricsNavigationModel;
                 }
             }
             else if (view == ViewNameEnum.TrackInfo) // track info
@@ -399,8 +411,9 @@ namespace MusicPlayUI.MVVM.ViewModels
 
                 if (IsTrackInfoOpen)
                 {
-                    selectedView = ViewNameEnum.TrackInfo;
-                    navigationModel = App.State.CreateNavigationModel<TrackInfoViewModel>();
+                    selectedView = ViewNameEnum.TrackInfo; 
+                    TrackInfoNavigationModel ??= App.State.CreateNavigationModel<TrackInfoViewModel>();
+                    navigationModel = TrackInfoNavigationModel;
                 }
             }
 
@@ -415,6 +428,19 @@ namespace MusicPlayUI.MVVM.ViewModels
                 IsSubViewOpen = true;
                 State.ChildViewModel = navigationModel;
                 ConfigurationService.SetPreference(SettingsEnum.NowPlayingStartingSubView, ((int)view).ToString());
+            }
+
+            if (LyricsNavigationModel is not null)
+            {
+                LyricsNavigationModel.ViewModel.IsActive = IsLyricsOpen;
+            }
+            if (QueueNavigationModel is not null)
+            {
+                QueueNavigationModel.ViewModel.IsActive = IsQueueOpen;
+            }
+            if (TrackInfoNavigationModel is not null)
+            {
+                TrackInfoNavigationModel.ViewModel.IsActive = IsTrackInfoOpen;
             }
 
             SetWidthValue();

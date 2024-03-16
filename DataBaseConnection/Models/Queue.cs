@@ -19,7 +19,7 @@ namespace MusicPlay.Database.Models
         private ModelTypeEnum _playingFromModelType = ModelTypeEnum.UNKNOWN;
         private int _playingFromId = -1;
         private PlayableModel _playingFrom;
-        private ObservableCollection<QueueTrack> _tracks = [];
+        private ObservableCollection<QueueTrack> _tracks = null;
         private Track _playingTrack;
 
         public bool IsShuffled
@@ -140,8 +140,17 @@ namespace MusicPlay.Database.Models
                 if(_playingQueueTrack == null && Tracks.IsNullOrEmpty())
                 {
                     return new(new Track(), 0);
+                } 
+
+                if(PlayingTrack is not null && PlayingTrack.Id != 0)
+                {
+                    _playingQueueTrack ??= Tracks.First(t => t.Track.Id == PlayingTrack.Id);
                 }
-                _playingQueueTrack ??= Tracks.First(t => t.Track.Id == PlayingTrack.Id);
+                else
+                {
+                    return new(new Track(), 0);
+                }
+
                 return _playingQueueTrack;
             }
             set
@@ -158,7 +167,7 @@ namespace MusicPlay.Database.Models
         {
             get
             {
-                if(_tracks.IsNullOrEmpty())
+                if(_tracks is null)
                 {
                     using DatabaseContext context = new();
                     _tracks = [..context.QueueTracks.Where(qt => qt.QueueId == Id)
