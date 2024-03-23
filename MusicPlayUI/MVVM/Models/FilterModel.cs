@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Policy;
 using System.Windows.Documents;
 using MessageControl;
 using MusicPlay.Database.Models;
@@ -25,6 +26,13 @@ namespace MusicPlayUI.MVVM.Models
                 DispatchFilters();
             }
         }
+
+        public LibraryFilters(IEnumerable<FilterModel> filters)
+        {
+            Filters = new(filters);
+        }
+
+        public LibraryFilters() { }
 
         [JsonIgnore]
         public ObservableCollection<FilterModel> TagFilters { get; private set; } = [];
@@ -100,7 +108,7 @@ namespace MusicPlayUI.MVVM.Models
             }
         }
 
-        private void DispatchFilters()
+        public void DispatchFilters()
         {
             TagFilters = [];
             ArtistRoleFilters = [];
@@ -135,7 +143,6 @@ namespace MusicPlayUI.MVVM.Models
         /// <summary>
         /// The name of the filter to display on the Chip
         /// </summary>
-        [JsonIgnore]
         public string Name
         {
             get => _name;
@@ -190,6 +197,8 @@ namespace MusicPlayUI.MVVM.Models
             Id = id;
             Type = type;
         }
+
+        public FilterModel() { }
 
         public virtual bool CompareTo(int value) 
         {

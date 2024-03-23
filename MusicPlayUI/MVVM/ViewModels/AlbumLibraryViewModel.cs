@@ -188,7 +188,11 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void InitFilters()
         {
-            AppliedFilters ??= SearchHelper.GetSelectedFilters();
+            if (AppliedFilters is null || AppliedFilters.Filters.IsNullOrEmpty())
+            {
+                AppliedFilters = SearchHelper.GetSelectedFilters();
+                AppliedFilters.DispatchFilters();
+            }
 
             Filters.Filters = new(FilterFactory.GetGenreFilter());
             Filters.AddFilters(FilterFactory.GetPrimaryArtistFilter());

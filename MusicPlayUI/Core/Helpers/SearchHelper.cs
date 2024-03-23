@@ -28,7 +28,7 @@ namespace MusicPlayUI.Core.Helpers
         {            
             SettingsEnum settingsEnum = album ? SettingsEnum.AlbumFilter : SettingsEnum.ArtistFilter;
             string json = ConfigurationService.GetStringPreference(settingsEnum);
-            if (json.IsNotNullOrWhiteSpace() || json == "NONE")
+            if (json.IsNullOrWhiteSpace() || json == "NONE")
             {
                 return new();
             }

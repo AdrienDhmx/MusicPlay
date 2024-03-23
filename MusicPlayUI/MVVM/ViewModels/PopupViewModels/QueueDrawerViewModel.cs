@@ -9,6 +9,7 @@ using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Helpers;
+using MusicPlayUI.Controls;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
@@ -35,10 +36,11 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             _commandsManager = commandsManager;
 
             ConfigurationService.QueueCoversChange += () => OnPropertyChanged(nameof(AreCoversEnabled));
+            _queueService.QueueChanged += QueueService_QueueChanged;
 
             ClearQueueCommand = new RelayCommand(_queueService.ClearQueue);
-            RemoveTrackCommand = new RelayCommand<Track>((track) => _queueService.RemoveTrack(track));
-            PlayTrackCommand = new RelayCommand<Track>((track) => _queueService.PlayTrack(track));
+            RemoveTrackCommand = new RelayCommand<Track>(_queueService.RemoveTrack);
+            PlayTrackCommand = new RelayCommand<Track>(_queueService.PlayTrack);
             OpenTrackPopupCommand = _commandsManager.OpenTrackPopupCommand;
             SaveQueueAsPlaylistCommand = new RelayCommand(() =>_modalService.OpenModal(ViewNameEnum.CreatePlaylist, OnCreatePlaylistClosed));
             NavigateToPlayingFromCommand = new RelayCommand(async () => await _queueService.NavigateToPlayingFrom());
@@ -49,9 +51,15 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             base.Init();
         }
 
+        private void QueueService_QueueChanged()
+        {
+            AsyncImage.ImageCache.Clear();
+        }
+
         public override void Dispose()
         {
             ConfigurationService.QueueCoversChange -= () => OnPropertyChanged(nameof(AreCoversEnabled));
+            _queueService.QueueChanged -= QueueService_QueueChanged;
         }
 
         private void OnCreatePlaylistClosed(bool isCanceled)

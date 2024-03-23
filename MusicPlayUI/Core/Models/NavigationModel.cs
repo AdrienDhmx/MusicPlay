@@ -31,6 +31,11 @@ namespace MusicPlayUI.Core.Models
             State = state;
         }
 
+        public NavigationStateSave SaveNavigation()
+        {
+            return new(State, ViewModel.GetType());
+        }
+
         public void UpdateState()
         {
             OnPropertyChanged(nameof(State));
@@ -75,6 +80,23 @@ namespace MusicPlayUI.Core.Models
             Parameter = parameters;
             ChildViewModel = childViewModel;
         }
+
+        public virtual NavigationStateSave SaveState(Type viewModelType)
+        {
+            return new(this, viewModelType);
+        }
+    }
+
+    /// <summary>
+    /// NavigationStateSave is only used to save a ViewModel with its state without holding a reference to the ViewModel. <br></br>
+    /// It can then be used to easily navigate back to the saved state of the ViewModel by creating a new instance of it's type.
+    /// </summary>
+    /// <param name="navigationState"></param>
+    /// <param name="viewModelType"></param>
+    public class NavigationStateSave(NavigationState navigationState, Type viewModelType)
+    {
+        public NavigationState NavigationState { get; init; } = navigationState;
+        public Type ViewModelType { get; init; } = viewModelType;
     }
 
     public class LibraryNavigationState : NavigationState

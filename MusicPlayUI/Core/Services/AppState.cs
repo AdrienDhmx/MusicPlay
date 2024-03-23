@@ -134,8 +134,8 @@ namespace MusicPlayUI.Core.Services
         }
 
         private bool _savePreviousViewModel = true;
-        private readonly List<NavigationModel> _backNavigationHistory = [];
-        private readonly List<NavigationModel> _forwardNavigationHistory = [];
+        private readonly List<NavigationStateSave> _backNavigationHistory = [];
+        private readonly List<NavigationStateSave> _forwardNavigationHistory = [];
 
         public NavigationModel CreateNavigationModel<TViewModel>(NavigationState state = null) where TViewModel : ViewModel
         {
@@ -167,7 +167,7 @@ namespace MusicPlayUI.Core.Services
 
             if (_savePreviousViewModel && CurrentView is not null && _backNavigationHistory.Count < _maxHistoryCount)
             {
-                _backNavigationHistory.Add(CurrentView);
+                _backNavigationHistory.Add(CurrentView.SaveNavigation());
             }
 
             _forwardNavigationHistory.Clear();
@@ -215,11 +215,11 @@ namespace MusicPlayUI.Core.Services
             if (!CanNavigateBack)
                 return;
 
-            _forwardNavigationHistory.Add(CurrentView);
-            NavigationModel previousNavModel = _backNavigationHistory.Last();
-            _backNavigationHistory.Remove(previousNavModel);
+            _forwardNavigationHistory.Add(CurrentView.SaveNavigation());
+            NavigationStateSave previousNav = _backNavigationHistory.Last();
+            _backNavigationHistory.Remove(previousNav);
 
-            CurrentView = CreateNavigationModel(previousNavModel.ViewModel.GetType(), previousNavModel.State);
+            CurrentView = CreateNavigationModel(previousNav.ViewModelType, previousNav.NavigationState);
         }
 
         public void NavigateForward()
@@ -227,11 +227,11 @@ namespace MusicPlayUI.Core.Services
             if (!CanNavigateForward)
                 return;
 
-            _backNavigationHistory.Add(CurrentView);
-            NavigationModel previousForwardedNavModel = _forwardNavigationHistory.Last();
-            _forwardNavigationHistory.Remove(previousForwardedNavModel);
+            _backNavigationHistory.Add(CurrentView.SaveNavigation());
+            NavigationStateSave previousForwardedNav = _forwardNavigationHistory.Last();
+            _forwardNavigationHistory.Remove(previousForwardedNav);
 
-            CurrentView = CreateNavigationModel(previousForwardedNavModel.ViewModel.GetType(), previousForwardedNavModel.State);
+            CurrentView = CreateNavigationModel(previousForwardedNav.ViewModelType, previousForwardedNav.NavigationState);
         }
 
         public bool UpdateCurrentViewIfIs(List<Type> viewModels)

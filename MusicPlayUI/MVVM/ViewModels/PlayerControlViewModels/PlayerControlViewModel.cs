@@ -239,6 +239,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             ConfigurationService.ColorfulPlayerControlChange += OnColorfulPlayerChanged;
             ConfigurationService.ColorfulUIChange += OnColorfulUIChanged;
             AppTheme.ThemeChanged += UpdateBlurredCover;
+            AppTheme.ThemeChanged += StyleNeedUpdate;
 
             Volume = ConfigurationService.GetPreference(SettingsEnum.Volume);
             OnDeviceChanged();
@@ -314,6 +315,12 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
             NavigateToPlayingFromCommand = new RelayCommand(async () => await _queueService.NavigateToPlayingFrom());
 
             UpdateBlurredCover();
+        }
+
+        private void StyleNeedUpdate()
+        {
+            OnPropertyChanged(nameof(AccentColor));
+            OnPropertyChanged(nameof(AccentHoverColor));
         }
 
         private void UpdateRadialGradient()

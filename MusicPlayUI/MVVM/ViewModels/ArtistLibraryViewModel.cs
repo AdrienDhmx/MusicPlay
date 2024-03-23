@@ -1,6 +1,7 @@
 ﻿using AudioHandler;
 using DynamicScrollViewer;
 using MusicPlay.Database.Enums;
+using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
@@ -136,7 +137,11 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void InitFilters()
         {
-            AppliedFilters ??= SearchHelper.GetSelectedFilters(false);
+            if (AppliedFilters.IsNull() || AppliedFilters.Filters.IsNullOrEmpty())
+            {
+                AppliedFilters = SearchHelper.GetSelectedFilters(false);
+                AppliedFilters.DispatchFilters();
+            }
 
             Filters.Filters = new(FilterFactory.GetGenreFilter());
             Filters.AddFilters(FilterFactory.GetArtistRoleFilter());

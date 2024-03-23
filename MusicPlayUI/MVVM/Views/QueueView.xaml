@@ -100,7 +100,6 @@
                         SelectedItem="{Binding QueueService.Queue.PlayingQueueTrack, Mode=OneWay}"
                         SelectionMode="Single"
                         Background="Transparent"
-                      Loaded="QueueTracks_Loaded"
                           dd:DragDrop.IsDragSource="True"
                          dd:DragDrop.IsDropTarget="True"
                          dd:DragDrop.DropHandler="{Binding QueueService}"
@@ -140,6 +139,8 @@
                     <DataTemplate>
                         <asyncImage:IsInViewportBorder x:Name="RootItemBorder"
                                                    Height="60"
+                                                       PlaceholderHeight="60"
+                                                       BackgroundPlaceholder="{DynamicResource ScdWhiteTransparent}"
                                                     Background="Transparent">
                             <Border.InputBindings>
                                 <MouseBinding Gesture="RightClick"
@@ -171,6 +172,7 @@
                                                        Height="60"
                                                        IsInViewport="False"
                                                        ImagePath="{Binding Track, Converter={StaticResource TNullImageConverter}}"
+                                                       CacheImage="True"
                                                        x:Name="CoverBorder">
                                     <asyncImage:AsyncImage.Placeholder>
                                         <Border ClipToBounds="True">

@@ -42,15 +42,15 @@ namespace MusicPlayUI.MVVM.Views
             }
         }
 
-        private void QueueTracks_Loaded(object sender, RoutedEventArgs e)
-        {
-            DynamicScrollViewer.DynamicScrollViewer QueueScroll = QueueTracks.GetVisualDescendent<DynamicScrollViewer.DynamicScrollViewer>();
+        //private void QueueTracks_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    DynamicScrollViewer.DynamicScrollViewer QueueScroll = QueueTracks.GetVisualDescendent<DynamicScrollViewer.DynamicScrollViewer>();
 
-            if(QueueScroll is not null)
-            {
-                QueueScroll.ScrollToItem(QueueTracks.SelectedItem);
-                QueueScroll.UpdateIsInViewPort();
-            } 
-        }
+        //    if(QueueScroll is not null)
+        //    {
+        //        QueueScroll.ScrollToItem(QueueTracks.SelectedItem);
+        //        QueueScroll.UpdateIsInViewPort();
+        //    } 
+        //}
     }
 }

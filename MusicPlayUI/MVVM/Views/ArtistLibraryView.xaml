@@ -91,7 +91,7 @@
                                                  Grid.Column="3"
                                                  HorizontalAlignment="Right"
                                                 Style="{DynamicResource SearchBarStyle}"
-                                                Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
+                                                Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 </custom:PlaceholderTextBox>
             </Grid>
 

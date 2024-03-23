@@ -511,7 +511,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 IsFullScreen = AppState.IsFullScreen;
                 SetCovers();
-                SetWidthValue();
             }
         }
 

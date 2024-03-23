@@ -151,6 +151,21 @@ namespace DynamicScrollViewer
             if(FindParent<ItemsControl>(this) is ItemsControl itemsControl)
             { 
                 ((INotifyCollectionChanged)itemsControl.Items).CollectionChanged += DynamicScrollViewer_CollectionChanged;
+                Unloaded += DynamicScrollViewer_Unloaded;
+            }
+        }
+
+        private void DynamicScrollViewer_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (FindParent<ItemsControl>(this) is ItemsControl itemsControl)
+            {
+                ((INotifyCollectionChanged)itemsControl.Items).CollectionChanged -= DynamicScrollViewer_CollectionChanged;
+                Unloaded -= DynamicScrollViewer_Unloaded;
+            }
+
+            if(EnableLazyLoading && Content is Panel panel)
+            {
+                panel.LayoutUpdated -= Panel_LayoutUpdated;
             }
         }
 
@@ -461,7 +476,7 @@ namespace DynamicScrollViewer
                         }
 
                         double offset = itemIndex * meanItemHeight - spaceBeforeItem;
-                        if(offset <= 0 && VerticalOffset <= meanItemHeight * 3)
+                        if(offset <= 0 && VerticalOffset <= meanItemHeight * 2)
                         {
                             return false;
                         }

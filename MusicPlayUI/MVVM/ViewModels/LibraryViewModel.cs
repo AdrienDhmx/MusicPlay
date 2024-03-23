@@ -321,6 +321,7 @@ namespace MusicPlayUI.MVVM.ViewModels
         public override void Init()
         {
             _searchText = LibraryState.SearchText;
+            OnPropertyChanged(nameof(SearchText));
 
             AppliedFilters = LibraryState.AppliedFilters;
             InitFilters();
@@ -342,8 +343,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 SortBy = SortOptions.First(s => s.IsSelected);
             }
-
-            SearchText = LibraryState.SearchText;
         }
 
         public override void UpdateAppBarStyle()

@@ -2,13 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:popupviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PopupViewModels"
              xmlns:customButton="clr-namespace:IconButton;assembly=IconButton" 
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:model="clr-namespace:MusicPlay.Database.Models.DataBaseModels;assembly=MusicPlay.Database"
-             xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls" xmlns:ListView="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" xmlns:asyncImage="clr-namespace:MusicPlayUI.Controls"
+             xmlns:ListView="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" 
+             xmlns:asyncImage="clr-namespace:MusicPlayUI.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=popupviewmodels:QueueDrawerViewModel}"
              x:Name="RootQueuePopupView"
@@ -133,8 +133,11 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <asyncImage:IsInViewportBorder x:Name="RootItemBorder"
-                                    Padding="2"
-                                    Background="Transparent">
+                                                            Padding="2"
+                                                           BackgroundPlaceholder="{DynamicResource PrimaryHover}"
+                                                           Height="64"
+                                                           PlaceholderHeight="64"
+                                                            Background="Transparent">
                                 <Border.InputBindings>
                                     <MouseBinding Gesture="RightClick"
                                                   Command="{Binding DataContext.OpenTrackPopupCommand, ElementName=RootQueuePopupView}"
@@ -159,6 +162,7 @@
                                     <asyncImage:AsyncImage CornerRadius="{DynamicResource PrimaryCornerRadius}"
                                                                Width="60"
                                                                Height="60"
+                                                           CacheImage="True"
                                                                IsInViewport="False"
                                                                ImagePath="{Binding Track, Converter={StaticResource TNullImageConverter}}"
                                                                x:Name="CoverBorder">
