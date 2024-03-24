@@ -428,6 +428,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             AppBar.SetData(Artist.Name, "");
 
             Genres = [..Artist.ArtistTags.Select(at => at.Tag)];
+            Biography = Artist.Biography;
             List<Track> tracks = new();
 
             {
@@ -457,7 +458,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             SinglesAndEPHeader = $"Singles & EP: {SinglesAndEP.Count}";
             FeaturedInHeader = $"Featured in {FeaturedInAlbum.Count} {(FeaturedInAlbum.Count == 1 ? Resources.Album : Resources.Albums_View)}";
 
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 {
                     IOrderedEnumerable<Track> tempTracks = Artist.Tracks.OrderBy(t => t.AlbumId);
@@ -494,11 +495,17 @@ namespace MusicPlayUI.MVVM.ViewModels
                 ComposerOfHeader = $"Composer of {ComposedTracks.Count} {(ComposedTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
                 PerformedInHeader = $"Performed in {PerformedInTracks.Count} {(PerformedInTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
                 LyricistOfHeader = $"Lyricist of {LyricistOfTracks.Count} {(LyricistOfTracks.Count == 1 ? Resources.Track : Resources.Tracks)}";
-
-                // Fetch and update if needed with data from external sources (last.fm...)
-                await Artist.UpdateWithExternalData(await Artist.GetExternalData());
-                Biography = Artist.Biography;
             });
+
+            // Fetch and update if needed with data from external sources (last.fm...)
+            if(Biography.IsNullOrWhiteSpace())
+            {
+                _ = Task.Run(async () => {
+                    Root data = await Artist.GetExternalData();
+                    Biography = data.Artist.Bio.Content;
+                    OnPropertyChanged(nameof(Artist));
+                });
+            }
         }
     }
 }

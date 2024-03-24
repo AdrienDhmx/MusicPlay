@@ -134,6 +134,7 @@
                         <ColumnDefinition MinWidth="250" Width="0.2*"/>
                     </Grid.ColumnDefinitions>
                     <templates:TextPreviewTemplate Text="{Binding Biography}"
+                                                   PreviewFirstParagraph="True"
                                                        Visibility="{Binding Biography, Converter={StaticResource EmptyTextToVisibilityConverter}}"
                                                         Margin="25, 15">
                         <templates:TextPreviewTemplate.Width>

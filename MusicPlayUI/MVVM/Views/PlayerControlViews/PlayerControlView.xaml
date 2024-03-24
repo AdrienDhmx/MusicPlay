@@ -18,7 +18,7 @@
     <Border Height="100"
             CornerRadius="0,0,10,10"
             BorderThickness="0,1,0,0"
-            BorderBrush="{DynamicResource SurfaceVariant}"
+            BorderBrush="{Binding AccentHoverColor}"
             Background="{DynamicResource Background}">
 
         <Grid>

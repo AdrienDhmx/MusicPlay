@@ -119,7 +119,9 @@
                         <Setter Property="IsOpen" Value="False"/>
                         <Setter Property="Child">
                             <Setter.Value>
-                                <popup:AddToPlaylistPopup DataContext="{Binding DataContext, ElementName=RootView}"/>
+                                <popup:AddToPlaylistPopup AddToPlaylistCommand="{Binding DataContext.AddToPlaylistCommand, ElementName=RootView}"
+                                                            CreatePlaylistCommand="{Binding DataContext.CreatePlaylistCommand, ElementName=RootView}"
+                                                            Playlists="{Binding DataContext.Playlists, ElementName=RootView}"/>
                             </Setter.Value>
                         </Setter>
                         <Style.Triggers>

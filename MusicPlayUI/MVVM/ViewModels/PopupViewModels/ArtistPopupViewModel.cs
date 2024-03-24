@@ -11,6 +11,8 @@ using MusicPlayUI.Core.Helpers;
 using System.Collections.ObjectModel;
 using MusicPlay.Database.Models;
 using MusicPlay.Database.Enums;
+using MusicFilesProcessor.Helpers;
+using MusicPlayUI.Core.Factories;
 
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
@@ -31,14 +33,14 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private ObservableCollection<Playlist> _userPlaylists;
-        public ObservableCollection<Playlist> UserPlaylists
+        private ObservableCollection<Playlist> _playlists;
+        public ObservableCollection<Playlist> Playlists
         {
-            get => _userPlaylists;
+            get => _playlists;
             set
             {
-                _userPlaylists = value;
-                OnPropertyChanged(nameof(UserPlaylists));
+                _playlists = value;
+                OnPropertyChanged(nameof(Playlists));
             }
         }
 
@@ -70,21 +72,17 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             });
         }
 
-        private async void PlayNext(bool end = false)
+        private void PlayNext(bool end = false)
         {
-            _queueService.AddTracks(await ArtistServices.GetArtistTracks(Artist.Id), end, false, Artist.Name);
+            _queueService.AddTracks(Artist.GetAllArtistTracks(), end, false, Artist.Name);
             ClosePopup();
         }
 
         private async void AddToPlaylist(Playlist playlist)
         {
-            _playlistService.AddToPlaylist(await ArtistServices.GetArtistTracks(Artist.Id), playlist);
-            UserPlaylists.Remove(playlist);
-
-            if (App.State.CurrentView.State.Parameter is Playlist playlistModel  && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
-            {
-                App.State.CurrentView.ViewModel.Update();
-            }
+            int tracksAdded = await Playlist.AddTracks(playlist, Artist.GetAllArtistTracks());
+            MessageFactory.TracksAddedToPlaylist(playlist.Name, tracksAdded).PublishWithAppDispatcher();
+            Playlists.Remove(playlist);
         }
 
         private async void OnCreatePlaylistClosed(bool isCanceled)
@@ -115,11 +113,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             App.State.UpdateCurrentViewIfIs([typeof(ArtistLibraryViewModel), typeof(ArtistViewModel)]);
         }
 
-        private async Task GetUserPlaylists()
-        {
-            UserPlaylists = new(await Playlist.GetAll());
-        }
-
         public override void Init()
         {
             LoadData();
@@ -130,7 +123,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             Artist = (Artist)State.Parameter;
             //Artist.TrackTag = await DataAccess.Connection.GetArtistTag(Artist.Id);
 
-            await GetUserPlaylists();
+            Playlists = new(await Playlist.GetAll());
             GetTags(Artist.ArtistTags.Select(g => g.TagId));
         }
     }

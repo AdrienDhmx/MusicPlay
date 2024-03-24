@@ -375,7 +375,7 @@
                                                     Visibility="{Binding DataContext.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, ElementName=RootView}"
                                                     Height="50">
                                                 <Border.Background>
-                                                    <ImageBrush ImageSource="{Binding Track, Converter={StaticResource ONullImageConverter}}"
+                                                    <ImageBrush ImageSource="{Binding Track, Converter={StaticResource TNullImageConverter}}"
                                                                 Stretch="UniformToFill"/>
                                                 </Border.Background>
                                             </Border>

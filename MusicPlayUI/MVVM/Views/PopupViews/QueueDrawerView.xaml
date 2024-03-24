@@ -191,7 +191,7 @@
                                             <TextBlock.InputBindings>
                                                 <MouseBinding Gesture="LeftClick"
                                                                     Command="{Binding DataContext.NavigateToArtistCommand, ElementName=RootQueuePopupView}"
-                                                                    CommandParameter="{Binding Track.Album.PrimaryArtist.Name}"/>
+                                                                    CommandParameter="{Binding Track.Album.PrimaryArtistId}"/>
                                             </TextBlock.InputBindings>
                                         </TextBlock>
                                     </StackPanel>

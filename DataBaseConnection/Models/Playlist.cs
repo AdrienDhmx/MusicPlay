@@ -213,8 +213,18 @@ namespace MusicPlay.Database.Models
                 ];
         }
 
+        private static bool CanAddTrackToPlaylist(Playlist playlist, Track track)
+        {
+            return !playlist.Tracks.Any(t => t.Id == track.Id);
+        }
+
         public static void AddTrack(Playlist playlist, Track track)
         {
+            if (!CanAddTrackToPlaylist(playlist, track))
+            {
+                return;
+            }
+
             using DatabaseContext context = new();
             PlaylistTrack playlistTrack = new PlaylistTrack(playlist.Id, track.Id, playlist.PlaylistTracks.Count + 1);
             context.PlaylistTracks.Add(playlistTrack);
@@ -225,6 +235,11 @@ namespace MusicPlay.Database.Models
 
         public static async Task InsertTrack(Playlist playlist, Track track, int index)
         {
+            if(!CanAddTrackToPlaylist(playlist, track))
+            {
+                return;
+            }
+
             using DatabaseContext context = new();
             PlaylistTrack playlistTrack = new PlaylistTrack(playlist.Id, track.Id, index + 1);
             context.PlaylistTracks.Add(playlistTrack);
@@ -236,14 +251,20 @@ namespace MusicPlay.Database.Models
             playlistTrack.Track = track;
         }
 
-        public static async Task AddTracks(Playlist playlist, List<Track> tracks)
+        public static async Task<int> AddTracks(Playlist playlist, List<Track> tracks)
         {
+            // make sure only new tracks are added
+            tracks.RemoveAll(t => playlist.Tracks.Any(pt => pt.Id == t.Id));
+
             using DatabaseContext context = new();
-            foreach (var track in tracks)
+            for (int i = 0; i < tracks.Count; ++i)
             {
-                playlist.PlaylistTracks.Add(new PlaylistTrack(playlist.Id, track.Id, playlist.PlaylistTracks.Count));
+                Track track = tracks[i];
+                PlaylistTrack playlistTrack = new(playlist.Id, track.Id, playlist.PlaylistTracks.Count + i + 1);
+                context.PlaylistTracks.Add(playlistTrack);
             }
             await context.SaveChangesAsync();
+            return tracks.Count;
         }
 
         public static async Task MoveTrack(Playlist playlist, int oldIndex, int newIndex) 
@@ -302,7 +323,9 @@ namespace MusicPlay.Database.Models
         public static async Task Delete(Playlist playlist)
         {
             using DatabaseContext context = new();
-            context.Playlists.Remove(playlist);
+            context.PlaylistTracks.Where(pt => pt.PlaylistId == playlist.Id).ExecuteDelete();
+            context.PlaylistTags.Where(pt => pt.PlaylistId == playlist.Id).ExecuteDelete();
+            context.Playlists.Where(p => p.Id == playlist.Id).ExecuteDelete();
             await context.SaveChangesAsync();
         }
     }

@@ -27,13 +27,11 @@ namespace MusicPlayUI.Core.Services
 
         private static void AddtoPlaylistWihtoutMsg(List<Track> tracks, Playlist playlist)
         {
-            List<OrderedTrack> playlistTracks = new(); //playlist.Tracks;
+            List<OrderedTrack> playlistTracks = [..playlist.PlaylistTracks];
 
             tracks.AddRange(playlistTracks.Select(pt => pt.Track));
             tracks = tracks.DistinctBy(t => t.Id).ToList();
             tracks = tracks.Where(at => !playlistTracks.Select(t => t.Track.Id).Contains(at.Id)).ToList();
-
-            //await DataAccess.Connection.AddTrackToPlaylist(playlist, tracks);
         }
 
         public void AddToPlaylist(List<PlaylistTrack> tracks, Playlist playlist)
@@ -78,12 +76,20 @@ namespace MusicPlayUI.Core.Services
             {
                 var playlists = await Playlist.GetAll();
 
-                playlists = playlists.ToList().OrderBy(t => t.CreationDate).ToList();
+                playlists = [.. playlists.ToList().OrderBy(t => t.CreationDate)];
                 Playlist createdPlaylist = playlists.LastOrDefault();
 
                 if (createdPlaylist is not null)
                 {
-                    AddToPlaylist(tracks, createdPlaylist);
+                    int tracksAdded = await Playlist.AddTracks(createdPlaylist, tracks);
+                    void GoToPlaylist(bool confirm)
+                    {
+                        if(confirm)
+                        {
+                            App.State.NavigateTo<PlaylistViewModel>(createdPlaylist);
+                        }
+                    }
+                    MessageFactory.PlaylistCreatedWithAction(createdPlaylist.Name, GoToPlaylist, "Go to playlist");
                 }
 
                 UpdateView(false);

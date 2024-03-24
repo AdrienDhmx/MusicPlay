@@ -210,7 +210,7 @@
                                     </TextBlock>
                                 </StackPanel>
 
-                                <!-- Performer -->
+                                <!-- Artists -->
                                 <ListView:TrackArtistsListView Track="{Binding Track}"
                                                                Grid.Column="2"
                                                                Foreground="{StaticResource WhiteForeground}"

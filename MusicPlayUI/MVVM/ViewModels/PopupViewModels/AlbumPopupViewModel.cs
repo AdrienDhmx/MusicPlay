@@ -10,6 +10,7 @@ using MusicPlayUI.Core.Helpers;
 using System.Collections.ObjectModel;
 using MusicPlay.Database.Models;
 using MusicPlay.Database.Enums;
+using MusicPlayUI.Core.Factories;
 
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
@@ -30,14 +31,14 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private ObservableCollection<Playlist> _userPlaylists;
-        public ObservableCollection<Playlist> UserPlaylists
+        private ObservableCollection<Playlist> _playlists;
+        public ObservableCollection<Playlist> Playlists
         {
-            get => _userPlaylists;
+            get => _playlists;
             set
             {
-                _userPlaylists = value;
-                OnPropertyChanged(nameof(UserPlaylists));
+                _playlists = value;
+                OnPropertyChanged(nameof(Playlists));
             }
         }
 
@@ -75,14 +76,9 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private async Task AddToPlaylist(Playlist playlist)
         {
-            await Playlist.AddTracks(playlist, [.. Album.Tracks]);
-
-            UserPlaylists.Remove(playlist);
-
-            if (App.State.CurrentView.State.Parameter is Playlist playlistModel && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
-            {
-                App.State.CurrentView.ViewModel.Update(); // will load the new tracks
-            }
+            int tracksAdded = await Playlist.AddTracks(playlist, [.. Album.Tracks]);
+            MessageFactory.TracksAddedToPlaylist(playlist.Name, tracksAdded).PublishWithAppDispatcher();
+            Playlists.Remove(playlist);
         }
 
         private void CreatePlaylist()
@@ -119,7 +115,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private async Task GetUserPlaylists()
         {
-            UserPlaylists = new(await Playlist.GetAll());
+            Playlists = new(await Playlist.GetAll());
         }
 
         public override void Init()

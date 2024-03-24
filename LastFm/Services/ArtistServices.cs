@@ -37,12 +37,15 @@ namespace LastFmNamespace.Services
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public async Task<Root?> DeserializeArtistInfoJson(string json)
+        public async Task<Root?> DeserializeArtistInfoJson(string json, bool fetchImages = true)
         {
             Root? data = JsonConvert.DeserializeObject<Root>(json);
             if (data != null && data.Artist != null)
             {
-                data.Artist.Images = await GetArtistImages(data.Artist.Url);
+                if(fetchImages)
+                {
+                    data.Artist.Images = await GetArtistImages(data.Artist.Url);
+                }
                 data.Method = artistInfoMethod;
             }
             return data;

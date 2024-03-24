@@ -17,7 +17,7 @@
                 ClipToBounds="True"
                 Margin="0, 0, 0, 2"
                 VerticalAlignment="Top">
-            <markdownviewercontrol:MarkdownViewer Name="MarkdownViewer"
+            <markdownviewercontrol:MarkdownViewer Name="markdownViewer"
                                                   LinkColor="{DynamicResource Primary}"
                                                   Foreground="{DynamicResource OnSurfaceVariant}"
                                                   Header1Foreground="{DynamicResource OnBackground}"

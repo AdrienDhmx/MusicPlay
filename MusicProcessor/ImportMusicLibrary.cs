@@ -13,9 +13,6 @@ using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Enums;
 using MusicFilesProcessor.Lyrics;
 using MusicPlay.Database.DatabaseAccess;
-using System.Drawing;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System.DirectoryServices.ActiveDirectory;
 
 namespace MusicFilesProcessor
 {

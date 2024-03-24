@@ -229,12 +229,14 @@ namespace MusicPlay.Database.DatabaseAccess
             modelBuilder.Entity<Playlist>()
                 .HasMany(p => p.PlaylistTracks)
                 .WithOne(pt => pt.Playlist)
-                .HasForeignKey(pt => pt.PlaylistId);
+                .HasForeignKey(pt => pt.PlaylistId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Playlist>()
                 .HasMany(t => t.PlaylistTags)
                 .WithOne(pt => pt.Playlist)
-                .HasForeignKey(tar => tar.PlaylistId);
+                .HasForeignKey(tar => tar.PlaylistId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Tracks
             modelBuilder.Entity<PlaylistTrack>()
@@ -248,7 +250,8 @@ namespace MusicPlay.Database.DatabaseAccess
             modelBuilder.Entity<PlaylistTrack>()
                 .HasOne(pt => pt.Playlist)
                 .WithMany(p => p.PlaylistTracks)
-                .HasForeignKey(pt => pt.PlaylistId);
+                .HasForeignKey(pt => pt.PlaylistId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void OnLyricsCreated(ModelBuilder modelBuilder)

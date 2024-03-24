@@ -6,7 +6,6 @@ using LastFmNamespace.Models;
 using MusicFilesProcessor.Helpers;
 using MusicPlay.Database.Helpers;
 using MusicPlay.Database.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MusicFilesProcessor
 {
@@ -25,14 +24,22 @@ namespace MusicFilesProcessor
             if (playableModel.HasAlreadyFetchedData())
             {
                 string[] files = playableModel.GetLastFmFiles();
-                string mostRecentSave = files.OrderDescending().ElementAt(0);
-                string json = File.ReadAllText(mostRecentSave);
+                Dictionary<string, string> fileNames = [];
+                foreach (string filePath in files)
+                {
+                    if (File.Exists(filePath))
+                    {
+                        fileNames.Add(filePath, Path.GetFileName(filePath));
+                    }
+                }
+                KeyValuePair<string, string> mostRecentSave = fileNames.OrderDescending().First();
+                string json = File.ReadAllText(mostRecentSave.Key);
 
-                string fileType = mostRecentSave.Split('_')[1];
+                string fileType = mostRecentSave.Value.Split('_')[1].Split(".")[0];
 
                 return fileType switch
                 {
-                    artistInfo => await LastFm.Instance.Artist.DeserializeArtistInfoJson(json),
+                    artistInfo => await LastFm.Instance.Artist.DeserializeArtistInfoJson(json, false),
                     _ => null,
                 };
             }
@@ -44,13 +51,14 @@ namespace MusicFilesProcessor
             return null;
         }
 
-        public static async Task UpdateWithExternalData(this Artist artist, Root data)
+        public static async Task<string> UpdateWithExternalData(this Artist artist, Root data)
         {
             if (data.IsNull())
-                return;
+                return null;
 
             if(data.Method == artistInfo)
             {
+                string appliedCover = null;
                 await ImageHelper.SaveAllCovers(data.Artist.Images, artist, async (cover) =>
                 {
                     // this callback is called once to update the cover of the model
@@ -58,11 +66,12 @@ namespace MusicFilesProcessor
                     await Artist.Update((artist) =>
                     {
                         artist.Biography = data.Artist.Bio.Content;
-                        artist.Cover = cover;
-
+                        artist.Cover = appliedCover = cover;
                     }, artist);
                 });
+                return appliedCover;
             }
+            return null;
         }
 
         private static async Task<Root> GetArtistExtData(Artist artist)
@@ -86,6 +95,7 @@ namespace MusicFilesProcessor
 
             // save to file
             await SaveLastFmJson(artist, jsonData, artistInfo);
+            await UpdateWithExternalData(artist, data);
             return data;
         }
 

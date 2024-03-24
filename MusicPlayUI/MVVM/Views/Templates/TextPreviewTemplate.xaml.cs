@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using MarkdownViewerControl;
 using MusicPlay.Database.Helpers;
 
 namespace MusicPlayUI.MVVM.Views.Templates
@@ -25,15 +23,32 @@ namespace MusicPlayUI.MVVM.Views.Templates
 
             Loaded += OnLoaded;
             SizeChanged += OnLoaded;
+            Unloaded += TextPreviewTemplate_Unloaded;
+        }
+
+        private void TextPreviewTemplate_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= OnLoaded;
+            SizeChanged -= OnLoaded;
+            Unloaded -= TextPreviewTemplate_Unloaded;
         }
 
         protected override void OnChildDesiredSizeChanged(UIElement child)
         {
             base.OnChildDesiredSizeChanged(child);
-            MarkdownViewer.MeasureDesiredSize(new Size(this.ActualWidth, double.PositiveInfinity));
-            _markdownDesiredSize = MarkdownViewer.DesiredSize;
+            markdownViewer.MeasureDesiredSize(new Size(this.ActualWidth, double.PositiveInfinity));
+            _markdownDesiredSize = markdownViewer.DesiredSize;
             
             Init();
+        }
+
+        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(d is TextPreviewTemplate textPreview && e.NewValue is string newText)
+            {
+                textPreview._parsed = false;
+                textPreview.Init();
+            }
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -66,8 +81,17 @@ namespace MusicPlayUI.MVVM.Views.Templates
             set { SetValue(CanExtendProperty, value); }
         }
 
+        public bool PreviewFirstParagraph
+        {
+            get { return (bool)GetValue(PreviewFirstParagraphProperty); }
+            set { SetValue(PreviewFirstParagraphProperty, value); }
+        }
+
+        public static readonly DependencyProperty PreviewFirstParagraphProperty =
+            DependencyProperty.Register("PreviewFirstParagraph", typeof(bool), typeof(TextPreviewTemplate), new PropertyMetadata(false));
+
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(string), typeof(TextPreviewTemplate), new PropertyMetadata(""));
+            DependencyProperty.Register("Text", typeof(string), typeof(TextPreviewTemplate), new PropertyMetadata("", OnTextChanged));
 
         public static readonly DependencyProperty PreviewHeightProperty =
             DependencyProperty.Register("PreviewHeight", typeof(double), typeof(TextPreviewTemplate), new PropertyMetadata(94d));
@@ -79,16 +103,16 @@ namespace MusicPlayUI.MVVM.Views.Templates
             DependencyProperty.Register("CanExtend", typeof(bool), typeof(TextPreviewTemplate), new PropertyMetadata(true));
 
 
-        private async void Init(int retry = 2)
+        private void Init()
         {
             if (Text.IsNotNullOrWhiteSpace() && !_parsed)
             {
-                MarkdownViewer.ParseMarkdown(Text);
+                markdownViewer.ParseMarkdown(Text);
                 _parsed = true;
             }
 
-            MarkdownViewer.MeasureDesiredSize(new Size(this.ActualWidth, double.PositiveInfinity));
-            _markdownDesiredSize = MarkdownViewer.DesiredSize;
+            markdownViewer.MeasureDesiredSize(new Size(this.ActualWidth, double.PositiveInfinity));
+            _markdownDesiredSize = markdownViewer.DesiredSize;
             CanExtend = _markdownDesiredSize.Height > PreviewHeight + 0.6 * PreviewHeight; // add a margin so that the extend option is not just for a single line
             if (!CanExtend) // text is too short to be extended
             {
@@ -100,6 +124,16 @@ namespace MusicPlayUI.MVVM.Views.Templates
             }
             else
             {
+                if(PreviewFirstParagraph && Text.Split("\n").Length > 1)
+                {
+                    string firstParagraph = Text.Split("\n")[0];
+                    Size firstParagraphSize = MeasureText(firstParagraph);
+                    if(firstParagraphSize.Height < PreviewHeight + 0.6 * PreviewHeight)
+                    {
+                        PreviewHeight = firstParagraphSize.Height;
+                    }
+                }
+
                 TextContainer.Height = PreviewHeight;
                 CacheBorder.Height = PreviewHeight;
 
@@ -110,23 +144,17 @@ namespace MusicPlayUI.MVVM.Views.Templates
                 ExtendButton.PreviewMouseLeftButtonUp -= OnCacheBorderClick;
                 ExtendButton.PreviewMouseLeftButtonUp += OnCacheBorderClick;
             }
-
-            if(retry > 0 && !_parsed)
-            {
-                await Task.Delay(1000);
-                Init(--retry);
-            }
         }
 
-        private Size MeasureText()
+        private Size MeasureText(string text)
         {
-            TextBlock textBlock = new TextBlock
+            TextBlock textBlock = new()
             {
-                Text = this.Text,
+                Text = text,
                 TextWrapping = TextWrapping.Wrap,
                 Width = this.ActualWidth,
-                FontSize = MarkdownViewer.FontSize + 0.5, // take into account possible headers
-                FontWeight = MarkdownViewer.FontWeight,
+                FontSize = markdownViewer.FontSize + 0.5, // take into account possible headers
+                FontWeight = markdownViewer.FontWeight,
             };
 
 
