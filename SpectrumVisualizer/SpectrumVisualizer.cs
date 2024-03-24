@@ -311,7 +311,7 @@ namespace SpectrumVisualizer
 
         private void SpectrumVisualizer_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (Visibility == Visibility.Collapsed || Visibility == Visibility.Hidden)
+            if (e.NewValue as Visibility? == Visibility.Collapsed || e.NewValue as Visibility? == Visibility.Hidden)
             {
                 dispatcherTimer.Stop();
             }
@@ -463,7 +463,7 @@ namespace SpectrumVisualizer
             double baseY = _minHeight;
             if (RepresentationType == DataRepresentationTypeEnum.LinearUpwardBar)
             {
-                baseY = ActualHeight - MinHeight;
+                baseY = ActualHeight - _minHeight;
             }
 
             double amp = linearSizeMultiplier * ActualHeight;

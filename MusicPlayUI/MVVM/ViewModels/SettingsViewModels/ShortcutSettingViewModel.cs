@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using MusicPlayModels;
+using MessageControl;
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Factories;
+using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
 
 namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 {
     public class ShortcutSettingViewModel : BaseSettingViewModel
     {
-        private ObservableCollection<ShortcutModel> _shortcuts;
-        public ObservableCollection<ShortcutModel> Shortcuts
+        private ObservableCollection<ShortcutCommand> _shortcuts;
+        private readonly IModalService _modalService;
+
+        public ObservableCollection<ShortcutCommand> Shortcuts
         {
             get { return _shortcuts; }
             set
@@ -25,20 +28,42 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             }
         }
 
-        public ShortcutSettingViewModel()
+        public ICommand ResetAllShortcutsCommand { get; }
+        public ICommand ResetShortcutCommand { get; }
+        public ICommand ChangeShortcutCommand { get; }
+        public ShortcutSettingViewModel(IModalService modalService)
         {
+            _modalService = modalService;
+
+            ResetAllShortcutsCommand = new RelayCommand(() => 
+            {
+                App.ShortcutsManager.ResetToDefault();
+                Update();
+            });
+            ResetShortcutCommand = new RelayCommand<ShortcutCommand>((ShortcutCommand shortcut) => 
+            {
+                App.ShortcutsManager.ResetToDefault(shortcut);
+                Update();
+            });
+            ChangeShortcutCommand = new RelayCommand<ShortcutCommand>((ShortcutCommand shortcut) =>
+            {
+                _modalService.OpenModal(ViewNameEnum.UpdateShortcut, UpdateShortcutModalClosed, (ShortcutCommand)shortcut.Clone());
+            });
             Update();
+        }
+
+        private void UpdateShortcutModalClosed(bool canceled)
+        {
+            if(!canceled)
+            {
+                MessageHelper.PublishMessage(DefaultMessageFactory.CreateSuccessMessage("The shortcut has been updated!"));
+                Update();
+            }
         }
 
         public override void Update(BaseModel parameter = null)
         {
-            List<ShortcutModel> shortcuts = new List< ShortcutModel >();
-            foreach (KeyValuePair<CommandEnums, KeyBinding> kvp in App.ShortcutsManager.KeyBindings)
-            {
-                shortcuts.Add(new(kvp.Key, kvp.Value));
-            }
-
-            Shortcuts = new(shortcuts);
+            Shortcuts = new(App.ShortcutsManager.ShortcutCommands);
         }
     }
 }

@@ -1,16 +1,17 @@
 using System.Timers;
-using AudioHandler.Enums;
-using AudioHandler.Models;
 using ManagedBass;
-using ManagedBass.Fx;
 using MessageControl;
-using MusicPlayModels;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.AudioModels;
 using Timer = System.Timers.Timer;
 
 namespace AudioHandler
 {
     public class AudioPlayback : ObservableObject, IAudioPlayback
     {
+        public EQManager EQManager { get; set; } = new();
+
         private readonly Timer deviceTimer;
         private string _file;
         private int _savedVolume = 100;
@@ -23,13 +24,15 @@ namespace AudioHandler
             private set
             {
                 _stream = value;
+                // pass the new stream to the equalizer
+                EQManager.ApplyPreset(Stream);
                 OnStreamChanged();
             }
         }
 
         public bool AutoChangeOutputDevice { get; private set; } = false;
 
-        public DeviceModel Device { get; private set; }
+        public AudioDeviceModel Device { get; private set; }
 
 
         public int Frequency { get; private set; } = 44100;
@@ -136,132 +139,67 @@ namespace AudioHandler
 
         private void ErrorHandler()
         {
-            switch (Bass.LastError)
+            Errors bassError = Bass.LastError;
+
+            string errorMessage = bassError switch
             {
-                case Errors.Unknown:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: Unknown Audio Error."));
-                    break;
-                case Errors.FileOpen:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the audio file was already opened."));
-                    break;
-                case Errors.Driver:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: no valid driver found."));
-                    break;
-                case Errors.SampleFormat:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: unsupported file format."));
-                    break;
-                case Errors.Position:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: playback position invalid."));
-                    break;
-                case Errors.Init:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the device could not be initialized."));
-                    break;
-                case Errors.Already:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("The device is already initialized."));
-                    break;
-                case Errors.No3D:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: 3D is not supported."));
-                    break;
-                case Errors.Device:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the device is not supported/valid."));
-                    break;
-                case Errors.NoInternet:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("You are not connected to the internet."));
-                    break;
-                case Errors.FileFormat:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: unsupported file format."));
-                    break;
-                case Errors.Speaker:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: speakers are unavailable."));
-                    break;
-                case Errors.Codec:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: unsupported codec."));
-                    break;
-                case Errors.Ended:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file or channel has ended."));
-                    break;
-                case Errors.Busy:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the device is busy with another process."));
-                    break;
-                case Errors.Unstreamable:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file can't be streamed using the buffered file system."));
-                    break;
-                case Errors.WmaLicense:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is protected and can't be streamed."));
-                    break;
-                case Errors.WmaAccesDenied:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is protected and can't be streamed."));
-                    break;
-                case Errors.Wasapi:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: WASAPI is not available."));
-                    break;
-                case Errors.Memory:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: there has been a memory error."));
-                    break;
-                case Errors.BufferLost:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the sample buffer was lost."));
-                    break;
-                case Errors.Handle:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file was not loaded correctly."));
-                    break;
-                case Errors.Parameter:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: a wrong parameter was used."));
-                    break;
-                case Errors.NoChannel:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: there is no free channel."));
-                    break;
-                case Errors.Start:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the audio engine has not been initialized successfully."));
-                    break;
-                case Errors.NoEAX:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: you do not have EAX (Environmental Audio Extensions) support."));
-                    break;
-                case Errors.NotPlaying:
-                    if(!Init(AudioOutput.GetDefaultdevice().Index, Frequency))
-                    {
-                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing, the audio device could not be initialized correctly."));
-                    }
-                    else if(!RetryLoadingAndPLayingFile()) // device initalized successfully
-                    { 
-                        MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not playing and the device has successfully been initialized, the error might come from the file being corrupted."));
-                    }
-                    break;
-                case Errors.SampleRate:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the sample rate of this file is not valid."));
-                    break;
-                case Errors.NotFile:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file is not a valid audio file."));
-                    break;
-                case Errors.Empty:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the file was not loaded correctly or is empty."));
-                    break;
-                case Errors.NoFX:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the effects are not available."));
-                    break;
-                case Errors.Playing:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the channel is playing."));
-                    break;
-                case Errors.NotAvailable:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: the requested data is not available."));
-                    break;
-                case Errors.DirectX:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: your directx version is not supported."));
-                    break;
-                case Errors.Timeout:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: connection timeout, check your internet connection and try again."));
-                    break;
-                case Errors.Mp4NoStream:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Error: your mp4 file has media segment in the wrong order (\"madt\" before \"moov\")"));
-                    break;
-                default:
-                    MessageHelper.PublishMessage(DefaultMessageFactory.CreateErrorMessage("Unknown Audio Error."));
-                    break;
+                Errors.NotPlaying => HandleNotPlayingError(),
+                Errors.FileOpen => "Error: the audio file was already opened.",
+                Errors.Driver => "Error: no valid driver found.",
+                Errors.SampleFormat => "Error: unsupported file format.",
+                Errors.Position => "Error: playback position invalid.",
+                Errors.Init => "Error: the device could not be initialized.",
+                Errors.Already => "The device is already initialized.",
+                Errors.No3D => "Error: 3D is not supported.",
+                Errors.Device => "Error: the device is not supported/valid.",
+                Errors.NoInternet => "You are not connected to the internet.",
+                Errors.FileFormat => "Error: unsupported file format.",
+                Errors.Speaker => "Error: speakers are unavailable.",
+                Errors.Codec => "Error: unsupported codec.",
+                Errors.Ended => "Error: the file or channel has ended.",
+                Errors.Busy => "Error: the device is busy with another process.",
+                Errors.Unstreamable => "Error: the file can't be streamed using the buffered file system.",
+                Errors.WmaLicense => "Error: the file is protected and can't be streamed.",
+                Errors.WmaAccesDenied => "Error: the file is protected and can't be streamed.",
+                Errors.Wasapi => "Error: WASAPI is not available.",
+                Errors.Memory => "Error: there has been a memory error.",
+                Errors.BufferLost => "Error: the sample buffer was lost.",
+                Errors.Handle => "Error: the file was not loaded correctly.",
+                Errors.Parameter => "Error: a wrong parameter was used.",
+                Errors.NoChannel => "Error: there is no free channel.",
+                Errors.Start => "Error: the audio engine has not been initialized successfully.",
+                Errors.NoEAX => "Error: you do not have EAX (Environmental Audio Extensions) support.",
+                Errors.SampleRate => "Error: the sample rate of this file is not valid.",
+                Errors.NotFile => "Error: the file is not a valid audio file.",
+                Errors.Empty => "Error: the file was not loaded correctly or is empty.",
+                Errors.NoFX => "Error: the effects are not available.",
+                Errors.Playing => "Error: the channel is playing.",
+                Errors.NotAvailable => "Error: the requested data is not available.",
+                Errors.DirectX => "Error: your directx version is not supported.",
+                Errors.Timeout => "Error: connection timeout, check your internet connection and try again.",
+                Errors.Mp4NoStream => "Error: your mp4 file has media segment in the wrong order (\"madt\" before \"moov\")",
+                Errors.Unknown => "Error: Unknown Audio Error.",
+                _ => "Error: Unknown Audio Error."
+            };
+
+            errorMessage?.CreateErrorMessage().Publish();
+        }
+
+        private string HandleNotPlayingError()
+        {
+            if(Init(AudioOutput.GetDefaultDevice().Index, Frequency))
+            {
+                if(RetryLoadingAndPLayingFile()) // success
+                    return null;
+                return "Error: the file is not playing despite the device being successfully been initialized, the error might come from the file being corrupted.";
             }
+
+            return "Error: the file is not playing, the audio device might not be initialized correctly.";
         }
 
         private void DeviceTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            DeviceModel device = AudioOutput.GetDefaultdevice();
+            AudioDeviceModel device = AudioOutput.GetDefaultDevice();
             // the user has not choosen a device manually
             // and new default device or the current device isn't available anymore
             if (_deviceChoosenByUser == -1 && (device.Index != Device.Index || !AudioOutput.GetAllDevices().Any(d => d.Index == Device.Index)))
@@ -273,7 +211,7 @@ namespace AudioHandler
             }
         }
 
-        public bool ChangeOutputDevice(DeviceModel device, bool fromUser = true)
+        public bool ChangeOutputDevice(AudioDeviceModel device, bool fromUser = true)
         {
             if (Device.Index == device.Index) return false;
 
@@ -299,7 +237,7 @@ namespace AudioHandler
                 Loop(IsLooping);
 
                 // if the device are speakers the playback does not resume but if the device are headphones then resume
-                if ((!isPlaying && Device.Type != DeviceTypeEnum.HeadPhones) || Device.Type == DeviceTypeEnum.Speakers)
+                if ((!isPlaying && Device.DeviceType != AudioDeviceTypeEnum.HeadPhones) || Device.DeviceType == AudioDeviceTypeEnum.Speakers)
                 {
                     Pause();
                 }
@@ -328,7 +266,7 @@ namespace AudioHandler
                 Bass.StreamFree(Stream);
             }
 
-            Stream = Bass.CreateStream(file, Flags: BassFlags.Default);
+            Stream = Bass.CreateStream(file);
         }
 
         public void Play()
@@ -413,7 +351,7 @@ namespace AudioHandler
         public void Init()
         {
             _volume = GetCurrentVolume();
-            Device = AudioOutput.GetDefaultdevice();
+            Device = AudioOutput.GetDefaultDevice();
             if(!Bass.Init(Device.Index, Frequency, DeviceInitFlags.Default))
             {
                 ErrorHandler();

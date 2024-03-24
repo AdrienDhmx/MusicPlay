@@ -3,12 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels"
+             xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
+             xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
              d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid Margin="{Binding TopMargin}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
@@ -23,23 +24,21 @@
                           VerticalAlignment="Top"
                           Height="auto"
                           Width="auto"
-                          MinWidth="150"
-                          BorderBrush="{DynamicResource Primary}"
-                           Margin="0,20, 0, 0">
+                          MinWidth="120"
+                          BorderBrush="{DynamicResource Primary}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid Background="Transparent"
                                     x:Name="ItemBorder"
                                     Height="40"
                                     Width="auto"
-                                    Margin="0, 0, 8, 0">
+                              Cursor="Hand">
                             <Grid.InputBindings>
-                                <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToSettingCommand, Source={x:Reference RootView}}"
+                                <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToSettingCommand, ElementName=RootView}"
                                                     CommandParameter="{Binding .}"/>
                             </Grid.InputBindings>
 
-                            <Border  CornerRadius="0,4,4,0"
-                                     Opacity="0"
+                            <Border Opacity="0"
                                      Background="{DynamicResource PrimaryHover}"
                                      IsHitTestVisible="True"
                                      x:Name="BgcBorder">
@@ -59,7 +58,7 @@
                                             Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibilityConverter}}">
                                 </Border>
                                 
-                                <TextBlock Text="{Binding SettingName}"
+                                <TextBlock Text="{Binding Name}"
                                             Grid.Column="1"
                                             x:Name="SettingName"
                                             FontSize="18"
@@ -100,9 +99,13 @@
             </ItemsControl>
         </Border>
 
-        <Border Grid.Column="1"
-                Background="Transparent">
-            <ContentControl Content="{Binding NavigationService.SecondaryViewModel}"/>
-        </Border>
+        <ds:DynamicScrollViewer OnScrollCommand="{Binding OnScrollCommand}"
+                                StartingVerticalOffset="{Binding State.ScrollOffset}"
+                                IsInertiaEnabled="False"
+                                Grid.Column="1"
+                                CanMouseWheel="True">
+            <ContentControl Content="{Binding State.ChildViewModel.ViewModel}"
+                                Grid.Row="1"/>
+        </ds:DynamicScrollViewer>
     </Grid>
 </UserControl>

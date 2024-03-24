@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Views.PopupViews
 {
@@ -27,15 +27,15 @@ namespace MusicPlayUI.MVVM.Views.PopupViews
             InitializeComponent();
         }
 
-        public ObservableCollection<GenreModel> Genres
+        public ObservableCollection<Tag> Genres
         {
-            get { return (ObservableCollection<GenreModel>)GetValue(GenresProperty); }
+            get { return (ObservableCollection<Tag>)GetValue(GenresProperty); }
             set { SetValue(GenresProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Genre.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for CurrentTagView.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty GenresProperty =
-            DependencyProperty.Register("Genre", typeof(ObservableCollection<GenreModel>), typeof(GenreListPopupView), new PropertyMetadata(new ObservableCollection<GenreModel>()));
+            DependencyProperty.Register("CurrentTagView", typeof(ObservableCollection<Tag>), typeof(GenreListPopupView), new PropertyMetadata(new ObservableCollection<Tag>()));
 
         public ICommand Command
         {

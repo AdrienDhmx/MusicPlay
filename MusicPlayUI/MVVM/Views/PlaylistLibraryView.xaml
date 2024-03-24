@@ -10,11 +10,12 @@
              xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
              xmlns:loader="clr-namespace:LoadingControl;assembly=LoadingControl"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
-             xmlns:customSearchBar="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox"
+             xmlns:customSearchBar="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox" xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer" xmlns:controls="clr-namespace:MusicPlayUI.Controls" xmlns:conv="clr-namespace:MusicPlayUI.Converters" xmlns:vc="clr-namespace:VirtualizingControls;assembly=VirtualizingControls"
              d:DataContext="{d:DesignInstance Type=viewmodels:PlaylistLibraryViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
+
     <Grid x:Name="RootGrid"
           AllowDrop="True"
         Drop="RootGrid_Drop"
@@ -26,7 +27,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <Border x:Name="DropIndicatorBorder"
                 Grid.Row="1"
                 Margin="2"
@@ -36,156 +37,205 @@
                 BorderThickness="2"
                 Visibility="Hidden"/>
 
-        <loader:LoadingControl HorizontalAlignment="Left"
-                               Grid.Row="1"
-                                    VerticalAlignment="Top"
-                                    Margin="20,10"
-                                    Height="50"
-                                    Width="50"
-                                    MainColor="{DynamicResource Primary}"
-                                    Background="Transparent"
-                                    Visibility="{Binding FilesDropped, Converter={StaticResource BoolToVisibilityConverter}}"/>
+        <Grid Panel.ZIndex="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
 
-        <Grid Margin="30,10"> 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.45*"/>
-                <ColumnDefinition Width="0.18*"/>
-                <ColumnDefinition Width="0.45*"/>
-            </Grid.ColumnDefinitions>
+            <Border Background="{DynamicResource Background}"
+                    Effect="{DynamicResource PageHeaderDropShadow}"
+                    Grid.RowSpan="2"/>
 
-            <StackPanel>
-                <TextBlock Text="{x:Static lang:Resources.MyPlaylists}"
-                                       Style="{DynamicResource SLargeHeaderStyle}"/>
+            <Border Style="{DynamicResource PageHeaderBackgroundLight}"/>
 
-                <TextBlock Text="{Binding PlaylistCount}"
-                                   HorizontalAlignment="Left"
-                                       Style="{DynamicResource NLargeSecondaryStyle}"/>
-            </StackPanel>
+            <Border Margin="{Binding TopMargin}">
+                <Grid Margin="30, 10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel x:Name="HeaderPart"
+                                Height="80"
+                                MaxHeight="80"
+                                MinHeight="0">
+                        <TextBlock Text="{x:Static lang:Resources.MyPlaylists}"
+                                           Style="{DynamicResource SLargeHeaderStyle}"/>
 
-            <StackPanel Orientation="Horizontal"
-                        Grid.Column="1"
-                        HorizontalAlignment="Center">
-                <iconbtn:IconButton Icon="{DynamicResource addSign}"
-                                      Style="{DynamicResource PlaylistIconButton}"
-                                        ToolTip="Create an empty playlist. You can also drop a folder here to create a playlist."
-                                            Command="{Binding CreatePlaylistCommand}"/>
+                        <TextBlock Text="{Binding PlaylistCount}"
+                                       HorizontalAlignment="Left"
+                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
+                    </StackPanel>
 
-                <iconbtn:IconButton Icon="{DynamicResource PlaylistLibrary}"
-                                    Margin="20,0,0,0"
-                                         Style="{DynamicResource PlaylistIconButton}"
-                                        ToolTip="Create a radio based on a random track."
-                                            Command="{Binding CreateAutoPlaylistCommand}"/>
-            </StackPanel>
+                    <Grid Grid.Row="2"
+                          Margin="0, 10, 0, 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="2"
-                    HorizontalAlignment="Stretch"
-                    x:Name="searchBarBorder">
-                <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
-                                                    HorizontalAlignment="Right"
-                                                    MaxWidth="300"
-                                                    MinWidth="200"
-                                                    Width="{Binding ActualWidth, ElementName=searchBarBorder, Converter={StaticResource SubstractionConverter}, ConverterParameter=40, UpdateSourceTrigger=PropertyChanged}"
-                                                    Style="{DynamicResource SearchBarStyle}"
-                                                    Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
-                
+                        <StackPanel Orientation="Horizontal">
+                            <iconbtn:IconButton Style="{DynamicResource PlaylistIconButton}"
+                                                Icon="{DynamicResource addSign}"
+                                                Command="{Binding CreatePlaylistCommand}"
+                                                ToolTip="Create Playlist"/>
+
+                            <Border Width="20"/>
+
+                            <iconbtn:IconButton Style="{DynamicResource PlaylistIconButton}"
+                                                Icon="{DynamicResource radio}"
+                                                Command="{Binding CreateAutoPlaylistCommand}"
+                                                ToolTip="Generate a radio"/>
+                        </StackPanel>
+                        
+                        <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
+                                                            HorizontalAlignment="Right"
+                                                            Width="250"
+                                                            MinWidth="200"
+                                                            Grid.Column="1"
+                                                            Style="{DynamicResource SearchBarStyle}"
+                                                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    </Grid>
+                </Grid>
             </Border>
         </Grid>
 
-        <Grid Margin="10,0"
-              Background="Transparent"
-                  Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="210"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <ItemsControl Grid.Row="0"
-                            x:Name="ConstAutoPlaylists"
-                                HorizontalAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                            ItemsSource="{Binding ConstAutoPlaylist}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel HorizontalAlignment="Center"
-                                                IsItemsHost="True"
-                                        VirtualizingPanel.IsVirtualizing="True"
-                                        VirtualizingPanel.VirtualizationMode="Recycling"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+        <Border Grid.Row="1"
+                Background="Transparent">
+            <ItemsControl ItemsSource="{Binding Playlists}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                          x:Name="PlaylistsItemControl">
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ds:DynamicScrollViewer OnScrollCommand="{Binding DataContext.OnScrollCommand, ElementName=RootView}"
+                                    StartingVerticalOffset="{Binding DataContext.LibraryState.ScrollOffset, Mode=OneTime, ElementName=RootView}"
+                                    AnimatedHeader="{x:Reference HeaderPart}"
+                                    AnimateHeaderOpacity="True"
+                                    EnableLazyLoading="True"
+                                                VerticalScrollBarVisibility="Hidden"
+                                   HorizontalAlignment="Stretch"
+                                    HorizontalScrollBarVisibility="Disabled"
+                                    x:Name="Scrollviewer">
+                            <StackPanel Orientation="Vertical"
+                                       IsItemsHost="True"
+                                        Margin="20, 0"
+                                       HorizontalAlignment="Stretch"/>
+                        </ds:DynamicScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Width="180"
-                                    Height="200"
-                                    Margin="2,10,2,2"
-                                    x:Name="itemgrid">
+                        <Border Padding="8,0"
+                                Cursor="Hand"
+                                x:Name="itemgrid">
+                            <Grid Height="auto"
+                                  MaxHeight="100"
+                                    HorizontalAlignment="Stretch">
                             <Grid.InputBindings>
-                                <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToPlaylistCommand, Source={x:Reference RootView}}"
-                                              CommandParameter="{Binding .}"/>
-                                <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenPlaylistPopupCommand, Source={x:Reference RootView}}"
-                                              CommandParameter="{Binding .}"/>
+                                <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToPlaylistCommand, ElementName=RootView}"
+                                                  CommandParameter="{Binding .}"/>
+                                <MouseBinding Gesture="RightClick" Command="{Binding DataContext.OpenPlaylistPopupCommand, ElementName=RootView}"
+                                                  CommandParameter="{Binding .}"/>
                             </Grid.InputBindings>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="150"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" MaxWidth="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Border Grid.ColumnSpan="3"
+                                        BorderBrush="{DynamicResource SurfaceVariant}"
+                                        BorderThickness="0, 0, 0, 1"/>
+                                
+                                <Border x:Name="MouseOverBorder"
+                                    Grid.ColumnSpan="3"
+                                    Opacity="0"
+                                    Background="{DynamicResource PrimaryHover}"/>
 
-                            <Border x:Name="MouseOverBorder"
-                                        Grid.Row="0"
-                                        Panel.ZIndex="2"
-                                        Opacity="0"
-                                        CornerRadius="10"
-                                         Width="150"
-                                        Height="150"
-                                        Background="{DynamicResource TransparentGradient}"/>
+                            <controls:AsyncImage Margin="8"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                                 ImagePath="{Binding ., Converter={StaticResource MNullImageConverter}}"
+                                                x:Name="BorderImage">
+                                <controls:AsyncImage.Placeholder>
+                                        <iconbtn:IconButton Icon="{Binding Cover}"
+                                                        Background="{DynamicResource PrimaryContainer}"
+                                                        FillColor="{DynamicResource OnPrimaryContainer}"
+                                                        Style="{DynamicResource BaseIconButton}"
+                                                        IsEnabled="False"
+                                                        Width="50"
+                                                        Height="50"
+                                                        IconHeight="25"
+                                                        IconWidth="25"/>
+                                </controls:AsyncImage.Placeholder>
+                            </controls:AsyncImage>
 
-                            <iconbtn:IconButton Icon="{Binding Cover}"
-                                                    Background="{DynamicResource SecondaryContainer}"
-                                                    FillColor="{DynamicResource OnSecondaryContainer}"
-                                                    Style="{DynamicResource BaseIconButton}"
-                                                    Width="150"
-                                                    Height="150"
-                                                    CornerRadius="{DynamicResource SecondaryCornerRadius}"
-                                                    IconHeight="100"
-                                                    IconWidth="100">
-                            </iconbtn:IconButton>
+                                <Grid Grid.Column="1"
+                                      x:Name="NameGrid"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"
+                                      Margin="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
 
-                            <Grid Opacity="0"
-                                      VerticalAlignment="Bottom"
-                                      Panel.ZIndex="3"
-                                      Margin="25,5"
-                                      x:Name="BtnGrid">
-                                <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
-                                                        Command="{Binding DataContext.PlayPlaylistCommand, ElementName=RootView}"
-                                                        CommandParameter="{Binding .}"/>
+                                    <TextBlock Text="{Binding Name}"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           TextAlignment="Left"
+                                           FontSize="18"
+                                           Margin="0"
+                                           Padding="0"
+                                            Style="{DynamicResource SListItemNameStyle}"/>
 
-                                <iconbtn:IconButton Style="{DynamicResource CircledMoreOptionButton}"
-                                                Command="{Binding DataContext.OpenPlaylistPopupCommand, ElementName=RootView}"
-                                            CommandParameter="{Binding .}"/>
+                                    <TextBlock Text="{Binding Description}"
+                                        Visibility="{Binding Description.Length, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        HorizontalAlignment="Left"
+                                        MaxHeight="60"
+                                               Grid.Row="1"
+                                        Style="{DynamicResource NSmallSecondayStyle}"/>
                             </Grid>
+                            
+                            <Grid Opacity="1"
+                                  Grid.Column="2"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Right"
+                                  Visibility="{Binding IsMouseOver, ElementName=itemgrid, Converter={StaticResource BoolToHVisibilityConverter}}"
+                                  Panel.ZIndex="3"
+                                  x:Name="BtnGrid">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="24"/>
+                                    </Grid.ColumnDefinitions>
+                                <iconbtn:IconButton Style="{DynamicResource OpacityIconButton}"
+                                                    Icon="{DynamicResource PlayIcon}"
+                                                    FillColor="{DynamicResource OnPrimaryContainer}"
+                                                    Command="{Binding DataContext.PlayPlaylistCommand, ElementName=RootView}"
+                                                    CommandParameter="{Binding .}"/>
 
-                            <TextBlock Text="{Binding Name}"
-                                            Style="{DynamicResource SListItemNameStyle}"
-                                            Grid.Row="1"/>
+                                <iconbtn:IconButton Style="{DynamicResource ContrastMoreOptionIconButton}"
+                                                    Icon="{DynamicResource MoreOptionIcon}"
+                                                     FillColor="{DynamicResource OnPrimaryContainer}"
+                                                    Grid.Column="2"
+                                                    Command="{Binding DataContext.OpenPlaylistPopupCommand, ElementName=RootView}"
+                                                    CommandParameter="{Binding .}"/>
+                            </Grid>
                         </Grid>
+                        </Border>
                         <DataTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True" SourceName="itemgrid">
                                 <Trigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Duration="0:0:0.1"
-                                                          To="1" From="0"
+                                                          To="0.8" From="0"
                                                           Storyboard.TargetName="MouseOverBorder"
-                                                         Storyboard.TargetProperty="Opacity">
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Duration="0:0:0.1"
-                                                          To="1" From="0"
-                                                          Storyboard.TargetName="BtnGrid"
-                                                         Storyboard.TargetProperty="Opacity">
-                                            </DoubleAnimation>
+                                                         Storyboard.TargetProperty="Opacity"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.EnterActions>
@@ -193,19 +243,9 @@
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Duration="0:0:0.1"
-                                                          To="0" From="1"
+                                                          To="0" From="0.8"
                                                           Storyboard.TargetName="MouseOverBorder"
-                                                         Storyboard.TargetProperty="Opacity">
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Duration="0:0:0.1"
-                                                          To="0" From="1"
-                                                          Storyboard.TargetName="BtnGrid"
-                                                         Storyboard.TargetProperty="Opacity">
-                                            </DoubleAnimation>
+                                                         Storyboard.TargetProperty="Opacity"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.ExitActions>
@@ -214,11 +254,6 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-
-            <Border Grid.Row="1">
-                <listviews:PlaylistListView DataContext="{Binding DataContext, ElementName=RootView}"
-                                                Grid.Row="1"/>
-            </Border>
-        </Grid>
+        </Border>
     </Grid>
 </UserControl>

@@ -7,51 +7,54 @@
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views" 
              xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PopupViewModels" 
              xmlns:popup="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
-             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
+             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" xmlns:controls="clr-namespace:MusicPlayUI.Controls"
              d:DataContext="{d:DesignInstance Type=viewmodels:ArtistPopupViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Background="{DynamicResource Background}"
-                        Padding="0,5,0,0"
-            MinWidth="200"
-            MaxWidth="350"
-            CornerRadius="4"
-            BorderThickness="1"
-            BorderBrush="{DynamicResource Outline}">
+    <Border Style="{DynamicResource PopupBorder}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" MinHeight="70"/>
+                <RowDefinition Height="82"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <!-- Artist Info -->
-            <Grid Grid.Column="1"
-                        Margin="5,0,5,5">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Cover -->
-                <Border CornerRadius="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
-                        VerticalAlignment="Stretch"
-                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
-                    <Border.Background>
-                        <ImageBrush ImageSource="{Binding Artist.Cover, Converter={StaticResource TNullImageConverter}, ConverterParameter=1}"
-                                            Stretch="UniformToFill"/>
-                    </Border.Background>
-                </Border>
+                <controls:AsyncImage  IsInViewport="True"
+                                    Height="65"
+                                    Width="65"
+                                      Margin="8"
+                                    CornerRadius="33"
+                                    PlaceholderAnimationEnabled="false"
+                                    ImagePath="{Binding Artist, Converter={StaticResource MNullImageConverter}}">
+                    <controls:AsyncImage.Placeholder>
+                        <Border Background="{DynamicResource SecondaryContainer}">
+                            <TextBlock Text="{Binding Artist.Acronyme}"
+                                        Foreground="{DynamicResource OnSecondaryContainer}"
+                                        Style="{DynamicResource BWelcomeMessageStyle}"
+                                        FontSize="22"/>
+                        </Border>
+                    </controls:AsyncImage.Placeholder>
+                </controls:AsyncImage>
 
                 <TextBlock Text="{Binding Artist.Name}"
-                           Grid.Column="1"
-                           Margin="10,4"
-                             Style="{DynamicResource SStyle}"
-                               MaxHeight="50"/>
+                               Grid.Column="1"
+                               Margin="8, 4"
+                           VerticalAlignment="Center"
+                                 Style="{DynamicResource SStyle}"
+                                   MaxHeight="60"/>
             </Grid>
 
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
@@ -73,19 +76,25 @@
                                     x:Name="AddToPlaylistBorder"
                                     Style="{DynamicResource PopupBtn}"/>
 
-                <textbtn:TextButton Text="Remove from Genre"
-                                Grid.Row="3"
+                <textbtn:TextButton Text="Add to Tag"
+                                    Grid.Row="3"
+                                    x:Name="AddToTagBorder"
+                                    Style="{DynamicResource PopupBtn}"/>
+
+                <textbtn:TextButton Text="Remove from Tag"
+                                Grid.Row="4"
                                     Height="40"
                                     Visibility="{Binding CanRemoveFromGenre, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2}"
-                                    Command="{Binding RemoveArtistGenreCommand}"
+                                    Command="{Binding RemoveTagCommand}"
+                                    CommandParameter="{Binding Artist}"
                                 x:Name="RemomveFromGenreBorder"
                                 Style="{DynamicResource PopupBtn}"/>
 
-                <textbtn:TextButton Text="{x:Static lang:Resources.Change_Cover}"
-                                    Grid.Row="4"
+                <textbtn:TextButton Text="{x:Static lang:Resources.Edit}"
+                                    Grid.Row="5"
                                     CornerRadius="0,0,4,4"
                                    Style="{DynamicResource PopupBtn}"
-                                    Command="{Binding ChangeCoverCommand}"/>
+                                    Command="{Binding OpenEditArtistWindow}"/>
             </Grid>
             <!-- Playlists Popup -->
             <Popup AllowsTransparency="True"
@@ -109,6 +118,34 @@
                                 <Setter Property="IsOpen" Value="True"/>
                             </Trigger>
                             <DataTrigger Binding="{Binding IsMouseOver, ElementName=AddToPlaylistBorder}" Value="true">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Popup.Style>
+            </Popup>
+
+            <!-- Tag Popup -->
+            <Popup AllowsTransparency="True"
+                   x:Name="tagsPopup"
+                   PopupAnimation="None"
+                   StaysOpen="True">
+                <Popup.Style>
+                    <Style TargetType="Popup">
+                        <Setter Property="PlacementTarget" Value="{Binding ElementName=AddToTagBorder}"/>
+                        <Setter Property="Placement" Value="Right"/>
+                        <Setter Property="VerticalOffset" Value="0"/>
+                        <Setter Property="IsOpen" Value="False"/>
+                        <Setter Property="Child">
+                            <Setter.Value>
+                                <popup:AddToTagPopup DataContext="{Binding DataContext, ElementName=RootView}"/>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsMouseOver, ElementName=AddToTagBorder}" Value="true">
                                 <Setter Property="IsOpen" Value="True"/>
                             </DataTrigger>
                         </Style.Triggers>

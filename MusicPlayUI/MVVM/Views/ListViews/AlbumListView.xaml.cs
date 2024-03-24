@@ -1,5 +1,6 @@
 ﻿using GongSolutions.Wpf.DragDrop.Utilities;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
+using MusicPlayUI.MVVM.Views.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,14 +29,34 @@ namespace MusicPlayUI.MVVM.Views.ListViews
             InitializeComponent();
         }
 
-        public ObservableCollection<AlbumModel> Albums
+        protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
         {
-            get { return (ObservableCollection<AlbumModel>)GetValue(AlbumsProperty); }
+            DynamicScrollViewer.DynamicScrollViewer parentScrollviewer = MainWindow.FindParent<DynamicScrollViewer.DynamicScrollViewer>(e.Source as DependencyObject);
+            if(parentScrollviewer != null)
+            {
+                parentScrollviewer.ScrollToVerticalOffset(parentScrollviewer.VerticalOffset - e.Delta / 3);
+                e.Handled = true;
+            }
+        }
+
+        public ObservableCollection<Album> Albums
+        {
+            get { return (ObservableCollection<Album>)GetValue(AlbumsProperty); }
             set { SetValue(AlbumsProperty, value); }
         }
 
         public static readonly DependencyProperty AlbumsProperty =
-            DependencyProperty.Register("Albums", typeof(ObservableCollection<AlbumModel>), typeof(AlbumListView), new PropertyMetadata(new ObservableCollection<AlbumModel>()));
+            DependencyProperty.Register("Albums", typeof(ObservableCollection<Album>), typeof(AlbumListView), new PropertyMetadata(new ObservableCollection<Album>()));
 
+
+        public bool ShowArtist
+        {
+            get { return (bool)GetValue(ShowArtistProperty); }
+            set { SetValue(ShowArtistProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for showArtist.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ShowArtistProperty =
+            DependencyProperty.Register("ShowArtist", typeof(bool), typeof(AlbumListView), new PropertyMetadata(true));
     }
 }

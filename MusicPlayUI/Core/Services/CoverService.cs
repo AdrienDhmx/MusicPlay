@@ -1,17 +1,18 @@
-﻿using MusicPlayModels.MusicModels;
-using MusicPlayUI.Core.Factories;
+﻿using MusicPlayUI.Core.Factories;
 using MessageControl;
 using FilesProcessor;
 using MusicFilesProcessor.Helpers;
+using MusicPlay.Database.Models;
+using System.Threading.Tasks;
 
 namespace MusicPlayUI.Core.Services
 {
     public static class CoverService
     {
-        public static bool ChangeCover(this TrackModel track)
+        public static async Task<bool> ChangeCover(this Track track)
         {
             string oldCover = track.Artwork;
-            bool result = CoverProcessor.ChangeCover(track);
+            bool result = await CoverProcessor.ChangeCover(track);
             if (result)
             {
                 CoverProcessor.DeleteAllCoversVersion(oldCover);
@@ -20,10 +21,10 @@ namespace MusicPlayUI.Core.Services
             return result;
         }
 
-        public static bool ChangeCover(this AlbumModel album)
+        public static async Task<bool> ChangeCover(this Album album)
         {
             string oldCover = album.AlbumCover;
-            bool result = CoverProcessor.ChangeCover(album);
+            bool result = await CoverProcessor.ChangeCover(album);
             if (result)
             {
                 CoverProcessor.DeleteAllCoversVersion(oldCover);
@@ -32,10 +33,10 @@ namespace MusicPlayUI.Core.Services
             return result;
         }
 
-        public static bool ChangeCover(this ArtistModel artist)
+        public static async Task<bool> ChangeCover(this Artist artist)
         {
             string oldCover = artist.Cover;
-            bool result = CoverProcessor.ChangeCover(artist);
+            bool result = await CoverProcessor.ChangeCover(artist);
             if (result)
             {
                 CoverProcessor.DeleteAllCoversVersion(oldCover);
@@ -44,20 +45,31 @@ namespace MusicPlayUI.Core.Services
             return result;
         }
 
-        public static string ChangeCover(this PlaylistModel playlist)
+        public static async Task<string> ChangeCover(this Playlist playlist, bool update = true)
         {
             string oldCover = playlist.Cover;
-            bool result = CoverProcessor.ChangeCover(playlist);
-            if (result)
+            if(update)
             {
-                CoverProcessor.DeleteAllCoversVersion(oldCover);
+                bool result = await CoverProcessor.ChangeCover(playlist);
+                if (result)
+                {
+                    CoverProcessor.DeleteAllCoversVersion(oldCover);
+                }
+            } 
+            else
+            {
+                string cover = CoverProcessor.OpenFileDialog();
+                if (!string.IsNullOrWhiteSpace(cover))
+                {
+                    playlist.Cover = cover;
+                }
             }
             return playlist.Cover;
         }
 
-        public static void DeleteArtwork(this TrackModel track)
+        public static async Task DeleteArtwork(this Track track)
         {
-            track.RemoveCover();
+            await track.RemoveCover();
             MessageHelper.PublishMessage(MessageFactory.CoverDeletedMessage(track.Title, true));
         }
     }

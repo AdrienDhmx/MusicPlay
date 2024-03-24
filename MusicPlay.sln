@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBaseConnection", "DataBaseConnection\DataBaseConnection.csproj", "{C221A4BD-33D1-4136-9755-5B5250459B34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicPlay.Database", "DataBaseConnection\MusicPlay.Database.csproj", "{C221A4BD-33D1-4136-9755-5B5250459B34}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicPlay", "MusicPlayUI\MusicPlay.csproj", "{BE441883-4BAC-4EFF-9931-AA44A9B849B6}"
 EndProject
@@ -29,8 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modal", "Modal\Modal.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpectrumVisualizer", "SpectrumVisualizer\SpectrumVisualizer.csproj", "{FDEB234A-47FD-4BA6-ADDD-3A6780A53BE6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MusicPlayModels", "MusicPlayModels\MusicPlayModels.csproj", "{3AED9880-1F8F-4C77-BAC0-E4323B507651}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistoryChart", "HistoryChart\HistoryChart.csproj", "{F4F028FE-6C1F-4E5B-90BB-2DE145C2D97F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoadingControl", "LoadingControl\LoadingControl.csproj", "{97BC043F-E1A3-4E45-A9AA-98452826AE82}"
@@ -50,6 +48,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualizingControls", "VirtualizingControls\VirtualizingControls.csproj", "{0E1948EA-FA02-4184-93B6-67091822CF2D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicScrollViewer", "DynamicScrollViewer\DynamicScrollViewer.csproj", "{53A0392E-353B-4292-850A-35989618C659}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Equalizer", "Equalizer\Equalizer.csproj", "{F9C8E8C2-1518-4508-B5FF-7AA3F601187C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToggleSwitch", "ToggleSwitch\ToggleSwitch.csproj", "{29CD1EE0-16E9-4663-8B1D-2BE865BAC937}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LastFm", "LastFm\LastFm.csproj", "{90D8CFF4-6228-416D-94B9-E30DE4145AEB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkdownViewerControl", "MarkdownViewer\MarkdownViewerControl.csproj", "{C2033B02-19DF-46E6-AD9C-737FB7556689}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModalPopupControl", "ModalPopupControl\ModalPopupControl.csproj", "{0D5F33AF-4987-42A8-8410-267A1F36AE85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,10 +105,6 @@ Global
 		{FDEB234A-47FD-4BA6-ADDD-3A6780A53BE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDEB234A-47FD-4BA6-ADDD-3A6780A53BE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDEB234A-47FD-4BA6-ADDD-3A6780A53BE6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3AED9880-1F8F-4C77-BAC0-E4323B507651}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3AED9880-1F8F-4C77-BAC0-E4323B507651}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3AED9880-1F8F-4C77-BAC0-E4323B507651}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AED9880-1F8F-4C77-BAC0-E4323B507651}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F4F028FE-6C1F-4E5B-90BB-2DE145C2D97F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F4F028FE-6C1F-4E5B-90BB-2DE145C2D97F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4F028FE-6C1F-4E5B-90BB-2DE145C2D97F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -141,6 +145,26 @@ Global
 		{53A0392E-353B-4292-850A-35989618C659}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53A0392E-353B-4292-850A-35989618C659}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53A0392E-353B-4292-850A-35989618C659}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9C8E8C2-1518-4508-B5FF-7AA3F601187C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9C8E8C2-1518-4508-B5FF-7AA3F601187C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9C8E8C2-1518-4508-B5FF-7AA3F601187C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9C8E8C2-1518-4508-B5FF-7AA3F601187C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29CD1EE0-16E9-4663-8B1D-2BE865BAC937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29CD1EE0-16E9-4663-8B1D-2BE865BAC937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29CD1EE0-16E9-4663-8B1D-2BE865BAC937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29CD1EE0-16E9-4663-8B1D-2BE865BAC937}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90D8CFF4-6228-416D-94B9-E30DE4145AEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90D8CFF4-6228-416D-94B9-E30DE4145AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90D8CFF4-6228-416D-94B9-E30DE4145AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90D8CFF4-6228-416D-94B9-E30DE4145AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2033B02-19DF-46E6-AD9C-737FB7556689}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2033B02-19DF-46E6-AD9C-737FB7556689}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2033B02-19DF-46E6-AD9C-737FB7556689}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2033B02-19DF-46E6-AD9C-737FB7556689}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D5F33AF-4987-42A8-8410-267A1F36AE85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D5F33AF-4987-42A8-8410-267A1F36AE85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D5F33AF-4987-42A8-8410-267A1F36AE85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D5F33AF-4987-42A8-8410-267A1F36AE85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

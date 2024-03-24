@@ -4,50 +4,22 @@
                     xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls">
 
     <Style x:Key="LyricsListView" TargetType="{x:Type ListView}">
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
-            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="ItemsPanel">
                 <Setter.Value>
                     <ItemsPanelTemplate>
-                        <VirtualizingStackPanel IsVirtualizing="{TemplateBinding VirtualizingPanel.IsVirtualizing}" VirtualizationMode="{TemplateBinding VirtualizingPanel.VirtualizationMode}" />
+                        <StackPanel Orientation="Vertical"/>
                     </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListView}">
-                        <Grid>
-                            <ScrollViewer
-                            x:Name="PART_ContentHost"
-                            CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
-                            HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        <Rectangle x:Name="PART_DisabledVisual"
-                                    Opacity="0"
-                                    RadiusX="2"
-                                    RadiusY="2"
-                                    Stretch="Fill"
-                                    Stroke="Transparent"
-                                    StrokeThickness="0"
-                                    Visibility="Collapsed">
-                        </Rectangle>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsGrouping" Value="True">
-                                <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="PART_DisabledVisual" Property="Visibility" Value="Visible" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
+                    <Grid>
+                        <ItemsPresenter />
+                    </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -61,20 +33,22 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                <Border x:Name="Border"
-                        Margin="0"
-                        Padding="4"
-                        Background="{TemplateBinding Background}"
-                        BorderThickness="0"
-                        CornerRadius="5"
-                        BorderBrush="Transparent">
-                    <ContentPresenter />
-                </Border>
-                <ControlTemplate.Triggers>
-                    <Trigger Property="IsSelected" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
-                    </Trigger>
-                </ControlTemplate.Triggers>
+                    <Border x:Name="Border"
+                            Margin="0"
+                            Padding="4"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="0"
+                            CornerRadius="5"
+                            BorderBrush="Transparent">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource WhiteTransparent}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -90,8 +64,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
                     <Border x:Name="Border"
-                        Margin="0"
-                        Padding="4"
+                            Margin="0, 2"
                         Background="{TemplateBinding Background}"
                             HorizontalAlignment="Stretch"
                         BorderThickness="0"
@@ -102,6 +75,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" TargetName="Border"  Value="{DynamicResource PrimaryHover}"/>
                             <Setter Property="BorderThickness" TargetName="Border"  Value="1"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -110,62 +84,31 @@
         </Setter>
     </Style>
 
-    <Style x:Key="QueueListView" TargetType="{x:Type vcontrol:VirtualizingListView}">
+    <Style x:Key="QueueListView" TargetType="{x:Type ListView}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        <Setter Property="KeepSelectedItemInView" Value="True"/>
-        <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
-        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
-        <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
-        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard"/>
-        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
-        <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="ItemsPanel">
-            <Setter.Value>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel HorizontalAlignment="Stretch"
-                                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
-                               VirtualizingPanel.IsVirtualizing="True"
-                                            VirtualizingPanel.CacheLength="5,5"
-                               VirtualizingPanel.VirtualizationMode="Standard"
-                               VirtualizingPanel.CacheLengthUnit="Item"
-                               VirtualizingPanel.IsContainerVirtualizable="True"
-                               VirtualizingPanel.ScrollUnit="Pixel"/>
-                </ItemsPanelTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="vcontrol:VirtualizingListView">
-                    <Grid>
-                        <ds:DynamicScrollViewer
-                            x:Name="PART_ContentHost"
-                            CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
-                            HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                            <ItemsPresenter />
-                        </ds:DynamicScrollViewer>
-                        <Rectangle
-                            x:Name="PART_DisabledVisual"
-                            Opacity="0"
-                            RadiusX="2"
-                            RadiusY="2"
-                            Stretch="Fill"
-                            Stroke="Transparent"
-                            StrokeThickness="0"
-                            Visibility="Collapsed">
-                        </Rectangle>
-                    </Grid>
+                <ControlTemplate TargetType="ListView">
+                    <ds:DynamicScrollViewer
+                                x:Name="PART_ContentHost"
+                                StartingVerticalOffset="{Binding DataContext.State.ScrollOffset, Mode=OneTime, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+                                EnableLazyLoading="True"
+                                OnScrollCommand="{Binding DataContext.OnScrollCommand, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+                                HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                ItemToKeepInView="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}">
+                        <StackPanel Orientation="Vertical"
+                                        IsItemsHost="True"
+                                        HorizontalAlignment="Stretch"/>
+                    </ds:DynamicScrollViewer>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsGrouping" Value="True">
                             <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="PART_DisabledVisual" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -174,7 +117,7 @@
     </Style>
 
     <Style BasedOn="{StaticResource QueueListViewItem}" TargetType="{x:Type ListViewItem}" />
-    <Style BasedOn="{StaticResource QueueListView}" TargetType="{x:Type vcontrol:VirtualizingListView}" />
+    <Style BasedOn="{StaticResource QueueListView}" TargetType="{x:Type ListView}" />
 
     <Style x:Key="LibraryItemsControl" TargetType="ItemsControl">
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
@@ -207,7 +150,7 @@
         <Setter Property="VirtualizingPanel.IsContainerVirtualizable" Value="True"/>
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
         <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
-        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard"/>
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
         <Setter Property="VirtualizingPanel.CacheLengthUnit" Value="Item"/>
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
         <Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
@@ -215,14 +158,15 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="CacheLengthUnit" Value="Item"/>
-        <Setter Property="CacheLength" Value="6"/>
+        <Setter Property="CacheLength" Value="16"/>
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
                     <vcontrol:VirtualizingWrapPanel ScrollViewer.VerticalScrollBarVisibility="Visible"
                                                    VirtualizingPanel.IsVirtualizing="True"
-                                                   VirtualizingPanel.VirtualizationMode="Standard"
+                                                   VirtualizingPanel.VirtualizationMode="Recycling"
                                                    VirtualizingPanel.CacheLengthUnit="Item"
+                                                    VirtualizingPanel.CacheLength="16"
                                                    VirtualizingPanel.IsContainerVirtualizable="True"
                                                    VirtualizingPanel.ScrollUnit="Pixel"
                                                     SpacingMode="StartAndEndOnly"

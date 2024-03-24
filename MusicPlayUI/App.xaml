@@ -12,11 +12,11 @@
              xmlns:playerviews="clr-namespace:MusicPlayUI.MVVM.Views.PlayerControlViews"
              xmlns:playerviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels"
              xmlns:settingsviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels"
-    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
+    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:windows="clr-namespace:MusicPlayUI.MVVM.Windows">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Colors -->
+                <!-- Theme -->
                 <ResourceDictionary>
                     <ResourceDictionary.MergedDictionaries>
                         <ResourceDictionary Source="Resources\ThemeColors\MainLightThemeColors.xaml"/>
@@ -36,13 +36,28 @@
                         <ResourceDictionary Source="Resources\ThemeStyles\MainThemeStyles.xaml"/>
                     </ResourceDictionary.MergedDictionaries>
                 </ResourceDictionary>
+
             </ResourceDictionary.MergedDictionaries>
+
+
+            <DataTemplate DataType="{x:Type viewmodels:EditArtistViewModel}">
+                <windows:EditArtistWindow/>
+            </DataTemplate>
 
             <DataTemplate DataType="{x:Type modalviewmodel:CreatePlaylistViewModel}">
                 <modalview:CreatePlaylistView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type modalviewmodel:CreateModelNameViewModel}">
+                <modalview:CreateModelNameModal/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type modalviewmodel:ValidationModalViewModel}">
                 <modalview:ValidationModalView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type modalviewmodel:UpdateShortcutViewModel}">
+                <modalview:UpdateShortcutView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type modalviewmodel:EditFolderViewModel}">
+                <modalview:EditFolderView/>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
@@ -57,8 +72,8 @@
             <DataTemplate DataType="{x:Type viewmodels:PlaylistLibraryViewModel}">
                 <views:PlaylistLibraryView/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type viewmodels:ImportLibraryViewModel}">
-                <views:ImportLibraryView/>
+            <DataTemplate DataType="{x:Type viewmodels:GenreLibraryViewModel}">
+                <views:GenreLibraryView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
                 <views:SettingsView/>
@@ -105,9 +120,18 @@
             <DataTemplate DataType="{x:Type popupviewmodels:PlaylistPopupViewModel}">
                 <popupviews:PlaylistPopupView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type popupviewmodels:TagPopupViewModel}">
+                <popupviews:TagPopupView/>
+            </DataTemplate>
 
             <DataTemplate DataType="{x:Type settingsviewmodels:GeneralSettingsViewModel}">
                 <settingsviews:GeneralSettingView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsviewmodels:StorageSettingsViewModel}">
+                <settingsviews:StorageSettingsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsviewmodels:DSPSettingsViewModels}">
+                <settingsviews:DSPSettingsView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type settingsviewmodels:AppThemeSettingViewModel}">
                 <settingsviews:AppThemeSettingView/>
@@ -115,21 +139,20 @@
             <DataTemplate DataType="{x:Type settingsviewmodels:LanguageSettingViewModel}">
                 <settingsviews:LanguageSettingView/>
             </DataTemplate>
-
+            <DataTemplate DataType="{x:Type settingsviewmodels:ShortcutSettingViewModel}">
+                <settingsviews:ShortcutSettingView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type settingsviewmodels:VisualizerSettingViewModel}">
                 <settingsviews:VisualizerSettingView/>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type settingsviewmodels:ShortcutSettingViewModel}">
-                <settingsviews:ShortcutSettingView/>
-            </DataTemplate>
-            
             <!-- Converters -->
             <converter:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converter:PercentageConverter x:Key="PercentageConverter" Invert="False"/>
             <converter:PercentageConverter x:Key="InvertPercentageConverter" Invert="True"/>
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" TrueValue="Visible"/>
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverterInverted" FalseValue="Visible" TrueValue="Collapsed"/>
+            <converter:BoolToVisibilityConverter x:Key="BoolToHVisibilityConverter" FalseValue="Hidden" TrueValue="Visible"/>
             <converter:SizeConverter x:Key="SizeConverter"/>
             <converter:NullImageConverter x:Key="ONullImageConverter" />
             <converter:NullImageConverter x:Key="MNullImageConverter" CoverSize="1"/>
@@ -144,10 +167,14 @@
             <converter:AddTextConverter x:Key="AddTextConverter"/>
             <converter:FindScrollViewerConverter x:Key="FindScrollViewerConverter"/>
             <converter:ArtistsRelationConverter x:Key="ArtistsRelationConverter"/>
+            <converter:NumberDisplayConverter x:Key="DisplayNumberHigherThan0"/>
+            <converter:IsNullConverter x:Key="IsNullConverter"/>
+            <converter:ToTypeConverter x:Key="ToTypeConverter"/>
 
             <BitmapImage x:Key="PlayImg" UriSource="Resources\Play.png" />
             <BitmapImage x:Key="PreviousImg" UriSource="Resources\Previous.png" />
             <BitmapImage x:Key="NextImg" UriSource="Resources\Next.png" />
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

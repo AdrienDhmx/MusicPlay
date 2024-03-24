@@ -1,5 +1,6 @@
 ﻿using GongSolutions.Wpf.DragDrop;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.DataBaseModels;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.MVVM.Models;
 using System;
@@ -11,44 +12,40 @@ namespace MusicPlayUI.Core.Services.Interfaces
 {
     public interface IQueueService
     {
-        bool AlbumCoverOnly { get; set; }
-        bool AreCoversEnabled { get; set; }
-        bool ArtworkOnly { get; set; }
-        bool AutoCover { get; set; }
-        bool IsOnRepeat { get; }
-        bool IsShuffled { get; }
-        QueuePlayingFromModel PlayingFrom { get; set; }
-        UIOrderedTrackModel PlayingTrack { get; set; }
-        string QueueCover { get; set; }
-        string QueueDuration { get; set; }
-        int QueueLength { get; set; }
-        ObservableCollection<UIOrderedTrackModel> QueueTracks { get; set; }
+        Queue Queue { get; }
 
         event Action PlayingTrackChanged;
+        event Action<int> PreviewPlayingTrackChanged;
         event Action QueueChanged;
         event Action PlayingTrackInteractionChanged;
 
-        void AddTrack(TrackModel track, bool end = false, bool showMsg = true);
-        void AddTracks(List<TrackModel> tracks, bool end = false, bool album = true, string name = "");
+        void SetNewQueue(IEnumerable<OrderedTrack> tracks, PlayableModel playingFrom, string playingFromName, string cover, Track playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
+        void SetNewQueue(IEnumerable<Track> tracks, PlayableModel playingFrom, string playingFromName, string cover, Track playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
         void DeleteQueue();
+
+        void PlayTrack(Track track);
+        bool NextTrack();
+        bool PreviousTrack();
+
+        void Repeat();
+        Task Shuffle();
+
+        void AddTrack(Track track, bool end = false, bool showMsg = true);
+        void AddTracks(List<Track> tracks, bool end = false, bool album = true, string name = "");
+        void MoveTrack(int originalIndex, int targetIndex);
+        void RemoveTrack(Track track);
+
+        int GetPlayingTrackIndex();
+        int GetTrackIndex(Track track);
+        Task IncreasePlayCount(int increaseValue);
+        Task UpdateFavorite();
+        Task UpdateRating(int rating);
+
         void DragOver(IDropInfo dropInfo);
         void Drop(IDropInfo dropInfo);
-        int GetPlayingTrackIndex();
-        int GetTrackIndex(TrackModel track);
-        void IncreasePlayCount(int increaseValue);
-        void MoveTrack(int originalIndex, int targetIndex);
-        bool NextTrack();
-        void PlayTrack(TrackModel track);
-        bool PreviousTrack();
-        void RemoveTrack(TrackModel track);
-        void Repeat();
-        void SetNewQueue(List<UIOrderedTrackModel> tracks, QueuePlayingFromModel playingFrom, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
-        void SetNewQueue(List<TrackModel> tracks, QueuePlayingFromModel playingFrom, string cover, TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTracks = false);
-        void Shuffle();
-        Task UpdateFavorite(bool isFavorite);
-        void UpdateRating(int rating);
 
-        Task SaveQueue();
-        void NavigateToPlayingFrom();
+        void ClearQueue();
+        void SaveQueue();
+        Task NavigateToPlayingFrom();
     }
 }

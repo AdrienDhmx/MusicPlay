@@ -49,7 +49,7 @@
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
         <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
     </Style>
 
@@ -68,6 +68,7 @@
     <Style x:Key="NTrackDataStyle" TargetType="TextBlock"
            BasedOn="{StaticResource NStyle}">
         <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Left"/>
     </Style>
 
@@ -104,7 +105,6 @@
         <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
     </Style>
 
-    <!-- For playing from -->
     <Style x:Key="NRun" TargetType="Run">
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="{DynamicResource OnSurfaceVariant}"/>
@@ -114,7 +114,7 @@
     <Style x:Key="SStyle" TargetType="TextBlock"
            BasedOn="{StaticResource TextblockBaseStyle}">
         <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontSize" Value="20"/>
     </Style>
 
     <!-- For name of item in libraries (album name, artist name, playlist name...) -->
@@ -125,29 +125,27 @@
         <Setter Property="VerticalAlignment" Value="Top"/>
         <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="MaxHeight" Value="50"/>
+        <Setter Property="Margin" Value="4, 0"/>
     </Style>
 
     <!-- For libraries Header and data names in their views (album name, artist name...) -->
     <Style x:Key="SValidationModalHeaderStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
-        <Setter Property="FontSize" Value="20"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="TextAlignment" Value="Center"/>
-        <Setter Property="Margin" Value="0,10"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="Margin" Value="10"/>
     </Style>
 
     <!-- For libraries Header and data names in their views (album name, artist name...) -->
     <Style x:Key="SLargeHeaderStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
-        <Setter Property="FontSize" Value="50"/>
+        <Setter Property="FontSize" Value="48"/>
         <Setter Property="FontFamily" Value="Times New Roman"/>
     </Style>
 
     <!-- For sub data like the artist of the album -->
     <Style x:Key="SSubDataStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
-        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontSize" Value="20"/>
     </Style>
 
     <!-- For lists name (recent artist, recent albums...) -->
@@ -155,6 +153,7 @@
            BasedOn="{StaticResource SStyle}">
         <Setter Property="FontSize" Value="26"/>
         <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+        <Setter Property="Margin" Value="10,0"/>
     </Style>
     
     <Style x:Key="SListPlaceHolderStyle" TargetType="TextBlock"
@@ -166,17 +165,19 @@
     <!-- For filters texts -->
     <Style x:Key="SFilterStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SStyle}">
+        <Setter Property="MinWidth" Value="100"/>
         <Setter Property="FontSize" Value="14"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Left"/>
         <Setter Property="Foreground" Value="{DynamicResource OnSecondaryContainer}"/>
-        <Setter Property="Margin" Value="4,0"/>
+        <Setter Property="Margin" Value="4,2"/>
     </Style>
 
     <!-- For filters Header -->
     <Style x:Key="SFilterHeaderStyle" TargetType="TextBlock"
            BasedOn="{StaticResource SFilterStyle}">
+        <Setter Property="Margin" Value="10,0"/>
         <Setter Property="FontSize" Value="18"/>
     </Style>
 
@@ -185,7 +186,7 @@
            BasedOn="{StaticResource TextblockBaseStyle}">
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="40"/>
-        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
@@ -224,6 +225,7 @@
     <Style x:Key="NLRun" TargetType="Run"
            BasedOn="{StaticResource NRun}">
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="TextDecorations" Value="Underline"/>
@@ -280,7 +282,7 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Margin" Value="10,0"/>
         <Setter Property="CornerRadius" Value="5"/>
-        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="MinWidth" Value="250"/>
         <Setter Property="Padding" Value="4,0"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="FontSize" Value="18"/>
@@ -313,13 +315,34 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1.2"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="BorderBrush" Value="{DynamicResource OnBackground}"/>
         <Style.Triggers>
             <Trigger Property="IsFocused" Value="true">
                 <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
-                <Setter Property="BorderThickness" Value="0,0,0,1.2"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="MultiLineTextFieldStyle" TargetType="searchBar:PlaceholderTextBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
+        <Setter Property="Padding" Value="8, 6"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Outline}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource OnSurfaceVariant}"/>
+        <Setter Property="Foreground" Value="{DynamicResource OnBackground}"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="BorderThickness" Value="1.4"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="true">
+                <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
             </Trigger>
         </Style.Triggers>
     </Style>

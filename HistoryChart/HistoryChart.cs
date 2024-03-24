@@ -1,10 +1,9 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.StatsModels;
+﻿using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -51,14 +50,20 @@ namespace HistoryChart
             DependencyProperty.Register("PrimaryColor", typeof(Brush), typeof(HistoryChart), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 250, 250, 250))));
 
         public static readonly DependencyProperty ForegroundProperty =
-            DependencyProperty.Register("Foreground", typeof(Brush), typeof(HistoryChart), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 250, 250, 250))));
+            DependencyProperty.Register("Foreground", typeof(Brush), typeof(HistoryChart), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 250, 250, 250)), OnForegroundChanged));
 
+        private static void OnForegroundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            StyleChanged?.Invoke();
+        }
 
         public int NumberOfWeek { get; private set; }
         public DateTime StartDate { get; private set; }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public List<HistoryModel> HistoryModels { get; private set; }
+        public List<PlayHistory> HistoryModels { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+        private static event Action StyleChanged;
 
         private int _maxPlayCount;
         private double _xTickSpace = 0;
@@ -87,6 +92,8 @@ namespace HistoryChart
         {
             base.EndInit();
 
+            StyleChanged += Redraw;
+
             NumberOfWeek = 2;
             StartDate = DateTime.Today.AddDays(-NumberOfWeek * 7);
             InitGraph(6);
@@ -98,12 +105,12 @@ namespace HistoryChart
                 InitGraph(0);
         }
 
-        private async void InitGraph(int childrenCount)
+        private void InitGraph(int childrenCount)
         {
             if (Children != null && Children.Count > childrenCount)
                 Children.RemoveRange(childrenCount, Children.Count - childrenCount);
 
-            HistoryModels = await DataAccess.Connection.GetHistoryModels(StartDate, NumberOfWeek);
+            HistoryModels = PlayHistory.GetHistoryBetween(StartDate, StartDate.AddDays(7 * NumberOfWeek));
 
             if (Children != null && Children.Count < 6) // if btn not drawn
             {
@@ -229,14 +236,16 @@ namespace HistoryChart
             int index = 0;
             int lastDayDif = -1;
             Point graphPoint;
-            foreach (HistoryModel h in HistoryModels)
+            foreach (PlayHistory h in HistoryModels)
             {
+                if (h.PlayCount == 0)
+                    continue;
                 int daydif = h.Date.Subtract(StartDate).Days;
                 if (lastDayDif != -1 && lastDayDif + 1 < daydif) // day(s) with no playcount
                 {
                     for (int i = 1; i < daydif - lastDayDif; i++) // draw every missing day with listenTime = 0
                     {
-                        graphPoint = DrawPoints(lastDayDif + i, new HistoryModel() { Id = 99999, PlayCount = 0}); // id = 99999 to know its not a real model
+                        graphPoint = DrawPoints(lastDayDif + i, new PlayHistory() { Id = 99999999+i });
 
                         if (index == 0)
                         {
@@ -271,10 +280,10 @@ namespace HistoryChart
             Children.Add(path);
         }
 
-        private Point DrawPoints(int daydif, HistoryModel h)
+        private Point DrawPoints(int daydif, PlayHistory h)
         {
             double x = _graphWidthMargin + _xTickSpace * daydif;
-            double y = _graphHeightMargin + _yTickSpace / _yStep * TimeSpan.FromMilliseconds(h.ListenTime).TotalMinutes;
+            double y = _graphHeightMargin + _yTickSpace / _yStep * TimeSpan.FromMilliseconds(h.PlayTime).TotalMinutes;
 
             double graphY = ActualHeight - y;
             Point graphPoint = new Point(x, graphY);
@@ -288,7 +297,7 @@ namespace HistoryChart
             ellipse.Fill = PrimaryColor;
             ellipse.Stroke = tranparent;
             ellipse.StrokeThickness = 2;
-            ellipse.ToolTip = h.PlayCount.ToString() + " - " + TimeSpan.FromMilliseconds(h.ListenTime).ToFormattedString();
+            ellipse.ToolTip = h.PlayCount.ToString() + " - " + TimeSpan.FromMilliseconds(h.PlayTime).ToShortString();
 
             SetLeft(ellipse, x - ellipse.Width / 2);
             SetBottom(ellipse, y - ellipse.Width / 2);
@@ -306,7 +315,7 @@ namespace HistoryChart
 
         private void DrawTimeYAxes()
         {
-            int totalms = HistoryModels.Max(h => h.ListenTime);
+            int totalms = HistoryModels.Max(h => h.PlayTime);
             double totalMin = TimeSpan.FromMilliseconds(totalms).TotalMinutes;
             int numberOfTicks = (int)totalMin;
             _yStep = 1;
@@ -317,7 +326,7 @@ namespace HistoryChart
             }
 
             numberOfTicks++; // so that the max value is not at the very top of the chart and has one tick above it
-            _yTickSpace = (_graphHeight - 10) / numberOfTicks; // -10 to make the ticks lines cross even at the extremeties (top and right)
+            _yTickSpace = (_graphHeight - 10) / numberOfTicks; // -10 to make the ticks lines cross even at the extremes of the graph (top and right)
 
             DrawLine(_graphWidthMargin, _graphHeightMargin, _lineMinSize, _graphHeight); // draw line y axes
             DrawText(MusicPlay.Language.Resources.Time, 16, _graphWidthMargin + 5, _graphHeightMargin + _graphHeight + 5, 0); // draw y axes legend
@@ -328,14 +337,11 @@ namespace HistoryChart
             {
                 double y = _graphHeightMargin + _yTickSpace * i;
 
-                double amp = 0;
-                if (i != 0 && i % 4 == 0) amp = 2;
-
-                string text = TimeSpan.FromMinutes(i * _yStep).ToFormattedString();
+                string text = TimeSpan.FromMinutes(i * _yStep).ToShortString();
                 text = RemoveSec(text);
 
-                DrawLine(leftTick, y, _graphWidth, _lineMinSize + amp, _backgroundLineOpacity); // draw tick
-                DrawText(text, 12 + (int)amp * 2, (leftTick - 10 - amp *2) - text.Length * 6, y - 5 - amp); // draw tick legend (time value)
+                DrawLine(leftTick, y, _graphWidth, _lineMinSize , _backgroundLineOpacity); // draw tick
+                DrawText(text, 12, (leftTick - 10) - text.Length * 6, y - 5); // draw tick legend (time value)
             }
         }
 
@@ -483,6 +489,9 @@ namespace HistoryChart
 
         private PointCollection ControlPoints(PointCollection points)
         {
+            if (points.Count == 0)
+                return points;
+
             PointCollection pc = new();
             for(int i = 0; i < points.Count; i++)
             {
@@ -513,6 +522,7 @@ namespace HistoryChart
         public void Dispose()
         {
             Children.Clear();
+            StyleChanged -= Redraw;
         }
     }
 }

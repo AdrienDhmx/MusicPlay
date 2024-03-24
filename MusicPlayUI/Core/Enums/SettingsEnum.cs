@@ -13,11 +13,10 @@ namespace MusicPlayUI.Core.Enums
         NowPlayingStartingSubView = 1,
 
         TimerInterval = 2,
-        DefaultBackgroundOpacity = 3,
 
         QueueCovers = 4,
 
-        AutoChangeOutputdevice = 5,
+        AutoChangeOutputDevice = 5,
 
         Volume = 6,
 
@@ -30,6 +29,8 @@ namespace MusicPlayUI.Core.Enums
         LightTheme =11, // theme is light or dark (bool)
         SunsetSunrise = 12, // theme is light or dark based on the time of the day (bool)
         SystemSyncTheme = 13, // theme is (light or dark) sync with the system (bool)
+        ColorfulPlayerControl = 14, // (bool)
+        ColorfulUI = 15, // (bool)
 
         Language = 20,
         UserName = 21,
@@ -49,36 +50,49 @@ namespace MusicPlayUI.Core.Enums
         VAutoColor = 61,
         VCenterFreq = 62,
 
+        AutoForeground = 63,
+
         // filters and orders
         ArtistFilter = 70,
         ArtistOrder = 71,
         AlbumFilter = 72,
         AlbumOrder = 73,
 
+
+        // shortcuts
         PlayPause = 100,
-        NexTrack,
-        PreviousTrack,
-        Shuffle,
-        Repeat,
-        DecreaseVolume,
-        IncreaseVolume,
-        MuteVolume,
-        ToggleFavorite,
-        Rating0,
-        Rating1,
-        Rating2,
-        Rating3,
-        Rating4,
-        Rating5,
-        Home,
-        Albums,
-        Artists,
-        Playlists,
-        NowPlaying,
-        Import,
-        Settings,
-        EscapeFullScreen,
-        ToggleFullScreen,
+        NexTrack = 101,
+        PreviousTrack = 102,
+        Shuffle = 103,
+        Repeat = 104,
+        DecreaseVolume = 105,
+        IncreaseVolume = 106,
+        MuteVolume = 107,
+        ToggleFavorite = 108,
+        Rating0 = 109,
+        Rating1 = 110,
+        Rating2 = 111,
+        Rating3 = 112,
+        Rating4 = 113,
+        Rating5 = 114,
+        Home = 115,
+        Albums = 116,
+        Artists = 117,
+        Playlists = 118,
+        NowPlaying = 119,
+        Settings = 120,
+        Back = 121,
+        Forward = 122,
+        ToggleQueueDrawer = 123,
+        EscapeFullScreen = 124,
+        ToggleFullScreen = 125,
+        ToggleTheme = 126,
+
+
+        // DSP settings
+        EqualizerEnabled = 200, // bool
+        EqualizerPreset = 201, // id of the preset
+
 
         UNKNOWN = -1
     }
@@ -99,8 +113,6 @@ namespace MusicPlayUI.Core.Enums
                     return "TimerInterval";
                 case SettingsEnum.NowPlayingStartingSubView:
                     return "NowPlayingStartingSubView";
-                case SettingsEnum.DefaultBackgroundOpacity:
-                    return "DefaultBackgroundOpacity";
                 default:
                     return null;
             }
@@ -120,8 +132,6 @@ namespace MusicPlayUI.Core.Enums
                     return SettingsEnum.TimerInterval;
                 case "NowPlayingStartingSubView":
                     return SettingsEnum.NowPlayingStartingSubView;
-                case "DefaultBackgroundOpacity":
-                    return SettingsEnum.DefaultBackgroundOpacity;
                 default:
                     return SettingsEnum.UNKNOWN;
             }

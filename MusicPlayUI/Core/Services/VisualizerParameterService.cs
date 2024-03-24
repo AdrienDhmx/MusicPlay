@@ -4,6 +4,8 @@ using System.Windows.Media;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.MVVM.ViewModels.SettingsViewModels;
 using MusicPlayUI.Core.Services.Interfaces;
+using MusicFilesProcessor;
+using System.Windows;
 
 namespace MusicPlayUI.Core.Services
 {
@@ -32,6 +34,17 @@ namespace MusicPlayUI.Core.Services
                 {
                     ConfigurationService.SetPreference(SettingsEnum.VColor, ToHex(value));
                 }
+                EmphasizedObjectColor = (value as SolidColorBrush).GetEmphasizedColor(1d, 210);
+            }
+        }
+        
+        private Brush _emphasizedObjectColor = ConfigurationService.GetVColor().GetEmphasizedColor(1d, 210);
+        public Brush EmphasizedObjectColor
+        {
+            get { return _emphasizedObjectColor; }
+            set
+            {
+                SetField(ref _emphasizedObjectColor, value);
             }
         }
 
@@ -153,6 +166,16 @@ namespace MusicPlayUI.Core.Services
             {
                 SetField(ref _centerFreq, value);
                 SetPreference(SettingsEnum.VCenterFreq, BoolToString(CenterFreq));
+            }
+        }
+
+        private TextAlignment _textAlignment = TextAlignment.Left;
+        public TextAlignment TextAlignment 
+        { 
+            get => _textAlignment;
+            set 
+            {
+                SetField(ref _textAlignment, value);
             }
         }
 

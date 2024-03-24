@@ -37,7 +37,7 @@ namespace MessageControl
             }
         }
 
-        public static void PublishMessage(MessageModel message)
+        public static void PublishMessage(MessageModel? message)
         {
             if(_container is not null && message is not null)
             {
@@ -57,18 +57,47 @@ namespace MessageControl
                     IsTimeDisplayed = message.IsDateTimeDisplayed,
                     IsInteractive = message.IsInteractive,
                     IsInteractiveWithCancel = message.IsInteractiveWithCancel,
+                    IsUndoneChangeThemeEnabled = message.IsUndoneChangeThemeEnabled,
                     IsUndoBtnVisible = message.IsUndoEnabled,
                     OnCloseCallBack= message.OnCloseCallBack,
                     InteractionCallBack = message.ConfirmCallBack,
                     UndoCallBack= message.UndoCallBack,
                     UndoneMessage = message.UndoneMessage,
                     UndoneFailedMessage = message.UndoneFailedMessage,
-                    FontSize = 16,
+                    FontSize = 15,
                     CornerRadius = new(8)
                 };
 
                 _container.Children.Insert(0,messageControl);
             }
+        }
+    }
+
+    public static class MessageHelperExt
+    {
+        public static void Publish(this MessageModel? message)
+        {
+            MessageHelper.PublishMessage(message);
+        }
+
+        public static MessageModel? CreateErrorMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateErrorMessage(message);
+        }
+
+        public static MessageModel? CreateWarningMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateWarningMessage(message);
+        }
+
+        public static MessageModel? CreateInfoMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateInfoMessage(message);
+        }
+
+        public static MessageModel? CreateSuccessMessage(this string message)
+        {
+            return DefaultMessageFactory.CreateSuccessMessage(message);
         }
     }
 }

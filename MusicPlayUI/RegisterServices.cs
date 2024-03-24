@@ -18,6 +18,9 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Commands;
+using MusicPlayUI.MVVM.Windows;
+using MusicPlayUI.MVVM.Views.AppBars;
+using MusicPlayUI.MVVM.ViewModels.AppBars;
 
 namespace MusicPlayUI
 {
@@ -34,7 +37,7 @@ namespace MusicPlayUI
                 services.AddSingleton<Func<Type, Window>>(servicesProvider => window => (Window)servicesProvider.GetRequiredService(window));
 
                 // Services
-                services.AddSingleton<INavigationService, NavigationService>();
+                services.AddSingleton<IAppState, AppState>();
                 services.AddSingleton<IQueueService, QueueService>();
                 services.AddSingleton<IHistoryServices, HistoryServices>();
                 services.AddSingleton<IRadioStationsService, RadioStationsService>();
@@ -46,9 +49,12 @@ namespace MusicPlayUI
                 services.AddSingleton<IPlaylistService, PlaylistService>();
                 services.AddSingleton<ICommandsManager, CommandsManager>();
 
-                // Views with their ViewModel
+                // Views
                 services.AddSingleton<MainMenuView>();
                 services.AddSingleton<MainMenuViewModel>();
+
+                services.AddSingleton<AppBarView>();
+                services.AddSingleton<AppBar>();
 
                 services.AddSingleton<PlayerControlView>();
                 services.AddSingleton<PlayerControlViewModel>();
@@ -62,18 +68,17 @@ namespace MusicPlayUI
                 services.AddTransient<ArtistLibraryView>();
                 services.AddTransient<ArtistLibraryViewModel>();
 
+                services.AddTransient<GenreLibraryView>();
+                services.AddTransient<GenreLibraryViewModel>();
+
                 services.AddTransient<HomeView>();
                 services.AddTransient<HomeViewModel>();
-
-                services.AddTransient<ImportLibraryView>();
-                services.AddTransient<ImportLibraryViewModel>();
 
                 services.AddTransient<SettingsView>();
                 services.AddTransient<SettingsViewModel>();
 
                 services.AddTransient<AlbumView>();
                 services.AddTransient<AlbumViewModel>();
-
 
                 services.AddTransient<ArtistView>();
                 services.AddTransient<ArtistViewModel>();
@@ -96,28 +101,24 @@ namespace MusicPlayUI
                 services.AddTransient<PlaylistLibraryView>();
                 services.AddTransient<PlaylistLibraryViewModel>();
 
-                services.AddTransient<CreatePlaylistView>();
-                services.AddTransient<CreatePlaylistViewModel>();
-
-                services.AddTransient<ValidationModalView>();
-                services.AddTransient<ValidationModalViewModel>();
-
                 services.AddTransient<PlaylistView>();
                 services.AddTransient<PlaylistViewModel>();
 
+                // Popups
                 services.AddTransient<TrackPopupView>();
                 services.AddTransient<TrackPopupViewModel>();
 
-
                 services.AddTransient<AlbumPopupView>();
                 services.AddTransient<AlbumPopupViewModel>();
-
 
                 services.AddTransient<ArtistPopupView>();
                 services.AddTransient<ArtistPopupViewModel>();
 
                 services.AddTransient<PlaylistPopupView>();
                 services.AddTransient<PlaylistPopupViewModel>();
+
+                services.AddTransient<TagPopupView>();
+                services.AddTransient<TagPopupViewModel>();
 
                 services.AddSingleton<QueueDrawerView>();
                 services.AddSingleton<QueueDrawerViewModel>();
@@ -126,11 +127,17 @@ namespace MusicPlayUI
                 services.AddTransient<GeneralSettingView>();
                 services.AddTransient<GeneralSettingsViewModel>();
 
+                services.AddTransient<StorageSettingsView>();
+                services.AddTransient<StorageSettingsViewModel>();
+
                 services.AddTransient<AppThemeSettingView>();
                 services.AddTransient<AppThemeSettingViewModel>();
 
                 services.AddTransient<LanguageSettingView>();
                 services.AddTransient<LanguageSettingViewModel>();
+
+                services.AddTransient<DSPSettingsView>();
+                services.AddTransient<DSPSettingsViewModels>();
 
                 services.AddTransient<VisualizerSettingView>();
                 services.AddTransient<VisualizerSettingViewModel>();
@@ -141,6 +148,23 @@ namespace MusicPlayUI
                 services.AddTransient<EmptyViewModel>();
                 services.AddTransient<EmptyView>();
 
+
+                // Modals
+                services.AddTransient<CreatePlaylistView>();
+                services.AddTransient<CreatePlaylistViewModel>();
+
+                services.AddTransient<CreateModelNameModal>();
+                services.AddTransient<CreateModelNameViewModel>();
+
+                services.AddTransient<ValidationModalView>();
+                services.AddTransient<ValidationModalViewModel>();
+
+                services.AddTransient<UpdateShortcutView>();
+                services.AddTransient<UpdateShortcutViewModel>();
+
+                services.AddTransient<EditFolderView>();
+                services.AddTransient<EditFolderViewModel>();
+
                 // Windows
                 services.AddSingleton(provider => new MainWindow()
                 {
@@ -150,10 +174,16 @@ namespace MusicPlayUI
 
                 services.AddTransient<VisualizerParametersWindow>(services => new VisualizerParametersWindow()
                 {
-                    DataContext = services.GetRequiredService<VisualizerSettingViewModel>()
+                    DataContext = services.GetRequiredService<VisualizerSettingViewModel>() // this view models also has setting view
                 });
 
-                
+                services.AddTransient<EditArtistViewModel>();
+                services.AddTransient<EditArtistWindow>(services => new EditArtistWindow()
+                {
+                    DataContext = services.GetRequiredService<EditArtistViewModel>()
+                });
+
+
                 service = services.BuildServiceProvider();
             });
         }

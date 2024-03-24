@@ -6,31 +6,55 @@ using MusicPlayUI.MVVM.Models;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using MusicPlayUI.Core.Services.Interfaces;
+using MusicPlayUI.MVVM.ViewModels.SettingsViewModels;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class MainMenuViewModel : ViewModel
     {
-        private readonly INavigationService _navigationService;
-
         public ObservableCollection<MenuModel> Menu { get; set; } = new(MenuModelFactory.CreateMenu());
 
         public ICommand MenuNavigateCommand { get; }
         public ICommand NavigateBackCommand { get; }
-        public MainMenuViewModel(INavigationService navigationService)
+        public MainMenuViewModel()
         {
-            _navigationService = navigationService;
-            _navigationService.CurrentViewChanged += UpdateMenuUi;
+            MenuNavigateCommand = new RelayCommand<MenuModel>((menu) => 
+            {
+                switch (menu.Enum)
+                {
+                    case ViewNameEnum.Home:
+                        App.State.NavigateTo<HomeViewModel>();
+                        break;
+                    case ViewNameEnum.Artists:
+                        App.State.NavigateTo<ArtistLibraryViewModel>();
+                        break;
+                    case ViewNameEnum.Albums:
+                        App.State.NavigateTo<AlbumLibraryViewModel>();
+                        break;
+                    case ViewNameEnum.Playlists:
+                        App.State.NavigateTo<PlaylistLibraryViewModel>();
+                        break;
+                    case ViewNameEnum.Genres:
+                        App.State.NavigateTo<GenreLibraryViewModel>();
+                        break;
+                    case ViewNameEnum.NowPlaying:
+                        App.State.NavigateTo<NowPlayingViewModel>();
+                        break;
+                    case ViewNameEnum.Settings:
+                        App.State.NavigateTo<SettingsViewModel, GeneralSettingsViewModel>();
+                        break;
+                }
+            });
+            NavigateBackCommand = new RelayCommand(App.State.NavigateBack);
 
-            MenuNavigateCommand = new RelayCommand<MenuModel>((menu) => _navigationService.NavigateTo(menu.Enum));
-            NavigateBackCommand = new RelayCommand(() => _navigationService.NavigateBack());
+            App.State.CurrentViewChanged += UpdateMenuUi;
 
-            _navigationService.NavigateTo((ViewNameEnum)ConfigurationService.GetPreference(SettingsEnum.MainStartingView));
+            App.State.NavigateTo<HomeViewModel>();
 
-            UpdateMenuUi(_navigationService.CurrentViewName);
+            UpdateMenuUi();
         }
 
-        private void UpdateMenuUi(ViewNameEnum selectedMenu)
+        private void UpdateMenuUi()
         {
             foreach (MenuModel menu in Menu)
             {
@@ -38,7 +62,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 {
                     menu.IsSelected = false;
                 }
-                if (menu.Enum == selectedMenu)
+                if (menu.Type == App.State.CurrentView.ViewModel.GetType())
                 {
                     menu.IsSelected = true;
                 }
@@ -47,7 +71,7 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         public override void Dispose()
         {
-
+            App.State.CurrentViewChanged -= UpdateMenuUi;
         }
     }
 }

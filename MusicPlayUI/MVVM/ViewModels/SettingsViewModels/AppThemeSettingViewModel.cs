@@ -5,9 +5,6 @@ using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Commands;
-using MessageControl;
-using Windows.Media.Audio;
-using System;
 
 namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
 {
@@ -91,6 +88,28 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             }
         }
 
+        private bool _colorfulPlayerControl;
+        public bool ColorfulPlayerControl
+        {
+            get => _colorfulPlayerControl;
+            set
+            {
+                SetField(ref _colorfulPlayerControl, value);
+                SetPreference(SettingsEnum.ColorfulPlayerControl, BoolToString(_colorfulPlayerControl));
+            }
+        }
+
+        private bool _colorfulUI;
+        public bool ColorfulUI
+        {
+            get => _colorfulUI;
+            set
+            {
+                SetField(ref _colorfulUI, value);
+                SetPreference(SettingsEnum.ColorfulUI, BoolToString(_colorfulUI));
+            }
+        }
+
         public ICommand SetThemeCommand { get; }
         public AppThemeSettingViewModel()
         {            
@@ -99,23 +118,28 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
                 SetNewTheme(theme);
             });
 
+            AppTheme.ThemeChanged += Load;
             Load();
         }
 
         public override void Dispose()
         {
             Themes.Clear();
+            AppTheme.ThemeChanged -= Load;
         }
 
         private void Load()
         {
-            _lightTheme = AppThemeService.IsLightTheme;
+            _lightTheme = AppTheme.IsLightTheme;
             _sunsetSunrise = ConfigurationService.GetPreference(SettingsEnum.SunsetSunrise) == 1;
             _systemSync = ConfigurationService.GetPreference(SettingsEnum.SystemSyncTheme) == 1;
+            _colorfulPlayerControl = ConfigurationService.GetPreference(SettingsEnum.ColorfulPlayerControl) == 1;
+            _colorfulUI = ConfigurationService.GetPreference(SettingsEnum.ColorfulUI) == 1;
 
             OnPropertyChanged(nameof(LightTheme));
             OnPropertyChanged(nameof(SunsetSunrise));
             OnPropertyChanged(nameof(SystemSync));
+            OnPropertyChanged(nameof(ColorfulPlayerControl));
 
             LoadThemes();
         }
@@ -134,9 +158,9 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             SetPreference(SettingsEnum.SunsetSunrise, BoolToString(sunsetSunrise));
             SetPreference(SettingsEnum.SystemSyncTheme, BoolToString(systemSync));
 
-            AppThemeService.InitializeAppTheme();
+            AppTheme.InitializeAppTheme();
 
-            _lightTheme = AppThemeService.IsLightTheme;
+            _lightTheme = AppTheme.IsLightTheme;
             OnPropertyChanged(nameof(LightTheme));
 
             LoadThemes();
@@ -149,10 +173,7 @@ namespace MusicPlayUI.MVVM.ViewModels.SettingsViewModels
             SetPreference(SettingsEnum.AppTheme, ((int)theme.Value).ToString());
             AppliedTheme = theme.Name;
             // init new theme
-            AppThemeService.InitializeAppTheme();
-
-            if(message)
-                MessageHelper.PublishMessage(theme.Name.AppThemeChanged());
+            AppTheme.InitializeAppTheme();
         }
 
         private void UpdateSelectedTheme(SettingsValueEnum theme)

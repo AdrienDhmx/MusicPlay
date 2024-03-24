@@ -119,18 +119,18 @@ namespace RatingControl
             DefaultStyleKeyProperty.OverrideMetadata(typeof(RatingControl), new FrameworkPropertyMetadata(typeof(RatingControl)));
         }
 
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            base.OnRenderSizeChanged(sizeInfo);
+            Draw();
+        }
+
         public override void EndInit()
         {
             base.EndInit();
 
             Background = tranparent;
             MouseLeave += Shape_MouseLeave;
-
-            Width = 120;
-            Height = 35;
-
-            shapeSize = Width / maxValue * 0.9;
-            space = Width / maxValue * 0.1;
 
             ratingChanged += UpdateRating;
             ColorChanged += Redraw;
@@ -156,7 +156,7 @@ namespace RatingControl
             {
                 for (int i = 1; i <= maxValue; i++)
                 {
-                    if(i -1< Children.Count)
+                    if(i -1 < Children.Count)
                     {
                         Path? c = Children[i - 1] as Path;
                         if(c != null)
@@ -178,10 +178,12 @@ namespace RatingControl
                 Children.Clear();
             }
 
+            shapeSize = ActualWidth / maxValue * 0.9;
+            space = ActualWidth / maxValue - shapeSize;
             for (int i = 0; i < maxValue; i++)
             {
                 double x = (shapeSize + space) * i;
-                double y = (Height - shapeSize) / 2;
+                double y = (ActualHeight - shapeSize) / 2;
 
                 if(i+1 <= Rating)
                 {
@@ -207,7 +209,7 @@ namespace RatingControl
 
             path.Width = shapeSize;
             path.Height = shapeSize;
-            path.Stretch = Stretch.Fill;
+            path.Stretch = Stretch.Uniform;
             path.IsHitTestVisible = true;
             path.Name = "shape_" + index.ToString();
 

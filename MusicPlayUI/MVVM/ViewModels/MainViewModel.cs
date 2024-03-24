@@ -16,7 +16,7 @@ using System.Windows.Media;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
-    public class MainViewModel : ViewModel, IOnMouseDownListener
+    public class MainViewModel : ViewModel
     {
         public IAudioPlayback AudioPlayback { get; }
         public IQueueService QueueService { get; }
@@ -28,13 +28,10 @@ namespace MusicPlayUI.MVVM.ViewModels
             set { SetField(ref _modalService, value); }
         }
 
-        private INavigationService _navigationService;
-        public INavigationService NavigationService
+        public static IAppState AppState
         {
-            get => _navigationService;
-            set { SetField(ref _navigationService, value); }
+            get => App.State;
         }
-
 
         private ViewModel _currentPlayerControl;
         public ViewModel CurrentPlayerControl
@@ -79,10 +76,13 @@ namespace MusicPlayUI.MVVM.ViewModels
             set { SetField(ref _queueDrawer, value); }
         }
 
-        public MainViewModel(INavigationService navigationService, IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService,
-             MainMenuViewModel mainMenuViewModel, QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel, ICommandsManager commandsManager)
+        public ICommand MinimizeCommand { get; }
+        public ICommand MaximizeCommand { get; }
+        public ICommand LeaveCommand { get; }
+        public MainViewModel(IAudioPlayback audioPlayback, IQueueService queueService, IModalService modalService, MainMenuViewModel mainMenuViewModel, 
+            QueueDrawerViewModel queueDrawerViewModel, PlayerControlViewModel playerControlViewModel, 
+             ICommandsManager commandsManager)
         {
-            NavigationService = navigationService;
             AudioPlayback = audioPlayback;
             QueueService = queueService;
             CurrentMenu = mainMenuViewModel;
@@ -90,79 +90,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             CurrentPlayerControl = playerControlViewModel;
             CommandsManager = commandsManager;
             ModalService = modalService;
-            _audioTimeService = audioTimeService;
-
-            PlayPauseCommand = new RelayCommand(_audioTimeService.PlayPause);
-
-            NextTrackCommand = new RelayCommand(() =>
-            {
-                queueService.NextTrack();
-            });
-
-            PreviousTrackCommand = new RelayCommand(() =>
-            {
-                queueService.PreviousTrack();
-            });
-
-            DecreaseVolumeCommand = new RelayCommand(() =>
-            {
-                audioPlayback.DecreaseVolume();
-            });
-
-            IncreaseVolumeCommand = new RelayCommand(() =>
-            {
-                audioPlayback.IncreaseVolume();
-            });
-
-            ShuffleCommand = new RelayCommand(() =>
-            {
-                Task.Run(queueService.Shuffle);
-            });
-
-            RepeatCommand = new RelayCommand(() =>
-            {
-                if (_audioTimeService.IsLooping)
-                {
-                    _audioTimeService.Loop(); // unloop
-                }
-                else
-                {
-                    if (queueService.IsOnRepeat)
-                    {
-                        _audioTimeService.Loop(); // loop
-                    }
-                    queueService.Repeat(); // repeat on/off
-                }
-            });
-
-            FavoriteCommand = new RelayCommand(() =>
-            {
-                queueService.UpdateFavorite(!queueService.PlayingTrack.IsFavorite); // invert favorite value of the playing track
-            });
-
-            RatingCommand = new RelayCommand<string>((value) =>
-            {
-                if (int.TryParse(value, out var rating))
-                    queueService.UpdateRating(rating);
-            });
-
-            NavigateCommand = new RelayCommand<string>((view) =>
-            {
-                NavigationService.NavigateTo(view);
-            });
-
-            SwitchFullScreenCommand = new RelayCommand(() =>
-            {
-                navigationService.ToggleFullScreen();
-            });
-
-            EscapeFullScreenCommand = new RelayCommand(() =>
-            {
-                if (NavigationService.IsFullScreen)
-                    navigationService.ToggleFullScreen();
-            });
-
-            ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);
 
             MinimizeCommand = new RelayCommand(() =>
             {
@@ -185,21 +112,6 @@ namespace MusicPlayUI.MVVM.ViewModels
             {
                 App.Current.Shutdown();
             });
-        }
-
-        public void OnClick(MouseButtonEventArgs e)
-        {
-            if (NavigationService.IsPopupOpen)
-            {
-                UIElement element = Mouse.DirectlyOver as UIElement;
-
-                Popup ancestor = FindParent<Popup>(element);
-                // if the click is not on the popup close popup
-                if(element is not null && ancestor is null)
-                {
-                   NavigationService.ClosePopup();
-                }
-            }
         }
 
         public override void Dispose()

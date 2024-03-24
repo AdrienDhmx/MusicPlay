@@ -1,0 +1,130 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.ModalViews.UpdateShortcutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ModalViews" 
+             xmlns:card="clr-namespace:CustomCardControl;assembly=CustomCardControl"
+             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" 
+             xmlns:customTextBox="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox" 
+             xmlns:iconbutton="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:models="clr-namespace:MusicPlayUI.MVVM.Models" 
+             xmlns:modalviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.ModalViewModels" 
+             d:DataContext="{d:DesignInstance Type=modalviewmodels:UpdateShortcutViewModel}"
+             mc:Ignorable="d" 
+             x:Name="RootModal"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Border x:Name="RootGrid"
+          Width="500"
+          Height="auto"
+          CornerRadius="{DynamicResource SecondaryCornerRadius}"
+          Background="{DynamicResource Background}">
+        <Grid Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="80"/>
+            </Grid.RowDefinitions>
+
+            <iconbutton:IconButton Style="{DynamicResource CloseModalBtn}"
+                                       Command="{Binding CloseModalCommand}"/>
+
+            <StackPanel Grid.Row="1"
+                            MaxWidth="400"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch">
+                <Grid Margin="0, 10, 0, 20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <textbtn:TextButton Text="None"
+                                        Command="{Binding ChangeModifierCommand}"
+                                        CommandParameter="None">
+                        <textbtn:TextButton.Style>
+                            <Style BasedOn="{StaticResource Normalbtn}" TargetType="{x:Type textbtn:TextButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.ModifierString,ElementName=RootModal}" Value="">
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </textbtn:TextButton.Style>
+                    </textbtn:TextButton>
+
+                    <textbtn:TextButton Text="CTRL"
+                                        Grid.Column="1"
+                                        Command="{Binding ChangeModifierCommand}"
+                                        CommandParameter="CTRL">
+                        <textbtn:TextButton.Style>
+                            <Style BasedOn="{StaticResource Normalbtn}" TargetType="{x:Type textbtn:TextButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.ModifierString,ElementName=RootModal}" Value="CTRL">
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </textbtn:TextButton.Style>
+                    </textbtn:TextButton>
+
+                    <textbtn:TextButton Text="ALT"
+                                         Grid.Column="2"
+                                        Command="{Binding ChangeModifierCommand}"
+                                        CommandParameter="ALT">
+                        <textbtn:TextButton.Style>
+                            <Style BasedOn="{StaticResource Normalbtn}" TargetType="{x:Type textbtn:TextButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.ModifierString,ElementName=RootModal}" Value="ALT">
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </textbtn:TextButton.Style>
+                    </textbtn:TextButton>
+
+                    <textbtn:TextButton Text="SHIFT"
+                                         Grid.Column="3"
+                                        Command="{Binding ChangeModifierCommand}"
+                                        CommandParameter="SHIFT">
+                        <textbtn:TextButton.Style>
+                            <Style BasedOn="{StaticResource Normalbtn}" TargetType="{x:Type textbtn:TextButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.ModifierString,ElementName=RootModal}" Value="SHIFT">
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryContainer}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </textbtn:TextButton.Style>
+                    </textbtn:TextButton>
+                </Grid>
+
+                <TextBlock Text="{Binding Key, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"
+                           HorizontalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource NLargeStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.IsKeyValid, ElementName=RootModal}" Value="false">
+                                    <Setter Property="Foreground" Value="{DynamicResource Error}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+            </StackPanel>
+
+            <textbtn:TextButton Grid.Row="2"
+                                IsEnabled="{Binding IsKeyValid}"
+                                    Style="{DynamicResource EditBtn}"
+                                    Command="{Binding ChangeShortcutCommand}"/>
+        </Grid>
+    </Border>
+
+</UserControl>

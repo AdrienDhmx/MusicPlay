@@ -30,13 +30,21 @@ namespace MessageControl.Model
 
         public Brush? Background { get; set; }
 
-        public Brush? MouseOverBackground { get; set; }
+        public Brush? MouseOverBackground { get; set; }    
 
         public bool IsInteractive { get; set; } = false;
 
         public bool IsInteractiveWithCancel { get; set; } = false;
 
         public bool IsUndoEnabled { get; set; } = false;
+
+        /// <summary>
+        /// When the undo button is pressed the theme of the message will change
+        /// If successful the Success theme registered in <see cref="DefaultMessageFactory"/> will be used,
+        /// if it failed then the error theme registered will be used
+        /// If no theme is not registered the theme will not change
+        /// </summary>
+        public bool IsUndoneChangeThemeEnabled = true;
 
         public bool StaysOpen { get; set; } = false;
 

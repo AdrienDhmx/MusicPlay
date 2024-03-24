@@ -1,5 +1,6 @@
 ﻿using SpectrumVisualizer.Enums;
 using System;
+using System.Windows;
 using System.Windows.Media;
 
 namespace MusicPlayUI.Core.Services.Interfaces
@@ -12,6 +13,8 @@ namespace MusicPlayUI.Core.Services.Interfaces
         bool Fill { get; set; }
         bool Gradient { get; set; }
         Brush ObjectColor { get; set; }
+        Brush EmphasizedObjectColor { get; }
+        TextAlignment TextAlignment { get; set; }
         ObjectLengthEnum ObjectLength { get; set; }
         FrameRateEnum RefreshRate { get; set; }
         DataRepresentationTypeEnum Representation { get; set; }

@@ -3,14 +3,141 @@
                     xmlns:converter="clr-namespace:MusicPlayUI.Converters">
     <converter:LowerThanConverter x:Key="LowerThanConverter"/>
 
+    <Storyboard x:Key="GlowOn">
+        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" 
+                    Storyboard.TargetProperty="(Effect).Opacity">
+            <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="0.5"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+    <Storyboard x:Key="GlowOff">
+        <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" 
+                          Storyboard.TargetProperty="(Effect).Opacity">
+            <SplineDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
+        </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+
+    <DropShadowEffect x:Key="PageHeaderDropShadow" 
+                    BlurRadius="12" ShadowDepth="2" Color="#101010"
+                    Direction="-20"
+                    Opacity="0.5"/>
+
+    <DropShadowEffect x:Key="FilterPanelDropShadow" 
+                    Color="#101010"
+                    BlurRadius="12"
+                    ShadowDepth="2"
+                    Opacity="0.6"
+                    Direction="-80"/>
+
+    <DropShadowEffect x:Key="PopupDropShadow" 
+                    Color="#101010"
+                    BlurRadius="20"
+                    ShadowDepth="2"
+                    Opacity="0.8"
+                    Direction="-80"/>
+
+    <DropShadowEffect x:Key="PopupSmallDropShadow" 
+                    Color="#101010"
+                    BlurRadius="12"
+                    ShadowDepth="2"
+                    Opacity="0.6"
+                    Direction="-80"/>
+
+    <DropShadowEffect x:Key="MouseOverDropShadow" 
+                    Color="#101010"
+                    BlurRadius="16"
+                    ShadowDepth="2"
+                    Opacity="0"
+                    Direction="-80"/>
+
+    <Style x:Key="MouseOverBorderDropShadow" TargetType="FrameworkElement">
+        <Setter Property="Effect" Value="{DynamicResource MouseOverDropShadow}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard
+                              Storyboard="{StaticResource GlowOn}"/>
+                </Trigger.EnterActions>
+
+                <Trigger.ExitActions>
+                    <BeginStoryboard
+                              Storyboard="{StaticResource GlowOff}"/>
+                </Trigger.ExitActions>
+
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PopupRootBorder" TargetType="Border">
+        <Setter Property="Margin" Value="20"/>
+        <Setter Property="Effect" Value="{DynamicResource PopupDropShadow}"/>
+    </Style>
+    
+    <Style x:Key="PageHeaderBackground" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+        <Setter Property="Opacity" Value="0.2"/>
+    </Style>
+
+    <Style x:Key="PageHeaderBackgroundLight" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource PrimaryContainer}"/>
+        <Setter Property="Opacity" Value="0.05"/>
+        <Setter Property="Grid.RowSpan" Value="3"/>
+        <Setter Property="Grid.ColumnSpan" Value="3"/>
+    </Style>
+
+    <Style x:Key="BottomBlackGradientBorder" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource BlackGradient}"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="Opacity" Value="0.8"/>
+        <Setter Property="Panel.ZIndex" Value="2"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="OpacityMask">
+            <Setter.Value>
+                <LinearGradientBrush  StartPoint="0,1"
+                          EndPoint="0,0">
+                    <GradientStop Color="#00000000" Offset="1"/>
+                    <GradientStop Color="#10000000" Offset="0.8"/>
+                    <GradientStop Color="#25000000" Offset="0.6"/>
+                    <GradientStop Color="#38000000" Offset="0.4"/>
+                    <GradientStop Color="#5a000000" Offset="0.2"/>
+                    <GradientStop Color="#5f000000" Offset="0"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TopBlackGradientBorder" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource BlackGradient}"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Opacity" Value="0.8"/>
+        <Setter Property="Panel.ZIndex" Value="2"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="OpacityMask">
+            <Setter.Value>
+                <LinearGradientBrush  StartPoint="0,1"
+                          EndPoint="0,0">
+                    <GradientStop Color="#00000000" Offset="0"/>
+                    <GradientStop Color="#10000000" Offset="0.2"/>
+                    <GradientStop Color="#25000000" Offset="0.4"/>
+                    <GradientStop Color="#38000000" Offset="0.6"/>
+                    <GradientStop Color="#5a000000" Offset="0.8"/>
+                    <GradientStop Color="#5f000000" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style x:Key="RootDataBorder" TargetType="Border">
         <Setter Property="Padding" Value="20"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
     </Style>
 
     <Style x:Key="ListHeaderBorder" TargetType="Border">
-        <Setter Property="Padding" Value="10,0"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource Background}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
         <Setter Property="BorderThickness" Value="0,0,0,1.5"/>
         <Setter Property="Margin" Value="40,10"/>
     </Style>
@@ -311,7 +438,7 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=260}" 
+            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=230}" 
                          Value="False">
                 <DataTrigger.EnterActions>
                     <BeginStoryboard>
@@ -366,7 +493,149 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=260}" 
+            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=230}" 
+                         Value="False">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="0:0:0.2"
+                                                          To="0" From="1"
+                                                         Storyboard.TargetProperty="Opacity">
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                              From="40" To="0"
+                                              Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                              From="0" To="100"
+                                              Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="0:0:0.01"
+                                            From="280" To="0"
+                                            Storyboard.TargetProperty="Width">
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+                <DataTrigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="0:0:0.2"
+                                                          To="1" From="0"
+                                                         Storyboard.TargetProperty="Opacity">
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                              From="0" To="40"
+                                              Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                              From="100" To="0"
+                                              Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="0:0:0.01"
+                                            From="0" To="280"
+                                            Storyboard.TargetProperty="Width">
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.ExitActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Opacity, RelativeSource={RelativeSource Mode=Self}}" Value="0">
+                <Setter Property="Width" Value="0"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TagLargeBtnStackPanel" TargetType="StackPanel">
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Margin" Value="0,5"/>
+        <Setter Property="Width" Value="460"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform Y="40"/>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=210}" 
+                         Value="False">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="0:0:0.2"
+                                            To="1" From="0"
+                                            Storyboard.TargetProperty="Opacity">
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                              From="40" To="-5"
+                                              Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+                <DataTrigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Duration="0:0:0.1"
+                                            To="0" From="1"
+                                            Storyboard.TargetProperty="Opacity">
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                             From="-5" To="40"
+                                              Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.ExitActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Opacity, RelativeSource={RelativeSource Mode=Self}}" Value="0">
+                <Setter Property="Height" Value="0"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <Style x:Key="TagSmallBtnStackPanel" TargetType="StackPanel">
+        <Setter Property="Opacity" Value="0"/>
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="2, 5, 2, 5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform Y="0" X="40" />
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource LowerThanConverter}, ConverterParameter=210}" 
                          Value="False">
                 <DataTrigger.EnterActions>
                     <BeginStoryboard>
@@ -448,6 +717,22 @@
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="Margin" Value="10, 5, 10, 0"/>
         <Setter Property="Padding" Value="10, 0"/>
+        <Setter Property="ClipToBounds" Value="false"/>
+    </Style>
+
+    <Style x:Key="PopupBorder" TargetType="Border">
+        <Setter Property="MinWidth" Value="300"/>
+        <Setter Property="MaxWidth" Value="450"/>
+        <Setter Property="Background" Value="{DynamicResource Background}"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
+    </Style>
+
+    <Style x:Key="SecondaryPopupBorder" TargetType="Border"
+           BasedOn="{StaticResource PopupBorder}">
+        <Setter Property="MaxHeight" Value="350"/>
+        <Setter Property="MinWidth" Value="250"/>
+        <Setter Property="Width" Value="250"/>
+        <Setter Property="Margin" Value="5, 8, 8, 8"/>
     </Style>
 
     <Style x:Key="BorderImage" TargetType="Border">
@@ -469,8 +754,9 @@
     </Style>
 
     <Style x:Key="LibraryItemsImageBorder" TargetType="Border">
-        <Setter Property="Width" Value="170"/>
-        <Setter Property="Height" Value="170"/>
+        <Setter Property="Width" Value="150"/>
+        <Setter Property="Height" Value="150"/>
+        <Setter Property="Margin" Value="0, 6, 0, 0"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
@@ -507,10 +793,11 @@
     </Style>
 
     <Style x:Key="LibraryItemsRootGrid" TargetType="Grid">
-        <Setter Property="Width" Value="170"/>
-        <Setter Property="Height" Value="220"/>
+        <Setter Property="Width" Value="160"/>
+        <Setter Property="Height" Value="225"/>
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Margin" Value="6,6,6,0"/>
+        <Setter Property="Margin" Value="8,4,8,4"/>
+        <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
 </ResourceDictionary>

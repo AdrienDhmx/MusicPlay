@@ -1,4 +1,4 @@
-﻿using MusicPlayModels;
+﻿using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
@@ -71,8 +71,17 @@ namespace MusicPlayUI.Core.Services
                 case ViewNameEnum.CreatePlaylist:
                     Modal = _viewFactory.Invoke(typeof(CreatePlaylistViewModel));
                     break;
+                case ViewNameEnum.CreateTag:
+                    Modal = _viewFactory.Invoke(typeof(CreateModelNameViewModel));
+                    break;
                 case ViewNameEnum.ConfirmAction:
                     Modal = _viewFactory.Invoke(typeof(ValidationModalViewModel));
+                    break;
+                case ViewNameEnum.UpdateShortcut:
+                    Modal = _viewFactory.Invoke(typeof(UpdateShortcutViewModel));
+                    break;
+                case ViewNameEnum.EditFolder:
+                    Modal = _viewFactory.Invoke(typeof(EditFolderViewModel));
                     break;
             }
         }

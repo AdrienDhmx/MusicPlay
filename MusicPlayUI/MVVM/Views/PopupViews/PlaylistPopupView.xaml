@@ -6,17 +6,13 @@
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views" 
              xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.PopupViewModels" 
-             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
+             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" 
+             xmlns:popup="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
              d:DataContext="{d:DesignInstance Type=viewmodels:PlaylistPopupViewModel}"
              mc:Ignorable="d" 
+             x:Name="RootPopup"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Background="{DynamicResource Background}"
-                        Padding="0,5,0,0"
-            MinWidth="200"
-            MaxWidth="350"
-            CornerRadius="4"
-            BorderThickness="1"
-            BorderBrush="{DynamicResource Outline}">
+    <Border Style="{DynamicResource PopupBorder}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" MinHeight="60"/>
@@ -77,6 +73,8 @@
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Play_Next}"
@@ -88,15 +86,30 @@
                                    Style="{DynamicResource PopupBtn}"
                                     Command="{Binding AddToQueueCommand}"/>
 
-                <textbtn:TextButton Text="{x:Static lang:Resources.Edit}"
+                <textbtn:TextButton Text="Add to Tag"
                                     Grid.Row="2"
+                                    x:Name="AddToTagBorder"
+                                    IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
+                                    Style="{DynamicResource PopupBtn}"/>
+
+                <textbtn:TextButton Text="Remove from Tag"
+                                Grid.Row="3"
+                                    Height="40"
+                                    Visibility="{Binding CanRemoveFromGenre, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2}"
+                                    Command="{Binding RemoveTagCommand}"
+                                    CommandParameter="{Binding Playlist}"
+                                x:Name="RemomveFromGenreBorder"
+                                Style="{DynamicResource PopupBtn}"/>
+
+                <textbtn:TextButton Text="{x:Static lang:Resources.Edit}"
+                                    Grid.Row="4"
                                      x:Name="EditBorder"
                                     IsEnabled="{Binding IsAutoPlaylist, Converter={StaticResource InverseBoolConverter}}"
                                     Command="{Binding EditPlaylistCommand}"
                                     Style="{DynamicResource PopupBtn}"/>
 
                 <textbtn:TextButton Text="{x:Static lang:Resources.Delete}"
-                                    Grid.Row="3"
+                                    Grid.Row="5"
                                     Height="40"
                                     CornerRadius="0,0,4,4"
                                     x:Name="DeleteBorder"
@@ -104,6 +117,34 @@
                                    Style="{DynamicResource PopupBtn}"
                                     Command="{Binding DeletePlaylistCommand}"/>
             </Grid>
+
+            <!-- Tag Popup -->
+            <Popup AllowsTransparency="True"
+                   x:Name="tagsPopup"
+                   PopupAnimation="None"
+                   StaysOpen="True">
+                <Popup.Style>
+                    <Style TargetType="Popup">
+                        <Setter Property="PlacementTarget" Value="{Binding ElementName=AddToTagBorder}"/>
+                        <Setter Property="Placement" Value="Right"/>
+                        <Setter Property="VerticalOffset" Value="0"/>
+                        <Setter Property="IsOpen" Value="False"/>
+                        <Setter Property="Child">
+                            <Setter.Value>
+                                <popup:AddToTagPopup DataContext="{Binding DataContext, ElementName=RootPopup}"/>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsMouseOver, ElementName=AddToTagBorder}" Value="true">
+                                <Setter Property="IsOpen" Value="True"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Popup.Style>
+            </Popup>
         </Grid>
     </Border>
 </UserControl>

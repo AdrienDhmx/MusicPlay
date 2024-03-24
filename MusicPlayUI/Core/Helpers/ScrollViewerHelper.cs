@@ -77,6 +77,11 @@ namespace MusicPlayUI.Core.Helpers
 
         private static void Control_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
+            if (e.Handled)
+            {
+                return;
+            }
+
             DependencyObject d = sender as DependencyObject;
             if (d == null) return;
 
@@ -114,7 +119,7 @@ namespace MusicPlayUI.Core.Helpers
                     }
 
                     if(scroll)
-                        scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - scrollValue);
+                        scrollViewer.ScrollToVerticalOffset(0);
                     else
                     {
                         scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset);

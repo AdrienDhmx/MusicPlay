@@ -1,18 +1,10 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using MusicFilesProcessor.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using MusicPlayUI.MVVM.Models;
-using MusicPlayModels;
 using System.Collections.ObjectModel;
-using System.Xml.Linq;
-using System.Reflection.Metadata;
-using System.Diagnostics;
-using System.Windows.Navigation;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Models.DataBaseModels;
 
 namespace MusicPlayUI.Core.Helpers
 {
@@ -20,88 +12,7 @@ namespace MusicPlayUI.Core.Helpers
     {
         private static readonly Random rng = new();
 
-        public async static Task<UIQueueModel> CreateQueue(this List<TrackModel> tracks, string playingFrom, string cover, bool albumCoverOnly, bool autoCover = false,
-            TrackModel playingTrack = null, bool isShuffled = false, bool isOnRepeat = false, bool orderTrack = false)
-        {
-            if (tracks is null || tracks.Count == 0)
-                return null;
-
-            string duration = tracks.GetTotalLength(out int length);
-            tracks = await tracks.GetAlbumTrackProperties();
-
-            ObservableCollection<TrackModel> Tracks = new();
-
-            if (isShuffled)
-                Tracks = await Task.Run(() => Shuffle<TrackModel>(tracks));
-            else if (orderTrack)
-                Tracks = await Task.Run(Tracks.OrderTracks);
-            else
-                Tracks = new(tracks);
-
-            if (playingTrack is null)
-            {
-                playingTrack = Tracks.First();
-            }
-            else
-            {
-                playingTrack = Tracks.ToList().Find(t => t.Id == playingTrack.Id);
-                if (isShuffled)
-                {
-                    int index = Tracks.IndexOf(playingTrack);
-                    if (index == -1)
-                        playingTrack = Tracks.First();
-                    else
-                    {
-                        Tracks.RemoveAt(index);
-                        Tracks.Insert(0, playingTrack);
-                    }
-                }
-            }
-
-            return new(isShuffled, isOnRepeat, length, duration, playingTrack.Id, playingFrom, cover, playingTrack, tracks, albumCoverOnly, autoCover);
-        }
-
-        /// <summary>
-        /// Get the albumName and the albumCover of each track.
-        /// </summary>
-        /// <param name="tracks"></param>
-        /// <returns></returns>
-        public async static Task<List<T>> GetAlbumTrackProperties<T>(this List<T> tracks) where T : TrackModel
-        {
-            int albumId = 0;
-            string albumTitle = "";
-            string albumCover = "";
-            foreach (TrackModel t in tracks)
-            {
-                if (t != null && !string.IsNullOrWhiteSpace(t.Path))
-                {
-                    if (t.AlbumId != albumId)
-                    {
-                        albumId = t.AlbumId;
-
-                        AlbumModel album = await DataAccess.Connection.GetAlbum(t.AlbumId);
-                        albumTitle = album.Name;
-                        albumCover = album.AlbumCover;
-                    }
-                    t.AlbumName = albumTitle;
-                    t.AlbumCover = albumCover;
-                }
-            }
-            return tracks;
-        }
-
-        public async static Task<T> GetAlbumTrackProperties<T>(this T track) where T : TrackModel
-        {
-            if (track != null && track.Path.ValidPath())
-            {
-                AlbumModel album = await DataAccess.Connection.GetAlbum(track.AlbumId);
-                track.AlbumName = album.Name;
-                track.AlbumCover = album.AlbumCover;
-            }
-            return track;
-        }
-
-        public static IEnumerable<T> YieldShuffle<T>(IEnumerable<T> source)
+        public static IEnumerable<T> YieldShuffle<T>(this IEnumerable<T> source)
         {
             if (source is null || !source.Any()) yield return default;
             else
@@ -120,51 +31,88 @@ namespace MusicPlayUI.Core.Helpers
             }
         }
 
-        public static ObservableCollection<T> Shuffle<T>(this IEnumerable<T> tracks, T firstTrack = null) where T : BaseModel
+        public static ObservableCollection<T> Shuffle<T>(this IEnumerable<T> tracks, T firstTrack = null) where T : ObservableObject
         {
             if (tracks is null || tracks.Count() < 2) return new(tracks);
 
             T[] elements = tracks.ToArray();
-            int fisrtTrackIndex = -1;
+            int firstTrackIndex = -1;
             int n = tracks.Count();
             while(n > 1)
             {
                 int k = rng.Next(n);
                 n--;
                 if (elements[k].Equals(firstTrack))
-                    fisrtTrackIndex = k;
+                    firstTrackIndex = k;
                 else
                     (elements[k], elements[n]) = (elements[n], elements[k]);
             }
 
-            if(fisrtTrackIndex != -1)
+            if(firstTrackIndex != -1)
             {
-                (elements[fisrtTrackIndex], elements[0]) = (elements[0], elements[fisrtTrackIndex]);
+                (elements[firstTrackIndex], elements[0]) = (elements[0], elements[firstTrackIndex]);
             }
             return new ObservableCollection<T>(elements);
         }
 
-        public static ObservableCollection<T> OrderTracks<T>(this ObservableCollection<T> queue) where T : TrackModel
+        public static ObservableCollection<T> OrderTracks<T>(this ObservableCollection<T> queue) where T : Track
         {
-            return new(queue.OrderBy(t => t.AlbumId).ThenBy(t => t.DiscNumber).ThenBy(t => t.Tracknumber));
+            return new(queue.OrderBy(t => t.Album.Id).ThenBy(t => t.DiscNumber).ThenBy(t => t.TrackNumber));
         }
 
-        public static List<T> OrderTracks<T>(this List<T> queue) where T : TrackModel
+        public static List<T> OrderTracks<T>(this List<T> queue) where T : Track
         {
-            return new(queue.OrderBy(t => t.AlbumId).ThenBy(t => t.DiscNumber).ThenBy(t => t.Tracknumber));
+            return new(queue.OrderBy(t => t.Album.Id).ThenBy(t => t.DiscNumber).ThenBy(t => t.TrackNumber));
         }
 
-        public static ObservableCollection<UIOrderedTrackModel> OrderTracks(this ObservableCollection<UIOrderedTrackModel> queue)
-        {
-            return new(queue.OrderBy(t => t.TrackIndex));
-        }
-
-        public static List<UIOrderedTrackModel> OrderTracks(this List<UIOrderedTrackModel> queue)
+        public static ObservableCollection<T> Order<T>(this ObservableCollection<T> queue) where T : OrderedTrack
         {
             return new(queue.OrderBy(t => t.TrackIndex));
         }
 
-        public static int GetLengthUntilTrack<T>(this int trackIndex, ObservableCollection<T> queue) where T : TrackModel
+        public static List<T> Order<T>(this List<T> queue) where T : OrderedTrack
+        {
+            return new(queue.OrderBy(t => t.TrackIndex));
+        }
+
+        public static ObservableCollection<T> ToOrderedTracks<T>(this ObservableCollection<Track> tracks) where T : OrderedTrack
+        {
+            ObservableCollection<T> output = [];
+            for (int i = 0; i < tracks.Count; i++)
+            {
+                output.Add((T)new OrderedTrack(tracks[i], i));
+            }
+            return output;
+        }
+
+        public static List<T> ToOrderedTracks<T>(this List<Track> tracks) where T : OrderedTrack
+        {
+            List<T> output = [];
+            for (int i = 0; i < tracks.Count; i++)
+            {
+                if(typeof(T) == typeof(PlaylistTrack))
+                {
+                    output.Add((T)(OrderedTrack)new PlaylistTrack(tracks[i], i + 1));
+                }
+                else
+                {
+                    output.Add((T)new OrderedTrack(tracks[i], i + 1));
+                }
+            }
+            return output;
+        }
+
+        public static List<Track> ToTrack<T>(this List<T> tracks) where T : OrderedTrack
+        {
+            return tracks.Select(t => t.Track).ToList();
+        }
+
+        public static ObservableCollection<Track> ToTrack<T>(this ObservableCollection<T> tracks) where T : OrderedTrack
+        {
+            return new(tracks.Select(t => t.Track));
+        }
+
+        public static int GetLengthUntilTrack<T>(this int trackIndex, ObservableCollection<T> queue) where T : Track
         {
             int length = 0;
             var asSpan = CollectionsMarshal.AsSpan(queue.ToList());
@@ -178,6 +126,20 @@ namespace MusicPlayUI.Core.Helpers
                 }
             }
             return length;
+        }
+
+        public static bool AreEquals<T>(this List<T> list1, List<T> list2) where T : BaseModel
+        {
+            if(list1.Count != list2.Count) return false;
+
+            for (int i = 0; i < list1.Count; i++)
+            {
+                if (list1[i].Id != list2[i].Id)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

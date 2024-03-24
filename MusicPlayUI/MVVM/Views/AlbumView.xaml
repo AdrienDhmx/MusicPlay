@@ -5,169 +5,174 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
-             xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              xmlns:listview="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
-             xmlns:model="clr-namespace:MusicPlayModels.MusicModels;assembly=MusicPlayModels"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
-             xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
-             xmlns:dropdown="clr-namespace:CardDropDown;assembly=CardDropDown"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" 
+             xmlns:mathconv="clr-namespace:MusicPlayUI.Converters" 
+             xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer" 
+             xmlns:controls="clr-namespace:MusicPlayUI.Controls"
              d:DataContext="{d:DesignInstance Type=viewmodel:AlbumViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="DataTemplates\ArtistDataTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <ds:DynamicScrollViewer Background="Transparent"
+                                OnScrollCommand="{Binding OnScrollCommand}"
+                            StartingVerticalOffset="{Binding State.ScrollOffset, Mode=OneWay}"
+                                IsInertiaEnabled="False"
+                      x:Name="AlbumScroll"
+                      Grid.Row="1"            
+                      VerticalScrollBarVisibility="Hidden">
+        <Grid x:Name="HeaderPart">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-    <Grid helper:ScrollViewerHelper.IsStickyEnabled="True"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=AlbumScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyPart}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+            <Grid Panel.ZIndex="2"
+                HorizontalAlignment="Stretch">
 
-        <Border VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
-              Panel.ZIndex="2"
-              Background="{DynamicResource PrimaryContainer}">
+                <Border Style="{DynamicResource PageHeaderBackground}"/>
 
-            <Grid x:Name="StickyPart"
-                    MinHeight="180"
-                  Height="350"
-                  HorizontalAlignment="Stretch"
-                  MaxHeight="350">
-                <Grid Grid.Column="1"
-                    Margin="10"
-                    HorizontalAlignment="Center">
+                <Grid Margin="{Binding TopMargin}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="0.05*" MaxWidth="80"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="0.05*" MaxWidth="80"/>
                     </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="1"
+                        Margin="0, 10"
+                        HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Album Cover -->
+                        <Border Grid.RowSpan="2"
+                                    MaxHeight="400"
+                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                    Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
+                            <Border.Background>
+                                <ImageBrush ImageSource="{Binding Album.AlbumCover, Converter={StaticResource ONullImageConverter}}"
+                                            Stretch="UniformToFill"/>
+                            </Border.Background>
+                        </Border>
 
-                    <!-- Album Cover -->
-                    <Border Grid.RowSpan="2"
-                            Margin="0,0,10,0"
-                            MaxHeight="300"
-                            CornerRadius="{DynamicResource PrimaryCornerRadius}"
-                            Width="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}">
-                        <Border.Background>
-                            <ImageBrush ImageSource="{Binding Album.AlbumCover, Converter={StaticResource MNullImageConverter}}"
-                                                Stretch="UniformToFill"/>
-                        </Border.Background>
-                    </Border>
-
-                    <!-- Album & Artist Name + Duration + More Opt Btn -->
-                    <Grid VerticalAlignment="Stretch"
-                          HorizontalAlignment="Stretch"
-                          MaxHeight="300"
-                          Margin="0,4, 0, 0"
-                            Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="{Binding Album.Year}"
-                                   Visibility="{Binding Album.Year, Converter={StaticResource BoolToVisibilityConverter}}"
-                                        Style="{DynamicResource NLargeStyle}"/>
-
-                        <Grid Grid.Row="1"
-                              VerticalAlignment="Top">
+                        <!-- Album & Artist Name + Duration + More Opt Btn -->
+                        <Grid VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                    Margin="18, 4, 0, 4"
+                                  MaxHeight="350"
+                                  x:Name="AlbumInfoGrid"
+                                    Grid.Column="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
-                            
-                            <!--  Album Name -->
-                            <TextBlock Text="{Binding Album.Name}"
-                                       Grid.ColumnSpan="2"
-                                       MaxWidth="{Binding ActualHeight, ElementName=AlbumScroll,Converter={StaticResource SizeConverter}, ConverterParameter=0.5}"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Center"
-                                       MaxHeight="{Binding ActualHeight, ElementName=StickyPart, Converter={StaticResource SizeConverter}, ConverterParameter=2}"
-                                       Style="{DynamicResource SLargeHeaderStyle}"/>
+                            <Grid VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*" MinHeight="55"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
 
-                            <!--  Artist Name -->
-                            <TextBlock Text="{Binding MainArtist.Name}"
-                                       Grid.Row="1"
-                                       MaxWidth="650"
-                                       Style="{DynamicResource SLSubDataStyle}">
-                                <TextBlock.InputBindings>
-                                    <MouseBinding Gesture="LeftClick"
-                                                  Command="{Binding NavigateToArtistByIdCommand}"
-                                                  CommandParameter="{Binding MainArtist.ArtistId}"/>
-                                </TextBlock.InputBindings>
-                            </TextBlock>
+                                <TextBlock Text="{Binding Album.Release}"
+                                           Style="{DynamicResource NLargeStyle}"/>
 
+                                <!--  Album Name -->
+                                <controls:If Grid.Row="1"                                                   
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Center"
+                                            MaxHeight="140">
+                                    <controls:If.Condition>
+                                        <MultiBinding Converter="{mathconv:BooleanExpressionConverter}" ConverterParameter="a >= 500">
+                                            <Binding ElementName="AlbumInfoGrid" Path="ActualWidth"/>
+                                        </MultiBinding>
+                                    </controls:If.Condition>
+                                    <controls:If.True>
+                                        <TextBlock Text="{Binding Album.MultilineName}"
+                                                   Style="{DynamicResource SLargeHeaderStyle}">
+                                        </TextBlock>
+                                    </controls:If.True>
+
+                                    <controls:If.False>
+                                        <TextBlock Text="{Binding Album.Name}"
+                                                   Style="{DynamicResource SLargeHeaderStyle}">
+                                        </TextBlock>
+                                    </controls:If.False>
+                                    </controls:If>
+                                
+                                <!--  Artist Name -->
+                                <TextBlock Text="{Binding Album.PrimaryArtist.Name}"
+                                               Grid.Row="2"
+                                           Margin="0, 6, 0, 0"
+                                               Style="{DynamicResource SLSubDataStyle}">
+                                    <TextBlock.InputBindings>
+                                        <MouseBinding Gesture="LeftClick"
+                                                          Command="{Binding DataContext.NavigateToArtistByIdCommand, ElementName=RootView}"
+                                                          CommandParameter="{Binding Album.PrimaryArtist.Id}"/>
+                                    </TextBlock.InputBindings>
+                                </TextBlock>
+
+                                <StackPanel Orientation="Horizontal"
+                                             Grid.Row="3"
+                                            Margin="0,10"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top">
+
+                                    <TextBlock Text="{Binding Album.WrittenDuration}"
+                                                    Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+                                    <TextBlock Text="{Binding Album.Tracks.Count, StringFormat=- {0}}"
+                                                   Margin="5,0"
+                                                   Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+                                    <TextBlock Text="{x:Static lang:Resources.Tracks}"
+                                                   Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Action Buttons -->
                             <StackPanel Orientation="Horizontal"
-                                     Grid.Row="2"
-                                    Margin="0,10"
-                                        HorizontalAlignment="Left">
-                                <TextBlock Text="{Binding Album.Duration}"
-                                            Style="{DynamicResource NLargeSecondaryStyle}"/>
+                                        Grid.Row="1"
+                                        Margin="0, 10, 0, 0"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Left">
+                                <iconbtn:IconButton Command="{Binding PlayAlbumCommand}"
+                                                    CommandParameter="{Binding Album}"
+                                                        Style="{DynamicResource FilledPlayBtn}">
+                                </iconbtn:IconButton>
 
-                                <TextBlock Text="{Binding AlbumTracks.Count, StringFormat=- {0}}"
-                                           Margin="5,0"
-                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
+                                <iconbtn:IconButton Command="{Binding PlayShuffledAlbumCommand}"
+                                                    CommandParameter="{Binding Album}"
+                                                        Style="{DynamicResource FilledPlayShuffleBtn}">
+                                </iconbtn:IconButton>
 
-                                <TextBlock Text="{x:Static lang:Resources.Tracks}"
-                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
-
+                                <!-- More Option Button -->
+                                <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
+                                                            IconHeight="5"
+                                                            IconWidth="28"
+                                                                Icon="{DynamicResource MoreOptionIcon}"
+                                                                Command="{Binding OpenAlbumPopupCommand}"
+                                                            CommandParameter="{Binding Album}"/>
                             </StackPanel>
                         </Grid>
-
-                        <!-- Play Buttons -->
-                        <StackPanel Grid.Row="2"
-                                    Grid.ColumnSpan="2"
-                                    Style="{DynamicResource LargePlayBtnStackPanel}"
-                                    Orientation="Horizontal">
-                            <iconbtn:IconButton Command="{Binding PlayAlbumCommand}"
-                                                                    Style="{DynamicResource LargePlayButton}"/>
-
-                            <iconbtn:IconButton Command="{Binding PlayShuffledAlbumCommand}"
-                                                                    Style="{DynamicResource LargePlayShuffleButton}"/>
-
-                            <!-- More Option Button -->
-                            <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
-                                                    Command="{Binding OpenAlbumPopupCommand}"/>
-                        </StackPanel>
                     </Grid>
-
-                    <!-- Small Play Buttons -->
-                    <StackPanel Grid.Column="2"
-                                Grid.RowSpan="2"
-                                Style="{DynamicResource SmallPlayBtnStackPanel}"
-                                Orientation="Horizontal">
-                        <iconbtn:IconButton Command="{Binding PlayAlbumCommand}"
-                                            Style="{DynamicResource SmallPlayButton}"/>
-
-                        <iconbtn:IconButton Command="{Binding PlayShuffledAlbumCommand}"
-                                            Style="{DynamicResource SmallPlayShuffleButton}"/>
-
-                        <!-- More Option Button -->
-                        <iconbtn:IconButton Style="{DynamicResource SmallBtn}"
-                                                IconHeight="5"
-                                                IconWidth="28"
-                                                    Icon="{DynamicResource MoreOptionIcon}"
-                                                    Margin="6,0"
-                                                    Command="{Binding OpenAlbumPopupCommand}"/>
-                    </StackPanel>
                 </Grid>
             </Grid>
-        </Border>
-        
-        <ScrollViewer Background="Transparent"
-                      x:Name="AlbumScroll"
-                      Grid.Row="1"
-                      VerticalScrollBarVisibility="Hidden">
-            <Grid Margin="0,5,0,0">
+
+            <Grid Margin="0,5,0,0"
+                  Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -175,7 +180,7 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <listview:ChipListView Genres="{Binding Genres}"
+                <listview:ChipListView Genres="{Binding Album.Tags}"
                                        NavigateToGenreCommand="{Binding NavigateToGenreCommand}"
                                         Margin="0,5,0,0"
                                         VerticalAlignment="Center"
@@ -183,8 +188,7 @@
 
                 <listview:TrackListView Grid.Row="1"
                                         AlbumVisibility="Collapsed"
-                                        CoverVisibility="{Binding QueueService.AreCoversEnabled, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=2, Mode=OneWay}"
-                                        TrackModels="{Binding AlbumTracks}"/>
+                                        TrackModels="{Binding Album.OrderedTracks}"/>
 
                 <StackPanel Grid.Row="3"
                             MaxWidth="1500"
@@ -193,7 +197,7 @@
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Visible"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Artists.Count}" Value="0">
+                                <DataTrigger Binding="{Binding Album.CreditedArtists.Count}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -204,21 +208,35 @@
                             BorderThickness="0,0,0,1"
                             BorderBrush="{DynamicResource Primary}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Artists.Count}"
+                            <TextBlock Text="{Binding Album.CreditedArtists.Count}"
                                        Style="{DynamicResource SlistInfoStyle}"/>
 
-                            <TextBlock Text=" artists related to this album"
+                            <TextBlock Text="credited artists"
+                                       Margin="0"
                                        Style="{DynamicResource SlistInfoStyle}"/>
                         </StackPanel>
                     </Border>
-                    
-                    <listview:HorizontalArtistListView Artists="{Binding Artists}"
-                                                            VerticalAlignment="Stretch"
-                                                           Margin="30,0"
-                                                            ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+
+                    <ItemsControl ItemsSource="{Binding Album.CreditedArtists}"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch"
+                                  Grid.Row="1"
+                                  Margin="20,6"
+                                  Style="{DynamicResource LibraryItemsControl}">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ds:DynamicScrollViewer VerticalScrollBarVisibility="Disabled"
+                                                   HorizontalAlignment="Stretch"
+                                                    HorizontalScrollBarVisibility="Hidden">
+                                    <StackPanel IsItemsHost="true" Orientation="Horizontal"
+                                                HorizontalAlignment="Center"/>
+                                </ds:DynamicScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
                 </StackPanel>
             </Grid>
             
-        </ScrollViewer>
-    </Grid>
+        </Grid>
+    </ds:DynamicScrollViewer>
 </UserControl>

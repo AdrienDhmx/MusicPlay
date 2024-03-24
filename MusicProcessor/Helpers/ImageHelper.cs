@@ -2,25 +2,14 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
 
 namespace MusicFilesProcessor.Helpers
 {
-    public static class ImageHelper
+    public static partial class ImageHelper
     {
-        private static readonly List<string> ImageExtension = new() { ".png", ".jpg", ".bmp", ".gif", ".webp" };
-        public static readonly string imgFormat = ".png";
-        public static readonly int treshold = 200000;
-
-        public static string CreateCoverPath(string fileName)
-        {
-            fileName = Path.GetFileName(fileName);
-            fileName = fileName.FormatSyntax();
-
-            string path = Path.Combine(DirectoryHelper.AppCoverFolder, fileName);
-            DirectoryHelper.CheckDirectory(DirectoryHelper.AppCoverFolder);
-            path = CreateValidPath(path);
-            return path;
-        }
+        public static readonly int threshold = 200000;
 
         private static string CreateValidPath(this string path)
         {
@@ -47,19 +36,17 @@ namespace MusicFilesProcessor.Helpers
             return path;
         }
 
-        public static (string, string) GetAlbumCover(string album, string filepath)
+        public static string GetAlbumCover(string album, string filePath)
         {
-            if (Path.HasExtension(filepath))
-                filepath = DirectoryHelper.GetDirectory(filepath);
+            if (Path.HasExtension(filePath))
+                filePath = DirectoryHelper.GetDirectory(filePath);
 
-            string coverPath = GetAlbumCoverFromDirectory(filepath, album);
+            string coverPath = GetAlbumCoverFromDirectory(filePath, album);
             if (!string.IsNullOrWhiteSpace(coverPath))
             {
-                string newPath = CreateCoverPath(CreateCoverFilename());
-                coverPath.SaveFileToNewPath(newPath);
-                return (coverPath, newPath);
+                return coverPath;
             }
-            return ("", "");
+            return string.Empty;
         }
 
         /// <summary>
@@ -69,20 +56,76 @@ namespace MusicFilesProcessor.Helpers
         /// <param name="newPath"></param>
         public static void SaveFileToNewPath(this string file, string newPath)
         {
-            if(file.ValidPath() && !string.IsNullOrWhiteSpace(newPath))
+            if(file.ValidFilePath() && !string.IsNullOrWhiteSpace(newPath))
             {
                 if(file != newPath)
                     File.Copy(file, newPath, true); // copy original version
 
                 string mediumFileNamePath = GetModifiedCoverPath(newPath, true);
                 string thumbnailFileNamePath = GetModifiedCoverPath(newPath, false);
-                ImageProcessor.FormatImage(file, mediumFileNamePath, thumbnailFileNamePath, treshold);
+                ImageProcessor.FormatImage(file, mediumFileNamePath, thumbnailFileNamePath, threshold);
             }
+        }
+
+        public static void SaveSmallerImageVersions(this string file)
+        {
+            if (file.ValidFilePath())
+            {
+                string mediumFileNamePath = GetModifiedCoverPath(file, true);
+                string thumbnailFileNamePath = GetModifiedCoverPath(file, false);
+                ImageProcessor.FormatImage(file, mediumFileNamePath, thumbnailFileNamePath, threshold);
+            }
+        }
+
+        public static async Task SaveAllCovers<T>(List<string> covers, T playableModel, Action<string> saveFirstCallback) where T : PlayableModel
+        {
+            bool saved = false;
+            for (int i = 0; i < 10 && i < covers.Count; i++)
+            {
+                string path = playableModel.GetNewCoverPath();
+                string image = covers[i];
+                if (await ConnectivityHelper.Instance.DownloadImage(image, path))
+                {
+                    SaveSmallerImageVersions(path);
+                    if (!saved)
+                    {
+                        saveFirstCallback(path);
+                        saved = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update the entity Cover/Artwork with a copy of the file parameter in its cover folder
+        /// </summary>
+        /// <param name="playableModel"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static async Task UpdateCoverWithFile(this PlayableModel playableModel, string file)
+        {
+            if (!file.ValidFilePath())
+                return;
+
+            string path = playableModel.GetNewCoverPath();
+            SaveFileToNewPath(file, path);
+
+            if (playableModel is Album album)
+                await Album.UpdateCover(album, path);
+            else if (playableModel is Artist artist)
+                await Artist.UpdateCover(artist, path);
+            else if (playableModel is Track track)
+                await Track.UpdateArtwork(track, path);
+            else if(playableModel is Playlist playlist) 
+                Playlist.UpdateCover(playlist, path);
+            else
+                throw new Exception("This type doesn't support the UpdateCoverWithFile method yet!");
         }
 
         public static string GetModifiedCoverPath(this string path, bool medium)
         {
-            if (!ValidPath(path))
+            if (!ValidFilePath(path))
                 return string.Empty;
 
             string fileName = Path.GetFileNameWithoutExtension(path);
@@ -101,11 +144,6 @@ namespace MusicFilesProcessor.Helpers
             return directory + fileName + ext;
         }
 
-        public static string CreateCoverFilename()
-        {
-            return Path.GetRandomFileName() + imgFormat;
-        }
-
         private static string FormatSyntax(this string text)
         {
             text = text.Replace("|", "-");
@@ -116,15 +154,15 @@ namespace MusicFilesProcessor.Helpers
             return text;
         }
 
-        private static string FormatForCoverSearch(this string text, bool removeCover = false)
+        public static string FormatFileNameForCoverSearch(this string text, bool removeCover = false)
         {
             if (string.IsNullOrWhiteSpace(text)) 
                 return "";
 
             text = text.Replace(" ", string.Empty).ToLower();
-            text = Regex.Replace(text, @"[-,._&'|:]*", string.Empty); // Remove any of these
-            text = Regex.Replace(text, @"(\([^()]*\))*", string.Empty); // Remove any parentheses and their content
-            text = Regex.Replace(text, @"[1-9]*", string.Empty); // Remove all numbers
+            text = SpecialCharacters().Replace(text, string.Empty); // Remove any special characters
+            text = ParenthesesWithContent().Replace(text, string.Empty); // Remove any parentheses and their content
+            text = Numbers().Replace(text, string.Empty); // Remove all numbers
             if (removeCover)
             {
                 text = text.Replace("cover", string.Empty);
@@ -139,10 +177,14 @@ namespace MusicFilesProcessor.Helpers
                 return "";
             }
 
-            string albumNameForSearch = albumName.FormatForCoverSearch(true);
-            foreach (string file in Directory.EnumerateFiles(Path.GetDirectoryName(path)).Where(s => ImageExtension.Contains(Path.GetExtension(s).ToLower())))
+            string albumNameForSearch = albumName.FormatFileNameForCoverSearch(true);
+            foreach (string file in Directory.EnumerateFiles(Path.GetDirectoryName(path)))
             {
-                string filename = Path.GetFileNameWithoutExtension(file).FormatForCoverSearch();
+                // not a supported image file
+                if (!CoverHelper.SupportedImageExt.Contains(Path.GetExtension(file)))
+                    continue;
+
+                string filename = Path.GetFileNameWithoutExtension(file).FormatFileNameForCoverSearch();
                 
                 if (filename.Contains(albumNameForSearch) || filename == "cover" || filename.Contains("albumcover"))
                 {
@@ -160,24 +202,27 @@ namespace MusicFilesProcessor.Helpers
                 return "";
             }
 
-            album = album.FormatForCoverSearch();
-            string titleForSearch = title.FormatForCoverSearch(true);
+            album = album.FormatFileNameForCoverSearch();
+            string titleForSearch = title.FormatFileNameForCoverSearch(true);
 
             if (string.IsNullOrWhiteSpace(titleForSearch))
                 return "";
 
-            List<string> files = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).ToList().Where(s => ImageExtension.Contains(Path.GetExtension(s).ToLower())).ToList();
+            List<string> files = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).ToList();
             foreach (string file in files)
             {
-                string filename = Path.GetFileNameWithoutExtension(file).FormatForCoverSearch(true);
+                // not a supported image file
+                if (!CoverHelper.SupportedImageExt.Contains(Path.GetExtension(file)))
+                    continue;
+
+
+                string filename = Path.GetFileNameWithoutExtension(file).FormatFileNameForCoverSearch(true);
                 if (filename.Contains(album) || album.Contains(filename) || string.IsNullOrWhiteSpace(filename))
                     continue;
 
                 if (filename.Contains(titleForSearch) || titleForSearch.Contains(filename))
                 {
-                    string newPath = CreateCoverPath(CreateCoverFilename());
-                    file.SaveFileToNewPath(newPath);
-                    return newPath;
+                    return file;
                 }
             }
 
@@ -191,24 +236,32 @@ namespace MusicFilesProcessor.Helpers
                 return "";
             }
 
-            string artistForSearch = artist.FormatForCoverSearch(true);
-            List<string> files = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).ToList().Where(s => ImageExtension.Contains(Path.GetExtension(s).ToLower())).ToList();
+            string artistForSearch = artist.FormatFileNameForCoverSearch(true);
+            List<string> files = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).ToList();
             foreach (string file in files)
             {
-                string filename = Path.GetFileNameWithoutExtension(file).FormatForCoverSearch();
+                // not a supported image file
+                if (!CoverHelper.SupportedImageExt.Contains(Path.GetExtension(file)))
+                    continue;
+
+                string filename = Path.GetFileNameWithoutExtension(file).FormatFileNameForCoverSearch();
 
                 if (filename.Contains(artistForSearch) || filename.Contains("artist"))
                 {
-                    string newPath = CreateCoverPath(CreateCoverFilename());
-                    file.SaveFileToNewPath(newPath);
-                    return newPath;
+                    return file;
                 }
             }
 
             return "";
         }
 
-        public static bool ValidPath(this string path, bool acceptWhiteSpace = false)
+        /// <summary>
+        /// Make sure the path is not null or white space and that it exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="acceptWhiteSpace"></param>
+        /// <returns></returns>
+        public static bool ValidFilePath(this string path, bool acceptWhiteSpace = false)
         {
             if (!acceptWhiteSpace && string.IsNullOrWhiteSpace(path)) return false;
 
@@ -216,5 +269,12 @@ namespace MusicFilesProcessor.Helpers
 
             return File.Exists(path);
         }
+
+        [GeneratedRegex(@"[-,._&'|:\\/;`~!?<>%*^$#@]*")]
+        private static partial Regex SpecialCharacters();
+        [GeneratedRegex(@"(\([^()]*\))*")]
+        private static partial Regex ParenthesesWithContent();
+        [GeneratedRegex(@"[1-9]*")]
+        private static partial Regex Numbers();
     }
 }

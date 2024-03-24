@@ -16,7 +16,7 @@
         <ScrollViewer x:Name="RootScroll"
                       VerticalScrollBarVisibility="Hidden"
                       PreviewMouseWheel="RootScroll_PreviewMouseWheel">
-            <Grid>
+            <Grid Margin="0, 10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -25,10 +25,10 @@
 
                 <cardexpander:CardDropDown Icon="{DynamicResource music_icon}"
                                            Foreground="{DynamicResource WhiteForeground}"
-                                           Margin="5, 2"
+                                           Margin="5"
                                             Background="{DynamicResource ScdWhiteTransparent}"
                                            BorderThickness="1.5"
-                                            BorderBrush="{DynamicResource Primary}"
+                                            BorderBrush="{DynamicResource WhiteTransparent}"
                                            FontSize="18"
                                            FontWeight="DemiBold"
                                            HeaderHeight="80"
@@ -53,13 +53,15 @@
                                                  Foreground="{DynamicResource WhiteForeground}"
                                                  FontSize="18"
                                                  FontWeight="Bold"
+                                                   Margin="8,2"
                                                  HorizontalAlignment="Stretch"
                                                  VerticalAlignment="Stretch"/>
 
                                         <TextBlock Text="{Binding InfoValue}"
                                                  Grid.Column="1"
+                                                   HorizontalAlignment="Right"
                                                    Foreground="{DynamicResource WhiteForeground}"
-                                                 Margin="5,2"
+                                                 Margin="8,2"
                                                    Style="{DynamicResource NTrackDataStyle}"/>
                                     </Grid>
                                 </Border>
@@ -73,10 +75,10 @@
                                            Grid.Row="1"
                                            HeaderHeight="80"
                                            Foreground="{DynamicResource WhiteForeground}"
-                                           Margin="5, 2"
+                                           Margin="5"
                                             Background="{DynamicResource ScdWhiteTransparent}"
                                            BorderThickness="1.5"
-                                            BorderBrush="{DynamicResource Primary}"
+                                            BorderBrush="{DynamicResource WhiteTransparent}"
                                            FontSize="18"
                                            FontWeight="DemiBold"
                                            Header="{x:Static lang:Resources.File_Properties}"
@@ -102,13 +104,15 @@
                                                  Foreground="{DynamicResource WhiteForeground}"
                                                  FontSize="18"
                                                  FontWeight="Bold"
+                                                    Margin="8,2"
                                                  HorizontalAlignment="Stretch"
                                                  VerticalAlignment="Center"/>
 
                                         <TextBlock Text="{Binding InfoValue}"
                                                    Foreground="{DynamicResource WhiteForeground}"
                                                  Grid.Column="1"
-                                                 Margin="5,2"
+                                                   HorizontalAlignment="Right"
+                                                 Margin="8,2"
                                                    Style="{DynamicResource NTrackDataStyle}"/>
                                     </Grid>
                                 </Border>
@@ -122,10 +126,10 @@
                                            Grid.Row="2"
                                            HeaderHeight="80"
                                            Foreground="{DynamicResource WhiteForeground}"
-                                           Margin="5, 2"
+                                           Margin="5"
                                             Background="{DynamicResource ScdWhiteTransparent}"
                                            BorderThickness="1.5"
-                                            BorderBrush="{DynamicResource Primary}"
+                                            BorderBrush="{DynamicResource WhiteTransparent}"
                                            FontSize="18"
                                            FontWeight="DemiBold"
                                            Header="{x:Static lang:Resources.Your_Interactions}"
@@ -143,8 +147,9 @@
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Center">
                             <!-- Rating -->
-                            <rating:RatingControl Fill="{DynamicResource Primary}"
-                                      MouseOverColor="{DynamicResource PrimaryHover}"
+                            <rating:RatingControl Fill="{DynamicResource WhiteTransparent}"
+                                      MouseOverColor="{DynamicResource ScdWhiteTransparent}"
+                                                  Width="140"
                                                   HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Shape="{DynamicResource StarIcon}"
@@ -163,10 +168,10 @@
                                     Margin="10,0"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
-                                    StrokeColor="{DynamicResource Primary}"
+                                    StrokeColor="{DynamicResource WhiteTransparent}"
                                     Command="{Binding IsFavoriteCommand}"
                                     MouseOverBackground="Transparent"
-                                    FillColor="{DynamicResource Primary}">
+                                    FillColor="{DynamicResource WhiteTransparent}">
                                 <iconbtn:IconButton.Style>
                                     <Style TargetType="iconbtn:IconButton">
                                         <Setter Property="Icon" Value="{DynamicResource HeartIcon}"/>
@@ -193,13 +198,13 @@
                                     IconStretch="Fill"
                                     MouseOverBackground="Transparent"
                                     Command="{Binding IsFavoriteCommand}"
-                                    StrokeColor="{DynamicResource Primary}">
+                                    StrokeColor="{DynamicResource WhiteTransparent}">
                                 <iconbtn:IconButton.Style>
                                     <Style TargetType="iconbtn:IconButton">
                                         <Setter Property="FillColor" Value="Transparent"/>
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="true">
-                                                <Setter Property="FillColor" Value="{DynamicResource PrimaryHover}"/>
+                                                <Setter Property="FillColor" Value="{DynamicResource ScdWhiteTransparent}"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>

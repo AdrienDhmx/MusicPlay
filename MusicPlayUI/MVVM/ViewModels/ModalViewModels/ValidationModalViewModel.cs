@@ -1,4 +1,4 @@
-﻿using MusicPlayModels;
+﻿
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
@@ -11,10 +11,8 @@ using System.Windows.Input;
 
 namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 {
-    public class ValidationModalViewModel : ViewModel
+    public class ValidationModalViewModel : ModalViewModel
     {
-        private readonly IModalService _modalService;
-        private readonly INavigationService _navigationService;
         private ConfirmActionModel _validationMessage;
         public ConfirmActionModel ValidationMessage
         {
@@ -24,15 +22,11 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 
         public ICommand ConfirmCommand { get; }
         public ICommand CancelCommand { get; }
-        public ValidationModalViewModel(IModalService modalService, INavigationService navigationService)
+        public ValidationModalViewModel(IModalService modalService) : base(modalService)
         {
-            _modalService = modalService;
-            _navigationService = navigationService;
-
             ConfirmCommand = new RelayCommand(() => _modalService.CloseModal());
             CancelCommand = new RelayCommand(() => _modalService.CloseModal(true));
 
-            _navigationService.ClosePopup();
             Load();
         }
 

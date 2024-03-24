@@ -4,196 +4,224 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Services;
-using SQLitePCL;
-using Windows.Devices.PointOfService;
+using MusicPlayUI.MVVM.Models;
+using MusicPlayUI.MVVM.ViewModels;
 
 namespace MusicPlayUI.Core.Commands
 {
-    public class KeyGesture
-    {
-        public Key Key { get; private set; }
-        public ModifierKeys Modifier { get; private set; }
-
-        public KeyGesture(Key key, ModifierKeys modifier)
-        {
-            Key = key;
-            Modifier = modifier;
-        }
-    }
-
     public class ShortcutsManager
     {
-        private const int SettingsEnumStartCommandEnum = 100;
-        private readonly ICommandsManager _commandsManager;
-        private readonly Window _window;
+        public static readonly int SettingsEnumStartCommandEnum = 100;
+        public static readonly int ShortcutQuantity = 27;
+        private readonly ICommandsManager _commandsManager; // command manager that define all the commands
+        private readonly Window _window; // window to listen to the key down event from
 
-        private Dictionary<CommandEnums, KeyBinding> _keyBindings = new();
-        public Dictionary<CommandEnums, KeyBinding> KeyBindings => _keyBindings;
+        private Key LastKeyDown { get; set; } = Key.None;
+        private ModifierKeys LastModifierDown { get; set; } = ModifierKeys.None;
 
-        private readonly KeyGesture _defaultPlayPauseGesture = new(Key.Space, ModifierKeys.None);
-        private readonly KeyGesture _defaultNextTrackGesture = new(Key.Right, ModifierKeys.Shift);
-        private readonly KeyGesture _defaultPreviousTrackGesture = new(Key.Left, ModifierKeys.Shift);
+        public bool NextIsChangeOfKey { get; set; } = false;
+        public event Action<Key> KeyDown; 
 
-        private readonly KeyGesture _defaultShuffleGesture = new(Key.S, ModifierKeys.Shift);
-        private readonly KeyGesture _defaultRepeatGesture = new(Key.R, ModifierKeys.Shift);
-
-        private readonly KeyGesture _defaultDecreaseVolumeGesture = new(Key.Down, ModifierKeys.Shift);
-        private readonly KeyGesture _defaultIncreaseVolumeGesture = new(Key.Up, ModifierKeys.Shift);
-        private readonly KeyGesture _defaultMuteVolumeGesture = new(Key.M, ModifierKeys.Shift);
-
-        private readonly KeyGesture _defaultFavoriteGesture = new(Key.F, ModifierKeys.Control);
-
-        private readonly KeyGesture _defaultRating0Gesture = new(Key.D0, ModifierKeys.Control);
-        private readonly KeyGesture _defaultRating1Gesture = new(Key.D1, ModifierKeys.Control);
-        private readonly KeyGesture _defaultRating2Gesture = new(Key.D2, ModifierKeys.Control);
-        private readonly KeyGesture _defaultRating3Gesture = new(Key.D3, ModifierKeys.Control);
-        private readonly KeyGesture _defaultRating4Gesture = new(Key.D4, ModifierKeys.Control);
-        private readonly KeyGesture _defaultRating5Gesture = new(Key.D5, ModifierKeys.Control);
-
-        private readonly KeyGesture _defaultNavigateHomeGesture = new(Key.H, ModifierKeys.Alt);
-        private readonly KeyGesture _defaultNavigateToAlbumsGesture = new(Key.D, ModifierKeys.Alt);
-        private readonly KeyGesture _defaultNavigateToArtistsGesture = new(Key.A, ModifierKeys.Alt);
-        private readonly KeyGesture _defaultNavigateToPlaylistsGesture = new(Key.P, ModifierKeys.Alt);
-        private readonly KeyGesture _defaultNavigateToNowPlayingGesture = new(Key.N, ModifierKeys.Alt);
-        private readonly KeyGesture _defaultNavigateToImportGesture = new(Key.I, ModifierKeys.Alt);
-        private readonly KeyGesture _defaultNavigateToSettingsGesture = new(Key.S, ModifierKeys.Alt);
-        private readonly KeyGesture _defaultNavigateBackGesture = new(Key.B, ModifierKeys.Alt); 
-        
-        private readonly KeyGesture _defaultToggleQueueDrawer = new(Key.Q, ModifierKeys.Alt);
-
-        private readonly KeyGesture _defaultEscapeFullScreenGesture = new(Key.Escape, ModifierKeys.None);
-        private readonly KeyGesture _defaultToggleFullScreenGesture = new(Key.F, ModifierKeys.Alt);
-
-        public KeyBinding PlayPauseGesture { get; private set; }
-        public KeyBinding NextTrackGesture { get; private set; }
-        public KeyBinding PreviousTrackGesture { get; private set; }
-               
-        public KeyBinding ShuffleGesture { get; private set; }
-        public KeyBinding RepeatGesture { get; private set; }
-              
-        public KeyBinding DecreaseVolumeGesture { get; private set; }
-        public KeyBinding IncreaseVolumeGesture { get; private set; }
-        public KeyBinding MuteVolumeGesture { get; private set; }
-               
-        public KeyBinding FavoriteGesture { get; private set; }
-              
-        public KeyBinding Rating0Gesture { get; private set; }
-        public KeyBinding Rating1Gesture { get; private set; }
-        public KeyBinding Rating2Gesture { get; private set; }
-        public KeyBinding Rating3Gesture { get; private set; }
-        public KeyBinding Rating4Gesture { get; private set; }
-        public KeyBinding Rating5Gesture { get; private set; }
-              
-        public KeyBinding NavigateHomeGesture { get; private set; }
-        public KeyBinding NavigateToAlbumsGesture { get; private set; }
-        public KeyBinding NavigateToArtistsGesture { get; private set; }
-        public KeyBinding NavigateToPlaylistsGesture { get; private set; }
-        public KeyBinding NavigateToNowPlayingGesture { get; private set; }
-        public KeyBinding NavigateToImportGesture { get; private set; }
-        public KeyBinding NavigateToSettingsGesture { get; private set; }
-        public KeyBinding NavigateBackGesture { get; private set; }
-              
-        public KeyBinding ToggleQueueDrawer { get; private set; }
-
-        public KeyBinding EscapeFullScreenGesture { get; private set; }
-        public KeyBinding ToggleFullScreenGesture { get; private set; }
+        private List<ShortcutCommand> _shortcutCommands = new();
+        public List<ShortcutCommand> ShortcutCommands => _shortcutCommands;
 
         public ShortcutsManager(ICommandsManager commandsManager, Window window)
         {
             _commandsManager = commandsManager;
 
             _window = window;
-            ResetToDefault();
+            _window.PreviewKeyDown += OnPreviewKeyDownHandler;
+            _window.PreviewKeyUp += OnPreviewKeyUpHandler;
+            Init();
+        }
+
+        private void OnPreviewKeyUpHandler(object sender, KeyEventArgs e)
+        {
+            ModifierKeys modifier = e.Key.ToModifier();
+            if (e.Key == Key.System)
+            {
+                modifier = e.SystemKey.ToModifier();
+            }
+
+            if (modifier == ModifierKeys.None)
+            {
+                LastKeyDown = Key.None;
+            }
+            else
+            {
+                LastModifierDown = ModifierKeys.None;
+            }
+        }
+
+        private void OnPreviewKeyDownHandler(object sender, KeyEventArgs e)
+        {
+            IInputElement element = Keyboard.FocusedElement;
+
+            if (NextIsChangeOfKey) // the user is changing a shortcut keys
+            {              
+                ModifierKeys modifier = e.Key.ToModifier();
+                Key keyDown = e.Key;
+                if(e.Key == Key.System)
+                {
+                    modifier = e.SystemKey.ToModifier();
+                    keyDown = e.SystemKey;
+                }
+
+                if (modifier != ModifierKeys.None) // modifier are not allowed (chosen with UI)
+                {
+                    KeyDown?.Invoke(Key.None);
+                } 
+                else
+                {
+                    KeyDown?.Invoke(keyDown); // will notify the listener (view model linked to UI to change keys of a command)
+                }
+                e.Handled = true;
+            }
+            // no text box focused and key not already handled
+            else if (element != null && element as TextBox == null)
+            {
+                ModifierKeys modifier = e.Key.ToModifier();
+                if(e.Key == Key.System)
+                {
+                    modifier = e.SystemKey.ToModifier();
+
+                    if (modifier == ModifierKeys.None)
+                    {
+                        LastKeyDown = e.SystemKey;
+                    }
+                    else
+                    {
+                        LastModifierDown = modifier;
+                    }
+                }
+                else
+                {
+                    if (modifier == ModifierKeys.None)
+                    {
+                        LastKeyDown = e.Key;
+                    }
+                    else
+                    {
+                        LastModifierDown = modifier;
+                    }
+                }
+
+                if (HandleKeysDown())
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private bool HandleKeysDown()
+        {
+            foreach (ShortcutCommand shortcut in _shortcutCommands)
+            {
+                if(LastModifierDown == shortcut.Modifier && LastKeyDown == shortcut.Key)
+                {
+                    if(shortcut.Command == null)
+                    {
+                        ChangeShortcut(GetDefaultShortcut(CommandEnums.ToggleTheme));
+                    }
+                    shortcut.Command.Execute(shortcut.CommandParameter);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void Init()
+        {
+            ShortcutCommand shortcut;
+            for (int i = SettingsEnumStartCommandEnum; i < SettingsEnumStartCommandEnum + ShortcutQuantity; i++)
+            {
+                string savedShortcut = ConfigurationService.GetStringPreference((SettingsEnum)i);
+                if (string.IsNullOrEmpty(savedShortcut))
+                {
+                    ResetToDefault();
+                    break;
+                }
+                else
+                {
+                    shortcut = savedShortcut.ParseToShortcut(_commandsManager.GetCommand);
+                }
+
+                if (shortcut != null)
+                {
+                    _shortcutCommands.Add(shortcut);
+                }
+            }
+
+            AddMediaShortCuts();
         }
 
         public void ResetToDefault()
         {
-            _keyBindings = new();
+            _shortcutCommands = new();
 
-            PlayPauseGesture = _defaultPlayPauseGesture.CreateKeyBinding(_commandsManager.PlayPauseCommand);
-            _keyBindings.Add(CommandEnums.PlayPause, PlayPauseGesture);
+            ShortcutCommand shortcut;
+            for (int i = SettingsEnumStartCommandEnum; i < SettingsEnumStartCommandEnum + ShortcutQuantity; i++)
+            {
+                shortcut = GetDefaultShortcut((CommandEnums)(i - SettingsEnumStartCommandEnum));
+                ConfigurationService.SetPreference((SettingsEnum)i, shortcut.ShortcutToString());
 
-            NextTrackGesture = _defaultNextTrackGesture.CreateKeyBinding(_commandsManager.NextTrackCommand);
-            _keyBindings.Add(CommandEnums.NexTrack, NextTrackGesture);
+                _shortcutCommands.Add(shortcut);
+            }
 
-            PreviousTrackGesture = _defaultPreviousTrackGesture.CreateKeyBinding(_commandsManager.PreviousTrackCommand);
-            _keyBindings.Add(CommandEnums.PreviousTrack, PreviousTrackGesture);
-
-            ShuffleGesture = _defaultShuffleGesture.CreateKeyBinding(_commandsManager.ShuffleCommand);
-            _keyBindings.Add(CommandEnums.Shuffle, ShuffleGesture);
-
-            RepeatGesture = _defaultRepeatGesture.CreateKeyBinding(_commandsManager.RepeatCommand); 
-            _keyBindings.Add(CommandEnums.Repeat, RepeatGesture);
-
-            DecreaseVolumeGesture = _defaultDecreaseVolumeGesture.CreateKeyBinding(_commandsManager.DecreaseVolumeCommand);
-            _keyBindings.Add(CommandEnums.DecreaseVolume, DecreaseVolumeGesture);
-
-            IncreaseVolumeGesture = _defaultIncreaseVolumeGesture.CreateKeyBinding(_commandsManager.IncreaseVolumeCommand); 
-            _keyBindings.Add(CommandEnums.IncreaseVolume, IncreaseVolumeGesture);
-
-            MuteVolumeGesture = _defaultMuteVolumeGesture.CreateKeyBinding(_commandsManager.MuteVolumeCommand);
-            _keyBindings.Add(CommandEnums.MuteVolume, MuteVolumeGesture);
-
-            FavoriteGesture = _defaultFavoriteGesture.CreateKeyBinding(_commandsManager.FavoriteCommand);
-            _keyBindings.Add(CommandEnums.ToggleFavorite, FavoriteGesture);
-
-            Rating0Gesture = _defaultRating0Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "0");
-            _keyBindings.Add(CommandEnums.Rating0, Rating0Gesture);
-
-            Rating1Gesture = _defaultRating1Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "1");
-            _keyBindings.Add(CommandEnums.Rating1, Rating1Gesture);
-
-            Rating2Gesture = _defaultRating2Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "2");
-            _keyBindings.Add(CommandEnums.Rating2, Rating2Gesture);
-
-            Rating3Gesture = _defaultRating3Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "3");
-            _keyBindings.Add(CommandEnums.Rating3, Rating3Gesture);
-
-            Rating4Gesture = _defaultRating4Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "4"); 
-            _keyBindings.Add(CommandEnums.Rating4, Rating4Gesture);
-
-            Rating5Gesture = _defaultRating5Gesture.CreateKeyBinding(_commandsManager.RatingCommand, "5");
-            _keyBindings.Add(CommandEnums.Rating5, Rating5Gesture);
-
-            NavigateHomeGesture = _defaultNavigateHomeGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Home); 
-            _keyBindings.Add(CommandEnums.Home, NavigateHomeGesture);
-
-            NavigateToAlbumsGesture = _defaultNavigateToAlbumsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Albums);
-            _keyBindings.Add(CommandEnums.Albums, NavigateToAlbumsGesture);
-
-            NavigateToArtistsGesture = _defaultNavigateToArtistsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Artists);
-            _keyBindings.Add(CommandEnums.Artists, NavigateToArtistsGesture);
-
-            NavigateToImportGesture = _defaultNavigateToImportGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Import);
-            _keyBindings.Add(CommandEnums.Import, NavigateToImportGesture);
-
-            NavigateToNowPlayingGesture = _defaultNavigateToNowPlayingGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.NowPlaying);
-            _keyBindings.Add(CommandEnums.NowPlaying, NavigateToNowPlayingGesture);
-
-            NavigateToPlaylistsGesture = _defaultNavigateToPlaylistsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Playlists);
-            _keyBindings.Add(CommandEnums.Playlists, NavigateToPlaylistsGesture);
-
-            NavigateToSettingsGesture = _defaultNavigateToSettingsGesture.CreateKeyBinding(_commandsManager.NavigateCommand, ViewNameEnum.Settings); 
-            _keyBindings.Add(CommandEnums.Settings, NavigateToSettingsGesture);
-
-            NavigateBackGesture = _defaultNavigateBackGesture.CreateKeyBinding(_commandsManager.NavigateBackCommand);
-            _keyBindings.Add(CommandEnums.NavigateBack, NavigateBackGesture);
-
-            EscapeFullScreenGesture = _defaultEscapeFullScreenGesture.CreateKeyBinding(_commandsManager.EscapeFullScreenCommand);
-            _keyBindings.Add(CommandEnums.EscapeFullScreen, EscapeFullScreenGesture);
-
-            ToggleFullScreenGesture = _defaultToggleFullScreenGesture.CreateKeyBinding(_commandsManager.ToggleFullScreenCommand);
-            _keyBindings.Add(CommandEnums.ToggleFullScreen, ToggleFullScreenGesture);
-
-            ToggleQueueDrawer = _defaultToggleQueueDrawer.CreateKeyBinding(_commandsManager.ToggleQueueDrawerCommand);
-            _keyBindings.Add(CommandEnums.ToggleQueueDrawer, ToggleQueueDrawer);
-
-            _window.InputBindings.Clear();
-            _window.InputBindings.AddRange(_keyBindings.Values);
             AddMediaShortCuts();
+        }
+
+        public void ResetToDefault(ShortcutCommand shortcut)
+        {
+            // remove current shortcut
+            int index = _shortcutCommands.IndexOf(shortcut);
+            _shortcutCommands.RemoveAt(index);
+
+            // insert default
+            ShortcutCommand defaultShorcut = GetDefaultShortcut(shortcut.CommandEnums);
+            _shortcutCommands.Insert(index, defaultShorcut);
+
+            // save in settings
+            ConfigurationService.SetPreference((SettingsEnum)(SettingsEnumStartCommandEnum + defaultShorcut.CommandEnums), defaultShorcut.ShortcutToString());
+        }
+
+        private ShortcutCommand GetDefaultShortcut(CommandEnums command)
+        {
+            return command switch
+            {
+                CommandEnums.PlayPause => new(Key.Space, _commandsManager.PlayPauseCommand, CommandEnums.PlayPause),
+                CommandEnums.NexTrack => new(Key.Right, _commandsManager.NextTrackCommand, CommandEnums.NexTrack),
+                CommandEnums.PreviousTrack => new(Key.Left, _commandsManager.PreviousTrackCommand, CommandEnums.PreviousTrack),
+                CommandEnums.Shuffle => new(Key.S, _commandsManager.ShuffleCommand, CommandEnums.Shuffle),
+                CommandEnums.Repeat => new(Key.R, _commandsManager.RepeatCommand, CommandEnums.Repeat),
+                CommandEnums.DecreaseVolume => new(Key.Down, _commandsManager.DecreaseVolumeCommand, 500, CommandEnums.DecreaseVolume),
+                CommandEnums.IncreaseVolume => new(Key.Up, _commandsManager.IncreaseVolumeCommand, 500, CommandEnums.IncreaseVolume),
+                CommandEnums.MuteVolume => new(Key.M, _commandsManager.MuteVolumeCommand, CommandEnums.MuteVolume),
+                CommandEnums.ToggleFavorite => new(Key.F, _commandsManager.FavoriteCommand, CommandEnums.ToggleFavorite),
+                CommandEnums.Rating0 => new(Key.D0, _commandsManager.RatingCommand, "0", CommandEnums.Rating0),
+                CommandEnums.Rating1 => new(Key.D1, _commandsManager.RatingCommand, "1", CommandEnums.Rating1),
+                CommandEnums.Rating2 => new(Key.D2, _commandsManager.RatingCommand, "2", CommandEnums.Rating2),
+                CommandEnums.Rating3 => new(Key.D3, _commandsManager.RatingCommand, "3", CommandEnums.Rating3),
+                CommandEnums.Rating4 => new(Key.D4, _commandsManager.RatingCommand, "4", CommandEnums.Rating4),
+                CommandEnums.Rating5 => new(Key.D5, _commandsManager.RatingCommand, "5", CommandEnums.Rating5),
+                CommandEnums.Home => new(Key.H, _commandsManager.NavigateCommand, typeof(HomeViewModel), CommandEnums.Home),
+                CommandEnums.Albums => new(Key.D, _commandsManager.NavigateCommand, typeof(AlbumLibraryViewModel), CommandEnums.Albums),
+                CommandEnums.Artists => new(Key.A, _commandsManager.NavigateCommand, typeof(ArtistLibraryViewModel), CommandEnums.Artists),
+                CommandEnums.Playlists => new(Key.P, _commandsManager.NavigateCommand, typeof(PlaylistLibraryViewModel), CommandEnums.Playlists),
+                CommandEnums.NowPlaying => new(Key.N, _commandsManager.NavigateCommand, typeof(NowPlayingViewModel), CommandEnums.NowPlaying),
+                CommandEnums.Settings => new(Key.O, _commandsManager.NavigateCommand, typeof(SettingsViewModel), CommandEnums.Settings),
+                CommandEnums.NavigateBack => new(Key.Left, ModifierKeys.Shift, _commandsManager.NavigateBackCommand, CommandEnums.NavigateBack),
+                CommandEnums.NavigateForward => new(Key.Right, ModifierKeys.Shift, _commandsManager.NavigateForwardCommand, CommandEnums.NavigateForward),
+                CommandEnums.EscapeFullScreen => new(Key.Escape, _commandsManager.EscapeFullScreenCommand, CommandEnums.EscapeFullScreen),
+                CommandEnums.ToggleFullScreen => new(Key.F, ModifierKeys.Control, _commandsManager.ToggleFullScreenCommand, CommandEnums.ToggleFullScreen),
+                CommandEnums.ToggleQueueDrawer => new(Key.Q, ModifierKeys.Control, _commandsManager.ToggleQueueDrawerCommand, CommandEnums.ToggleQueueDrawer),
+                CommandEnums.ToggleTheme => new(Key.L, ModifierKeys.Control, _commandsManager.ToggleThemeCommand, CommandEnums.ToggleTheme),
+                _ => null,
+            };
         }
 
         private void AddMediaShortCuts()
@@ -217,21 +245,33 @@ namespace MusicPlayUI.Core.Commands
             });
         }
 
-        public bool RegisterNewKeyBinding(KeyBinding keyGesture, CommandEnums command)
+        public bool ChangeShortcut(ShortcutCommand shortcut)
         {
-            if (keyGesture == null || IsGestureAlreadyTaken(keyGesture))
+            // divide key is used to save the shortcuts in the settings as a string 
+            if (shortcut.Key == Key.None || IsGestureAlreadyTaken(shortcut.Key, shortcut.Modifier) || shortcut.Key == Key.Divide)
                 return false;
 
-            _keyBindings.Remove(command);
-            _keyBindings.Add(command, keyGesture);
-            ConfigurationService.SetPreference((SettingsEnum)command + SettingsEnumStartCommandEnum, keyGesture.KeyGestureToString());
+            ReplaceShortcut(shortcut);
+            ConfigurationService.SetPreference((SettingsEnum)(shortcut.CommandEnums + SettingsEnumStartCommandEnum), shortcut.ShortcutToString());
 
             return true;
         }
 
-        public bool IsGestureAlreadyTaken(KeyBinding keyGesture)
+        private void ReplaceShortcut(ShortcutCommand shortcut)
         {
-            return _keyBindings.Any(k => k.Value.Match(keyGesture));
+            for (int i = 0; i < _shortcutCommands.Count; i++)
+            {
+                if(shortcut.CommandEnums == _shortcutCommands[i].CommandEnums)
+                {
+                    _shortcutCommands[i] = shortcut;
+                    return;
+                }
+            }
+        }
+
+        public bool IsGestureAlreadyTaken(Key key, ModifierKeys modifier)
+        {
+            return _shortcutCommands.Any(k => k.Key == key && k.Modifier == modifier);
         }
     }
 }

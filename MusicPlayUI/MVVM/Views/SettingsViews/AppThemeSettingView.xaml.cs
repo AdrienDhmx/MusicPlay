@@ -24,10 +24,5 @@ namespace MusicPlayUI.MVVM.Views.SettingsViews
         {
             InitializeComponent();
         }
-
-        private void SettingScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            SettingScroll.ScrollToVerticalOffset(SettingScroll.VerticalOffset - e.Delta / 3);
-        }
     }
 }

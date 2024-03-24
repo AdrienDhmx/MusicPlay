@@ -1,35 +1,30 @@
 ﻿using AudioHandler;
-using DataBaseConnection.DataAccess;
+
 using MusicFilesProcessor.Helpers;
-using MusicPlayModels;
-using MusicPlayModels.MusicModels;
+
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Threading;
+using MusicPlay.Database.Helpers;
+using System.Threading.Tasks;
 
 namespace MusicPlayUI.Core.Services
 {
     public class AudioTimeService : ObservableObject, IAudioTimeService, ISliderDragTarget
     {
         private readonly IQueueService _queueService;
+        private readonly AudioEventManager _audioEventManager;
         private readonly IAudioPlayback _audioPlayback;
         private readonly IHistoryServices _historyServices;
-        private readonly DispatcherTimer audioTimer;
 
         private int TimerInterval { get; set; } = ConfigurationService.GetPreference(Enums.SettingsEnum.TimerInterval);
 
-        private bool _isLooping;
-        public bool IsLooping
-        {
-            get => _isLooping;
-            set
-            {
-                SetField(ref _isLooping, value);
-            }
-        }
+        private Track _currentTrack = null;
 
         private string _currentPosition = "00:00";
         public string CurrentPosition
@@ -51,7 +46,7 @@ namespace MusicPlayUI.Core.Services
             set
             {
                 SetField(ref _currentPositionMs, value);
-                CurrentPosition = TimeSpan.FromMilliseconds(value).ToFormattedString();
+                CurrentPosition = TimeSpan.FromMilliseconds(value).ToShortString();
             }
         }
 
@@ -91,128 +86,91 @@ namespace MusicPlayUI.Core.Services
             get => _currentQueuePositionMs;
             private set
             {
-                CurrentQueuePosition = TimeSpan.FromMilliseconds(value).ToFormattedString();
+                CurrentQueuePosition = TimeSpan.FromMilliseconds(value).ToShortString();
                 SetField(ref _currentQueuePositionMs, value);
             }
         }
 
-        private int _trackListenTime = 0;
-        private int TrackListenTime
-        {
-            get => _trackListenTime;
-            set
-            {
-                if (value >= 0)
-                {
-                    SetField(ref _trackListenTime, value);
-                }
-            }
-        }
-
-        private int TrackJumpTime { get; set; } = 0;
-
         private int TimeUntilPlayingTrack { get; set; }
-        private bool playCountIncreased = false;
-        private int Lastpos { get; set; } = -1;
+
+        private bool sliderIsDragging = false;
 
         public event Action CurrentPositionChanged;
 
         public AudioTimeService(IQueueService queueService, IAudioPlayback audioPlayback, IHistoryServices historyServices)
         {
             _queueService = queueService;
+            _audioEventManager = new(audioPlayback, TimerInterval);
             _audioPlayback = audioPlayback;
             _historyServices = historyServices;
 
             _queueService.PlayingTrackChanged += OnPlayingTrackChanged;
             _queueService.QueueChanged += OnQueueChanged;
-            _audioPlayback.IsPlayingChanged += OnIsPlayingChanged;
 
-            audioTimer = new();
-            audioTimer.Tick += AudioTimer_Tick;
-            audioTimer.Interval = TimeSpan.FromMilliseconds(TimerInterval);
+            _audioPlayback.AutoChangeOutput(ConfigurationService.GetPreference(Enums.SettingsEnum.AutoChangeOutputDevice) == 1);
 
-            _audioPlayback.AutoChangeOutput(ConfigurationService.GetPreference(Enums.SettingsEnum.AutoChangeOutputdevice) == 1);
+            _audioEventManager.RegisterOnTickCallback(OnTickCallback);
+            _audioEventManager.RegisterOnHalfWayThroughCallback(async () => await UpdatePlayCounts());
+            _audioEventManager.RegisterOnStreamChangedCallback(OnStreamChangedCallback);
+            _audioEventManager.RegisterOnStreamEndCallback(EndOfTrackCallback);
+
+            if(_queueService.Queue.PlayingTrack.IsNotNull())
+            {
+                // init properties based on the current queue and playing track
+                _audioEventManager.MaxStreamDurationMs = _queueService.Queue.PlayingTrack.Length;
+                MaxPositionMs = (int)_audioEventManager.MaxStreamDurationMs;
+                OnQueueChanged();
+            }
         }
 
-        private void AudioTimer_Tick(object sender, EventArgs e)
+        private void OnTickCallback()
         {
+            if (sliderIsDragging) 
+                return;
+
+            CurrentPositionMs = (int)_audioEventManager.StreamPositionMs;
             CurrentQueuePositionMs = TimeUntilPlayingTrack + CurrentPositionMs;
-            CurrentPositionMs = (int)_audioPlayback.Position.TotalMilliseconds;
-
-            TrackListenTime = CurrentPositionMs - TrackJumpTime;
-            if (!playCountIncreased && TrackListenTime > (int)(0.75 * MaxPositionMs))
-            {
-                UpdatePlayCounts();
-            }
-
-            if (CurrentPositionMs >= MaxPositionMs || // max pos reached
-                (_audioPlayback.IsLooping && CurrentPositionMs >= MaxPositionMs - TimerInterval) || // when looping the max pos is sometime never reached because playback stop (and timer stop) in between the max pos and the max pos - timer interval
-                (Lastpos == CurrentPositionMs && CurrentPositionMs >= 0)) // max pos never reached for some file (mp3, I don't know why) or when audio output changes, then if pos hasn't changed consider end of track
-            {
-                EndOfTrack();
-            }
-
-            Lastpos = CurrentPositionMs;
             CurrentPositionChanged?.Invoke(); // trigger event for listener
         }
 
-        private async void UpdatePlayCounts()
+        private void OnStreamChangedCallback()
         {
-            playCountIncreased = true;
+            MaxPositionMs = (int)_audioEventManager.MaxStreamDurationMs;
+            // update the listen time
+            if(_currentTrack.IsNotNull())
+                _historyServices.UpdateTodayHistory(_currentTrack, (int)_audioEventManager.StreamListenTimeMs);
+            _currentTrack = _queueService.Queue.PlayingQueueTrack.Track;
+        }
 
-            _queueService.IncreasePlayCount(1);
+        private async Task UpdatePlayCounts()
+        {
+            await _queueService.IncreasePlayCount(1);
 
             List<int> artistIds = new(); // keep updated artist as to not update them more than once
-            foreach (ArtistDataRelation artistTrack in _queueService.PlayingTrack.Artists)
+            foreach (TrackArtistsRole artist in _queueService.Queue.PlayingTrack.TrackArtistRole)
             {
-                ArtistModel artist = await DataAccess.Connection.GetArtist(artistTrack.ArtistId);
-                if (artist != null && !artistIds.Any(id => id == artist.Id))
+                if(!artistIds.Any(a => a == artist.ArtistRole.Artist.Id))
                 {
-                    artistIds.Add(artist.Id);
-                    int playCount = artist.PlayCount + 1;
-                    DataAccess.Connection.UpdateArtistInteraction(playCount, artist.Id);
+                    await Artist.UpdatePlayCount(artist.ArtistRole.Artist);
+                    artistIds.Add(artist.ArtistRole.Artist.Id);
                 }
             }
 
-            AlbumModel album = await DataAccess.Connection.GetAlbum(_queueService.PlayingTrack.AlbumId);
+            Album album = _queueService.Queue.PlayingTrack.Album;
             if (album != null)
             {
-                int playCount = album.PlayCount + 1;
-                DataAccess.Connection.UpdateAlbumInteraction(playCount, album.Id);
-
-                foreach (ArtistDataRelation artistAlbum in album.Artists)
-                {
-                    ArtistModel artist = await DataAccess.Connection.GetArtist(artistAlbum.ArtistId);
-                    if (artist != null && !artistIds.Any(id => id == artist.Id))
-                    {
-                        artistIds.Add(artist.Id);
-                        playCount = artist.PlayCount + 1;
-                        DataAccess.Connection.UpdateArtistInteraction(playCount, artist.Id);
-                    }
-                }
+                await Album.UpdatePlayCount(album);
+                if(!artistIds.Any(a => a == album.PrimaryArtist.Id))
+                    await Artist.UpdatePlayCount(album.PrimaryArtist);
             }
         }
 
-        private void EndOfTrack()
+        private void EndOfTrackCallback()
         {
-            audioTimer.Stop(); // stop timer, it will be started when new playing track is set
-
-            // upadte the listen time
-            _historyServices.UpdateTodayHistory(TrackListenTime);
-
-            if (_audioPlayback.IsLooping)
-            {
-                // looping, the timer has to be restart here because the track does not change 
-                audioTimer.Start();
-                Lastpos = -1;
-                playCountIncreased = false;
-            }
-            else if (_queueService.NextTrack())
-            {
-                Lastpos = -1;
-                playCountIncreased = false;
-            }
+            if (!_audioPlayback.IsLooping)
+                _queueService.NextTrack();
         }
+
         /// <summary>
         /// Set the play back position to the position specified
         /// and update the current track jump time for the listen time
@@ -220,48 +178,33 @@ namespace MusicPlayUI.Core.Services
         /// <param name="position"> The position to go to in milliseconds </param>
         public void SetPlayBackPosition(int position)
         {
-            // update track jump time
-            if (position > CurrentPositionMs)
-            {
-                TrackJumpTime += position - TrackListenTime;
-            }
-            else
-            {
-                TrackJumpTime += TrackListenTime - position;
-            }
-
             // set playback position
             _audioPlayback.Position = TimeSpan.FromMilliseconds(position);
         }
-
 
         private void SetTimeUntilPlayingTrack()
         {
             TimeUntilPlayingTrack = 0;
             int index = _queueService.GetPlayingTrackIndex();
 
-            TimeUntilPlayingTrack = index.GetLengthUntilTrack(_queueService.QueueTracks);
+            TimeUntilPlayingTrack = index.GetLengthUntilTrack(_queueService.Queue.Tracks.ToTrack());
         }
 
         private void OnQueueChanged()
         {
-            MaxQueuePositionMs = _queueService.QueueLength;
+            MaxQueuePositionMs = _queueService.Queue.Length;
             CurrentQueuePositionMs = 0;
             SetTimeUntilPlayingTrack();
         }
+
         private void OnPlayingTrackChanged()
         {
-            if (_queueService.PlayingTrack is not null)
+            if (_queueService.Queue.PlayingTrack is not null)
             {
-                // update some properties
-                MaxPositionMs = _queueService.PlayingTrack.Length;
                 SetTimeUntilPlayingTrack();
 
-                // start the playback
-                _audioPlayback.LoadAnPlay(_queueService.PlayingTrack.Path);
-
-                // the previous track was looping
-                if (IsLooping)
+                // the previous track was looping, keep the new track looping
+                if (_audioPlayback.IsLooping)
                 {
                     _audioPlayback.Loop(true);
                 }
@@ -291,30 +234,17 @@ namespace MusicPlayUI.Core.Services
         public void Loop()
         {
             _audioPlayback.Loop();
-            IsLooping = _audioPlayback.IsLooping;
-        }
-
-        private void OnIsPlayingChanged(bool isPlaying)
-        {
-            if (isPlaying)
-            {
-                audioTimer.Start();
-            }
-            else
-            {
-                audioTimer.Stop();
-            }
         }
 
         public void OnDragStart(double value)
         {
-            audioTimer.Stop();
+            sliderIsDragging = true;
         }
 
         public void OnDragEnd(double value)
         {
-            audioTimer.Start();
             SetPlayBackPosition((int)value);
+            sliderIsDragging = false;
         }
     }
 }

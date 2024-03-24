@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MusicPlayUI.MVVM.Views.Windows;
 
 namespace MusicPlayUI.MVVM.Views
 {
@@ -32,11 +33,6 @@ namespace MusicPlayUI.MVVM.Views
         {
             Chart.Dispose();
             Unloaded -= HomeView_Unloaded;
-        }
-
-        private void RootScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            RootScroll.ScrollToVerticalOffset(RootScroll.VerticalOffset - e.Delta/3);
         }
 
         private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)

@@ -47,15 +47,15 @@ namespace VirtualizingControls
             }
         }
 
-        protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
-        {
-            var contentHost = Template.FindName("PART_ContentHost", this);
+        //protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
+        //{
+        //    ScrollViewer scrollViewer = FindChild<ScrollViewer>(this);
 
-            if (contentHost is ScrollViewer scrollViewer)
-            {
-                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta/3);
-            }
-        }
+        //    if (scrollViewer is not null)
+        //    {
+        //        scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta/3);
+        //    }
+        //}
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs? e)
         {
@@ -84,6 +84,29 @@ namespace VirtualizingControls
                     }
                 }
             }
+        }
+
+        public static T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null)
+                return null;
+
+            int childCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childCount; i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+
+                if (child is T)
+                {
+                    return (T)child;
+                }
+
+                T foundChild = FindChild<T>(child);
+                if (foundChild != null)
+                    return foundChild;
+            }
+
+            return null;
         }
     }
 }

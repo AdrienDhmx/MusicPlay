@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MusicPlayModels.MusicModels;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Views.ListViews
 {
@@ -24,17 +25,16 @@ namespace MusicPlayUI.MVVM.Views.ListViews
         public ChipListView()
         {
             InitializeComponent();
-
         }
 
-        public List<GenreModel> Genres
+        public ObservableCollection<Tag> Genres
         {
-            get { return (List<GenreModel>)GetValue(GenresProperty); }
+            get { return (ObservableCollection<Tag>)GetValue(GenresProperty); }
             set { SetValue(GenresProperty, value); }
         }
 
         public static readonly DependencyProperty GenresProperty =
-            DependencyProperty.Register("Genres", typeof(List<GenreModel>), typeof(ChipListView), new PropertyMetadata(new List<GenreModel>()));
+            DependencyProperty.Register("Genres", typeof(ObservableCollection<Tag>), typeof(ChipListView), new PropertyMetadata(new ObservableCollection<Tag>()));
 
         public ICommand NavigateToGenreCommand
         {

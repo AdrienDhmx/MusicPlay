@@ -7,96 +7,134 @@
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language" 
              xmlns:settingsviewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
-             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
+             xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers" xmlns:switch="clr-namespace:ToggleSwitch;assembly=ToggleSwitch"
              d:DataContext="{d:DesignInstance Type=settingsviewmodel:AppThemeSettingViewModel}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid  helper:ScrollViewerHelper.IsStickyEnabled="True"
-          helper:ScrollViewerHelper.ScrollViewer="{Binding ElementName=SettingScroll}"
-          helper:ScrollViewerHelper.StickyElement="{Binding ElementName=StickyGrid}">
+
+    <Grid Margin="30,0"
+          Grid.Row="1">
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Background="{DynamicResource PrimaryContainer}"
-              x:Name="StickyGrid"
-              MaxHeight="150"
-              Height="150"
-              MinHeight="100">
-            <StackPanel Orientation="Vertical"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                        Margin="0,8">
-                <TextBlock Text="{x:Static lang:Resources.Themes_Setting}"
-                       Style="{DynamicResource BStyle}"
-                       HorizontalAlignment="Center"/>
+        <Grid Margin="0, 20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{Binding AppliedTheme}"
-                           HorizontalAlignment="Center"
-                           Style="{DynamicResource SListItemNameStyle}"/>
+            <Border Grid.ColumnSpan="2"
+                    Background="{DynamicResource TertiaryContainer}"
+                    Opacity="0.2"
+                    CornerRadius="{DynamicResource SecondaryCornerRadius}">
+            </Border>
+
+            <TextBlock Text="Switch between dark and light modes manually or automatically based on system preferences or time."
+                        FontSize="20"
+                       MaxWidth="650"
+                       Margin="20"
+                        Style="{DynamicResource NLargeStyle}"/>
+
+            <StackPanel HorizontalAlignment="Right"
+                         VerticalAlignment="Center"
+                        Orientation="Vertical"
+                         Margin="0, 10, 20, 10"
+                        Grid.Column="1">
+
+                <switch:ToggleSwitch IsChecked="{Binding LightTheme, Converter={StaticResource InverseBoolConverter}}"
+                            CheckedText="Dark theme"
+                            UncheckedText="Dark theme"
+                             HorizontalAlignment="Right"
+                             Margin="0"/>
+
+                <switch:ToggleSwitch IsChecked="{Binding SunsetSunrise}"
+                            CheckedText="Sunset / Sunrise"
+                            UncheckedText="Sunset / Sunrise"
+                             HorizontalAlignment="Right"
+                             Margin="0"/>
+
+                <switch:ToggleSwitch IsChecked="{Binding SystemSync}"
+                            CheckedText="Sync with the system"
+                            UncheckedText="Sync with the system"
+                             HorizontalAlignment="Right"
+                             Margin="0"/>
             </StackPanel>
         </Grid>
 
 
-        <ScrollViewer Grid.Row="1"
-                      x:Name="SettingScroll">
-            <Grid Margin="10,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.ColumnSpan="2"
+                    Background="{DynamicResource TertiaryContainer}"
+                    Opacity="0.2"
+                    CornerRadius="{DynamicResource SecondaryCornerRadius}">
+            </Border>
 
-                <Grid HorizontalAlignment="Center"
-                      Margin="0,40, 0, 20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
+            <StackPanel Margin="20"
+                        Orientation="Vertical"
+                        HorizontalAlignment="Left"
+                        MaxWidth="650"
+                        MinWidth="400"> 
+                <TextBlock Text="Harmonize certain elements of the app's color scheme with the cover of the currently playing track."
+                            FontSize="20"
+                           Margin="0, 0, 0, 10"
+                            Style="{DynamicResource NLargeStyle}"/>
+                <TextBlock Text="Note: this works better in dark mode."
+                            FontSize="16"
+                            Style="{DynamicResource NLargeSecondaryStyle}"/>                
+            </StackPanel>
+            
+            <StackPanel  HorizontalAlignment="Left"
+                         VerticalAlignment="Center"
+                        Orientation="Vertical"
+                         Margin="0, 10, 20, 10"
+                        Grid.Column="1">
 
-                    <CheckBox IsChecked="{Binding LightTheme}"
-                              Style="{DynamicResource SettingsCheckBox}"
-                              Content="Light theme"/>
-                    
-                    <CheckBox IsChecked="{Binding SunsetSunrise}"
-                              Style="{DynamicResource SettingsCheckBox}"
-                              Content="Sunset / Sunrise"
-                              Margin="20,0"
-                              ToolTip="Switch based on time of day."
-                              Grid.Column="1"/>
-                    
-                    <CheckBox IsChecked="{Binding SystemSync}"
-                              Style="{DynamicResource SettingsCheckBox}"
-                              Content="system Sync"
-                              Grid.Column="2"/>
-                </Grid>
+                <switch:ToggleSwitch IsChecked="{Binding ColorfulPlayerControl}"
+                                    CheckedText="Background of the player control"
+                                    UncheckedText="Background of the player control"
+                                     HorizontalAlignment="Right"
+                                     Margin="0"/>
 
-                <Border Margin="40,10,40,0"
-                        Grid.Row="1"
+                <switch:ToggleSwitch IsChecked="{Binding ColorfulUI}"
+                                    CheckedText="UI of the player control"
+                                      HorizontalAlignment="Right"
+                                    UncheckedText="UI of the player control"
+                                     Margin="0"/>
+            </StackPanel>
+        </Grid>
+
+        <Border Margin="0,20,0,0"
+                        Grid.Row="2"
                         BorderBrush="{DynamicResource Primary}"
                         BorderThickness="0,0,0,1"
                         Background="Transparent">
-                    <TextBlock Text="Accent Colors"
+            <TextBlock Text="Accent Colors"
                                HorizontalAlignment="Center"
                                Style="{DynamicResource SlistInfoStyle}"/>
-                </Border>
-                
-                <Border Grid.Row="2"
+        </Border>
+
+        <Border Grid.Row="3"
                         Margin="20,10"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top">
-                    <ItemsControl ItemsSource="{Binding Themes}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="Transparent"
+            <ItemsControl ItemsSource="{Binding Themes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="Transparent"
                                         Width="80"
                                         Height="80"
                                         Padding="2"
@@ -105,35 +143,33 @@
                                         BorderBrush="{Binding AccentColor}"
                                         ToolTip="{Binding Description}"
                                         x:Name="ItemBorder">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Opacity" Value="1"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Opacity" Value="0.9"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <Border.InputBindings>
-                                        <MouseBinding Gesture="leftClick" 
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Opacity" Value="1"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.9"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Border.InputBindings>
+                                <MouseBinding Gesture="leftClick" 
                                                       Command="{Binding DataContext.SetThemeCommand, ElementName=RootView}"
                                                       CommandParameter="{Binding .}"/>
-                                    </Border.InputBindings>
+                            </Border.InputBindings>
 
-                                    <Border Background="{Binding AccentColor}"
+                            <Border Background="{Binding AccentColor}"
                                             CornerRadius="{Binding CornerRadius, ElementName=ItemBorder}"/>
-                                </Border>
-                                <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                                        <Setter Property="BorderThickness" Value="2" TargetName="ItemBorder"/>
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-            </Grid>
-        </ScrollViewer>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                <Setter Property="BorderThickness" Value="2" TargetName="ItemBorder"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
     </Grid>
 </UserControl>

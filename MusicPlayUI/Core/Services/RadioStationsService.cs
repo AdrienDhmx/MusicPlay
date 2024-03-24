@@ -1,5 +1,4 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
+﻿
 using MusicFilesProcessor.Helpers;
 using System;
 using System.Collections.Generic;
@@ -8,13 +7,15 @@ using System.Threading.Tasks;
 using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Helpers;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Enums;
 
 namespace MusicPlayUI.Core.Services
 {
     public class RadioStationsService : IRadioStationsService
     {
-        private List<PlaylistModel> _todayRadioStations;
-        public List<PlaylistModel> TodayRadioStations
+        private List<Playlist> _todayRadioStations;
+        public List<Playlist> TodayRadioStations
         {
             get { return _todayRadioStations; }
             set { _todayRadioStations = value; }
@@ -33,7 +34,7 @@ namespace MusicPlayUI.Core.Services
         public int ArtistInfluence { get; set; } = 40;
 
         /// <summary>
-        /// The min percentage of tracks included the radio having the same Genre as the track the radio is based on.
+        /// The min percentage of tracks included the radio having the same CurrentTagView as the track the radio is based on.
         /// </summary>
         public int GenreInfluence { get; set; } = 60;
 
@@ -42,21 +43,21 @@ namespace MusicPlayUI.Core.Services
         {
         }
 
-        public async Task<List<PlaylistModel>> CreateRadioStations(int number)
+        public async Task<List<Playlist>> CreateRadioStations(int number)
         {
             if (TodayRadioStations != null)
                 return TodayRadioStations;
             return await Task.Run(async () =>
             {
-                List<PlaylistModel> radioStations = new List<PlaylistModel>();
-                List<TrackModel> Tracks = await DataAccess.Connection.GetLastPlayedTracks(100);
+                List<Playlist> radioStations = new List<Playlist>();
+                List<Track> Tracks = new(); //await DataAccess.Connection.GetLastPlayedTracks(100);
 
                 if (Tracks.Count > RadioStationTrackNumber * 2)
                 {
                     for (int i = 0; i < number; i++)
                     {
                         int index = rng.Next(Tracks.Count - 1);
-                        PlaylistModel playlist = await CreateRadioStation(Tracks.ElementAt(index));
+                        Playlist playlist = await CreateRadioStation(Tracks.ElementAt(index));
                         if (playlist != null)
                             radioStations.Add(playlist);
                         Tracks.RemoveAt(index);
@@ -68,9 +69,9 @@ namespace MusicPlayUI.Core.Services
             });
         }
 
-        public async Task<PlaylistModel> CreateRadioStation()
+        public async Task<Playlist> CreateRadioStation()
         {
-            List<TrackModel> Tracks = await DataAccess.Connection.GetLastPlayedTracks(100);
+            List<Track> Tracks = new();//await DataAccess.Connection.GetLastPlayedTracks(100);
             if (Tracks.Count > RadioStationTrackNumber * 2)
             {
                 int index = rng.Next(0, Tracks.Count);
@@ -80,57 +81,62 @@ namespace MusicPlayUI.Core.Services
         }
 
 
-        public async Task<PlaylistModel> CreateRadioStation(TrackModel track)
+        public async Task<Playlist> CreateRadioStation(Track track)
         {
-            AlbumModel album = await DataAccess.Connection.GetAlbum(track.AlbumId);
-            track.AlbumName = album.Name;
-            track.AlbumCover = album.AlbumCover;
+            Album album = track.Album;
 
-            ArtistDataRelation ArtistDataRelation = album.GetAlbumArtist();
-            if(ArtistDataRelation == null)
-            {
-                ArtistDataRelation = album.Artists[0];
-            }
-            ArtistModel artist = await DataAccess.Connection.GetArtist(ArtistDataRelation.ArtistId);
+            Artist primaryArtist = album.PrimaryArtist;
 
-            List<GenreModel> genres = await DataAccess.Connection.GetAlbumGenre(album.Id);
-            List<TrackModel> RadioTracks = new();
-            List<TrackModel> Tracks = new();
-            List<AlbumModel> albums = new();
+            List<Tag> genres = new();//await DataAccess.Connection.GetAlbumTag(album.Id);
+            //genres.AddRange(await DataAccess.Connection.GetTrackTag(track.Id));
 
-            PlaylistModel radio = new();
-            radio.Name = $"{track.Title} Radio";
-            radio.PlaylistType = MusicPlayModels.Enums.PlaylistTypeEnum.Radio;
-            radio.Cover = string.IsNullOrWhiteSpace(track.Artwork) ? track.AlbumCover : track.Artwork;
+            List<Track> RadioTracks = new();
+            List<Track> Tracks = new();
+            List<Album> albums = new();
+            List<Playlist> playlists = new();
+
+            Playlist radio = new();
+            radio.Name = $"{track.Title} - Radio";
+            radio.Description = $"A radio based on the track '{track.Title}' by {album.PrimaryArtist.Name}.";
+            radio.PlaylistType = PlaylistTypeEnum.Radio;
+            radio.Cover = string.IsNullOrWhiteSpace(track.Artwork) ? track.Album.AlbumCover : track.Artwork;
 
             // add all tracks with the same genre
-            foreach (GenreModel genreModel in genres)
+            foreach (Tag genreModel in genres)
             {
                 if (genreModel is null) continue;
 
-                albums = await DataAccess.Connection.GetAlbumFromGenre(genreModel.Id);
+                //albums = await DataAccess.Connection.GetAlbumFromTag(genreModel.Id);
+                //playlists = await DataAccess.Connection.GetPlaylistFromTag(genreModel.Id);
 
-                Tracks.AddRange(await GetTracksFromAlbums(albums));
+                //foreach (var playlist in playlists)
+                //{
+
+                //    TrackTags.AddRange(await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id));
+                //}
+
+ 
+                //TrackTags.AddRange(await GetTracksFromAlbums(albums));
+                //TrackTags.AddRange(await DataAccess.Connection.GetTrackFromTag(genreModel.Id));
             }
 
             // add tracks from the same performer
-            Tracks.AddRange(await DataAccess.Connection.GetTracksFromArtist(artist.Id));
-            albums = await DataAccess.Connection.GetAlbumsFromArtist(artist.Id);
-            Tracks.AddRange(await GetTracksFromAlbums(albums));
+            //TrackTags.AddRange(await DataAccess.Connection.GetTracksFromArtist(artist.Id));
+            //albums = await DataAccess.Connection.GetAlbumsFromArtist(artist.Id);
+            //TrackTags.AddRange(await GetTracksFromAlbums(albums));
 
-            if(Tracks.Count < RadioStationTrackNumber)
-            {
-                ArtistModel albumArtist = await DataAccess.Connection.GetArtist(album.GetAlbumArtist().ArtistId);
-                if (albumArtist != null)
-                {
-                    Tracks.AddRange(await DataAccess.Connection.GetTracksFromArtist(albumArtist.Id));
-                    albums = await DataAccess.Connection.GetAlbumsFromArtist(albumArtist.Id);
-                    Tracks.AddRange(await GetTracksFromAlbums(albums));
-                }
-            }
+            //if(TrackTags.Count < RadioStationTrackNumber)
+            //{
+            //    Artist albumArtist = await DataAccess.Connection.GetArtist(album.GetAlbumArtist().ArtistId);
+            //    if (albumArtist != null)
+            //    {
+            //        TrackTags.AddRange(await DataAccess.Connection.GetTracksFromArtist(albumArtist.Id));
+            //        albums = await DataAccess.Connection.GetAlbumsFromArtist(albumArtist.Id);
+            //        TrackTags.AddRange(await GetTracksFromAlbums(albums));
+            //    }
+            //}
 
-            Tracks = TrackListHelper.Shuffle(Tracks).ToList();
-
+            Tracks = Tracks.DistinctBy(t => t?.Id).Shuffle().ToList();
             if(Tracks.Count >= RadioStationTrackNumber)
             {
                 RadioTracks = Tracks.GetRange(0, RadioStationTrackNumber);
@@ -143,21 +149,19 @@ namespace MusicPlayUI.Core.Services
             RadioTracks.Insert(0, track);
             RadioTracks = RadioTracks.DistinctBy(t => t?.Id).ToList();
 
-            radio.Tracks = RadioTracks.ToOrderedTrackModel();
-            radio.Duration = radio.Tracks.GetTotalLength(out int _);
+            radio.PlaylistTracks = new(); //RadioTracks.ToOrderedTrackModel();
             return radio;
         }
 
-        private async static Task<List<TrackModel>> GetTracksFromAlbums(List<AlbumModel> albums)
+        private async static Task<List<Track>> GetTracksFromAlbums(List<Album> albums)
         {
             if (albums is null) return new();
 
-            List<TrackModel> tracks = new List<TrackModel>();
-            foreach (AlbumModel a in albums)
+            List<Track> tracks = new List<Track>();
+            foreach (Album a in albums)
             {
                 if (a is null) continue;
-
-                tracks.AddRange(await DataAccess.Connection.GetTracksFromAlbum(a.Id));
+                tracks.AddRange(a.Tracks);
             }
             return tracks;
         }

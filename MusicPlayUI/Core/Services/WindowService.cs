@@ -1,9 +1,13 @@
-﻿using MusicPlayModels;
+﻿using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
+
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Helpers;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.ViewModels;
 using MusicPlayUI.MVVM.ViewModels.SettingsViewModels;
 using MusicPlayUI.MVVM.Views.Windows;
+using MusicPlayUI.MVVM.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,75 +20,90 @@ namespace MusicPlayUI.Core.Services
     public class WindowService : IWindowService
     {
         private readonly Func<Type, Window> _viewFactory;
+        private readonly List<WindowModel> _windows = new();
 
         public WindowService(Func<Type, Window> viewFactory)
         {
             _viewFactory = viewFactory;
         }
 
-        private List<WindowModel> _windows = new();
-
         public void OpenWindow(ViewNameEnum viewName, BaseModel parameter = null)
         {
             // window already open
-            if (_windows.Any(w => w.ViewName == viewName))
+            WindowModel window = _windows.Find(w => w.ViewName == viewName);
+            if (window.IsNotNull())
             {
-                WindowModel window = _windows.Find(w => w.ViewName == viewName);
-
                 // update the data (for track window properties the track changes)
-                window.Window.Update(parameter);
-
-                // find window and bring it to view (in the forefront)
-                foreach (Window w in App.Current.Windows)
-                {
-                    if (w.Name == viewName.ViewEnumToString())
-                    {
-                        w.WindowState = WindowState.Normal;
-                        w.Focus();
-                    }
-                }
+                window.ViewModel.Update(parameter);
+                window.Window.WindowState = WindowState.Normal; // if it was minimize open it
+                window.Window.Focus(); // bring the window to the front
             }
             else
             {
-                WindowModel window = new()
+                window = OpenWindow(viewName);
+                if (window.IsNotNull())
                 {
-                    ViewName = viewName,
-                    Window = OpenWindow(viewName)
-                };
-
-                if (window.Window != null)
-                {
+                    window.ViewModel.Update(parameter);
                     _windows.Add(window);
                 }
             }
         }
 
-        private ViewModel OpenWindow(ViewNameEnum viewName)
+        private WindowModel OpenWindow(ViewNameEnum viewName)
         {
-            Window w;
+            WindowModel window = new()
+            {
+                ViewName = viewName,
+            };
             switch (viewName)
             {
                 case ViewNameEnum.Visualizer:
-                    w = _viewFactory.Invoke(typeof(VisualizerParametersWindow));
-                    w.Show();
-                    return (ViewModel)w.DataContext;
+                    window.Window = _viewFactory.Invoke(typeof(VisualizerParametersWindow));
+                    break;
+                case ViewNameEnum.ArtistProperties:
+                    window.Window = _viewFactory.Invoke(typeof(EditArtistWindow));
+                    break;
                 default:
                     return null;
+            }
+            window.Window.Show();
+            window.ViewModel = (ViewModel)window.Window.DataContext;
+            return window;
+        }
+
+        public void MinimizeWindow(ViewNameEnum viewName)
+        {
+            WindowModel window = _windows.Find(w => w.ViewName == viewName);
+            if (window.IsNotNull())
+            {
+                window.Window.WindowState = WindowState.Minimized;
+            }
+        }
+
+        public void MaximizeWindow(ViewNameEnum viewName)
+        {
+            WindowModel window = _windows.Find(w => w.ViewName == viewName);
+            if (window.IsNotNull())
+            {
+                if(window.Window.WindowState == WindowState.Maximized)
+                {
+                    window.Window.WindowState = WindowState.Normal;
+                } 
+                else
+                {
+                    window.Window.WindowState = WindowState.Maximized;
+                }
             }
         }
 
         public void CloseWindow(ViewNameEnum viewName)
         {
-            if (_windows.Any(w => w.ViewName == viewName))
+            WindowModel window = _windows.Find(w => w.ViewName == viewName);
+            if (window.IsNotNull())
             {
-                foreach (Window window in App.Current.Windows)
-                {
-                    if (window.Name.ToViewNameEnum() == viewName)
-                    {
-                        window.Close();
-                        _windows.Remove(_windows.Find(w => w.ViewName == viewName));
-                    }
-                }
+                window.Window.Close();
+                window.ViewModel.Dispose();
+                _windows.Remove(window);
             }
         }
     }
@@ -93,6 +112,8 @@ namespace MusicPlayUI.Core.Services
     {
         public ViewNameEnum ViewName { get; set; }
 
-        public ViewModel Window { get; set; }
+        public Window Window { get; set; }
+
+        public ViewModel ViewModel { get; set; }
     }
 }

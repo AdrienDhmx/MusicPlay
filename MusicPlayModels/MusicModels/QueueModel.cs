@@ -1,5 +1,6 @@
 ﻿using MusicPlayUI.Core.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,24 +8,24 @@ using System.Threading.Tasks;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class QueueModel : BaseModel
+    public class QueueModel : PlayableModel
     {
-        private List<OrderedTrackModel> _tracks = new();
-        private TrackModel _playingTrack = new();
         private bool _isShuffled = false;
         private bool _isOnRepeat = false;
-        private string _playingFrom = "";
+        private string _playingFromName = "";
         private string _cover = "";
-        private int _playingFromId;
+        private ModelTypeEnum _playingFromModelType = ModelTypeEnum.UNKNOWN;
+        private int _playingFromId = -1;
+        private PlayableModel _playingFrom;
+        private List<OrderedTrackModel> _tracks = new();
+        private TrackModel _playingTrack = new();
 
-        public int Id { get; set; }
         public bool IsShuffled
         {
             get { return _isShuffled; }
             set
             {
-                _isShuffled = value;
-                OnPropertyChanged(nameof(IsShuffled));
+                SetField(ref _isShuffled, value);
             }
         }
         public bool IsOnRepeat
@@ -32,19 +33,22 @@ namespace MusicPlayModels.MusicModels
             get { return _isOnRepeat; }
             set
             {
-                _isOnRepeat = value;
-                OnPropertyChanged(nameof(IsOnRepeat));
+                SetField(ref _isOnRepeat, value);
             }
         }
-        public int Length { get; set; } = 0;
-        public string Duration { get; set; } = "";
-        public string PlayingFrom
+
+        public PlayableModel PlayingFrom
         {
-            get { return _playingFrom; }
+            get => _playingFrom;
+            set => SetField(ref _playingFrom, value);
+        }
+
+        public string PlayingFromName
+        {
+            get { return _playingFromName; }
             set
             {
-                _playingFrom = value;
-                OnPropertyChanged(nameof(PlayingFrom));
+                SetField(ref _playingFromName, value);
             }
         }
 
@@ -62,20 +66,16 @@ namespace MusicPlayModels.MusicModels
             get { return _cover; }
             set
             {
-                _cover = value;
-                OnPropertyChanged(nameof(Cover));
+                SetField(ref _cover, value);
             }
         }
-
-        public int PlayingTrackId { get; set; }
 
         public TrackModel PlayingTrack
         {
             get => _playingTrack;
             set
             {
-                _playingTrack = value;
-                OnPropertyChanged(nameof(PlayingTrack));
+                SetField(ref _playingTrack, value);
             }
         }
 
@@ -84,12 +84,17 @@ namespace MusicPlayModels.MusicModels
             get => _tracks;
             set
             {
-                _tracks = value;
-                OnPropertyChanged(nameof(Tracks));
+                SetField(ref _tracks, value);
             }
         }
 
-        public ModelTypeEnum ModelType { get; set; }
+        public int PlayingTrackId { get; set; }
+
+        public ModelTypeEnum PlayingFromModelType
+        {
+            get => _playingFromModelType;
+            set => SetField(ref _playingFromModelType, value);
+        }
 
         public QueueModel(int id, bool isShuffled, bool isOnRepeat, int length, string duration, int playingTrackId, string from, string cover)
         {
@@ -99,7 +104,7 @@ namespace MusicPlayModels.MusicModels
             Length = length;
             Duration = duration;
             PlayingTrackId = playingTrackId;
-            PlayingFrom = from;
+            PlayingFromName = from;
             Cover = cover;
         }
 
@@ -110,7 +115,7 @@ namespace MusicPlayModels.MusicModels
             Length = length;
             Duration = duration;
             PlayingTrackId = playingTrackId;
-            PlayingFrom = from;
+            PlayingFromName = from;
             Cover = cover;
         }
 
@@ -137,6 +142,22 @@ namespace MusicPlayModels.MusicModels
         public QueueModel()
         {
 
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>
+            {
+                { nameof(PlayingTrackId), PlayingTrackId },
+                { nameof(IsShuffled), IsShuffled.ToInt() },
+                { nameof(IsOnRepeat), IsOnRepeat.ToInt() },
+                { nameof(Cover), Cover },
+                { nameof(PlayingFromName), PlayingFromName },
+                { nameof(PlayingFromModelType), (int)PlayingFromModelType },
+                { nameof(PlayingFromId), PlayingFromId },
+            };
+
+            return keyValues;
         }
     }
 }

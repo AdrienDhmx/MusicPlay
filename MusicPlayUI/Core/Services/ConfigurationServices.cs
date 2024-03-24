@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Drawing;
-using System.Timers;
-using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
-using MessageControl;
 using MusicPlayUI.Core.Enums;
-using MusicPlayUI.Core.Factories;
-using Windows.UI;
-using Windows.UI.ViewManagement;
 
 namespace MusicPlayUI.Core.Services
 {
@@ -17,7 +9,33 @@ namespace MusicPlayUI.Core.Services
         public static event Action QueueCoversChange;
         private static void OnQueueCoverChanged()
         {
+            UpdateCoverSettings();
             QueueCoversChange?.Invoke();
+        }
+
+        public static event Action ColorfulPlayerControlChange;
+        private static void OnColorfulPlayerControlChanged()
+        {
+            ColorfulPlayerControlChange?.Invoke();
+        }
+
+        public static event Action ColorfulUIChange;
+        private static void OnColorfulUIChanged()
+        {
+            ColorfulUIChange?.Invoke();
+        }
+
+        public static bool AreCoversEnabled { get; private set; } = true;
+
+        public static bool AlbumCoverOnly { get; private set; } = false;
+
+        public static bool ArtworkOnly { get; private set; } = false;
+
+        public static bool AutoCover { get; private set; } = true;
+
+        public static void Init()
+        {
+            UpdateCoverSettings();
         }
 
         public static int GetPreference(SettingsEnum key)
@@ -30,11 +48,13 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.LightTheme => Settings.Default.LightTheme,
                 SettingsEnum.SunsetSunrise => Settings.Default.SunsetSunrise,
                 SettingsEnum.SystemSyncTheme => Settings.Default.SystemSyncTheme,
+                SettingsEnum.ColorfulPlayerControl => Settings.Default.ColorfulPlayerControl,
+                SettingsEnum.ColorfulUI => Settings.Default.ColorfulUI,
                 SettingsEnum.Language => Settings.Default.Language,
                 SettingsEnum.TimerInterval => Settings.Default.TimerInterval,
                 SettingsEnum.NowPlayingStartingSubView => Settings.Default.NowPlayingStartingSubView,
                 SettingsEnum.QueueCovers => Settings.Default.QueueCover,
-                SettingsEnum.AutoChangeOutputdevice => Settings.Default.AutoChangeOutputDevice,
+                SettingsEnum.AutoChangeOutputDevice => Settings.Default.AutoChangeOutputDevice,
                 SettingsEnum.ArtistFilter => Settings.Default.ArtistsFilter,
                 SettingsEnum.ArtistOrder => Settings.Default.ArtistOrder,
                 SettingsEnum.AlbumFilter => Settings.Default.AlbumFilter,
@@ -54,6 +74,9 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.VRefreshRate => Settings.Default.VRefreshRate,
                 SettingsEnum.VAutoColor => Settings.Default.VAutoColor,
                 SettingsEnum.VCenterFreq => Settings.Default.VCenterFreq,
+                SettingsEnum.AutoForeground => Settings.Default.AutoForeground,
+                SettingsEnum.EqualizerEnabled => Settings.Default.EqualizerEnabled,
+                SettingsEnum.EqualizerPreset => Settings.Default.EqualizerPreset,
                 _ => "",
             };
             return int.TryParse(storedInt, out int id) ? id : -2;
@@ -68,6 +91,30 @@ namespace MusicPlayUI.Core.Services
                 SettingsEnum.AlbumOrder => Settings.Default.AlbumOrder,
                 SettingsEnum.ArtistOrder => Settings.Default.ArtistOrder,
                 SettingsEnum.UserName => Settings.Default.UserName,
+                SettingsEnum.PlayPause => Settings.Default.PlayPauseShortcut,
+                SettingsEnum.NexTrack => Settings.Default.NextTrackShortcut,
+                SettingsEnum.PreviousTrack => Settings.Default.PreviousTrackShortcut,
+                SettingsEnum.Repeat => Settings.Default.RepeatShortcut,
+                SettingsEnum.Shuffle => Settings.Default.ShuffleShortcut,
+                SettingsEnum.ToggleFavorite => Settings.Default.ToggleFavShortcut,
+                SettingsEnum.Rating0 => Settings.Default.Rating0Shortcut,
+                SettingsEnum.Rating1 => Settings.Default.Rating1Shortcut,
+                SettingsEnum.Rating2 => Settings.Default.Rating2Shortcut,
+                SettingsEnum.Rating3 => Settings.Default.Rating3Shortcut,
+                SettingsEnum.Rating4 => Settings.Default.Rating4Shortcut,
+                SettingsEnum.Rating5 => Settings.Default.Rating5Shortcut,
+                SettingsEnum.Home => Settings.Default.NavHomeShortcut,
+                SettingsEnum.Albums => Settings.Default.NavAlbumsShortcut,
+                SettingsEnum.Artists => Settings.Default.NavArtistsShortcut,
+                SettingsEnum.Playlists => Settings.Default.NavPlaylistsShortcut,
+                SettingsEnum.NowPlaying => Settings.Default.NavNowPlayingShortcut,
+                SettingsEnum.Settings => Settings.Default.NavSettingsShortcut,
+                SettingsEnum.Back => Settings.Default.NavBackShortcut,
+                SettingsEnum.Forward => Settings.Default.NavForwardShortcut,
+                SettingsEnum.ToggleFullScreen => Settings.Default.ToggleFullScreenShortcut,
+                SettingsEnum.EscapeFullScreen => Settings.Default.EscapeFullScreenShortcut,
+                SettingsEnum.ToggleTheme => Settings.Default.ToggleLightThemeShortcut,
+                SettingsEnum.ToggleQueueDrawer => Settings.Default.ToggleQueueShortcut,
                 _ => "",
             };
         }
@@ -91,7 +138,7 @@ namespace MusicPlayUI.Core.Services
         /// </summary>
         /// <param name="key"> the setting the value correspond to </param>
         /// <param name="value"> the value to save </param>
-        /// <param name="force"> force the value even if it is valid (empty string or null value) </param>
+        /// <param name="force"> force the value even if it's not valid (empty string or null value) </param>
         /// <returns></returns>
         public static bool SetPreference(SettingsEnum key, string value, bool force = false)
         {
@@ -115,6 +162,14 @@ namespace MusicPlayUI.Core.Services
                 case SettingsEnum.SystemSyncTheme:
                     Settings.Default.SystemSyncTheme = value;
                     break;
+                case SettingsEnum.ColorfulPlayerControl:
+                    Settings.Default.ColorfulPlayerControl = value;
+                    OnColorfulPlayerControlChanged();
+                    break;
+                case SettingsEnum.ColorfulUI:
+                    Settings.Default.ColorfulUI = value;
+                    OnColorfulUIChanged();
+                    break;
                 case SettingsEnum.Language:
                     Settings.Default.Language = value;
                     break;
@@ -128,7 +183,7 @@ namespace MusicPlayUI.Core.Services
                     Settings.Default.QueueCover = value;
                     OnQueueCoverChanged();
                     break;
-                case SettingsEnum.AutoChangeOutputdevice:
+                case SettingsEnum.AutoChangeOutputDevice:
                     Settings.Default.AutoChangeOutputDevice = value;
                     break;
                 case SettingsEnum.LyricsFontSize:
@@ -194,13 +249,127 @@ namespace MusicPlayUI.Core.Services
                 case SettingsEnum.VCenterFreq:
                     Settings.Default.VCenterFreq = value;
                     break;
+                case SettingsEnum.AutoForeground:
+                    Settings.Default.AutoForeground = value;
+                    break;
                 case SettingsEnum.UNKNOWN:
                     return false;
+                case SettingsEnum.PlayPause:
+                    Settings.Default.PlayPauseShortcut = value;
+                    break;
+                case SettingsEnum.NexTrack:
+                    Settings.Default.NextTrackShortcut = value;
+                    break;
+                case SettingsEnum.PreviousTrack:
+                    Settings.Default.PreviousTrackShortcut = value;
+                    break;
+                case SettingsEnum.Shuffle:
+                    Settings.Default.ShuffleShortcut = value;
+                    break;
+                case SettingsEnum.Repeat:
+                    Settings.Default.RepeatShortcut = value;
+                    break;
+                case SettingsEnum.DecreaseVolume:
+                    Settings.Default.DecreaseVolShortcut = value;
+                    break;
+                case SettingsEnum.IncreaseVolume:
+                    Settings.Default.IncreaseVolShortcut = value;
+                    break;
+                case SettingsEnum.MuteVolume:
+                    Settings.Default.MuteVolShortcut = value;
+                    break;
+                case SettingsEnum.ToggleFavorite:
+                    Settings.Default.ToggleFavShortcut = value;
+                    break;
+                case SettingsEnum.Rating0:
+                    Settings.Default.Rating0Shortcut = value;
+                    break;
+                case SettingsEnum.Rating1:
+                    Settings.Default.Rating1Shortcut = value;
+                    break;
+                case SettingsEnum.Rating2:
+                    Settings.Default.Rating2Shortcut = value;
+                    break;
+                case SettingsEnum.Rating3:
+                    Settings.Default.Rating3Shortcut = value;
+                    break;
+                case SettingsEnum.Rating4:
+                    Settings.Default.Rating4Shortcut = value;
+                    break;
+                case SettingsEnum.Rating5:
+                    Settings.Default.Rating5Shortcut = value;
+                    break;
+                case SettingsEnum.Home:
+                    Settings.Default.NavHomeShortcut = value;
+                    break;
+                case SettingsEnum.Albums:
+                    Settings.Default.NavAlbumsShortcut = value;
+                    break;
+                case SettingsEnum.Artists:
+                    Settings.Default.NavArtistsShortcut = value;
+                    break;
+                case SettingsEnum.Playlists:
+                    Settings.Default.NavPlaylistsShortcut = value;
+                    break;
+                case SettingsEnum.NowPlaying:
+                    Settings.Default.NavNowPlayingShortcut = value;
+                    break;
+                case SettingsEnum.Settings:
+                    Settings.Default.NavSettingsShortcut = value;
+                    break;
+                case SettingsEnum.Back:
+                    Settings.Default.NavBackShortcut = value;
+                    break;
+                case SettingsEnum.ToggleQueueDrawer:
+                    Settings.Default.ToggleQueueShortcut = value;
+                    break;
+                case SettingsEnum.EscapeFullScreen:
+                    Settings.Default.EscapeFullScreenShortcut = value;
+                    break;
+                case SettingsEnum.ToggleFullScreen:
+                    Settings.Default.ToggleFullScreenShortcut = value;
+                    break;
+                case SettingsEnum.ToggleTheme:
+                    Settings.Default.ToggleLightThemeShortcut = value;
+                    break;
+                case SettingsEnum.EqualizerEnabled:
+                    Settings.Default.EqualizerEnabled = value;
+                    break;
+                case SettingsEnum.EqualizerPreset:
+                    Settings.Default.EqualizerPreset = value;
+                    break;
                 default:
                     return false;
             }
             Settings.Default.Save();
             return true;
+        }
+
+        private static void UpdateCoverSettings()
+        {
+            AreCoversEnabled = true;
+            AlbumCoverOnly = false;
+            ArtworkOnly = false;
+            AutoCover = false;
+            SettingsValueEnum settingsValue = (SettingsValueEnum)GetPreference(SettingsEnum.QueueCovers);
+            switch (settingsValue)
+            {
+                case SettingsValueEnum.NoCovers:
+                    AreCoversEnabled = false;
+                    break;
+                case SettingsValueEnum.AlbumCovers:
+                    AlbumCoverOnly = true;
+                    break;
+                case SettingsValueEnum.ArtworkCovers:
+                    ArtworkOnly = true;
+                    break;
+                case SettingsValueEnum.AutoCovers:
+                    AutoCover = true;
+                    break;
+                default:
+                    AutoCover = true;
+                    break;
+            }
         }
     }
 }

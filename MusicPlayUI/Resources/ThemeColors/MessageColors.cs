@@ -17,9 +17,9 @@ namespace MusicPlayUI.ThemeColors
         public static readonly Brush OnSuccessContainer = CreateBrush("#c2f18d");
         public static readonly Brush SuccessHover = CreateBrush("#805EB035");
 
-        public static readonly Brush WarningContainer = CreateBrush("#503500");
-        public static readonly Brush OnWarningContainer = CreateBrush("#F8D897");
-        public static readonly Brush WarningHover = CreateBrush("#80694115");
+        public static readonly Brush WarningContainer = CreateBrush("#B97606");
+        public static readonly Brush OnWarningContainer = CreateBrush("#ebe1d1");
+        public static readonly Brush WarningHover = CreateBrush("#80CB8D24");
 
         public static readonly Brush ErrorContainer = CreateBrush("#8C1D18");
         public static readonly Brush OnErrorContainer = CreateBrush("#F9DEDC");

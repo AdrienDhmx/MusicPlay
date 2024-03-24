@@ -8,31 +8,39 @@ using System.Threading.Tasks;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Enums;
 using System.Windows.Media;
+using MusicPlayUI.MVVM.ViewModels.SettingsViewModels;
 
 namespace MusicPlayUI.Core.Factories
 {
     public static class SettingsModelFactory
     {
-        private static SolidColorBrush LightDefaultAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#5954a8");
-        private static SolidColorBrush LightWaterAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#365bad");
-        private static SolidColorBrush LightForestAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#426915");
-        private static SolidColorBrush LightFallenLeavesAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#855300");
+        private static readonly SolidColorBrush LightDefaultAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#5954a8");
+        private static readonly SolidColorBrush LightWaterAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#365bad");
+        private static readonly SolidColorBrush LightTurquoiseAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#006b5f");
+        private static readonly SolidColorBrush LightForestAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#426915");
+        private static readonly SolidColorBrush LightFallenLeavesAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#855300");
+        private static readonly SolidColorBrush LightRedWineAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#984061");
 
-        private static SolidColorBrush DarkDefaultAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#c5c0ff");
-        private static SolidColorBrush DarkWaterAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#b2c5ff");
-        private static SolidColorBrush DarkForestAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#a7d474");
-        private static SolidColorBrush DarkFallenLeavesAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffb95f");
+
+        private static readonly SolidColorBrush DarkDefaultAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#c5c0ff");
+        private static readonly SolidColorBrush DarkWaterAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#b2c5ff");
+        private static readonly SolidColorBrush DarkTurquoiseAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#54dbc7");
+        private static readonly SolidColorBrush DarkForestAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#a7d474");
+        private static readonly SolidColorBrush DarkFallenLeavesAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffb95f");
+        private static readonly SolidColorBrush DarkRedWineAccentColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#ffb1c8");
 
         public static List<AppThemeModel> GetExistingThemes()
         {
-            if (AppThemeService.IsLightTheme)
+            if (AppTheme.IsLightTheme)
             {
                 return new()
                 {
                     new("Default Theme", "", SettingsValueEnum.DefaultTheme, LightDefaultAccentColor),
                     new("Water Theme", "", SettingsValueEnum.WaterTheme, LightWaterAccentColor),
+                    new("Turquoise Theme", "", SettingsValueEnum.TurquoiseTheme, LightTurquoiseAccentColor),
                     new("Forest Theme", "", SettingsValueEnum.ForestTheme, LightForestAccentColor),
                     new("Fallen Leaves Theme", "", SettingsValueEnum.FallenLeavesTheme, LightFallenLeavesAccentColor),
+                    new("Red Wine Theme", "", SettingsValueEnum.RedWineTheme, LightRedWineAccentColor),
                 };
             }
             else
@@ -41,8 +49,10 @@ namespace MusicPlayUI.Core.Factories
                 {
                     new("Default Theme", "", SettingsValueEnum.DefaultTheme, DarkDefaultAccentColor),
                     new("Water Theme", "", SettingsValueEnum.WaterTheme, DarkWaterAccentColor),
+                    new("Turquoise Theme", "", SettingsValueEnum.TurquoiseTheme, DarkTurquoiseAccentColor),
                     new("Forest Theme", "", SettingsValueEnum.ForestTheme, DarkForestAccentColor),
                     new("Fallen Leaves Theme", "", SettingsValueEnum.FallenLeavesTheme, DarkFallenLeavesAccentColor),
+                    new("Red Wine Theme", "", SettingsValueEnum.RedWineTheme, DarkRedWineAccentColor),
                 };
             }
         }
@@ -74,11 +84,13 @@ namespace MusicPlayUI.Core.Factories
         {
             List<SettingModel> settings = new()
             {
-                new(ViewNameEnum.General, Resources.General_Setting, "", true),
-                new(ViewNameEnum.AppTheme, Resources.Themes_Setting, ""),
-                new(ViewNameEnum.Language, Resources.Language_Setting, ""),
-                new(ViewNameEnum.Visualizer, Resources.Visualizer, ""),
-                new(ViewNameEnum.Shortcuts, "Shortcuts", ""),
+                new(ViewNameEnum.General, Resources.General_Setting, typeof(GeneralSettingsViewModel), true),
+                new(ViewNameEnum.Import, Resources.Storage, typeof(StorageSettingsViewModel)),
+                new(ViewNameEnum.AppTheme, Resources.Themes_Setting, typeof(AppThemeSettingViewModel)),
+                new(ViewNameEnum.Language, Resources.Language_Setting, typeof(LanguageSettingViewModel)),
+                new(ViewNameEnum.DSP, "Equalizer", typeof(DSPSettingsViewModels)), 
+                new(ViewNameEnum.Visualizer, Resources.Visualizer, typeof(VisualizerSettingViewModel)),
+                new(ViewNameEnum.Shortcuts, "Shortcuts", typeof(ShortcutSettingViewModel)),
             };
             return settings;
         }

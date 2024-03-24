@@ -6,43 +6,44 @@
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.PopupViews"
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             xmlns:conv="clr-namespace:MusicPlayUI.Converters"
              xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn"
              mc:Ignorable="d" 
              x:Name="AddToPlaylistUC"
              d:DesignHeight="450" d:DesignWidth="800">
-<Border Background="#01ffffff"
-        IsHitTestVisible="True"
+    <Border Background="#01ffffff"
+            IsHitTestVisible="True"
             x:Name="PopupRootBorder">
         <Border Height="auto"
                 x:Name="PopupContentBorder"
-                Background="{DynamicResource Background}"
-                BorderBrush="{DynamicResource Outline}"
-                BorderThickness="1"
-                Width="200"
-                MaxHeight="500"
-                    Margin="5,2, 5, 8"
-                CornerRadius="5">
+                Style="{DynamicResource SecondaryPopupBorder}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <Border Effect="{DynamicResource PopupSmallDropShadow}"
+                        Background="{DynamicResource Background}"
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                        Grid.RowSpan="2"/>
+
                 <iconbtn:IconButton Icon="{DynamicResource CircledAddIcon}"
+                                    Cursor="Hand"
                                     HorizontalAlignment="Stretch"
                                     Height="40"
                                     IconWidth="25"
                                     IconHeight="25"
                                     IconStretch="Fill"
-                                    CornerRadius="5"
+                                    CornerRadius="{DynamicResource PrimaryCornerRadius}"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
                                     StrokeColor="Transparent"
                                     MouseOverBackground="{DynamicResource PrimaryHover}"
-                                    Command="{Binding DataContext.CreatePlaylistCommand, ElementName=AddToPlaylistUC}"
+                                    Command="{Binding CreatePlaylistCommand, ElementName=AddToPlaylistUC}"
                                     FillColor="{DynamicResource Primary}">
                 </iconbtn:IconButton>
-                <ItemsControl ItemsSource="{Binding DataContext.UserPlaylists, ElementName=AddToPlaylistUC, UpdateSourceTrigger=PropertyChanged}"
-                              Visibility="{Binding DataContext.UserPlaylists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"
+                <ItemsControl ItemsSource="{Binding Playlists, ElementName=AddToPlaylistUC, UpdateSourceTrigger=PropertyChanged}"
+                              Visibility="{Binding Playlists.Count, ElementName=AddToPlaylistUC, Converter={StaticResource BoolToVisibilityConverter}}"
                             FontSize="16"
                               Margin="0,0,0,4"
                             Grid.Row="1">
@@ -54,11 +55,9 @@
                                                 CommandParameter="{Binding .}"
                                                 Style="{DynamicResource PopupBtn}"/>
                         </DataTemplate>
-                        </ItemsControl.ItemTemplate>
+                    </ItemsControl.ItemTemplate>
                 </ItemsControl>
-
             </Grid>
-
         </Border>
     </Border>
 </UserControl>

@@ -28,22 +28,20 @@ namespace MusicPlayUI.MVVM.Views.Windows
         public MainWindow()
         {
             InitializeComponent();
-            PreviewKeyDown += OnPreviewKeyDownHandler;
             Focus();
+
+            App.State.FullScreenChanged += State_FullScreenChanged;
         }
 
-        private void OnPreviewKeyDownHandler(object sender, KeyEventArgs e)
+        private void State_FullScreenChanged()
         {
-            if(e.Key == Key.Space ||
-                e.Key == Key.Left || e.Key == Key.Right ||
-                 e.Key == Key.Up || e.Key == Key.Down)
+            if(App.State.IsFullScreen)
             {
-                var element = Keyboard.FocusedElement;
-                if(element != null && element as TextBox == null && element as MainWindow == null)
-                {
-                    FocusManager.SetFocusedElement(this, this);
-                }
-                e.Handled = false; // not handled because we want the input bindings to call their commands (play, previous, next...)
+                this.WindowStyle = WindowStyle.None;
+            }
+            else
+            {
+                this.WindowStyle = WindowStyle.SingleBorderWindow;
             }
         }
 

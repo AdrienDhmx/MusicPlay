@@ -3,14 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
-             xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls"
+             xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls" xmlns:controls="clr-namespace:MusicPlayUI.Controls"
              mc:Ignorable="d" 
              x:Name="PlaylistsView"
              d:DesignHeight="450" d:DesignWidth="800">
     <vcontrol:VirtualizingItemsControl ItemsSource="{Binding DataContext.BindedPlaylists, ElementName=PlaylistsView}"
-                                        Style="{DynamicResource VLibraryItemsControl}">
+                                        Style="{DynamicResource VLibraryItemsControl}"
+                                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
         <vcontrol:VirtualizingItemsControl.ItemTemplate>
             <DataTemplate>
                 <Grid x:Name="itemgrid"
@@ -30,16 +30,25 @@
                             Grid.Row="0"
                             Panel.ZIndex="2"
                             Opacity="0"
+                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             Background="{DynamicResource TransparentGradient}"/>
 
-                    <Border Style="{DynamicResource LibraryItemsRoundedImageBorder}"
-                            x:Name="BorderImage">
-                        <Border.Background>
-                            <ImageBrush ImageSource="{Binding Cover, Converter={StaticResource MNullImageConverter}}"
-                                        Stretch="UniformToFill"/>
-                        </Border.Background>
-                    </Border>
+                    <controls:AsyncImage Style="{DynamicResource LibraryItemsRoundedImageBorder}"
+                                         ImagePath="{Binding Cover, Converter={StaticResource MNullImageConverter}}"
+                                        x:Name="BorderImage">
+                        <controls:AsyncImage.Placeholder>
+                            <iconbtn:IconButton Icon="{Binding Cover}"
+                                                    Background="{DynamicResource SecondaryContainer}"
+                                                    FillColor="{DynamicResource OnSecondaryContainer}"
+                                                    Style="{DynamicResource BaseIconButton}"
+                                                    Width="150"
+                                                    Height="150"
+                                                    CornerRadius="{DynamicResource SecondaryCornerRadius}"
+                                                    IconHeight="80"
+                                                    IconWidth="80"/>
+                        </controls:AsyncImage.Placeholder>
+                    </controls:AsyncImage>
 
                     <Grid Opacity="0"
                           VerticalAlignment="Bottom"

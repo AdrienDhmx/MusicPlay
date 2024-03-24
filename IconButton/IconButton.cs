@@ -6,12 +6,18 @@ using System.Windows.Media;
 
 namespace IconButton
 {
-    public class IconButton : Control
+    public class IconButton : Button
     {
         public Geometry Icon
         {
             get { return (Geometry)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
+        }
+
+        public double IconOpacity
+        {
+            get { return (double)GetValue(IconOpacityProperty); }
+            set { SetValue(IconOpacityProperty, value); }
         }
 
         public Brush FillColor
@@ -56,32 +62,25 @@ namespace IconButton
             set { SetValue(IconHeightProperty, value); }
         }
 
+        public double StrokeWidth
+        {
+            get { return (double)GetValue(StrokeWidthProperty); }
+            set { SetValue(StrokeWidthProperty, value); }
+
+        }
+
         public Brush MouseOverBackground
         {
             get { return (Brush)GetValue(MouseOverBackgroundProperty); }
             set { SetValue(MouseOverBackgroundProperty, value); }
         }
 
-        public ICommand Command
-        {
-            get { return (ICommand)GetValue(CommandProperty); }
-            set { SetValue(CommandProperty, value); }
-        }
-
-        public static readonly DependencyProperty CommandProperty =
-            DependencyProperty.Register("Command", typeof(ICommand), typeof(IconButton), new PropertyMetadata(null));
-
-        public object CommandParameter
-        {
-            get { return (object)GetValue(CommandParameterProperty); }
-            set { SetValue(CommandParameterProperty, value); }
-        }
-
-        public static readonly DependencyProperty CommandParameterProperty =
-            DependencyProperty.Register("CommandParameter", typeof(object), typeof(IconButton), new PropertyMetadata(null));
-
         public static readonly DependencyProperty MouseOverBackgroundProperty =
             DependencyProperty.Register("MouseOverBackground", typeof(Brush), typeof(IconButton), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(250, 90, 90, 90))));
+
+        public static readonly DependencyProperty IconOpacityProperty =
+            DependencyProperty.Register("IconOpacity", typeof(double), typeof(IconButton), new PropertyMetadata(1d));
+
 
         public static readonly DependencyProperty IconHeightProperty =
             DependencyProperty.Register("IconHeight", typeof(double), typeof(IconButton), new PropertyMetadata(20d));
@@ -107,6 +106,9 @@ namespace IconButton
         public static readonly DependencyProperty IconMarginProperty =
             DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(IconButton), new PropertyMetadata(new Thickness(4)));
 
+        public static readonly DependencyProperty StrokeWidthProperty =
+            DependencyProperty.Register("StrokeWidth", typeof(double), typeof(IconButton), new PropertyMetadata(1d));
+
         static IconButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(IconButton), new FrameworkPropertyMetadata(typeof(IconButton)));
@@ -117,28 +119,16 @@ namespace IconButton
             base.EndInit();
 
             if (IconWidth < 0) IconWidth = 0;
-            if (IconHeight <0) IconHeight = 0;
+            if (IconHeight < 0) IconHeight = 0;
         }
 
         public IconButton()
         {
-            PreviewMouseLeftButtonDown += MouseLeftButtonDownCommand;
-            PreviewMouseLeftButtonUp += IconButton_PreviewMouseLeftButtonUp;
         }
 
-        private void IconButton_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        protected override void OnClick()
         {
-            e.Handled = true;
+            Command?.Execute(CommandParameter);
         }
-
-        private void MouseLeftButtonDownCommand(object sender, MouseButtonEventArgs e)
-        {
-            if(Command is not null)
-            {
-                e.Handled= true;
-                Command.Execute(CommandParameter);
-            }
-        }
-
     }
 }

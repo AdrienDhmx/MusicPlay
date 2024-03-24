@@ -1,5 +1,8 @@
-﻿using MusicPlay.Language;
+﻿using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
+using MusicPlay.Language;
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Services;
 using MusicPlayUI.MVVM.Models;
 using System;
 using System.Collections.Generic;
@@ -16,10 +19,10 @@ namespace MusicPlayUI.Core.Factories
 {
     public static class ConfirmActionModelFactory
     {
-        private static SolidColorBrush RedColor => (SolidColorBrush)App.appThemeDic["ErrorHover"];
-        private static SolidColorBrush MainHoverColor => (SolidColorBrush)App.appThemeDic["PrimaryHover"];
-        private static SolidColorBrush OnRedColor => (SolidColorBrush)App.appThemeDic["Error"];
-        private static SolidColorBrush OnMainHoverColor => (SolidColorBrush)App.appThemeDic["Primary"];
+        private static SolidColorBrush RedColor => (SolidColorBrush)AppTheme.AppThemeDic["ErrorHover"];
+        private static SolidColorBrush MainHoverColor => (SolidColorBrush)AppTheme.AppThemeDic["PrimaryHover"];
+        private static SolidColorBrush OnRedColor => (SolidColorBrush)AppTheme.AppThemeDic["Error"];
+        private static SolidColorBrush OnMainHoverColor => (SolidColorBrush)AppTheme.AppThemeDic["Primary"];
 
         public static ConfirmActionModel CreateConfirmModel(this string confirmAction, string message, string messageDetail = "", Brush actionColor = null)
         {
@@ -58,10 +61,23 @@ namespace MusicPlayUI.Core.Factories
                 case ModelTypeEnum.Playlist:
                     dataType = Resources.Playlist;
                     break;
+                case ModelTypeEnum.Tag:
+                    dataType = "tag";
+                    break;
+                case ModelTypeEnum.EQPreset:
+                    dataType = "preset";
+                    break;
                 default:
                     break;
             }
             return CreateConfirmModel(Resources.Delete, $"{Resources.Delete} {dataType}", $"\"{dataToDelete}\" {Resources.PermanentlyDeletedWarning}", actionColor: RedColor);
+        }
+
+        public static ConfirmActionModel CreateConfirmDeleteFolderModel(this Folder folder)
+        {
+            string title = $"Deleting Folder \"{folder.Name}\"";
+            string contentMessage = $"Deleting this folder will also delete the {folder.TrackImportedCount} tracks imported from it.";
+            return CreateConfirmModel(Resources.Delete, title, contentMessage, RedColor);
         }
 
         public static ConfirmActionModel CreateConfirmClearDataBaseModel()

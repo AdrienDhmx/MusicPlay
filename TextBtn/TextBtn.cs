@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 
 namespace TextBtn
 {
-    public class TextButton : Control
+    public class TextButton : Button
     {
         public CornerRadius CornerRadius
         {
@@ -34,25 +34,6 @@ namespace TextBtn
 
         public static readonly DependencyProperty MouseOverBtnColorProperty =
             DependencyProperty.Register("MouseOverBtnColor", typeof(Brush), typeof(TextButton), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(100, 40, 40, 40))));
-
-        public ICommand Command
-        {
-            get { return (ICommand)GetValue(CommandProperty); }
-            set { SetValue(CommandProperty, value); }
-        }
-
-        public static readonly DependencyProperty CommandProperty =
-            DependencyProperty.Register("Command", typeof(ICommand), typeof(TextButton), new PropertyMetadata(null));
-
-
-        public object CommandParameter
-        {
-            get { return (object)GetValue(CommandParameterProperty); }
-            set { SetValue(CommandParameterProperty, value); }
-        }
-
-        public static readonly DependencyProperty CommandParameterProperty =
-            DependencyProperty.Register("CommandParameter", typeof(object), typeof(TextButton), new PropertyMetadata(null));
 
 
         public string Text
@@ -80,15 +61,12 @@ namespace TextBtn
 
         public TextButton()
         {
-            MouseLeftButtonUp += MouseLeftButtonUpCommand;
+            
         }
 
-        private void MouseLeftButtonUpCommand(object sender, MouseButtonEventArgs e)
+        protected override void OnClick()
         {
-            if (Command is null)
-                return;
-
-            Command.Execute(CommandParameter);
+            Command?.Execute(CommandParameter);
         }
     }
 }

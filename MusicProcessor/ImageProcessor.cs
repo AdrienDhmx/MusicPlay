@@ -3,16 +3,17 @@ using MusicFilesProcessor.Helpers;
 using System.Drawing;
 using System.Windows.Media;
 using System.IO;
-using System.Drawing.Imaging;
 using Image = SixLabors.ImageSharp.Image;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Rectangle = System.Drawing.Rectangle;
 using System.Drawing.Drawing2D;
 using SixLabors.ImageSharp.Formats.Png;
 using System.Windows;
 using MessageControl;
+using System.Drawing.Imaging;
+using MusicPlay.Database.Helpers;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace MusicFilesProcessor
 {
@@ -87,15 +88,15 @@ namespace MusicFilesProcessor
             // get the thumbnail size
             string mImagePath = imagePath.GetModifiedCoverPath(false);
 
-            if (!ImageHelper.ValidPath(mImagePath))
+            if (!ImageHelper.ValidFilePath(mImagePath))
             {
                 // try with the medium size
                 mImagePath = imagePath.GetModifiedCoverPath(true);
 
-                if (!ImageHelper.ValidPath(mImagePath))
+                if (!ImageHelper.ValidFilePath(mImagePath))
                 {
                     mImagePath = imagePath;
-                    if (!ImageHelper.ValidPath(mImagePath))
+                    if (!ImageHelper.ValidFilePath(mImagePath))
                         return "";
                 }
             }
@@ -118,14 +119,12 @@ namespace MusicFilesProcessor
 
         private static string CreateBlurredImagePath(this string originalPath)
         {
-            string path = Path.Combine(DirectoryHelper.BlurredCoverDirectory, Path.GetFileNameWithoutExtension(originalPath) + "_blurred.png");
-            DirectoryHelper.CheckDirectory(DirectoryHelper.BlurredCoverDirectory);
-            return path;
+            return DirectoryHelper.GetDirectory(originalPath) + Path.GetFileNameWithoutExtension(originalPath) + "_blurred.png";
         }
 
         public static SolidColorBrush CalculateMeanColor(this string imgPath)
         {
-            if (!ImageHelper.ValidPath(imgPath)) return new();
+            if (!ImageHelper.ValidFilePath(imgPath)) return new();
 
             using Bitmap bmp = new(imgPath);
 
@@ -134,7 +133,7 @@ namespace MusicFilesProcessor
             int red = 0;
             int green = 0;
             int blue = 0;
-            long[] totals = new long[] { 0, 0, 0 };
+            long[] totals = [0, 0, 0];
             int bppModifier = bmp.PixelFormat == PixelFormat.Format24bppRgb ? 3 : 4;
 
             BitmapData srcData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
@@ -172,36 +171,64 @@ namespace MusicFilesProcessor
             return new(System.Windows.Media.Color.FromRgb((byte)avgR, (byte)avgG, (byte)avgB));
         }
 
-        public static SolidColorBrush GetEmphasizedColor(this SolidColorBrush color)
+        public static SolidColorBrush GetEmphasizedColor(this SolidColorBrush color, double emphasizeBy = 1.05d, int maxChannelValue = 230)
         {
-            const int max = 230; // base max value for each color channel
             int red;
             int green;
             int blue;
 
             // color dif with the highest value increased
-            (double rRatio, double gRatio, double bRatio) = CalculateRatio(color.Color.R, color.Color.G, color.Color.B);
+            (double rRatio, double gRatio, double bRatio) = CalculateRatio(color.Color.R, color.Color.G, color.Color.B, emphasizeBy);
 
-            double brightness = (color.Color.R + color.Color.G + color.Color.B) / 765d;
+            double brightness = color.CalculateBrightness();
 
-            // change brightness to have a color that's eiter brighter or darker than the original (it needs to be visible)
-            red = (int)(rRatio * color.Color.R + (0.7 - brightness) * max * (1.05 - brightness));
-            green = (int)(gRatio * color.Color.G + (0.7 - brightness) * max * (1.05 - brightness));
-            blue = (int)(bRatio * color.Color.B + (0.7 - brightness) * max * (1.05 - brightness));
+            // change brightness to have a color that's either brighter or darker than the original (it needs to be visible)
+            red = (int)(rRatio * color.Color.R + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
+            green = (int)(gRatio * color.Color.G + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
+            blue = (int)(bRatio * color.Color.B + (0.7 - brightness) * maxChannelValue * (1.05 - brightness));
 
-            if(brightness <= 0.8)
+            if (brightness <= 0.8)
             {
                 // increase the brightness
                 brightness += 0.85 - brightness;
             }
 
             // accentuate or minimize rbg values while making sure they stay between valid values (0 - 255)
-            red = FormatRGB(red, 1.1, (int)(max * brightness * rRatio));
-            green = FormatRGB(green, 1.1, (int)(max * brightness * gRatio));
-            blue = FormatRGB(blue, 1.1, (int)(max * brightness * bRatio));
+            red = FormatRGB(red, 1.1, (int)(maxChannelValue * brightness * rRatio));
+            green = FormatRGB(green, 1.1, (int)(maxChannelValue * brightness * gRatio));
+            blue = FormatRGB(blue, 1.1, (int)(maxChannelValue * brightness * bRatio));
 
             return new(System.Windows.Media.Color.FromRgb((byte)red, (byte)green, (byte)blue));
         }
+
+        public static SolidColorBrush MultiplyBy(this SolidColorBrush color, double value)
+        {
+            double red = FormatRGB(color.Color.R, value, 255, 0);
+            double green = FormatRGB(color.Color.G, value, 255, 0);
+            double blue = FormatRGB(color.Color.B, value, 255, 0);
+
+            return new(System.Windows.Media.Color.FromRgb((byte)red, (byte)green, (byte)blue));
+        }
+
+        /// <summary>
+        /// Calculate the mean value of the 3 channels (RGB)
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns>The mean value between 0 and 1</returns>
+        public static double CalculateBrightness(this SolidColorBrush color)
+        {
+            return (color.Color.R + color.Color.G + color.Color.B) / 765d;
+        }
+
+        public static bool IsGrey(this SolidColorBrush color, int margin = 40)
+        {
+            int r = color.Color.R;
+            int g = color.Color.G;
+            int b = color.Color.B;
+
+            return Math.Abs(r - g) <= margin && Math.Abs(g - b) <= margin && Math.Abs(b - r) <= margin;
+        }
+
 
         private static int FormatRGB(int value, double ratio, int maxvalue = 210, int minvalue = 20)
         {
@@ -214,10 +241,8 @@ namespace MusicFilesProcessor
             return output < min ? min : output;
         }
 
-        private static (double, double, double) CalculateRatio(double red, double green, double blue)
+        private static (double, double, double) CalculateRatio(double red, double green, double blue,double maxRatio = 1.05d)
         {
-            double maxRatio = 1.05d;
-
             double rRatio = maxRatio;
             double gRatio = maxRatio;
             double bRatio = maxRatio;
@@ -310,34 +335,42 @@ namespace MusicFilesProcessor
 
         /// <summary>
         /// Format an image by resizing it and setting the bit-depth to 24 (RGB).
-        /// The image is then saved to the newPath
         /// </summary>
         /// <param name="imgPath"></param>
         /// <param name="newPath"></param>
-        /// <param name="treshold"> The physical file size in bytes at wich the image gets compressed (default = 512 000 bytes = 500 kb) </param>
+        /// <param name="treshold"> The physical file size in bytes at which the image gets compressed (default = 512 000 bytes = 500 kb) </param>
         public static void FormatImage(string imgPath, string mediumSized, string thumbnailSized, long treshold = 512000)
         {
             try
             {
-                FileInfo fileInfo = new FileInfo(imgPath);
+                const int mediumSizeThreshold = 400;
+                const int thumbnailSizeThreshold = 200;
+                PngEncoder pngEncoder = new() { CompressionLevel = PngCompressionLevel.NoCompression };
 
-                PngEncoder pngEncoder = new PngEncoder()
-                {
-                    CompressionLevel = PngCompressionLevel.NoCompression,
-                };
-
+                FileInfo fileInfo = new(imgPath);
                 if (fileInfo.Length > treshold)
                 {
-                    pngEncoder = new PngEncoder()
+                    pngEncoder = new PngEncoder() // CompressionLevel prop is init only
                     {
-                        CompressionLevel = PngCompressionLevel.DefaultCompression,
+                       CompressionLevel = PngCompressionLevel.DefaultCompression,
                     };
                 }
 
                 using (Image image = Image.Load(imgPath))
                 {
-                    ResizeAndCompressImage(image, mediumSized, 400, pngEncoder);
-                    ResizeAndCompressImage(image, thumbnailSized, 200, pngEncoder);
+                    if (image.Width > mediumSizeThreshold && image.Height > mediumSizeThreshold)
+                    {
+                        ResizeAndCompressImage(image, mediumSized, mediumSizeThreshold, pngEncoder);
+                        if (image.Width > thumbnailSizeThreshold && image.Height > thumbnailSizeThreshold)
+                            ResizeAndCompressImage(image, thumbnailSized, thumbnailSizeThreshold, pngEncoder);
+                        else
+                            image.SaveAsync(thumbnailSized);
+                    }
+                    else
+                    {
+                        image.SaveAsync(mediumSized);
+                        image.SaveAsync(thumbnailSized);
+                    }
                 }
             }
             catch (Exception ex)
@@ -349,9 +382,41 @@ namespace MusicFilesProcessor
             }
         }
 
+        private static void ResizeImage(string image, string newPath, int desiredSize)
+        {
+            Bitmap bmp = new(image);
+
+            (int width, int height) = GetNewSize(desiredSize, bmp.Width, bmp.Height);
+
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(bmp.HorizontalResolution, bmp.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.Default;
+                graphics.InterpolationMode = InterpolationMode.Default;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(bmp, destRect, 0, 0, bmp.Width, bmp.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            destImage.Save(newPath, ImageFormat.Png);
+
+            bmp.Dispose();
+            destImage.Dispose();
+        }
+
         private static void ResizeAndCompressImage(Image image, string newPath, int desiredSize, PngEncoder pngEncoder)
         {
-            double heightWidthDif =image.Width - image.Height;
+            double heightWidthDif = image.Width - image.Height;
             double ratio;
             int width;
             int height;
@@ -375,7 +440,33 @@ namespace MusicFilesProcessor
 
             image.Mutate(x => x.Resize(width, height, KnownResamplers.Bicubic));
 
-            image.Save(newPath, pngEncoder);//Replace Png encoder with the file format of choice
+            image.SaveAsync(newPath, pngEncoder);
+        }
+
+        private static (int, int) GetNewSize(int desiredSize, int originalWidth, int originalHeight)
+        {
+            double heightWidthDif = originalWidth - originalHeight;
+            double ratio;
+            int width;
+            int height;
+
+            if (heightWidthDif == 0)
+            {
+                width = height = desiredSize;
+            }
+            else if (heightWidthDif > 0)
+            {
+                width = desiredSize;
+                ratio = width / originalWidth;
+                height = (int)(originalHeight * ratio);
+            }
+            else
+            {
+                height = desiredSize;
+                ratio = height / originalHeight;
+                width = (int)(originalWidth * ratio);
+            }
+            return (width, height);
         }
 
         public static ImageCodecInfo GetEncoder(string format)
@@ -383,7 +474,7 @@ namespace MusicFilesProcessor
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
             foreach (ImageCodecInfo codec in codecs)
             {
-                if (codec.FilenameExtension.ToLower().Contains(format))
+                if (codec.FilenameExtension.Contains(format, StringComparison.CurrentCultureIgnoreCase))
                 {
                     return codec;
                 }

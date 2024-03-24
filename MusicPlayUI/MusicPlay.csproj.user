@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_LastSelectedProfileId>C:\dev\C#\MusicPlay\MusicPlayUI\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>C:\dev\C#\MusicPlay-private\MusicPlayUI\Properties\PublishProfiles\_myrepo_.azurecr.io.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
@@ -12,7 +12,13 @@
     <Compile Update="MVVM\Views\AlbumLibraryView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\AppBars\AppBarView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\EmptyView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\GenreLibraryView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\GenreView.xaml.cs">
@@ -33,10 +39,10 @@
     <Compile Update="MVVM\Views\ListViews\ChipListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="MVVM\Views\ListViews\HorizontalAlbumListView.xaml.cs">
+    <Compile Update="MVVM\Views\ListViews\FilterOptionsListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="MVVM\Views\ListViews\HorizontalArtistListView.xaml.cs">
+    <Compile Update="MVVM\Views\ListViews\GenreListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\ListViews\PlaylistListView.xaml.cs">
@@ -54,6 +60,15 @@
     <Compile Update="MVVM\Views\MainMenuView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\ModalViews\CreateModelNameModal.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\ModalViews\EditFolderView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\ModalViews\ValidationModalView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -61,6 +76,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\PopupViews\AddToPlaylistPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\PopupViews\AddToTagPopup.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\PopupViews\AlbumPopupView.xaml.cs">
@@ -82,9 +100,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\HomeView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="MVVM\Views\ImportLibraryView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\LyricsView.xaml.cs">
@@ -114,6 +129,9 @@
     <Compile Update="MVVM\Views\PopupViews\SortByPopupView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\PopupViews\TagPopupView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\QueueView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -121,6 +139,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\SettingsViews\AppThemeSettingView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Views\SettingsViews\DSPSettingsView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\SettingsViews\GeneralSettingView.xaml.cs">
@@ -132,6 +153,9 @@
     <Compile Update="MVVM\Views\SettingsViews\ShortcutSettingView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\SettingsViews\StorageSettingsView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\SettingsViews\VisualizerSettingTemplateView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -141,10 +165,16 @@
     <Compile Update="MVVM\Views\Templates\ListHeaderTemplate.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MVVM\Views\Templates\TextPreviewTemplate.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MVVM\Views\TrackInfoView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Views\PopupViews\TrackPopupView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="MVVM\Windows\EditArtistWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MVVM\Windows\VisualizerParametersWindow.xaml.cs">
@@ -152,6 +182,18 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="MVVM\Views\AppBars\AppBarView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\DataTemplates\AlbumDataTemplate.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\DataTemplates\ArtistDataTemplate.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\GenreLibraryView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\GenreView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -164,10 +206,10 @@
     <Page Update="MVVM\Views\ListViews\ChipListView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="MVVM\Views\ListViews\HorizontalAlbumListView.xaml">
+    <Page Update="MVVM\Views\ListViews\FilterOptionsListView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="MVVM\Views\ListViews\HorizontalArtistListView.xaml">
+    <Page Update="MVVM\Views\ListViews\GenreListView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\ListViews\SelectedFilterListView.xaml">
@@ -179,10 +221,22 @@
     <Page Update="MVVM\Views\ListViews\TrackListView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="MVVM\Views\ModalViews\CreateModelNameModal.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\ModalViews\EditFolderView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\ModalViews\UpdateShortcutView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\ModalViews\ValidationModalView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\PlayerControlViews\NowPlayingPlayerControlView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\PopupViews\AddToTagPopup.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\PopupViews\GenreListPopupView.xaml">
@@ -191,7 +245,16 @@
     <Page Update="MVVM\Views\PopupViews\SortByPopupView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="MVVM\Views\PopupViews\TagPopupView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\SettingsViews\DSPSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Views\SettingsViews\ShortcutSettingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Views\SettingsViews\StorageSettingsView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\SettingsViews\VisualizerSettingTemplateView.xaml">
@@ -203,16 +266,34 @@
     <Page Update="MVVM\Views\Templates\ListHeaderTemplate.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="MVVM\Views\Templates\TextPreviewTemplate.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MVVM\Windows\EditArtistWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MVVM\Windows\MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\ThemeColors\DarkFallenLeavesThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Resources\ThemeColors\DarkRedWineThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\DarkTurquoiseThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Resources\ThemeColors\DarkWaterThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\ThemeColors\LightFallenLeavesThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\LightRedWineThemeColors.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Resources\ThemeColors\LightTurquoiseThemeColors.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Resources\ThemeColors\LightWaterThemeColors.xaml">
@@ -261,9 +342,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\HomeView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="MVVM\Views\ImportLibraryView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MVVM\Views\LyricsView.xaml">

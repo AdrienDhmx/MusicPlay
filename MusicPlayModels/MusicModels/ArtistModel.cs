@@ -3,23 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicPlayModels.Interfaces;
 
 namespace MusicPlayModels.MusicModels
 {
-    public class ArtistModel : DatedModel
+    public class ArtistModel : PlayableModel, ITaggable
     {
-        private string _cover = "";
-        private string _duration = "";
+        private string _cover = string.Empty;
+        private string _name = string.Empty;
+        private string _biography = string.Empty;
+        private string _realName = string.Empty;
+
+        private int _birthDate = 0;
+        private int _deathDate = 0;
+
+        private string _country = string.Empty;
+        private bool _isGroup = false;
+        private List<ArtistModel> _groupMembers = new();
+
+        private List<ArtistRoleModel> _roles = new List<ArtistRoleModel>();
+        private List<AlbumModel> _albums = new List<AlbumModel>();
+        private List<TrackModel> _tracks = new List<TrackModel>();
+        private List<TagModel> _tags = new List<TagModel>();
 
         /// <summary>
-        /// The unique identifier
+        /// The artist name
         /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Thge artist name
-        /// </summary>
-        public string Name { get; set; } = "";
+        public string Name
+        {
+            get => _name;
+            set => SetField(ref _name, value);
+        }
 
         /// <summary>
         /// The artist cover
@@ -34,66 +48,125 @@ namespace MusicPlayModels.MusicModels
             }
         }
 
-        /// <summary>
-        /// The total duration of all the tracks the artist made and contributed to.
-        /// </summary>
-        public string Duration 
+        public string Biography
         {
-            get => _duration;
-            set
-            {
-                SetField(ref _duration, value);
+            get => _biography;
+            set => SetField(ref _biography, value);
+        }
+
+        public string RealName
+        {
+            get => _realName;
+            set => SetField(ref _realName, value);
+        }
+
+        public string Country
+        {
+            get => _country;
+            set => SetField(ref _country, value);
+        }
+
+        public int BirthDate
+        {
+            get => _birthDate;
+            set 
+            { 
+                SetField(ref _birthDate, value);
+                OnPropertyChanged(nameof(Birth));
             }
         }
-        public string Biography { get; set; } = "";
 
-        public List<GenreModel> Genres { get; set; }
+        public int DeathDate
+        {
+            get => _deathDate;
+            set
+            {
+                SetField(ref _deathDate, value);
+                OnPropertyChanged(nameof(Death));
+            }
+        }
 
-        public int PlayCount { get; set; } = 0;
-        public DateTime LastPlayed { get; set; } = DateTime.MinValue;
+        public bool IsGroup
+        {
+            get => _isGroup;
+            set => SetField(ref _isGroup, value);
+        }
 
-        /// <summary>
-        /// Wether the artist only appear as the main artist of 1 or more albums
-        /// -- Allows to avoid database query when the artist has no individual tracks (performer) --
-        /// </summary>
-        public bool IsAlbumArtist { get; set; }
+        public List<ArtistModel> GroupMembers
+        {
+            get => _groupMembers;
+            set => SetField(ref _groupMembers, value);
+        }
 
-        /// <summary>
-        /// Wether the artist is the main artist of an album or only appear on tracks as a performer
-        /// true = no albums has the artist id in its table, only 1 or more tracks has.
-        /// false = the artist has albums (his id is in the table of 1 or more albums).
-        /// -- Allows to avoid database query when the artist has no album --
-        /// </summary>
-        public bool IsPerformer { get; set; }
+        public List<ArtistRoleModel> Roles
+        {
+            get => _roles;
+            set => SetField(ref _roles, value);
+        }
 
-        public bool IsComposer { get; set; }
+        // All the albums the artist is credited as the Primary Artist
+        public List<AlbumModel> Albums
+        {
+            get => _albums;
+            set => SetField(ref _albums, value);
+        }
 
-        public bool IsFeatured { get; set; }
+        // All the tracks the artists is credited on
+        public List<TrackModel> Tracks
+        {
+            get => _tracks;
+            set => SetField(ref _tracks, value);
+        }
 
-        public bool IsLyricist { get; set; }
+        public List<TagModel> Tags
+        {
+            get => _tags;
+            set => SetField(ref _tags, value);
+        }
 
-        public ArtistModel(int id, string name, string cover, string duration, bool isAlbumArtistOnly, bool isPerformerOnly)
+        public string Birth
+        {
+            get => TimestampToDateString(_birthDate);
+        }
+
+        public string Death
+        {
+            get => TimestampToDateString(_deathDate);
+        }
+
+        public ArtistModel(int id, string name, string cover, string duration)
         {
             Id = id;
             Name = name;
             Cover = cover;
             Duration = duration;
-            IsAlbumArtist = isAlbumArtistOnly;
-            IsPerformer = isPerformerOnly;
         }
 
         public ArtistModel(string name)
         {
             Name = name;
-            Cover = "";
-            Duration = "";
-            IsAlbumArtist = false;
-            IsPerformer = false;
+            Cover = string.Empty;
+            Duration = string.Empty;
         }
 
         public ArtistModel()
         {
 
+        }
+
+        public override Dictionary<string, object> CreateTable()
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>
+            {
+                { nameof(Name), Name },
+                { nameof(Cover), Cover },
+                { nameof(Biography), Biography },
+                { nameof(RealName), RealName },
+                { nameof(BirthDate), BirthDate },
+                { nameof(DeathDate), DeathDate },
+                { nameof(IsGroup), IsGroup.ToInt() },
+            };
+            return base.CreateTable().AddRange(keyValues);
         }
     }
 }

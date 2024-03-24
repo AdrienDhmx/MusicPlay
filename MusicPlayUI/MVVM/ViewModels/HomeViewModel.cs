@@ -1,28 +1,27 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using MusicPlay.Language;
+﻿using MusicPlay.Language;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Markup;
-using MusicFilesProcessor.Helpers;
-using MusicPlayModels;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Enums;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Services.Interfaces;
 using System.Collections.ObjectModel;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Helpers;
+using DynamicScrollViewer;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class HomeViewModel : ViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
         private readonly IRadioStationsService _radioStationsServices;
         private readonly IHistoryServices _historyServices;
-
+        private readonly ICommandsManager _commandsManager;
         private string _welcomeMessage;
         public string WelcomeMessage
         {
@@ -94,8 +93,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<ArtistModel> _bindedArtists = new();
-        public ObservableCollection<ArtistModel> BindedArtists
+        private ObservableCollection<Artist> _bindedArtists = new();
+        public ObservableCollection<Artist> BindedArtists
         {
             get { return _bindedArtists; }
             set
@@ -105,8 +104,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private ObservableCollection<AlbumModel> _bindedAlbums = new();
-        public ObservableCollection<AlbumModel> BindedAlbums
+        private ObservableCollection<Album> _bindedAlbums = new();
+        public ObservableCollection<Album> BindedAlbums
         {
             get { return _bindedAlbums; }
             set
@@ -138,8 +137,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<PlaylistModel> _bindedPlaylists;
-        public List<PlaylistModel> BindedPlaylists
+        private List<Playlist> _bindedPlaylists;
+        public List<Playlist> BindedPlaylists
         {
             get { return _bindedPlaylists; }
             set
@@ -160,98 +159,90 @@ namespace MusicPlayUI.MVVM.ViewModels
         public ICommand PlayPlaylistCommand { get; }
         public ICommand NavigateToPlaylistCommand { get; }
         public ICommand OpenPlaylistPopupCommand { get; }
-        public HomeViewModel(INavigationService navigationService, IQueueService queueService, IRadioStationsService radioStationsServices, IHistoryServices historyServices)
+        public HomeViewModel(IQueueService queueService, IRadioStationsService radioStationsServices, IHistoryServices historyServices, ICommandsManager commandsManager)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
             _radioStationsServices = radioStationsServices;
             _historyServices = historyServices;
+            _commandsManager = commandsManager;
 
             // Cards navigation Commands
-            NavigateToArtistsCommand = new RelayCommand(() => Navigate(ViewNameEnum.Artists));
-            NavigateToAlbumsCommand = new RelayCommand(() => Navigate(ViewNameEnum.Albums));
+            NavigateToArtistsCommand = new RelayCommand(() => App.State.NavigateTo<ArtistLibraryViewModel>());
+            NavigateToAlbumsCommand = new RelayCommand(() => App.State.NavigateTo<AlbumLibraryViewModel>());
 
             // navigation commands
-            NavigateToArtistCommand = new RelayCommand<ArtistModel>((artist) => Navigate(ViewNameEnum.SpecificArtist, artist));
-            NavigateToAlbumCommand = new RelayCommand<AlbumModel>((album) => Navigate(ViewNameEnum.SpecificAlbum, album));
-            NavigateToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) => Navigate(ViewNameEnum.SpecificPlaylist, playlist));
+            NavigateToArtistCommand = _commandsManager.NavigateToArtistCommand;
+            NavigateToAlbumCommand = _commandsManager.NavigateToAlbumCommand;
+            NavigateToPlaylistCommand = _commandsManager.NavigateToPlaylistCommand;
 
             // play commands
-            PlayArtistCommand = new RelayCommand<ArtistModel>((artist) => PlayArtist(artist));
-            PlayAlbumCommand = new RelayCommand<AlbumModel>((album) => PlayAlbum(album));
-            PlayPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) => PlayPlaylist(playlist));
+            PlayArtistCommand = _commandsManager.PlayNewQueueCommand;
+            PlayAlbumCommand = _commandsManager.PlayNewQueueCommand;
+            PlayPlaylistCommand = _commandsManager.PlayNewQueueCommand;
 
             // open popup commands
-            OpenArtistPopupCommand = new RelayCommand<ArtistModel>((artist) => OpenPopup(artist, ViewNameEnum.ArtistPopup));
-            OpenAlbumPopupCommand = new RelayCommand<AlbumModel>((album) => OpenPopup(album, ViewNameEnum.AlbumPopup));
-            OpenPlaylistPopupCommand = new RelayCommand<PlaylistModel>((playlist) => OpenPopup(playlist, ViewNameEnum.PlaylistPopup));
-
-            Task.Run(Init);
+            OpenArtistPopupCommand = _commandsManager.OpenArtistPopupCommand;
+            OpenAlbumPopupCommand = _commandsManager.OpenAlbumPopupCommand;
+            OpenPlaylistPopupCommand = _commandsManager.OpenPlaylistPopupCommand;
         }
 
-        private async void Init()
+        public override void OnScrollEvent(OnScrollEvent e)
+        {
+            AppBar.AnimateElevation(e.VerticalOffset, true);
+            base.OnScrollEvent(e);
+        }
+
+        public override void UpdateAppBarStyle()
+        {
+            if (AppBar is not null)
+            {
+                AppBar.Reset();
+                AppBar.ApplyDropShadow = false;
+                AppBar.BackgroundOpacity = 0;
+                AppBar.ContentOpacity = 0;
+                AppBar.Title = WelcomeMessage;
+            }
+        }
+
+        public override void Init()
         {
             WelcomeMessage = MessageService.GetWelcomeMessage();
 
-            (int numberOfArtists, int numberOfAlbums, int numberOfTracks) = await DataAccess.Connection.GetNumberOfEntries();
-            NumberOfArtists = numberOfArtists + " " + Resources.Artists_View;
-            NumberOfAlbums = numberOfAlbums + " " + Resources.Albums_View;
-            NumberOfTracks = numberOfTracks + " " + Resources.Tracks;
+            base.Init();
 
-            int playCount = _historyServices.TodayHistory.PlayCount;
+            NumberOfArtists = Artist.Count() + " " + Resources.Artists_View;
+            NumberOfAlbums = Album.Count() + " " + Resources.Albums_View;
+            NumberOfTracks = Track.Count() + " " + Resources.Tracks;
+
+            int playCount = 0; //_historyServices.TodayHistory.PlayCount;
             if (playCount > 0)
             {
                 string tracks = playCount > 1 ? Resources.Tracks : Resources.Track;
-                TodayStats = Resources.Today + ": " + playCount.ToString() + " " + tracks + " - " + _historyServices.TodayListenTime.ToFormattedString(true);
+                TodayStats = Resources.Today + ": " + playCount.ToString() + " " + tracks + " - " + _historyServices.TodayListenTime.ToFullString();
             }
             else
             {
                 TodayStats = "";
             }
 
-            GetRecentData(numberOfTracks);
+            GetRecentData();
 
             if (BindedArtists.Count > 0)
             {
                 PlayHistory = true;
-                GetRadioStations();
+                //GetRadioStations();
             }
         }
 
-        private async void GetRecentData(int totalTrackNumber)
+        private void GetRecentData()
         {
-            BindedAlbums = new(await DataAccess.Connection.GetLastPlayedAlbums(TopLastPlayedAlbums));
-            BindedArtists = new(await DataAccess.Connection.GetLastPlayedArtists(TopLastPlayedArtists));
+            BindedAlbums = new(Album.GetLastPlayed(TopLastPlayedAlbums));
+            BindedArtists = new(Artist.GetLastPlayed(TopLastPlayedArtists));
         }
 
         private async void GetRadioStations()
         {
             BindedPlaylists = await _radioStationsServices.CreateRadioStations(4);
-        }
-
-        private void Navigate(ViewNameEnum viewNameEnum, BaseModel musicModel = null)
-        {
-            _navigationService.NavigateTo(viewNameEnum, musicModel);
-        }
-
-        private void OpenPopup(BaseModel musicModel, ViewNameEnum viewNameEnum)
-        {
-            _navigationService.OpenPopup(viewNameEnum, musicModel);
-        }
-
-        // Play methods
-        private async void PlayArtist(ArtistModel artist)
-        {
-            _queueService.SetNewQueue(await ArtistServices.GetArtistTracks(artist.Id), new(artist.Name, ModelTypeEnum.Artist, artist.Id), artist.Cover, null, false, false, false);
-        }
-        private async void PlayAlbum(AlbumModel album)
-        {
-            List<TrackModel> tracks = await DataAccess.Connection.GetTracksFromAlbum(album.Id);
-            _queueService.SetNewQueue(tracks, new(album.Name, ModelTypeEnum.Album, album.Id), album.AlbumCover, null, false, false, true);
-        }
-        private void PlayPlaylist(PlaylistModel playlist)
-        {
-            _queueService.SetNewQueue(playlist.Tracks.ToTrackModel(), new(playlist.Name, ModelTypeEnum.Playlist, playlist.Id), playlist.Cover, null);
         }
     }
 }

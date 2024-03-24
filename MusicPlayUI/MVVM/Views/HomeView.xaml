@@ -7,18 +7,29 @@
              xmlns:viewmodel="clr-namespace:MusicPlayUI.MVVM.ViewModels"
              xmlns:chart="clr-namespace:HistoryChart;assembly=HistoryChart"
               xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
-             xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews" 
+             xmlns:ds="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
              d:DataContext="{d:DesignInstance Type=viewmodel:HomeViewModel}"
              Language="{Binding CurrentCulture}"
              mc:Ignorable="d" 
              x:Name="RootView"
              d:DesignHeight="2000" 
              d:DesignWidth="800">
-
-    <ScrollViewer x:Name="RootScroll"
-                      PreviewMouseWheel="RootScroll_PreviewMouseWheel"
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="DataTemplates\AlbumDataTemplate.xaml"/>
+                <ResourceDictionary Source="DataTemplates\ArtistDataTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <ds:DynamicScrollViewer x:Name="RootScroll"
+                            OnScrollCommand="{Binding OnScrollCommand}"
+                            IsInertiaEnabled="False"
+                            CanMouseWheel="True"
                       VerticalScrollBarVisibility="Hidden">
-        <Grid SizeChanged="Grid_SizeChanged">
+        <Grid SizeChanged="Grid_SizeChanged"
+              Margin="{Binding TopMargin}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="120"/>
                 <RowDefinition Height="180"/>
@@ -26,11 +37,8 @@
             </Grid.RowDefinitions>
 
             <!-- Hello Message -->
-            <Border Background="{DynamicResource PrimaryContainer}"
-                        CornerRadius="0">
-                <TextBlock Text="{Binding WelcomeMessage}"
-                           Style="{DynamicResource BWelcomeMessageStyle}"/>
-            </Border>
+            <TextBlock Text="{Binding WelcomeMessage}"
+                        Style="{DynamicResource BWelcomeMessageStyle}"/>
 
             <!-- Library Info Cards -->
             <Grid Grid.Row="1"
@@ -74,9 +82,15 @@
                         Margin="40, 20">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto" MinHeight="20"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
+
+                        <Border  Background="{DynamicResource SurfaceVariant}"
+                                 CornerRadius="{DynamicResource PrimaryCornerRadius}"
+                                 Effect="{DynamicResource FilterPanelDropShadow}"
+                                 Grid.RowSpan="2"/>
+
                         <TextBlock Text="{Binding TodayStats}"
                                         Foreground="{DynamicResource OnSurfaceVariant}"
                                         VerticalAlignment="Center"
@@ -92,7 +106,6 @@
                                             Background="Transparent"
                                             MouseOverBtnColor="{DynamicResource TertiaryHover}"
                                             Grid.Row="2"
-                                            Margin="0,5"
                                             x:Name="Chart"/>
                     </Grid>
                 </Border>
@@ -108,14 +121,25 @@
                             BorderBrush="{DynamicResource Primary}"
                             Margin="10,0,20,0">
                         <TextBlock Text="{x:Static lang:Resources.Recently_Played_Artists}"
+                                   Margin="10,0"
                                    Style="{DynamicResource SlistInfoStyle}"/>
                     </Border>
-
-                    <listviews:HorizontalArtistListView Artists="{Binding BindedArtists}"
-                                                            VerticalAlignment="Stretch"
-                                                            Grid.Row="1"
-                                                           Margin="20,4"
-                                                            ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                    <ItemsControl ItemsSource="{Binding BindedArtists}"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch"
+                                  Grid.Row="1"
+                                  Margin="20,6"
+                                  Style="{DynamicResource LibraryItemsControl}">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ds:DynamicScrollViewer VerticalScrollBarVisibility="Disabled"
+                                                   HorizontalAlignment="Stretch"
+                                                    HorizontalScrollBarVisibility="Hidden">
+                                    <StackPanel IsItemsHost="true" Orientation="Horizontal"/>
+                                </ds:DynamicScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
                 </Grid>
 
                 <!-- Recently Played Albums -->
@@ -131,14 +155,25 @@
                                        Style="{DynamicResource SlistInfoStyle}"/>
                     </Border>
 
-                    <listviews:HorizontalAlbumListView Albums="{Binding BindedAlbums}"
-                                             HorizontalAlignment="Stretch"
-                                             HorizontalContentAlignment="Stretch"
-                                                 Grid.Row="1"
-                                                 Margin="20,4"/>
+                    <ItemsControl ItemsSource="{Binding BindedAlbums}"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch"
+                                  Grid.Row="1"
+                                  Margin="20,6"
+                                  Style="{DynamicResource LibraryItemsControl}">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ds:DynamicScrollViewer VerticalScrollBarVisibility="Disabled"
+                                                   HorizontalAlignment="Stretch"
+                                                    HorizontalScrollBarVisibility="Hidden">
+                                    <StackPanel IsItemsHost="true" Orientation="Horizontal"/>
+                                </ds:DynamicScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
                 </Grid>
 
-                <!-- Records -->
+                <!-- Playlists -->
                 <Grid Grid.Row="3"
                           Visibility="{Binding BindedPlaylists.Count, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.RowDefinitions>
@@ -154,7 +189,7 @@
 
                     <listviews:PlaylistListView DataContext="{Binding DataContext, ElementName=RootView}"
                                                 Grid.Row="1"
-                                                    Margin="4"/>
+                                                    Margin="4, 6"/>
                 </Grid>
             </Grid>
 
@@ -165,5 +200,5 @@
                                Style="{DynamicResource SListPlaceHolderStyle}"/>
             </Grid>
         </Grid>
-    </ScrollViewer>
+    </ds:DynamicScrollViewer>
 </UserControl>

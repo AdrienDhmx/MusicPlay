@@ -1,0 +1,181 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.SettingsViews.StorageSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.SettingsViews"
+            xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+            xmlns:IconBtn="clr-namespace:IconButton;assembly=IconButton"
+            xmlns:textbtn="clr-namespace:TextBtn;assembly=TextBtn" 
+             xmlns:cardcontrol="clr-namespace:CustomCardControl;assembly=CustomCardControl" 
+             xmlns:loadingControl="clr-namespace:LoadingControl;assembly=LoadingControl"
+             xmlns:settingsviewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels.SettingsViewModels" 
+             xmlns:dynamicscrollviewer="clr-namespace:DynamicScrollViewer;assembly=DynamicScrollViewer"
+             d:DataContext="{d:DesignInstance Type=settingsviewmodels:StorageSettingsViewModel}"
+            mc:Ignorable="d" 
+            x:Name="RootSetting"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="30, 20"
+                  HorizontalAlignment="Stretch"
+                  MaxWidth="1200">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="900"/>
+                <ColumnDefinition Width="0.2*" MinWidth="180"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="MusicPlay will monitor folders for new music. Your music files are not copied nor modified in any way."
+                           FontSize="20"
+                           Style="{DynamicResource NLargeSecondaryStyle}"/>
+
+            <cardcontrol:CustomCardControl Grid.Column="1"
+                                               CardHeader="Add folder"
+                                           HorizontalAlignment="Right"
+                                               Style="{DynamicResource BaseCardStyle}"
+                                               Icon="{DynamicResource CircledAddIcon}"
+                                               Width="160"
+                                               Command="{Binding AddFolderCommand}"/>
+        </Grid>
+
+        <ItemsControl ItemsSource="{Binding Folders}"
+                          MaxWidth="1200"
+                      Grid.Row="1"
+                          Margin="30, 10, 16, 10">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"
+                                    HorizontalAlignment="Stretch"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5, 8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Path Data="{DynamicResource Folder}"
+                                      Fill="{DynamicResource OnBackground}"
+                                      StrokeThickness="0"
+                                      Width="20"
+                                      Height="20"
+                                      Stretch="Uniform">
+                            </Path>
+
+                            <TextBlock Text="{Binding Name}"
+                                           Grid.Column="1"
+                                           Margin="8, 0"
+                                           FontSize="22"
+                                        MaxWidth="600"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Style="{DynamicResource NTrackDataStyle}"/>
+                        </Grid>
+
+                        <StackPanel Grid.Row="1"
+                                        Orientation="Vertical"
+                                        VerticalAlignment="Top">
+
+                            <TextBlock Text="{Binding Path, StringFormat={}({0})}"
+                                            VerticalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Style="{DynamicResource NSmallStyle}"/>
+
+                            <TextBlock Text="Watching for new files in real time"
+                                           Visibility="{Binding IsMonitored, Converter={StaticResource BoolToVisibilityConverter}}"
+                                           Style="{DynamicResource NSmallSecondayStyle}"/>
+
+                            <TextBlock Text="{Binding TrackImportedCount, StringFormat={}{0} tracks imported}"
+                                       Visibility="{Binding TrackImportedCount, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            Margin="0, 2, 0, 0"
+                                       VerticalAlignment="Top"
+                                           Style="{DynamicResource NSmallSecondayStyle}"/>
+                        </StackPanel>
+
+                        <StackPanel VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Stretch"
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2"
+                                        Visibility="{Binding Scanning, Converter={StaticResource BoolToHVisibilityConverter}}"
+                                        Margin="16, 0">
+
+                            <TextBlock Text="{Binding DataContext.Percentage, ElementName=RootSetting}"
+                                           HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Style="{DynamicResource NSmallStyle}"/>
+
+                            <ProgressBar x:Name="importProgress"
+                                             Value="{Binding DataContext.ImportValue, ElementName=RootSetting, UpdateSourceTrigger=PropertyChanged}"
+                                              Maximum="{Binding DataContext.MaximumValue, ElementName=RootSetting, UpdateSourceTrigger=PropertyChanged}"
+                                             Minimum="0"
+                                             HorizontalAlignment="Stretch"
+                                             MaxWidth="700"
+                                             Style="{DynamicResource ImportProgressBar}"/>
+
+                            <TextBlock Text="{Binding DataContext.CurrentInfo, ElementName=RootSetting, UpdateSourceTrigger=PropertyChanged}"
+                                           Style="{DynamicResource NSmallSecondayStyle}"
+                                           HorizontalAlignment="Center"
+                                           TextAlignment="Center"
+                                           MaxHeight="40"
+                                           MaxWidth="500"/>
+                        </StackPanel>
+
+
+                        <IconBtn:IconButton Grid.Column="2"
+                                                Grid.RowSpan="2"
+                                                VerticalAlignment="Top"
+                                                Margin="0, 4"
+                                                Style="{DynamicResource OpacityIconButton}"
+                                                Icon="{DynamicResource DownloadsIcon}"
+                                                Command="{Binding DataContext.ScanFolderCommand, ElementName=RootSetting}"
+                                                CommandParameter="{Binding .}">
+                        </IconBtn:IconButton>
+
+                        <IconBtn:IconButton Grid.Column="3"
+                                                Grid.RowSpan="2"
+                                                VerticalAlignment="Top"
+                                                Margin="0, 4"
+                                                Style="{DynamicResource OpacityIconButton}"
+                                                Icon="{DynamicResource Edit}"
+                                                Command="{Binding DataContext.EditFolderCommand, ElementName=RootSetting}"
+                                                CommandParameter="{Binding .}">
+                        </IconBtn:IconButton>
+
+                        <IconBtn:IconButton Grid.Column="4"
+                                                Grid.RowSpan="2"
+                                                VerticalAlignment="Top"
+                                                Margin="0, 4"
+                                                Visibility="{Binding TrackImportedCount, Converter={StaticResource BoolToVisibilityConverterInverted}, Mode=OneWay}"
+                                                Style="{DynamicResource OpacityIconButton}"
+                                                FillColor="{DynamicResource Error}"
+                                                Icon="{DynamicResource CircledRemoveIcon}"
+                                                Command="{Binding DataContext.RemoveFolderCommand, ElementName=RootSetting}"
+                                                CommandParameter="{Binding .}">
+                        </IconBtn:IconButton>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

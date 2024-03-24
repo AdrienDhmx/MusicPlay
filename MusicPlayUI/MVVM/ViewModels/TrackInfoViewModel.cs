@@ -1,5 +1,4 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
+﻿
 using MusicFilesProcessor;
 using MusicPlay.Language;
 using System;
@@ -10,6 +9,11 @@ using MusicPlayUI.Core.Commands;
 using MusicPlayUI.MVVM.Models;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
+using MusicPlay.Database.Models;
+
+using MusicPlay.Database.Helpers;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
@@ -19,13 +23,13 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private MusicFilePropertiesProcessor _musicFileProperties { get; set; } = new("");
 
-        public TrackModel PlayingTrack
+        public Track PlayingTrack
         {
-            get => _queueService.PlayingTrack;
+            get => _queueService.Queue.PlayingTrack;
         }
 
-        private AlbumModel _album;
-        public AlbumModel Album
+        private Album _album;
+        public Album Album
         {
             get => _album;
             set
@@ -143,7 +147,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 }
                 else
                 {
-                    return Resources.Last_Played + ": " + PlayingTrack.LastPlayed;
+                    return Resources.Last_Played + ": " + PlayingTrack.LastPlayed.ToShortDateString();
                 }
             }
         }
@@ -162,7 +166,7 @@ namespace MusicPlayUI.MVVM.ViewModels
             IsFavoriteCommand = new RelayCommand(async () =>
             {
                 IsFavorite = !IsFavorite;
-                await _queueService.UpdateFavorite(IsFavorite);
+                await _queueService.UpdateFavorite();
             });
         }
 
@@ -184,10 +188,10 @@ namespace MusicPlayUI.MVVM.ViewModels
             GC.SuppressFinalize(this);
         }
 
-        private async void LoadData()
+        private async Task LoadData()
         {
             OnPropertyChanged(nameof(PlayingTrack));
-            Album = await DataAccess.Connection.GetAlbum(PlayingTrack.AlbumId);
+            Album = await Album.Get(PlayingTrack.Album.Id);
 
             OnPropertyChanged(nameof(Rating));
             IsFavorite = PlayingTrack.IsFavorite;
@@ -201,18 +205,18 @@ namespace MusicPlayUI.MVVM.ViewModels
 
         private void CreateLists()
         {
-            List<TrackInfoModel> trackInfos = new()
+            List<TrackInfoModel> trackInfo = new()
             {
                 new(Resources.Title, PlayingTrack.Title),
                 new(Resources.Duration, PlayingTrack.Duration),
-                new(Resources.Album, PlayingTrack.AlbumName),
-                new(Resources.Artists_View, ArtistsToString(PlayingTrack.Artists)),
-                new(Resources.Year, Album.Year.ToString()),
+                new(Resources.Album, PlayingTrack.Album.Name),
+                new(Resources.Artists_View, ArtistsToString(PlayingTrack.TrackArtistRole.ToList())),
+                new(Resources.Year, Album.Release),
                 new(Resources.CopyRight, Album.Copyright)
             };
-            MainTracksInfo = new(trackInfos);
+            MainTracksInfo = new(trackInfo);
 
-            trackInfos = new()
+            trackInfo = new()
             {
                 new(Resources.FileName, FileName),
                 new(Resources.File_Path, PlayingTrack.Path),
@@ -222,24 +226,17 @@ namespace MusicPlayUI.MVVM.ViewModels
                 new(Resources.Audio_Sample_Rate, AudioSampleRate),
                 new(Resources.Bits_per_Sample, BitsPerSample)
             };
-            FileProperties = new(trackInfos);
+            FileProperties = new(trackInfo);
         }
 
-        public string ArtistsToString(List<ArtistDataRelation> artists)
+        public static string ArtistsToString(List<TrackArtistsRole> artists)
         {
-            string output = "";
-
-            foreach (var artist in artists.Order(true, false))
-            {
-                output += artist.Name + ", ";
-            }
-
-            return output.Remove(output.Length - 2);
+            return "";
         }
 
-        private void OnPlayingTrackChanged()
+        private async void OnPlayingTrackChanged()
         {
-            LoadData();
+            await LoadData();
 
             OnPlayingTrackInteractionChanged();
         }

@@ -7,25 +7,34 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:CustomCardControl}">
                     <Border x:Name="Border"
-                            Background="Transparent"
                             CornerRadius="{TemplateBinding CornerRadius}"
                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                             Padding="{TemplateBinding Padding}"
                             Width="{TemplateBinding Width}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
                             Height="{TemplateBinding Height}">
                         <Grid>
+                            <Border 
+                                Grid.ColumnSpan="2"
+                                Background="{TemplateBinding MouseOverBackgroundColor}"
+                               CornerRadius="{TemplateBinding CornerRadius}"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               Opacity="0"
+                                Panel.ZIndex="4"
+                               x:Name="MouseOverBgcBorder"/>
 
                             <Border Grid.ColumnSpan="2"
-                                     BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Panel.ZIndex="1"
                                     CornerRadius="{TemplateBinding CornerRadius}"
                                     Background="{TemplateBinding Background}"
-                                    Opacity="{TemplateBinding BackgroundOpacity}">
+                                    Opacity="{TemplateBinding BackgroundOpacity}"
+                                    Effect="{TemplateBinding Effect}"/>
 
-                            </Border>
-
-                            <Grid Margin="5,2">
+                            <Grid Margin="5,2"
+                                   Panel.ZIndex="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -36,6 +45,7 @@
                                       Margin="{TemplateBinding IconMargin}"
                                       Data="{TemplateBinding Icon}"
                                       Stroke="{TemplateBinding StrokeColor}"
+                                      StrokeThickness="{TemplateBinding StrokeWidth}"
                                       Fill="{TemplateBinding FillColor}"
                                       Stretch="{TemplateBinding IconStretch}"
                                       HorizontalAlignment="Center"
@@ -74,6 +84,33 @@
                             </Grid>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0:0:0.1"
+                                                          To="1" From="0"
+                                                          Storyboard.TargetName="MouseOverBgcBorder"
+                                                         Storyboard.TargetProperty="Opacity">
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0:0:0.1"
+                                                          To="0" From="1"
+                                                          Storyboard.TargetName="MouseOverBgcBorder"
+                                                         Storyboard.TargetProperty="Opacity">
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

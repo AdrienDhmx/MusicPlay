@@ -24,13 +24,5 @@ namespace MusicPlayUI.MVVM.Views
         {
             InitializeComponent();
         }
-
-        private void MenuBarGrid_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                App.Current.MainWindow.DragMove();
-            }
-        }
     }
 }

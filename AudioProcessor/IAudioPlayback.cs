@@ -1,23 +1,28 @@
-﻿using AudioHandler.Models;
+﻿using MusicPlay.Database.Models.AudioModels;
 
 namespace AudioHandler
 {
     public interface IAudioPlayback
     {
         /// <summary>
+        /// Manage the EQ settings
+        /// </summary>
+        EQManager EQManager { get; }
+
+        /// <summary>
         /// The device currently used
         /// </summary>
-        DeviceModel Device { get; }
+        AudioDeviceModel Device { get; }
         /// <summary>
         /// The frequency of the playback (44100 kHz by default)
         /// </summary>
         int Frequency { get; }
         /// <summary>
-        /// wether the current stream is looping or not
+        /// whether the current stream is looping or not
         /// </summary>
         bool IsLooping { get; }
         /// <summary>
-        /// wehter the current stream is playing or not
+        /// whether the current stream is playing or not
         /// </summary>
         bool IsPlaying { get; }
         /// <summary>
@@ -37,7 +42,7 @@ namespace AudioHandler
         /// </summary>
         int VolumeStep { get; set; }
         /// <summary>
-        /// wether the output device changes automatically when a new device is connected or a device get disconnected
+        /// whether the output device changes automatically when a new device is connected or a device get disconnected
         /// </summary>
         bool AutoChangeOutputDevice { get; }
 
@@ -59,7 +64,7 @@ namespace AudioHandler
         /// <param name="device">the device to init</param>
         /// <param name="fromUser">the user is the one who chose this device</param>
         /// <returns></returns>
-        bool ChangeOutputDevice(DeviceModel device, bool fromUser = true);
+        bool ChangeOutputDevice(AudioDeviceModel device, bool fromUser = true);
         /// <summary>
         /// decrease the volume by the <paramref name="VolumeStep"/> value
         /// </summary>
@@ -87,7 +92,7 @@ namespace AudioHandler
         /// </summary>
         void Mute();
         /// <summary>
-        /// increase the volume witht the specified step
+        /// increase the volume with the specified step
         /// </summary>
         /// <param name="step"></param>
         void IncreaseVolume(int step);

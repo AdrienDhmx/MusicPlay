@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using AudioHandler;
-using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
+using MessageControl;
+using MusicPlay.Database.Helpers;
+using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Enums;
+using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.MVVM.Models;
+using MusicPlayUI.MVVM.ViewModels;
+using MusicPlayUI.MVVM.ViewModels.PopupViewModels;
 
 namespace MusicPlayUI.Core.Commands
 {
@@ -19,7 +21,6 @@ namespace MusicPlayUI.Core.Commands
     {
         private readonly IAudioPlayback _audioPlayback;
         private readonly IQueueService _queueService;
-        private readonly INavigationService _navigationService;
         private readonly IAudioTimeService _audioTimeService;
 
         // audio
@@ -34,35 +35,48 @@ namespace MusicPlayUI.Core.Commands
         public ICommand ShuffleCommand { get; }
         public ICommand RepeatCommand { get; }
         public ICommand ToggleQueueDrawerCommand { get; }
+        public ICommand PlayNewQueueCommand { get; }
+        public ICommand PlayNewQueueShuffledCommand { get; }
 
         // navigation
         public ICommand NavigateCommand { get; }
         public ICommand NavigateBackCommand { get; }
+        public ICommand NavigateForwardCommand { get; }
         public ICommand NavigateToAlbumByIdCommand { get; }
         public ICommand NavigateToArtistByIdCommand { get; }
         public ICommand NavigateToGenreCommand { get; }
         public ICommand NavigateToAlbumCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
+        public ICommand NavigateToPlaylistCommand { get; }
 
         // popup
-        public ICommand OpenAlbumPopupCommand { get;}
+        public ICommand OpenAlbumPopupCommand { get; }
         public ICommand OpenArtistPopupCommand { get; }
         public ICommand OpenTrackPopupCommand { get; }
+        public ICommand OpenPlaylistPopupCommand { get; }
+        public ICommand OpenTagPopupCommand { get; }
         public ICommand ClosePopupCommand { get; }
+
+        // settings
+        public ICommand ToggleThemeCommand { get; }
+
+        //Covers
+        public ICommand UpdateAlbumCover { get; }
 
         // others
         public ICommand FavoriteCommand { get; }
         public ICommand RatingCommand { get; }
+        public ICommand ToggleMenuDrawerCommand { get; }
         public ICommand ToggleFullScreenCommand { get; }
         public ICommand EscapeFullScreenCommand { get; }
         public ICommand MinimizeCommand { get; }
         public ICommand MaximizeCommand { get; }
         public ICommand LeaveCommand { get; }
-        public CommandsManager(IAudioPlayback audioPlayback, IQueueService queueService, INavigationService navigationService, IAudioTimeService audioTimeService)
+
+        public CommandsManager(IAudioPlayback audioPlayback, IQueueService queueService, IAudioTimeService audioTimeService)
         {
             _audioPlayback = audioPlayback;
             _queueService = queueService;
-            _navigationService = navigationService;
             _audioTimeService = audioTimeService;
 
             PlayPauseCommand = new RelayCommand(_audioTimeService.PlayPause);
@@ -77,9 +91,9 @@ namespace MusicPlayUI.Core.Commands
                 _queueService.PreviousTrack();
             });
 
-            DecreaseVolumeCommand = new RelayCommand(_audioPlayback.DecreaseVolume);
+            DecreaseVolumeCommand = new RelayCommand<int>((int value) => _audioPlayback.DecreaseVolume(value));
 
-            IncreaseVolumeCommand = new RelayCommand(_audioPlayback.IncreaseVolume);
+            IncreaseVolumeCommand = new RelayCommand<int>((int value) => _audioPlayback.IncreaseVolume(value));
 
             MuteVolumeCommand = new RelayCommand(_audioPlayback.Mute);
 
@@ -90,13 +104,13 @@ namespace MusicPlayUI.Core.Commands
 
             RepeatCommand = new RelayCommand(() =>
             {
-                if (_audioTimeService.IsLooping)
+                if (_audioPlayback.IsLooping)
                 {
                     _audioTimeService.Loop(); // unloop
                 }
                 else
                 {
-                    if (queueService.IsOnRepeat)
+                    if (queueService.Queue.IsOnRepeat)
                     {
                         _audioTimeService.Loop(); // loop
                     }
@@ -104,9 +118,13 @@ namespace MusicPlayUI.Core.Commands
                 }
             });
 
+            PlayNewQueueCommand = new RelayCommand<PlayableModel>(model => SetNewQueue(model));
+
+            PlayNewQueueShuffledCommand = new RelayCommand<PlayableModel>(model => SetNewQueue(model, true));
+
             FavoriteCommand = new RelayCommand(() =>
             {
-                queueService.UpdateFavorite(!_queueService.PlayingTrack.IsFavorite);
+                queueService.UpdateFavorite();
             });
 
             RatingCommand = new RelayCommand<string>((value) =>
@@ -115,53 +133,71 @@ namespace MusicPlayUI.Core.Commands
                     queueService.UpdateRating(rating);
             });
 
-            NavigateCommand = new RelayCommand<ViewNameEnum>((view) =>
+            NavigateCommand = new RelayCommand<Type>(type =>
             {
-                _navigationService.NavigateTo(view);
+                App.State.NavigateTo(type);
             });
 
-            NavigateBackCommand = new RelayCommand(_navigationService.NavigateBack);
+            NavigateBackCommand = new RelayCommand(App.State.NavigateBack);
+            NavigateForwardCommand = new RelayCommand(App.State.NavigateForward);
 
             NavigateToAlbumByIdCommand = new RelayCommand<int>(async (int id) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificAlbum, await DataAccess.Connection.GetAlbum(id));
+                App.State.NavigateTo<AlbumViewModel>(await Album.Get(id));
             });
 
             NavigateToArtistByIdCommand = new RelayCommand<int>(async (int id) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id));
+                App.State.NavigateTo<ArtistViewModel>(await Artist.Get(id));
             });
 
-            NavigateToGenreCommand = new RelayCommand<GenreModel>((genre) =>
+            NavigateToGenreCommand = new RelayCommand<Tag>((genre) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificGenre, genre);
+                App.State.NavigateTo<GenreViewModel>(genre);
             });
 
-            NavigateToAlbumCommand = new RelayCommand<AlbumModel>((album) =>
+            NavigateToAlbumCommand = new RelayCommand<Album>((album) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificAlbum, album);
+                App.State.NavigateTo<AlbumViewModel>(album);
             });
 
-            NavigateToArtistCommand = new RelayCommand<ArtistModel>((artist) =>
+            NavigateToArtistCommand = new RelayCommand<Artist>((artist) =>
             {
-                _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, artist);
+                App.State.NavigateTo<ArtistViewModel>(artist);
             });
 
-            OpenAlbumPopupCommand = new RelayCommand<AlbumModel>((album) => _navigationService.OpenPopup(ViewNameEnum.AlbumPopup, album));
-            OpenTrackPopupCommand = new RelayCommand<UIOrderedTrackModel>((track) => _navigationService.OpenPopup(ViewNameEnum.TrackPopup, track));
-            OpenArtistPopupCommand = new RelayCommand<ArtistModel>((artist) => _navigationService.OpenPopup(ViewNameEnum.ArtistPopup, artist));
+            NavigateToPlaylistCommand = new RelayCommand<Playlist>((playlist) =>
+            {
+                App.State.NavigateTo<PlaylistViewModel>(playlist);
+            });
 
-            ToggleQueueDrawerCommand = new RelayCommand(_navigationService.ToggleQueueDrawer);
+            OpenAlbumPopupCommand = new RelayCommand<Album>(App.State.OpenPopup<AlbumPopupViewModel>);
+            OpenTrackPopupCommand = new RelayCommand<Track>(App.State.OpenPopup<TrackPopupViewModel>);
+            OpenArtistPopupCommand = new RelayCommand<Artist>(App.State.OpenPopup<ArtistPopupViewModel>);
+            OpenPlaylistPopupCommand = new RelayCommand<Playlist>(App.State.OpenPopup<PlaylistPopupViewModel>);
+            OpenTagPopupCommand = new RelayCommand<UITagModel>(App.State.OpenPopup<TagPopupViewModel>);
 
-            ToggleFullScreenCommand = new RelayCommand(_navigationService.ToggleFullScreen);
+            ToggleMenuDrawerCommand = new RelayCommand(App.State.ToggleMenuDrawer);
+
+            ToggleQueueDrawerCommand = new RelayCommand(App.State.ToggleQueueDrawer);
+
+            ToggleFullScreenCommand = new RelayCommand(App.State.ToggleFullScreen);
 
             EscapeFullScreenCommand = new RelayCommand(() =>
             {
-                if (_navigationService.IsFullScreen)
-                    _navigationService.ToggleFullScreen();
+                if (App.State.IsFullScreen)
+                    App.State.ToggleFullScreen();
             });
 
-            ClosePopupCommand = new RelayCommand(_navigationService.ClosePopup);
+            ClosePopupCommand = new RelayCommand(App.State.ClosePopup);
+
+            UpdateAlbumCover = new RelayCommand<Album>(async (album) =>
+            {
+                if (await CoverService.ChangeCover(album))
+                {
+                    App.State.CurrentView.ViewModel.Update();
+                }
+            });
 
             MinimizeCommand = new RelayCommand(() =>
             {
@@ -183,6 +219,68 @@ namespace MusicPlayUI.Core.Commands
             LeaveCommand = new RelayCommand(() =>
             {
                 App.Current.Shutdown();
+            });
+
+            ToggleThemeCommand = new RelayCommand(() =>
+            {
+                static void ChangeTheme(bool changeTheme)
+                {
+                    if (changeTheme)
+                    {
+                        if (AppTheme.IsSystemSync)
+                        {
+                            ConfigurationService.SetPreference(SettingsEnum.SystemSyncTheme, "0");
+                        }
+                        else if (AppTheme.IsSunsetSunrise)
+                        {
+                            ConfigurationService.SetPreference(SettingsEnum.SunsetSunrise, "0");
+                        }
+
+                        // invert the theme in the config
+                        ConfigurationService.SetPreference(SettingsEnum.LightTheme, AppTheme.IsLightTheme ? "0" : "1");
+
+                        // reload app theme
+                        AppTheme.InitializeAppTheme();
+                    }
+                }
+
+                if (AppTheme.IsSystemSync)
+                {
+                    MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the system theme. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
+                } 
+                else if (AppTheme.IsSunsetSunrise)
+                {
+                    MessageHelper.PublishMessage(MessageFactory.CreateWraningMessageWithConfirmAction("The theme is based on the time of day. Changing it will disable this option.", 0, ChangeTheme, "Change Theme"));
+                } else
+                {
+                    ChangeTheme(true);
+                }
+            });
+        }
+
+        private async void SetNewQueue(PlayableModel model, bool shuffled = false)
+        {
+            if (model.IsNull())
+                return;
+
+            await Task.Run(() =>
+            {
+                if (model is Artist artist)
+                {
+                    _queueService.SetNewQueue(artist.Tracks, artist, artist.Name, artist.Cover, null, shuffled);
+                }
+                else if (model is Album album)
+                {
+                    _queueService.SetNewQueue(album.Tracks, album, album.Name, album.AlbumCover, null, shuffled);
+                }
+                else if (model is Playlist playlist)
+                {
+                    _queueService.SetNewQueue(playlist.Tracks, playlist, playlist.Name, playlist.Cover, null, shuffled);
+                }
+                else if (model is Tag tag)
+                {
+                    _queueService.SetNewQueue(tag.Tracks, tag, tag.Name, "", null, shuffled);
+                }
             });
         }
 
@@ -213,11 +311,12 @@ namespace MusicPlayUI.Core.Commands
                 CommandEnums.NavigateToAlbumById => NavigateToAlbumByIdCommand,
                 CommandEnums.NavigateToArtistById => NavigateToArtistByIdCommand,
                 CommandEnums.NavigateToGenre => NavigateToGenreCommand,
-                CommandEnums.Import => NavigateCommand,
                 CommandEnums.Settings => NavigateCommand,
                 CommandEnums.NavigateBack => NavigateBackCommand,
                 CommandEnums.EscapeFullScreen => EscapeFullScreenCommand,
                 CommandEnums.ToggleFullScreen => ToggleFullScreenCommand,
+                CommandEnums.ToggleQueueDrawer => ToggleQueueDrawerCommand,
+                CommandEnums.ToggleTheme => ToggleThemeCommand,
                 _ => null,
             };
         }

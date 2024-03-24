@@ -63,13 +63,13 @@ namespace MusicPlayUI.MVVM.ViewModels.PlayerControlViewModels
 
             RepeatCommand = new RelayCommand(() =>
             {
-                if (_audioService.IsLooping)
+                if (_audioPlayback.IsLooping)
                 {
                     _audioService.Loop(); // Remove the loop
                 }
                 else
                 {
-                    if (_queueService.IsOnRepeat)
+                    if (_queueService.Queue.IsOnRepeat)
                     {
                         _audioService.Loop(); // set the loop
                     }

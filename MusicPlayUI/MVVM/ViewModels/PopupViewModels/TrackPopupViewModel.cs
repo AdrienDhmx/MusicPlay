@@ -1,7 +1,4 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using MusicPlayModels.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,22 +10,22 @@ using MusicPlayUI.Core.Enums;
 using System.Collections.ObjectModel;
 using MusicPlayUI.Core.Services.Interfaces;
 using MessageControl;
-using MusicPlayUI.MVVM.Models;
-using MusicPlayUI.Core.Helpers;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models.DataBaseModels;
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
-    public class TrackPopupViewModel : ViewModel
+    public class TrackPopupViewModel : TagTargetPopupViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
         public IQueueService QueueService { get { return _queueService; } }
-        private readonly IModalService _modalService;
         
         private readonly IWindowService _windowService;
-
-        private UIOrderedTrackModel _selectedTrack;
-        public UIOrderedTrackModel SelectedTrack
+        private readonly IRadioStationsService _radioStationsService;
+        private readonly ICommandsManager _commandsManager;
+        private Track _selectedTrack;
+        public Track SelectedTrack
         {
             get { return _selectedTrack; }
             set
@@ -49,8 +46,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private ObservableCollection<PlaylistModel> _userPlaylists;
-        public ObservableCollection<PlaylistModel> UserPlaylists
+        private ObservableCollection<Playlist> _userPlaylists;
+        public ObservableCollection<Playlist> UserPlaylists
         {
             get => _userPlaylists;
             set
@@ -93,7 +90,6 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-
         public ICommand PlayNextCommand { get; }
         public ICommand AddToQueueCommand { get; }
         public ICommand AddToPlaylistCommand { get; }
@@ -102,28 +98,37 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         public ICommand ChangeArtworkCommand { get; }
         public ICommand OpenTagWindowCommand { get; }
         public ICommand NavigateToArtistCommand { get; }
-        public TrackPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, 
-             IWindowService windowService)
+        public ICommand AddToTagCommand { get; }
+        public ICommand CreateTagCommand { get; }
+        public ICommand StartRadioCommand { get; }
+        public TrackPopupViewModel(IQueueService queueService, IModalService modalService, 
+             IWindowService windowService, IRadioStationsService radioStationsService, ICommandsManager commandsManager) : base(modalService)
         {
-            _navigationService = navigationService;
-            _queueService = queueService;
-            _modalService = modalService;
-            
+            _queueService = queueService;            
             _windowService = windowService;
-
+            _radioStationsService = radioStationsService;
+            _commandsManager = commandsManager;
+            
             PlayNextCommand = new RelayCommand(PlayNext);
             AddToQueueCommand = new RelayCommand(AddToQueue);
-            AddToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) => AddToPlaylist(playlist));
+            AddToPlaylistCommand = new RelayCommand<Playlist>(AddToPlaylist);
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
-            RemoveFromPlaylistCommand = new RelayCommand(RemoveFromPlaylist);
-            ChangeArtworkCommand = new RelayCommand(ChangeArtwork);
+            RemoveFromPlaylistCommand = new RelayCommand(async () => await RemoveFromPlaylistAsync());
+            ChangeArtworkCommand = new RelayCommand(async () => await ChangeArtwork());
+            AddToTagCommand = new RelayCommand<Tag>(async (tag) => await AddToTag(tag, SelectedTrack));
+            CreateTagCommand = new RelayCommand(() => CreateTag(SelectedTrack));
             OpenTagWindowCommand = new RelayCommand(() =>
             {
                 _windowService.OpenWindow(ViewNameEnum.TrackProperties, SelectedTrack);
             });
-            NavigateToArtistCommand = new RelayCommand<int>(async (id) => _navigationService.NavigateTo(ViewNameEnum.SpecificArtist, await DataAccess.Connection.GetArtist(id)));
+            NavigateToArtistCommand = _commandsManager.NavigateToArtistByIdCommand;
 
-            Task.Run(LoadData);
+            StartRadioCommand = new RelayCommand(async () =>
+            {
+                Playlist radio = await _radioStationsService.CreateRadioStation(SelectedTrack);
+                queueService.SetNewQueue(radio.PlaylistTracks, radio, radio.Name, radio.Cover);
+                ClosePopup();
+            });
         }
 
         public override void Dispose()
@@ -134,23 +139,25 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         private void PlayNext()
         {
             _queueService.AddTrack(SelectedTrack);
+            ClosePopup();
         }
 
         private void AddToQueue()
         {
             _queueService.AddTrack(SelectedTrack, true);
+            ClosePopup();
         }
 
-        private async void AddToPlaylist(PlaylistModel playlist)
+        private void AddToPlaylist(Playlist playlist)
         {
-            await DataAccess.Connection.AddTrackToPlaylist(playlist, SelectedTrack, -1);
+            Playlist.AddTrack(playlist, SelectedTrack);
             MessageHelper.PublishMessage(SelectedTrack.Title.TrackAddedToPlaylist(playlist.Name));
 
             UserPlaylists.Remove(playlist);
 
-            if(_navigationService.CurrentViewParameter is PlaylistModel playlistModel && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
+            if(App.State.CurrentView.State.Parameter is Playlist playlistModel && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
             {
-                _navigationService.CurrentViewModel.Update();
+                App.State.CurrentView.ViewModel.Update();
             }
         }
 
@@ -164,64 +171,62 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
         {
             if (!isCanceled)
             {
-                var playlists = await DataAccess.Connection.GetAllPlaylists();
+                var playlists = await Playlist.GetAll();
                 playlists.ToList().Sort((x, y) => x.CreationDate.CompareTo(y.CreationDate));
 
-                PlaylistModel createdPlaylist = playlists.LastOrDefault();
+                Playlist createdPlaylist = playlists.LastOrDefault();
                 AddToPlaylist(createdPlaylist);
             }
         }
 
-        private async void RemoveFromPlaylist()
+        private async Task RemoveFromPlaylistAsync()
         {
-            PlaylistModel playlist = (PlaylistModel)_navigationService.CurrentViewParameter;
+            Playlist playlist = (Playlist)App.State.CurrentView.State.Parameter;
             if (playlist is not null)
             {
-                await DataAccess.Connection.RemoveTrackFromPlaylist(playlist, SelectedTrack);
-                List<OrderedTrackModel> playlistTracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
-
-                playlistTracks = playlistTracks.ToOrderedTrackModel(); // update all index correctly
-                await DataAccess.Connection.UpdatePlaylistTracks(playlist.Id, playlistTracks);
-
-                MessageHelper.PublishMessage(SelectedTrack.Title.TrackRemovedFromPlaylist(playlist.Name));
+                await Playlist.RemoveTrack(playlist, SelectedTrack);
 
                 // not in the playlist anymore
                 RemoveFromPlaylistVisibility = false;
                 UserPlaylists.Add(playlist);
 
-                // if the button to remove from playlist is visible then the view is a the playlist the tracks has been removed from
-                _navigationService.CurrentViewModel.Update();
+                // update the playlist
+                App.State.CurrentView.ViewModel.Update();
+                ClosePopup();
             }
         }
 
-        private void ChangeArtwork()
+        private async Task ChangeArtwork()
         {
-            SelectedTrack.ChangeCover();
+            ClosePopup();
+            await SelectedTrack.ChangeCover();
         }
 
         private async Task GetUserPlaylists()
         {
-            var playlists = await DataAccess.Connection.GetAllPlaylists();
-            var trackPlaylists = await DataAccess.Connection.GetTrackPlaylistsIds(SelectedTrack.Id);
+            UserPlaylists = new(await Playlist.GetAllWhereNotTrack(SelectedTrack));
+        }
 
-            UserPlaylists = new(playlists.ToList().ExceptBy(trackPlaylists, p => p.Id));
+        public override void Init()
+        {
+            LoadData();
         }
 
         private async void LoadData()
         {
-            TrackModel track = (TrackModel)_navigationService.PopupViewParameter;
+            Track track = (Track)State.Parameter;
             if(track is not null)
             {
-                track = await track.GetAlbumTrackProperties();
-                SelectedTrack = new(track, _queueService.AlbumCoverOnly, _queueService.AutoCover);
+                SelectedTrack = track;
+
                 await GetUserPlaylists();
+                GetTags(SelectedTrack.TrackTags.Select(t => t.Tag.Id));
 
                 // visible if the view is a playlist and the playlist type is a user one
-                if (_navigationService.CurrentViewParameter is PlaylistModel playlist
+                if (App.State.CurrentView.State.Parameter is Playlist playlist
                     && playlist.PlaylistType == PlaylistTypeEnum.UserPlaylist)
                 {
-                    List<OrderedTrackModel> tracks = await DataAccess.Connection.GetTracksFromPlaylist(playlist.Id);
-                    RemoveFromPlaylistVisibility = tracks.Any(t => t.Id == SelectedTrack.Id);
+                    RemoveFromPlaylistVisibility = playlist.PlaylistTracks.Any(t => t.Track.Id == SelectedTrack.Id);
                 }
                 else
                 {
@@ -231,7 +236,7 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             else
             {
                 // error
-                _navigationService.ClosePopup();
+                ClosePopup();
             }
         }
     }

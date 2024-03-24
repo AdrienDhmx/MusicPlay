@@ -24,6 +24,7 @@
                             Margin="5,3"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
+                            Cursor="Hand"
                             Background="{DynamicResource TertiaryContainer}"
                             x:Name="border">
                         <Border.InputBindings>
@@ -34,16 +35,16 @@
                         <Grid HorizontalAlignment="Stretch">
                             <Border x:Name="MouseOverBgcBorder"
                                     HorizontalAlignment="Stretch"
-                                    CornerRadius="19"
-                                    Height="38"
+                                    CornerRadius="18"
+                                    Height="36"
                                     Opacity="0"
                                     Background="{DynamicResource TertiaryHover}">
                             </Border>
                             <TextBlock Text="{Binding Name}"
-                                       Margin="20,0"
-                                       FontSize="16"
+                                       Margin="18,0"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
+                                       Foreground="{DynamicResource OnTertiaryContainer}"
                                        Style="{DynamicResource NChipStyle}"/>
                         </Grid>
                     </Border>
@@ -71,7 +72,6 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
-                            <Setter Property="Cursor" Value="Hand" TargetName="border"/>
                         </Trigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>

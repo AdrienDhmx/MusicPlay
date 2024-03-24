@@ -9,11 +9,13 @@
              mc:Ignorable="d" 
              x:Name="ArtistView"
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <vcontrol:VirtualizingItemsControl ItemsSource="{Binding Artists, ElementName=ArtistView}"
                           Style="{DynamicResource VLibraryItemsControl}">
         <vcontrol:VirtualizingItemsControl.ItemTemplate>
             <DataTemplate>
                 <Grid Style="{DynamicResource LibraryItemsRootGrid}"
+                      Height="200"
                       x:Name="itemgrid">
                     <Grid.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.NavigateToArtistCommand, ElementName=ArtistView}"
@@ -45,7 +47,7 @@
                     <Grid Opacity="0"
                           VerticalAlignment="Bottom"
                           Panel.ZIndex="3"
-                          Margin="34,17"
+                          Margin="28,17"
                           x:Name="BtnGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>

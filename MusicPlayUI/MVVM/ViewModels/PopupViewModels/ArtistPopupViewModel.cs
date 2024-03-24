@@ -1,5 +1,4 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
+﻿
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Enums;
 using System;
@@ -10,24 +9,19 @@ using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using MusicPlayUI.Core.Helpers;
 using System.Collections.ObjectModel;
-using MusicPlayUI.Core.Factories;
-using MusicPlayModels.Enums;
-using MusicPlayUI.MVVM.Models;
-using MessageControl;
-using TagLib;
-using Humanizer.Localisation;
+using MusicPlay.Database.Models;
+using MusicPlay.Database.Enums;
+
 
 namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 {
-    public class ArtistPopupViewModel : ViewModel
+    public class ArtistPopupViewModel : TagTargetPopupViewModel
     {
-        private readonly INavigationService _navigationService;
         private readonly IQueueService _queueService;
-        private readonly IModalService _modalService;
         private readonly IPlaylistService _playlistService;
-
-        private ArtistModel _artist;
-        public ArtistModel Artist
+        private readonly IWindowService _windowService;
+        private Artist _artist;
+        public Artist Artist
         {
             get { return _artist; }
             set
@@ -37,8 +31,8 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private ObservableCollection<PlaylistModel> _userPlaylists;
-        public ObservableCollection<PlaylistModel> UserPlaylists
+        private ObservableCollection<Playlist> _userPlaylists;
+        public ObservableCollection<Playlist> UserPlaylists
         {
             get => _userPlaylists;
             set
@@ -48,97 +42,48 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             }
         }
 
-        private bool _canRemoveFromGenre;
-        public bool CanRemoveFromGenre
-        {
-            get => _canRemoveFromGenre;
-            set
-            {
-                SetField(ref _canRemoveFromGenre, value);
-            }
-        }
-
-        private GenreModel _genre;
-        public GenreModel Genre
-        {
-            get => _genre;
-            set
-            {
-                SetField(ref _genre, value);
-            }
-        }
-
-        private MessageCancelClosedModel<GenreModel> _genreMessageCancelClosedModel { get; set; }
-        private int RemovedArtistGenreIndex { get; set; }
-
         public ICommand PlayNextCommand { get; }
         public ICommand AddToQueueCommand { get; }
         public ICommand AddToPlaylistCommand { get; }
+        public ICommand AddToTagCommand { get; }
         public ICommand ChangeCoverCommand { get; }
         public ICommand CreatePlaylistCommand { get; }
         public ICommand RemoveArtistGenreCommand { get; }
-        public ArtistPopupViewModel(INavigationService navigationService, IQueueService queueService, IModalService modalService, IPlaylistService playlistService)
+        public ICommand OpenEditArtistWindow { get; }
+        public ICommand CreateTagCommand { get; }
+        public ArtistPopupViewModel(IQueueService queueService, IModalService modalService, IPlaylistService playlistService, IWindowService windowService) : base(modalService)
         {
-            _navigationService = navigationService;
             _queueService = queueService;
-            _modalService = modalService;
             _playlistService = playlistService;
-
-            LoadData();
+            _windowService = windowService;
 
             PlayNextCommand = new RelayCommand(() => PlayNext());
             AddToQueueCommand = new RelayCommand(() => PlayNext(true));
-            AddToPlaylistCommand = new RelayCommand<PlaylistModel>((playlist) => AddToPlaylist(playlist));
-            ChangeCoverCommand = new RelayCommand(ChangeCover);
+            AddToPlaylistCommand = new RelayCommand<Playlist>((playlist) => AddToPlaylist(playlist));
+            ChangeCoverCommand = new RelayCommand(async () => await ChangeCover());
             CreatePlaylistCommand = new RelayCommand(() => _modalService.OpenModal(ViewNameEnum.CreatePlaylist, OnCreatePlaylistClosed));
-            RemoveArtistGenreCommand = new RelayCommand(() =>
-            {
-                if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
-                {
-                    RemovedArtistGenreIndex = genreViewModel.RemoveArtist(Artist.Id);
-                }
-
-                _genreMessageCancelClosedModel = new(Genre, RestoreGenre);
-                MessageHelper.PublishMessage(MessageFactory.AlbumRemovedFromGenre(Artist.Name, Genre.Name, _genreMessageCancelClosedModel.Cancel, RemoveFromGenreCloseCallBack));
+            AddToTagCommand = new RelayCommand<Tag>(async (tag) => await AddToTag(tag, Artist));
+            CreateTagCommand = new RelayCommand(() => CreateTag(Artist));
+            OpenEditArtistWindow = new RelayCommand(() => {
+                ClosePopup();
+                _windowService.OpenWindow(ViewNameEnum.ArtistProperties, Artist);
             });
-        }
-
-        public override void Dispose()
-        {
-        }
-
-        private bool RestoreGenre()
-        {
-            if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel &&
-                RemovedArtistGenreIndex != -1)
-            {
-                genreViewModel.Artists.Insert(RemovedArtistGenreIndex, Artist);
-            }
-            return true;
-        }
-
-        private async void RemoveFromGenreCloseCallBack()
-        {
-            if (!_genreMessageCancelClosedModel.IsCanceled)
-            {
-                await DataAccess.Connection.RemoveArtistGenre(Artist.Id, _genreMessageCancelClosedModel.Data.Id);
-            }
         }
 
         private async void PlayNext(bool end = false)
         {
-            _queueService.AddTracks(await (await ArtistServices.GetArtistTracks(Artist.Id)).GetAlbumTrackProperties(), end, false, Artist.Name);
+            _queueService.AddTracks(await ArtistServices.GetArtistTracks(Artist.Id), end, false, Artist.Name);
+            ClosePopup();
         }
 
-        private async void AddToPlaylist(PlaylistModel playlist)
+        private async void AddToPlaylist(Playlist playlist)
         {
             _playlistService.AddToPlaylist(await ArtistServices.GetArtistTracks(Artist.Id), playlist);
-
             UserPlaylists.Remove(playlist);
 
-            if (_navigationService.CurrentViewParameter is PlaylistModel playlistModel  && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
+            if (App.State.CurrentView.State.Parameter is Playlist playlistModel  && playlistModel.PlaylistType == PlaylistTypeEnum.UserPlaylist)
             {
-                _navigationService.CurrentViewModel.Update();
+                App.State.CurrentView.ViewModel.Update();
             }
         }
 
@@ -148,16 +93,17 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
             {
                 await Task.Delay(500);
 
-                var playlists = await DataAccess.Connection.GetAllPlaylists();
+                var playlists = await Playlist.GetAll();
                 playlists.ToList().Sort((x, y) => x.CreationDate.CompareTo(y.CreationDate));
-                PlaylistModel createdPlaylist = playlists.LastOrDefault();
+                Playlist createdPlaylist = playlists.LastOrDefault();
                 AddToPlaylist(createdPlaylist);
             }
         }
 
-        private void ChangeCover()
+        private async Task ChangeCover()
         {
-            bool result = Artist.ChangeCover();
+            ClosePopup();
+            bool result = await Artist.ChangeCover();
             if (result)
             {
                 UpdateView();
@@ -166,28 +112,26 @@ namespace MusicPlayUI.MVVM.ViewModels.PopupViewModels
 
         private void UpdateView()
         {
-            if(_navigationService.CurrentViewName == ViewNameEnum.Artists || _navigationService.CurrentViewName == ViewNameEnum.SpecificArtist)
-            {
-                _navigationService.CurrentViewModel.Update();
-            }
+            App.State.UpdateCurrentViewIfIs([typeof(ArtistLibraryViewModel), typeof(ArtistViewModel)]);
         }
 
         private async Task GetUserPlaylists()
         {
-            UserPlaylists = new(await DataAccess.Connection.GetAllPlaylists());
+            UserPlaylists = new(await Playlist.GetAll());
+        }
+
+        public override void Init()
+        {
+            LoadData();
         }
 
         private async void LoadData()
         {
-            Artist = (ArtistModel)_navigationService.PopupViewParameter;
-
-            if (_navigationService.CurrentViewModel is GenreViewModel genreViewModel)
-            {
-                CanRemoveFromGenre = true;
-                Genre = genreViewModel.Genre;
-            }
+            Artist = (Artist)State.Parameter;
+            //Artist.TrackTag = await DataAccess.Connection.GetArtistTag(Artist.Id);
 
             await GetUserPlaylists();
+            GetTags(Artist.ArtistTags.Select(g => g.TagId));
         }
     }
 }

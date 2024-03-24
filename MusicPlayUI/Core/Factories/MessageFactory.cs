@@ -13,23 +13,35 @@ using MessageControl.Model;
 using MessageControl;
 using MusicPlayUI.ThemeColors;
 using TagLib.Ape;
+using MusicPlayUI.Core.Services;
 
 namespace MusicPlayUI.Core.Factories
 {
     public static class MessageFactory
     {
-        private static PathGeometry AppThemeIcon => (PathGeometry)App.IconDic["PaletteIcon"]; // 0
-        private static PathGeometry CoverChangedIcon => (PathGeometry)App.IconDic["ImageIcon"]; // 1
-        private static PathGeometry ErrorIcon => (PathGeometry)App.IconDic["WarningIcon"]; // 2
-        private static PathGeometry LanguageIcon => (PathGeometry)App.IconDic["TranslateIcon"]; // 3
-        private static PathGeometry ImportLibraryDoneIcon => (PathGeometry)App.IconDic["ImportDoneIcon"]; // 4
-        private static PathGeometry SettingIcon => (PathGeometry)App.IconDic["SettingsIcon"]; // 5
-        private static PathGeometry CircledAddIcon => (PathGeometry)App.IconDic["CircledAddIcon"]; // 6
-        private static PathGeometry CircledRemoveIcon => (PathGeometry)App.IconDic["CircledRemoveIcon"]; // 7
+        private static PathGeometry AppThemeIcon => (PathGeometry)AppTheme.IconDic["PaletteIcon"]; // 0
+        private static PathGeometry CoverChangedIcon => (PathGeometry)AppTheme.IconDic["ImageIcon"]; // 1
+        private static PathGeometry ErrorIcon => (PathGeometry)AppTheme.IconDic["WarningIcon"]; // 2
+        private static PathGeometry LanguageIcon => (PathGeometry)AppTheme.IconDic["TranslateIcon"]; // 3
+        private static PathGeometry ImportLibraryDoneIcon => (PathGeometry)AppTheme.IconDic["ImportDoneIcon"]; // 4
+        private static PathGeometry SettingIcon => (PathGeometry)AppTheme.IconDic["SettingsIcon"]; // 5
+        private static PathGeometry CircledAddIcon => (PathGeometry)AppTheme.IconDic["CircledAddIcon"]; // 6
+        private static PathGeometry CircledRemoveIcon => (PathGeometry)AppTheme.IconDic["CircledRemoveIcon"]; // 7
+        private static PathGeometry SuccessIcon => (PathGeometry)AppTheme.IconDic["CheckBox.Checked"]; // 8
 
-        public static void RegisterErrorMessagesStyle()
-        { 
+        public static void RegisterMessagesStyles()
+        {
             DefaultMessageFactory.RegisterErrorMessageStyle(MessageColors.ErrorContainer, MessageColors.OnErrorContainer, MessageColors.ErrorHover, ErrorIcon);
+            DefaultMessageFactory.RegisterWarningMessageStyle(MessageColors.WarningContainer, MessageColors.OnWarningContainer, MessageColors.WarningHover, ErrorIcon);
+            DefaultMessageFactory.RegisterSuccessMessageStyle(MessageColors.SuccessContainer, MessageColors.OnSuccessContainer, MessageColors.SuccessHover, SuccessIcon);
+        }
+
+        public static void PublishWithAppDispatcher(this MessageModel message)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                MessageHelper.PublishMessage(message);
+            });
         }
 
         public static MessageModel ErrorMessage(ErrorEnum errorType)
@@ -46,9 +58,9 @@ namespace MusicPlayUI.Core.Factories
                 message = $"No new files were found.";
                 return message.CreateWarningMessage(2);
             }
-            else 
-            { 
-                message = $"{numberOfTrackImported} {Resources.Scan_Done_Msg}"; 
+            else
+            {
+                message = $"{numberOfTrackImported} {Resources.Scan_Done_Msg}";
                 return message.CreateSuccessMessage(4);
             }
         }
@@ -104,7 +116,7 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel TrackAddedToPlaylist(this string track, string playlistName)
         {
-            string message = $"{Resources.The_Track} \"{track}\" {Resources.Has_been_Added_To} \"{playlistName}\"";
+            string message = $"\"{track}\" {Resources.Has_been_Added_To} \"{playlistName}\"";
             return message.CreateInfoMessage(6);
         }
 
@@ -116,19 +128,19 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel TrackRemovedFromPlaylist(this string track, string playlistName)
         {
-            string message = $"{Resources.The_Track} \"{track}\" {Resources.Has_Been_Removed_From} \"{playlistName}\"";
+            string message = $"\"{track}\" {Resources.Has_Been_Removed_From} \"{playlistName}\"";
             return message.CreateWarningMessage(7);
         }
 
         public static MessageModel AlbumRemovedFromGenre(this string album, string genre, Func<bool> undoCallBack, Action closeCallBack)
         {
-            string message = $"{Resources.The_Album} \"{album}\" {Resources.Has_Been_Removed_From} \"{genre}\"";
+            string message = $"\"{album}\" {Resources.Has_Been_Removed_From} \"{genre}\"";
             return message.CreateWarningMessageWithUndoAndClose(7, undoCallBack, closeCallBack);
         }
 
         public static MessageModel ArtistRemovedFromGenre(this string artist, string genre, Func<bool> undoCallBack, Action closeCallBack)
         {
-            string message = $"{Resources.The_Artist} \"{artist}\" and all its albums have been removed from \"{genre}\"";
+            string message = $"\"{artist}\" and all its albums have been removed from \"{genre}\"";
             return message.CreateWarningMessageWithUndoAndClose(7, undoCallBack, closeCallBack);
         }
 
@@ -152,7 +164,7 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel DataUpdated(this string name)
         {
-            string message = $"{Resources.TheDataFor} \"{name}\" {Resources.Has_Been_Updated}";
+            string message = $"\"{name}\" {Resources.Has_Been_Updated}";
             return message.CreateSuccessMessage(1);
         }
 
@@ -187,8 +199,9 @@ namespace MusicPlayUI.Core.Factories
 
         public static MessageModel TrackRemovedFromQueueWithUndo(this string name, Func<bool> callback)
         {
-            string message = $"{Resources.The_Track} \"{name}\" {Resources.Has_Been_Removed_From} {Resources.The_Queue}.";
-            return message.CreateWarningMessageWithUndo(7, callback);
+            string message = $"\"{name}\" {Resources.Has_Been_Removed_From} {Resources.The_Queue}.";
+            string undoneMessage = $"\"{name}\" has been restored!";
+            return message.CreateWarningMessageWithUndo(7, callback, undoneMessage);
         }
 
         private static MessageModel CreateErrorMessage(this string message)
@@ -281,7 +294,7 @@ namespace MusicPlayUI.Core.Factories
             return messageModel;
         }
 
-        private static MessageModel CreateWarningMessageWithUndo(this string message, int iconType, Func<bool> undoCallBack)
+        private static MessageModel CreateWarningMessageWithUndo(this string message, int iconType, Func<bool> undoCallBack, string undoMessage = "The action has been undone.")
         {
             MessageModel messageModel = new()
             {
@@ -293,7 +306,9 @@ namespace MusicPlayUI.Core.Factories
                 MouseOverBackground = MessageColors.WarningHover,
                 IsUndoEnabled = true,
                 UndoCallBack = undoCallBack,
-                UndoMessage = "Undo"
+                UndoMessage = "Undo",
+                UndoneMessage = undoMessage,
+                UndoneFailedMessage = "The action could not be undone.",
             };
             return messageModel;
         }
@@ -314,6 +329,24 @@ namespace MusicPlayUI.Core.Factories
                 UndoneMessage = "The action has been undone.",
                 UndoneFailedMessage = "The action could not be undone.",
                 OnCloseCallBack = closeCallBack
+            };
+            return messageModel;
+        }
+
+
+        public static MessageModel CreateWraningMessageWithConfirmAction(this string message, int iconType, Action<bool> ConfirmCallBack, string confirmMsg = "Confirm")
+        {
+            MessageModel messageModel = new()
+            {
+                Message = message,
+                Icon = GetIcon(iconType),
+                Foreground = MessageColors.OnWarningContainer,
+                IconBrush = MessageColors.OnWarningContainer,
+                Background = MessageColors.WarningContainer,
+                MouseOverBackground = MessageColors.WarningHover,
+                IsInteractive = true,
+                ConfirmCallBack = ConfirmCallBack,
+                ConfirmMessage = confirmMsg,
             };
             return messageModel;
         }

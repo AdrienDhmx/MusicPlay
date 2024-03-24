@@ -1,14 +1,13 @@
-﻿using MusicPlayModels;
-using MusicPlayModels.Enums;
-using MusicPlayUI.Core.Enums;
+﻿using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models;
 
 namespace MusicPlayUI.MVVM.Models
 {
     public class SortModel : BaseModel
     {
-        public SortEnum SortType { get; }
+        public SortEnum Type { get; }
 
-        public string SortName { get; }
+        public string Name { get; }
 
         private bool _isSelected;
         public bool IsSelected
@@ -30,10 +29,11 @@ namespace MusicPlayUI.MVVM.Models
             }
         }
 
-        public SortModel(SortEnum sortType, string sortName, bool isSelected, bool isAscending)
+        public SortModel(int id, SortEnum sortType, string sortName, bool isSelected, bool isAscending)
         {
-            SortType = sortType;
-            SortName = sortName;
+            Id = id;
+            Type = sortType;
+            Name = sortName;
             IsSelected= isSelected;
             IsAscending = isAscending;
         }

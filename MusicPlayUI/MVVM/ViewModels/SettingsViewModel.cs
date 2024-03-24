@@ -6,19 +6,17 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using MusicPlayUI.Core.Services.Interfaces;
 using System;
+using MusicPlayUI.MVVM.ViewModels.SettingsViewModels;
+using System.Collections.ObjectModel;
+using System.Linq;
+using DynamicScrollViewer;
+using MusicPlayUI.Core.Services;
 
 namespace MusicPlayUI.MVVM.ViewModels
 {
     public class SettingsViewModel : ViewModel
     {
         private readonly IWindowService _windowService;
-
-        private INavigationService _navigationService;
-        public INavigationService NavigationService 
-        {
-            get => _navigationService;
-            set { SetField(ref _navigationService, value); }
-        }
 
         private bool _isSettingsMenuOpen = false;
         public bool IsSettingsMenuOpen
@@ -31,8 +29,8 @@ namespace MusicPlayUI.MVVM.ViewModels
             }
         }
 
-        private List<SettingModel> _settings;
-        public List<SettingModel> Settings
+        private ObservableCollection<SettingModel> _settings;
+        public ObservableCollection<SettingModel> Settings
         {
             get => _settings;
             set
@@ -47,46 +45,92 @@ namespace MusicPlayUI.MVVM.ViewModels
         {
             get
             {
-                if (_selectedSetting is null)
-                    return Settings.Find(s => s.IsSelected);
                 return _selectedSetting;
             }
             set
             {
                 _selectedSetting = value;
                 OnPropertyChanged(nameof(SelectedSetting));
+                AppBar.SetData(SelectedSetting.Name, string.Empty);
             }
         }
 
         public ICommand NavigateToSettingCommand { get; }
-        public SettingsViewModel(INavigationService navigationService, IWindowService windowService)
+        public SettingsViewModel(IWindowService windowService)
         {
-            NavigationService = navigationService;
             _windowService = windowService;
-
-            // navigate to general settings by default (sub view)
-            NavigationService.NavigateTo(ViewNameEnum.General);
 
             NavigateToSettingCommand = new RelayCommand<SettingModel>((setting) =>
             {
                 NavigateToSettings(setting);
             });
-
-            Init();
         }
 
         public override void Dispose()
         {
-            NavigationService.SecondaryViewModel?.Dispose();
-
             GC.SuppressFinalize(this);
         }
 
-        private void Init()
+        public override void OnScrollEvent(OnScrollEvent e)
         {
-            Settings = SettingsModelFactory.GetSettings();
+            AppBar.AnimateElevation(e.VerticalOffset, 
+                                    10, 500,
+                                    1000000, 0,
+                                    100, 500,
+                                    0.2, 0.8,
+                                    1, 1,
+                                    0.1, 0.8);
+            base.OnScrollEvent(e);
+        }
+
+        public override void UpdateAppBarStyle()
+        {
+            AppBar.SetStyle(AppTheme.Palette.PrimaryContainer, 0.2, 1, false, 28);
+            AppBar.SetDropShadow(0.1);
+            AppBar.Foreground = AppTheme.Palette.OnBackground;
+        }
+
+        public override void Init()
+        {
+            Settings = new(SettingsModelFactory.GetSettings());
+
+            if(State?.ChildViewModel?.ViewModel != null)
+            {
+                Type childViewModelType = State.ChildViewModel.ViewModel.GetType();
+                SetSelectedSetting(s => s.Type == childViewModelType);
+                IsSettingsMenuOpen = true;
+                base.Init();
+                return;
+            }
+            else if (State?.Parameter != null && State.Parameter is SettingModel setting)
+            {
+                SelectedSetting = setting;
+            }
+
+            if(SelectedSetting is null)
+            {
+                SetSelectedSetting(s => s.IsSelected);
+            }
+
+            base.Init();
             NavigateToSettings(SelectedSetting);
             IsSettingsMenuOpen = true;
+        }
+
+        private void SetSelectedSetting(Predicate<SettingModel> predicate)
+        {
+            foreach (SettingModel setting in Settings)
+            {
+                if (predicate(setting))
+                {
+                    SelectedSetting = setting;
+                    setting.IsSelected = true;
+                }
+                else
+                {
+                    setting.IsSelected = false;
+                }
+            }
         }
 
         private void SetSelectedSetting(SettingModel setting)
@@ -94,9 +138,18 @@ namespace MusicPlayUI.MVVM.ViewModels
             if (setting is not null)
             {
                 SelectedSetting = setting;
-                Settings.ForEach(s => s.IsSelected = false);
-                Settings.Find(s => s.SettingName == setting.SettingName).IsSelected = true;
-                Settings = new(Settings);
+
+                foreach(SettingModel settings in Settings)
+                {
+                    if (settings.IsSelected)
+                    {
+                        settings.IsSelected = false;
+                    } 
+                    else if(settings.Name == setting.Name)
+                    {
+                        settings.IsSelected = true;
+                    }
+                }
             }
         }
 
@@ -106,7 +159,7 @@ namespace MusicPlayUI.MVVM.ViewModels
                 return;
 
             SetSelectedSetting(setting);
-            NavigationService.NavigateTo(setting.SettingViewEnum);
+            State.ChildViewModel = App.State.CreateNavigationModel(setting.Type);
         }
     }
 }

@@ -16,6 +16,8 @@ namespace MusicPlayUI.Core.Enums
         WaterTheme = 1,
         ForestTheme = 2,
         FallenLeavesTheme = 3,
+        TurquoiseTheme = 4,
+        RedWineTheme = 5,
 
         // Languages (10 - 29)
         English = 10,
@@ -25,18 +27,27 @@ namespace MusicPlayUI.Core.Enums
         ChineseMandarin = 14,
         ChinseCantonese = 15,
         Korean = 16,
-        Japonese = 17,
+        Japanese = 17,
 
         // Queue Covers
         NoCovers = 50,
         AlbumCovers = 51,
         ArtworkCovers = 52,
-        AutoCovers = 53
+        AutoCovers = 53,
+    
+        // Pre made Equalizer presets
+        Acoustic = -100,
+        Classic = -101,
+        Electronic = -102,
+        Jazz = -103,
+        Metal = -104,
+        Piano = -105,
+        Pop = -106,
+        Rock = -107,
 
         // IDEAS:
         // - File directories = Cover and Lyrics directories
         // - Lyrics Settings = default fontsize, default website (only AZLyrics for now though), AutoSave
-        // - default blur radius or no blur at all
 
     }
 
@@ -62,7 +73,7 @@ namespace MusicPlayUI.Core.Enums
                     return "ch-ct";
                 case SettingsValueEnum.Korean:
                     return "kr";
-                case SettingsValueEnum.Japonese:
+                case SettingsValueEnum.Japanese:
                     return "jp";
                 default:
                     return "en";

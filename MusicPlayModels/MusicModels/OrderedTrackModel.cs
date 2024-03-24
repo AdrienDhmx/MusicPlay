@@ -9,6 +9,10 @@ namespace MusicPlayModels.MusicModels
     public class OrderedTrackModel : TrackModel
     {
         private int _index;
+
+        /// <summary>
+        /// The index of the track inside a list. This is not the track number (<see cref="TrackModel.TrackNumber"/>)
+        /// </summary>
         public int TrackIndex
         {
             get => _index;
@@ -31,15 +35,6 @@ namespace MusicPlayModels.MusicModels
         public OrderedTrackModel() : base()
         {
 
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is OrderedTrackModel track && Id == track.Id)
-            {
-                return true;
-            }
-            return false;
         }
     }
 

@@ -1,0 +1,80 @@
+﻿<UserControl x:Class="MusicPlayUI.MVVM.Views.GenreLibraryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views" 
+             xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
+             xmlns:customSearchBar="clr-namespace:PlaceHolderTextBox;assembly=PlaceHolderTextBox" 
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton" 
+             xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
+             xmlns:listviews="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
+             d:DataContext="{d:DesignInstance Type=viewmodels:GenreLibraryViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid ClipToBounds="False"
+              Panel.ZIndex="2">
+            <Border Background="{DynamicResource Background}"
+                        ClipToBounds="False"
+                        Effect="{DynamicResource PageHeaderDropShadow}"/>
+
+            <Border Style="{DynamicResource PageHeaderBackgroundLight}"/>
+
+            <Border Margin="{Binding TopMargin}">
+                <Grid Margin="30,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.45*"/>
+                    <ColumnDefinition Width="0.18*"/>
+                    <ColumnDefinition Width="0.45*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="My Tags"
+                            Style="{DynamicResource SLargeHeaderStyle}"/>
+
+                    <TextBlock Text="{Binding GenreCount}"
+                                       HorizontalAlignment="Left"
+                                           Style="{DynamicResource NLargeSecondaryStyle}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center">
+                    <iconbtn:IconButton Icon="{DynamicResource addSign}"
+                                          Style="{DynamicResource PlaylistIconButton}"
+                                                Command="{Binding CreateGenreCommand}"/>
+                </StackPanel>
+
+                <Border Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        x:Name="searchBarBorder">
+                    <customSearchBar:PlaceholderTextBox x:Name="SearchTextBox"
+                                                        HorizontalAlignment="Right"
+                                                        MaxWidth="300"
+                                                        MinWidth="200"
+                                                        Width="{Binding ActualWidth, ElementName=searchBarBorder, Converter={StaticResource SubstractionConverter}, ConverterParameter=40, UpdateSourceTrigger=PropertyChanged}"
+                                                        Style="{DynamicResource SearchBarStyle}"
+                                                        Text="{Binding SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+
+                </Border>
+            </Grid>
+            </Border>
+        </Grid>
+
+        <Grid Margin="2,0"
+              Background="{DynamicResource Background}"
+              ClipToBounds="True"
+            Grid.Row="1">
+
+            <listviews:GenreListView Tags="{Binding BindedGenres}"
+                                     Panel.ZIndex="0"/>
+        </Grid>
+    </Grid>
+
+</UserControl>

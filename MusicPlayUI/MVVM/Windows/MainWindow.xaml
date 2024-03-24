@@ -12,244 +12,268 @@
         xmlns:helper="clr-namespace:MusicPlayUI.Core.Helpers"
         xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
         xmlns:messagehelper="clr-namespace:MessageControl;assembly=MessageControl"
-        xmlns:command="clr-namespace:MusicPlayUI.Core.Commands"
+        xmlns:command="clr-namespace:MusicPlayUI.Core.Commands" 
+        xmlns:appBar="clr-namespace:MusicPlayUI.MVVM.Views.AppBars" 
+        xmlns:mp="clr-namespace:ModalPopupControl;assembly=ModalPopupControl"
         mc:Ignorable="d"
-        ResizeMode="CanResizeWithGrip"
-        WindowStyle="None"
+        ResizeMode="CanResize"
+        WindowStyle="SingleBorderWindow"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        AllowsTransparency="True"
-        Background="Transparent"
+        Background="{DynamicResource Background}"
         Height="750" 
         Width="1000"
-        MinWidth="820"
-        MinHeight="750"
-        Title="{Binding QueueService.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}"
+        MinWidth="800"
+        MinHeight="650"
+        Title="{Binding QueueService.Queue.PlayingTrack.Title, Converter={StaticResource AddTextConverter}, ConverterParameter='MusicPlay -'}"
         x:Name="Root"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}">
-    <!-- Root Border -->
-    <Border x:Name="WindowBorder"
-            Background="{DynamicResource Background}"
-            CornerRadius="{DynamicResource PrimaryCornerRadius}"
-            BorderThickness="0.5"
-            Margin="4,4,5,5"
-            helper:OnMouseDownHelper.OnClickListener="{Binding .}">
-        <Border.Style>
-            <Style TargetType="Border">
-                <Setter Property="BorderBrush" Value="{DynamicResource Background}"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding DataContext.NavigationService.IsFullScreen, ElementName=Root}" Value="True">
-                        <Setter Property="BorderBrush" Value="Transparent"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
-        
+
         <!-- Main Grid -->
-        <Grid x:Name="RootGrid"
-              ClipToBounds="True"
-              ShowGridLines="False"
-               SnapsToDevicePixels="True">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+    <Grid x:Name="RootGrid"
+                ClipToBounds="True"
+                ShowGridLines="False"
+                SnapsToDevicePixels="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <!-- Window Bar -->
-            <Border Grid.ColumnSpan="3"
-                    Height="28"
-                    Margin="0"
-                    Panel.ZIndex="2"
-                    Background="Transparent"
-                    Visibility="{Binding NavigationService.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}"
-                    BorderBrush="{DynamicResource SurfaceVariant}"
-                    BorderThickness="0,0,0,1"
-                    MouseDown="WindowTopBorder_MouseLeftButtonDown">
-                <Border.InputBindings>
-                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding CommandsManager.MaximizeCommand}"/>
-                </Border.InputBindings>
-                <Grid x:Name="MenuBarGrid"
-                      Grid.ColumnSpan="3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="120"/>
-                        </Grid.ColumnDefinitions>
+        <appBar:AppBarView DataContext="{Binding AppState.AppBar}"
+                           VerticalAlignment="Top"
+                           Grid.ColumnSpan="2"
+                            ClipToBounds="False"
+                            Panel.ZIndex="10"/>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="10,0, 0, 0">
-                        <Path Data="M5 17.3336V6.66698C5 5.78742 5 5.34715 5.18509 5.08691C5.34664 4.85977 5.59564 4.71064 5.87207 4.67499C6.18868 4.63415 6.57701 4.84126 7.35254 5.25487L17.3525 10.5882L17.3562 10.5898C18.2132 11.0469 18.642 11.2756 18.7826 11.5803C18.9053 11.8462 18.9053 12.1531 18.7826 12.4189C18.6418 12.7241 18.212 12.9537 17.3525 13.4121L7.35254 18.7454C6.57645 19.1593 6.1888 19.3657 5.87207 19.3248C5.59564 19.2891 5.34664 19.1401 5.18509 18.9129C5 18.6527 5 18.2132 5 17.3336Z"
-                              Stroke="{DynamicResource Primary}"
-                              StrokeThickness="1"
-                              Stretch="Uniform"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Height="20"/>
-
-                        <TextBlock Text="MusicPlay"
-                                   FontSize="16"
-                                   FontFamily="Calibri"
-                                   HorizontalAlignment="Left"
-                                   Margin="10,0"
-                                   Style="{DynamicResource NStyle}"/>
-                    </StackPanel>
-                
-                    <Grid Grid.Column="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <iconbtn:IconButton Style="{DynamicResource MinimizeBtn}"
-                                            Command="{Binding CommandsManager.MinimizeCommand}"/>
-
-                        <iconbtn:IconButton Style="{DynamicResource MaximizeBtn}"
-                                        Grid.Column="1"
-                                           x:Name="MaximizeBtn"
-                                            Command="{Binding CommandsManager.MaximizeCommand}"/>
-
-                        <iconbtn:IconButton Style="{DynamicResource CloseBtn}"
-                                        Grid.Column="2"
-                                            Command="{Binding CommandsManager.LeaveCommand}"/>
-                    </Grid>
-                </Grid>
-                
-            </Border >
-
-            <!-- Menu -->
-            <Border x:Name="MenuBorder"
-                    Grid.Row="1"
-                    Panel.ZIndex="2"
+        <!-- Menu -->
+        <Border x:Name="MenuBorder"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Panel.ZIndex="12"
                     Background="Transparent"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Stretch"
-                    BorderBrush="{DynamicResource SurfaceVariant}"
-                    BorderThickness="0,0,1,0"
-                    Visibility="{Binding NavigationService.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}">
-                <views:MainMenuView DataContext="{Binding CurrentMenu}"/>
-            </Border>
+                    VerticalAlignment="Stretch">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" 
+                            Color="#000000"
+                            Opacity="0.4"
+                            Direction="-90"/>
+            </Border.Effect>
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <TranslateTransform X="-60"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Width" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding AppState.IsMenuDrawerOpen}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                                From="-60" To="0"
+                                                                Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                                From="0" To="60"
+                                                                Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                                From="0" To="-40"
+                                                                Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                              From="40" To="0"
+                                                              Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <views:MainMenuView DataContext="{Binding CurrentMenu}"/>
+        </Border>
 
-            <!-- MainContent -->
-            <Border Grid.Row="1"
-                    Grid.Column="1"
-                    x:Name="MainContentBorder">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="0"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding DataContext.NavigationService.IsFullScreen, ElementName=Root}" Value="True">
-                                <Setter Property="CornerRadius" Value="{DynamicResource PrimaryCornerRadius}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-                <ContentControl Content="{Binding NavigationService.CurrentViewModel}"
+        <!-- MainContent -->
+        <Border Grid.Column="1"
+                x:Name="MainContentBorder">
+            <ContentControl Content="{Binding AppState.CurrentView.ViewModel}"
                                 Style="{DynamicResource Basestyle}"
-                                ClipToBounds="True"
-                                x:Name="MainContent">
-                </ContentControl>
-            </Border>
-            
-            <!-- Music Player Control -->
-            <Border Grid.Row="2"
+                                x:Name="MainContent"/>
+        </Border>
+
+
+        <!-- Music Player Control -->
+        <Border Grid.Row="1"
+                    VerticalAlignment="Bottom"
                     Grid.ColumnSpan="3"
-                    ClipToBounds="True"
-                    Panel.ZIndex="2"
-                    Visibility="{Binding NavigationService.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}">
-                <playercontrolviews:PlayerControlView DataContext="{Binding CurrentPlayerControl}"/>
-            </Border>
+                    ClipToBounds="False"
+                    Panel.ZIndex="200"
+                    Visibility="{Binding AppState.IsFullScreen, Converter={StaticResource BoolToVisibilityConverterInverted}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Height" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding QueueService.Queue.PlayingTrack, Converter={StaticResource IsNullConverter}}" Value="False">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Height"
+                                                                From="0" To="100"
+                                                                Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Height"
+                                                                From="100" To="0"
+                                                                Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" 
+                            Color="#000000"
+                            Opacity="0.8"
+                            Direction="200"/>
+
+            </Border.Effect>
+            <playercontrolviews:PlayerControlView DataContext="{Binding CurrentPlayerControl}">
+            </playercontrolviews:PlayerControlView>
+        </Border>
+
+        <!-- Queue Drawer -->
+        <Border Grid.Column="1"
+                Margin="0, 0, 20, 0"
+              Panel.ZIndex="4"
+              Width="360"
+                HorizontalAlignment="Right">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <TranslateTransform Y="800"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding AppState.IsQueueDrawerOpen}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                From="800" To="0"
+                                                               Duration="0:0:0.6" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                From="0" To="800"
+                                                              Duration="0:0:0.6" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
             
-            <!-- Queue Drawer -->
-            <Grid Grid.Column="1"
-                    Grid.Row="1"
-                    HorizontalAlignment="Right">
+            <Grid >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="110"/>
+                    <!-- Empty row to let space above the drawer -->
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Border Grid.Row="1"
-                        Width="360">
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Setter Property="RenderTransform">
-                                <Setter.Value>
-                                    <TranslateTransform X="370"/>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding NavigationService.IsQueueDrawerOpen}" Value="True">
-                                    <DataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                                                             From="370" To="-20"
-                                                             Duration="0:0:0.3" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </DataTrigger.EnterActions>
-                                    <DataTrigger.ExitActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                                                             From="-20" To="370"
-                                                             Duration="0:0:0.3" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </DataTrigger.ExitActions>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
+                <Border CacheMode="BitmapCache"
+                        CornerRadius="10, 10, 0, 0"
+                        Background="{DynamicResource Background}"
+                        Grid.Row="1">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="12" ShadowDepth="2" Color="Black"
-                                  Direction="250"
-                                   Opacity="0.8"/>
+                                        Direction="250"
+                                           RenderingBias="Performance"
+                                        Opacity="0.8"/>
                     </Border.Effect>
-                    <popupviews:QueueDrawerView DataContext="{Binding QueueDrawer}"/>
                 </Border>
+                <popupviews:QueueDrawerView DataContext="{Binding QueueDrawer}" Grid.Row="1"/>
             </Grid>
-            
-            <!-- Message Popup -->
-            <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right"
-                          VerticalAlignment="Top"
-                          Style="{DynamicResource Basestyle}"
-                          Grid.Column="1"
-                          Grid.Row="1">
-                <StackPanel VerticalAlignment="Top" Margin="0,5,10,10"
-                            messagehelper:MessageHelper.IsMessagesContainer="True"/>
-            </ScrollViewer>
-            
-            <!-- Modal (playlist creation and edit + verif message) -->
-            <modal:Modal Grid.ColumnSpan="2"
-                         Grid.RowSpan="3"
-                         Margin="0"
-                         CornerRadius="{DynamicResource SecondaryCornerRadius}"
-                         Panel.ZIndex="3"
-                         BorderThickness="0"
-                         BorderBrush="{DynamicResource SurfaceVariant}"
-                         IsOpen="{Binding ModalService.IsModalOpen}"
-                         Content="{Binding ModalService.Modal, UpdateSourceTrigger=PropertyChanged}"
-                          Background="{DynamicResource BlackTransparent}">
-            </modal:Modal>
-            
-            <!-- Popup Views -->
-            <Popup Placement="MousePoint"
-                   StaysOpen="True"
-                   HorizontalOffset="5"
-                   VerticalOffset="5"
-                   IsOpen="{Binding NavigationService.IsPopupOpen}"
-                    AllowsTransparency="True">
-                <ContentControl Content="{Binding NavigationService.PopupViewModel}"
-                                Background="Transparent">
+        </Border>
+
+        <!-- Message Popup -->
+        <ScrollViewer VerticalScrollBarVisibility="Hidden" 
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Style="{DynamicResource Basestyle}"
+                            Grid.Column="1"
+                      Panel.ZIndex="100">
+            <StackPanel VerticalAlignment="Top" 
+                        Margin="0,20,10,10"
+                        messagehelper:MessageHelper.IsMessagesContainer="True"/>
+        </ScrollViewer>
+
+        <!-- Modal (playlist creation and edit + verif message) -->
+        <modal:Modal Grid.ColumnSpan="2"
+                            Grid.RowSpan="3"
+                            Margin="0"
+                            CornerRadius="{DynamicResource SecondaryCornerRadius}"
+                            Panel.ZIndex="999"
+                            BorderThickness="0"
+                            BorderBrush="{DynamicResource SurfaceVariant}"
+                            IsOpen="{Binding ModalService.IsModalOpen}"
+                            Content="{Binding ModalService.Modal, UpdateSourceTrigger=PropertyChanged}"
+                            Background="{DynamicResource BlackTransparent}"/>
+
+
+        <!-- Popup Views -->
+        <mp:ModalPopup Placement="MousePoint"
+                        StaysOpen="False"
+                        HorizontalOffset="5"
+                        VerticalOffset="5"
+                        PopupAnimation="Fade"
+                        ClipToBounds="false"
+                        Panel.ZIndex="80"
+                        IsOpen="{Binding AppState.IsPopupOpen}"
+                         AllowsTransparency="True">
+            <Grid>
+                <Border Effect="{DynamicResource PopupDropShadow}"
+                        Background="{DynamicResource Background}"
+                        Margin="24"
+                        ClipToBounds="false"
+                        CornerRadius="{DynamicResource PrimaryCornerRadius}">
+                </Border>
+                <ContentControl Content="{Binding AppState.CurrentPopup.ViewModel}"
+                                    Margin="24"
+                             ClipToBounds="false"
+                                x:Name="popupContent"
+                             Background="{DynamicResource Background}">
                 </ContentControl>
-            </Popup>
-        </Grid>
-    </Border>
-   
+            </Grid>
+        </mp:ModalPopup>
+    </Grid>
 </Window>

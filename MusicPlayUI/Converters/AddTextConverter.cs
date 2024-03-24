@@ -12,7 +12,7 @@ namespace MusicPlayUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is null || value is not string) return "";
+            if (value is null) return "";
 
             if(parameter is string param)
             {

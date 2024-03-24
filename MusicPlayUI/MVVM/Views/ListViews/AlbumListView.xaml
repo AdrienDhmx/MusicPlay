@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MusicPlayUI.MVVM.Views.ListViews"
              xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:templates="clr-namespace:MusicPlayUI.MVVM.Views.Templates"
              xmlns:vcontrol="clr-namespace:VirtualizingControls;assembly=VirtualizingControls"
              mc:Ignorable="d" 
              x:Name="RootListView"
@@ -24,13 +25,15 @@
                     </Grid.InputBindings>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
                     <Border x:Name="MouseOverBorder"
                             Grid.Row="0"
-                            Panel.ZIndex="2"
+                            Panel.ZIndex="3"
                             Opacity="0"
+                            Style="{DynamicResource LibraryItemsRoundedImageBorder}"
                             CornerRadius="{DynamicResource PrimaryCornerRadius}"
                             Background="{DynamicResource TransparentGradient}"/>
 
@@ -39,18 +42,18 @@
                         <Border.Background>
                             <ImageBrush ImageSource="{Binding AlbumCover, Converter={StaticResource MNullImageConverter}}"
                                         Stretch="UniformToFill"
-                                        RenderOptions.BitmapScalingMode="Linear"
-                                        RenderOptions.EdgeMode="Aliased"/>
+                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                        RenderOptions.EdgeMode="Unspecified"/>
                         </Border.Background>
                     </Border>
 
                     <Grid Opacity="0"
                           VerticalAlignment="Bottom"
-                          Panel.ZIndex="3"
-                          Margin="15,5, 20, 5"
+                          Panel.ZIndex="4"
+                          Margin="12,5, 12, 5"
                           IsHitTestVisible="True"
                           x:Name="BtnGrid">
-                        
+
                         <iconbtn:IconButton Style="{DynamicResource QuickPlayButton}"
                                             Command="{Binding DataContext.PlayAlbumCommand, ElementName=RootListView}"
                                             CommandParameter="{Binding .}"/>
@@ -63,7 +66,38 @@
                     <TextBlock Text="{Binding Name}"
                                 Style="{DynamicResource SListItemNameStyle}"
                                Panel.ZIndex="3"
+                               HorizontalAlignment="Left"
+                               TextAlignment="Left"
+                               Padding="2, 2, 2, 0"
                                 Grid.Row="1"/>
+
+                    <TextBlock Text="{Binding PrimaryArtist.Name}"
+                               Visibility="{Binding ShowArtist, ElementName=RootListView, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Style="{DynamicResource SListItemNameStyle}"
+                               Panel.ZIndex="3"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               HorizontalAlignment="Left"
+                               TextAlignment="Left"
+                               FontSize="14"
+                               Padding="2, 0"
+                               FontWeight="Normal"
+                               Foreground="{DynamicResource OnSurfaceVariant}"
+                                Grid.Row="2"/>
+
+                    <TextBlock Text="{Binding Release, Converter={StaticResource DisplayNumberHigherThan0}}"
+                              Visibility="{Binding ShowArtist, ElementName=RootListView, Converter={StaticResource BoolToVisibilityConverterInverted}}"
+                               Style="{DynamicResource SListItemNameStyle}"
+                              Panel.ZIndex="3"
+                              TextWrapping="NoWrap"
+                              TextTrimming="CharacterEllipsis"
+                              HorizontalAlignment="Left"
+                              TextAlignment="Left"
+                              FontSize="14"
+                              Padding="2, 0"
+                              FontWeight="Normal"
+                              Foreground="{DynamicResource OnSurfaceVariant}"
+                               Grid.Row="2"/>
                 </Grid>
                 <DataTemplate.Triggers>
                     <Trigger Property="IsMouseOver" Value="True" SourceName="itemgrid">

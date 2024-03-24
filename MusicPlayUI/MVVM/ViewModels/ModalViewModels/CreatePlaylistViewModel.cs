@@ -1,24 +1,20 @@
-﻿using DataBaseConnection.DataAccess;
-using MessageControl;
+﻿using MessageControl;
 using Microsoft.Win32;
+using MusicPlay.Database.Models;
 using MusicPlay.Language;
-using MusicPlayModels.MusicModels;
 using MusicPlayUI.Core.Commands;
 using MusicPlayUI.Core.Factories;
 using MusicPlayUI.Core.Services;
 using MusicPlayUI.Core.Services.Interfaces;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Windows.Media.Playlists;
 
 namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
 {
-    public class CreatePlaylistViewModel : ViewModel
+    public class CreatePlaylistViewModel : ModalViewModel
     {
-        private readonly IModalService _modalService;
-        private readonly INavigationService _navigationService;
-
-        private PlaylistModel Playlist { get; set; }
+        private Playlist PlaylistModel { get; set; }
 
         private string _playlistName = "";
         public string PlaylistName
@@ -90,28 +86,17 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             }
         }
 
-        public ICommand CloseModalCommand { get; }
         public ICommand CreatePlaylistCommand { get; }
         public ICommand SelectCoverCommand { get; }
-        public CreatePlaylistViewModel(IModalService modalService, INavigationService navigationService)
-        {
-            _modalService = modalService;
-            
-            _navigationService = navigationService;
-
-            CloseModalCommand = new RelayCommand(() => CloseModal(true));
+        public CreatePlaylistViewModel(IModalService modalService) : base(modalService)
+        {            
             CreatePlaylistCommand = new RelayCommand(CreatePlaylist);
-            SelectCoverCommand = new RelayCommand(SelectCover);
+            SelectCoverCommand = new RelayCommand(async () => await SelectCover());
 
-            if (_navigationService.IsPopupOpen)
-            {
-                _navigationService.ClosePopup();
-            }
-
-            if(_modalService.ModalParameter is PlaylistModel playlist)
+            if(_modalService.ModalParameter is Playlist playlist)
             {
                 IsCreate = false; // updating instead
-                Playlist = playlist;
+                PlaylistModel = playlist;
 
                 PlaylistName = playlist.Name;
                 PlaylistDescription = playlist.Description;
@@ -119,23 +104,18 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             }
             else
             {
-                Playlist = new();
+                PlaylistModel = new();
             }
         }
 
-        private void CloseModal(bool canceled = false)
-        {   
-            _modalService.CloseModal(canceled);
-        }
-
-        private void SelectCover()
+        private async Task SelectCover()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Images (*.BMP;*.JPG;*.GIF,*.PNG,*.TIFF)|*.BMP;*.JPG;*.GIF;*.PNG;*.TIFF";
             openFileDialog.Multiselect = false;
             openFileDialog.Title = Resources.Select_an_Image;
 
-            PlaylistCover =  CoverService.ChangeCover(Playlist);
+            PlaylistCover = await CoverService.ChangeCover(PlaylistModel, !IsCreate);
         }
 
         private async void CreatePlaylist()
@@ -146,22 +126,18 @@ namespace MusicPlayUI.MVVM.ViewModels.ModalViewModels
             {
                 if (IsCreate)
                 {
-                    int id = await PlaylistsFactory.CreatePlaylist(PlaylistName, PlaylistDescription.Trim(), PlaylistCover);
-                    MessageHelper.PublishMessage(PlaylistName.PlaylistCreatedWithAction(async (bool confirm) =>
+                    Playlist playlist = await PlaylistsFactory.CreatePlaylist(PlaylistName, PlaylistDescription.Trim(), PlaylistCover);
+                    MessageHelper.PublishMessage(PlaylistName.PlaylistCreatedWithAction((bool confirm) =>
                     {
                         if(confirm)
                         {
-                            _navigationService.NavigateTo(Core.Enums.ViewNameEnum.SpecificPlaylist, await DataAccess.Connection.GetPlaylist(id));
+                            App.State.NavigateTo<PlaylistViewModel>(playlist);
                         }
                     }, "Go to playlist"));
                 }
                 else
                 {
-                    Playlist.Name = PlaylistName;
-                    Playlist.Description = PlaylistDescription.Trim();
-                    Playlist.Cover = PlaylistCover;
-
-                    await DataAccess.Connection.UpdatePlaylist(Playlist);
+                    await Playlist.Update(PlaylistModel, PlaylistName, PlaylistDescription.Trim(), PlaylistCover);
                 }
                 CloseModal();
             }

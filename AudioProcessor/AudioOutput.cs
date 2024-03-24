@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using AudioHandler.Enums;
-using AudioHandler.Models;
-using ManagedBass;
+﻿using ManagedBass;
+using MusicPlay.Database.Enums;
+using MusicPlay.Database.Models.AudioModels;
 
 namespace AudioHandler
 {
@@ -16,20 +10,20 @@ namespace AudioHandler
         /// Get all the available audio endpoints
         /// </summary>
         /// <returns></returns>
-        public static List<DeviceModel> GetAllDevices()
+        public static List<AudioDeviceModel> GetAllDevices()
         {
-            List<DeviceModel> devices = new();
+            List<AudioDeviceModel> devices = new();
             
             for(int i = 1; i < Bass.DeviceCount; i++)
             {
                 DeviceInfo deviceInfo = Bass.GetDeviceInfo(i);
                 if (deviceInfo.IsEnabled)
                 {
-                    DeviceTypeEnum deviceType = GetdeviceType(deviceInfo.Type);
-                    devices.Add(new()
+                    AudioDeviceTypeEnum deviceType = GetDeviceType(deviceInfo.Type);
+                    devices.Add(new(deviceInfo.Name)
                     { 
                         Name = deviceInfo.Name, 
-                        Type = deviceType, 
+                        DeviceType = deviceType, 
                         IsDefault = deviceInfo.IsDefault, 
                         IsInitialized = deviceInfo.IsInitialized, 
                         Index = i
@@ -41,23 +35,23 @@ namespace AudioHandler
 
 
         /// <summary>
-        /// Get the default audio endpoint currently available
+        /// Get the default audio endpoint available
         /// </summary>
         /// <returns>The default device that has been found</returns>
-        public static DeviceModel GetDefaultdevice()
+        public static AudioDeviceModel GetDefaultDevice()
         {
-            DeviceModel device = new();
+            AudioDeviceModel device = null;
             int deviceCount = Bass.DeviceCount;
             for (int i = 1; i < deviceCount; i++)
             {
                 DeviceInfo deviceInfo = Bass.GetDeviceInfo(i);
                 if (deviceInfo.IsDefault)
                 {
-                    DeviceTypeEnum deviceType = GetdeviceType(deviceInfo.Type);
-                    device = new() 
+                    AudioDeviceTypeEnum deviceType = GetDeviceType(deviceInfo.Type);
+                    device = new(deviceInfo.Name) 
                     { 
                         Name = deviceInfo.Name,
-                        Type = deviceType,
+                        DeviceType = deviceType,
                         IsDefault = deviceInfo.IsDefault,
                         IsInitialized = deviceInfo.IsInitialized,
                         Index = i
@@ -68,18 +62,18 @@ namespace AudioHandler
             return device;
         }
 
-        private static DeviceTypeEnum GetdeviceType(DeviceType type)
+        private static AudioDeviceTypeEnum GetDeviceType(DeviceType type)
         {
             return type switch
             {
-                DeviceType.Network => DeviceTypeEnum.Network,
-                DeviceType.Speakers => DeviceTypeEnum.Speakers,
-                DeviceType.Headphones => DeviceTypeEnum.HeadPhones,
-                DeviceType.Headset => DeviceTypeEnum.HeadSet,
-                DeviceType.SPDIF => DeviceTypeEnum.SPDIF,
-                DeviceType.HDMI => DeviceTypeEnum.HDMI,
-                DeviceType.Handset => DeviceTypeEnum.HeadSet,
-                _ => DeviceTypeEnum.UNKNOWN,
+                DeviceType.Network => AudioDeviceTypeEnum.Network,
+                DeviceType.Speakers => AudioDeviceTypeEnum.Speakers,
+                DeviceType.Headphones => AudioDeviceTypeEnum.HeadPhones,
+                DeviceType.Headset => AudioDeviceTypeEnum.HeadSet,
+                DeviceType.SPDIF => AudioDeviceTypeEnum.SPDIF,
+                DeviceType.HDMI => AudioDeviceTypeEnum.HDMI,
+                DeviceType.Handset => AudioDeviceTypeEnum.HeadSet,
+                _ => AudioDeviceTypeEnum.UNKNOWN,
             };
         }
 

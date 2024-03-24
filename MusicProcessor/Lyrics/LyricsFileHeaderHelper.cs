@@ -1,5 +1,4 @@
-﻿using MusicFilesProcessor.Helpers;
-using MusicFilesProcessor.Models;
+﻿using MusicPlay.Database.Models;
 using System.Text.RegularExpressions;
 
 namespace MusicFilesProcessor.Lyrics.Helper
@@ -15,9 +14,9 @@ namespace MusicFilesProcessor.Lyrics.Helper
         /// </summary>
         /// <param name="lyrics"></param>
         /// <returns> the website, the URL, if the lyrics are from the user </returns>
-        public static (string, string, bool) GetHeader(this string lyrics)
+        public static (string, string) GetHeader(this string lyrics)
         {
-            List<string> lines = lyrics.Trim().Split("\n").ToList();
+            List<string> lines = [.. lyrics.Trim().Split("\n")];
             return GetHeader(lines);
         }
 
@@ -26,18 +25,16 @@ namespace MusicFilesProcessor.Lyrics.Helper
         /// </summary>
         /// <param name="lyrics"></param>
         /// <returns> the website, the URL, if the lyrics are from the user </returns>
-        public static (string, string, bool) GetHeader(this List<string> lyrics)
+        public static (string, string) GetHeader(this List<string> lyrics)
         {
             string website = "";
             string url = "";
-            bool IsFromUser = false;
             if (lyrics[0] == header) // Footer start
             {
-                IsFromUser = lyrics[1].Trim() == "1" ? true : false;
                 website = lyrics[2].Trim();
                 url = lyrics[3].Trim();
             }
-            return (website, url, IsFromUser);
+            return (website, url);
         }
 
         /// <summary>
@@ -91,44 +88,43 @@ namespace MusicFilesProcessor.Lyrics.Helper
         }
 
         /// <summary>
-        /// For every string in lines create a TimedLyricsLineModel.
+        /// For every string in lines create a TimedLyricsLine.
         /// </summary>
         /// <param name="lines"></param>
-        /// <returns> A list of TimedLyricsLineModel. </returns>
-        public static List<TimedLyricsLineModel> ConvertTimedLyrics(this List<string> lines)
+        /// <returns> A list of TimedLyricsLine. </returns>
+        public static List<TimedLyricsLine> ConvertTimedLyrics(this List<string> lines)
         {
-            List<TimedLyricsLineModel> timedLyricsLines = new List<TimedLyricsLineModel>();
+            List<TimedLyricsLine> timedLyricsLines = new List<TimedLyricsLine>();
             for (int i = 0; i < lines.Count; i++)
             {
                 string[] parts = lines[i].Split(separator); // Separate the Length in milliseconds and the lyrics
                 if (parts.Length == 2 && parts is not null)
                 {
                     int length = int.Parse(parts[0]);
-                    TimedLyricsLineModel timedLyrics = new()
+                    TimedLyricsLine timedLyrics = new()
                     {
-                        index = 1,
-                        LengthInMilliseconds = length,
-                        Time = TimeSpan.FromMilliseconds(length).ToFormattedString(),
-                        Lyrics = parts[1]
+                        TimestampMs = length,
+                        Line = parts[1]
                     };
                     timedLyricsLines.Add(timedLyrics);
                 }
             }
+
             return timedLyricsLines;
         }
 
         /// <summary>
         /// For every timedLyricsLineModel in the list create its string representation:
-        /// line = LengthInMilliseconds + separator + Lyrics.
+        /// _line = LengthInMilliseconds + separator + Lyrics.
         /// </summary>
         /// <param name="timedLyricsLines"></param>
-        /// <returns> A list of string representing each line of the lyrics with its time in milliseconds. </returns>
-        public static List<string> ConvertToString(this List<TimedLyricsLineModel> timedLyricsLines)
+        /// <returns> A list of string representing each _line of the lyrics with its time in milliseconds. </returns>
+        public static List<string> ConvertToString(this List<TimedLyricsLine> timedLyricsLines)
         {
             List<string> output = new List<string>();
-            foreach (TimedLyricsLineModel t in timedLyricsLines)
+            foreach (TimedLyricsLine t in timedLyricsLines)
             {
-                string line = t.LengthInMilliseconds + separator + t.Lyrics;
+                string line = t.TimestampMs + separator + t.Line;
                 output.Add(line);
             }
             return output;

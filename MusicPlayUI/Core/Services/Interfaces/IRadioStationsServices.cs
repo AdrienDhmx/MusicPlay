@@ -1,4 +1,4 @@
-﻿using MusicPlayModels.MusicModels;
+﻿using MusicPlay.Database.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,10 +9,10 @@ namespace MusicPlayUI.Core.Services.Interfaces
         int ArtistInfluence { get; set; }
         int GenreInfluence { get; set; }
         int RadioStationTrackNumber { get; set; }
-        List<PlaylistModel> TodayRadioStations { get; set; }
+        List<Playlist> TodayRadioStations { get; set; }
 
-        Task<PlaylistModel> CreateRadioStation();
-        Task<PlaylistModel> CreateRadioStation(TrackModel basedOn);
-        Task<List<PlaylistModel>> CreateRadioStations(int number);
+        Task<Playlist> CreateRadioStation();
+        Task<Playlist> CreateRadioStation(Track basedOn);
+        Task<List<Playlist>> CreateRadioStations(int number);
     }
 }

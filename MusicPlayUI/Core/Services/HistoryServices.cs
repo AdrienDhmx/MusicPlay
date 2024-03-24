@@ -1,15 +1,17 @@
-﻿using DataBaseConnection.DataAccess;
-using MusicPlayModels.MusicModels;
-using MusicPlayModels.StatsModels;
+﻿
+
+using MusicPlay.Database.DatabaseAccess;
+using MusicPlay.Database.Models;
 using MusicPlayUI.Core.Services.Interfaces;
 using System;
+using System.Threading.Tasks;
 
 namespace MusicPlayUI.Core.Services
 {
     public class HistoryServices : IHistoryServices
     {
-        private HistoryModel _todayHistory = new();
-        public HistoryModel TodayHistory
+        private PlayHistory _todayHistory = new();
+        public PlayHistory TodayHistory
         {
             get { return _todayHistory; }
             set
@@ -30,32 +32,36 @@ namespace MusicPlayUI.Core.Services
 
         public HistoryServices()
         {
-            TodayHistory = DataAccess.Connection.GetTodayHistoryModel();
-
-            if (TodayHistory is null || TodayHistory.Id == -1)
-                TodayHistory = new();
-
-            TodayListenTime = TimeSpan.FromMilliseconds(TodayHistory.ListenTime);
+            TodayHistory = PlayHistory.GetTodayHistory();
+            TodayListenTime = TimeSpan.FromMilliseconds(TodayHistory.PlayTime);
         }
 
-        public void UpdateTodayHistory(int listenTimeIncrease)
+        public void UpdateTodayHistory(Track track, int listenTimeIncrease)
         {
-            TodayHistory.PlayCount++;
+            if (listenTimeIncrease < 10000)
+                return;
+
             UpdateTodayListenTime(listenTimeIncrease);
-            if (TodayHistory.Id == -1)
+            PlayHistoryEntry entry = new()
             {
-                TodayHistory = DataAccess.Connection.InsertHistoryModel(TodayHistory);
-            }
-            else
-            {
-                DataAccess.Connection.UpdateHistoryModel(TodayHistory);
-            }
+                TrackId = track.Id,
+                HistoryId = TodayHistory.Id,
+                PlayedLength = listenTimeIncrease,
+                PlayTime = (int)TimeOnly.FromDateTime(DateTime.Now).ToTimeSpan().TotalSeconds
+            };
+            PlayHistoryEntry.Insert(entry);
+            entry.Track = track;
+            TodayHistory.Entries.Add(entry);
         }
 
         private void UpdateTodayListenTime(int listenTimeIncrease)
         {
-            TodayHistory.ListenTime += listenTimeIncrease;
-            TodayListenTime = TimeSpan.FromMilliseconds(TodayHistory.ListenTime);
+            using DatabaseContext context = new DatabaseContext();
+            context.PlayHistories.Update(TodayHistory);
+            TodayHistory.PlayTime += listenTimeIncrease;
+            TodayListenTime = TimeSpan.FromMilliseconds(TodayHistory.PlayTime);
+            context.SaveChanges();
         }
     }
+
 }

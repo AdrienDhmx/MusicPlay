@@ -7,26 +7,30 @@
              xmlns:viewmodels="clr-namespace:MusicPlayUI.MVVM.ViewModels" 
              xmlns:lang="clr-namespace:MusicPlay.Language;assembly=MusicPlay.Language"
              d:DataContext="{d:DesignInstance Type=viewmodels:MainMenuViewModel}"
-             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton"
+             xmlns:iconbtn="clr-namespace:IconButton;assembly=IconButton" xmlns:cardbtn="clr-namespace:CustomCardControl;assembly=CustomCardControl"
              mc:Ignorable="d"
              x:Name="RootView"
-             d:DesignHeight="50" d:DesignWidth="900">
+             d:DesignHeight="500" d:DesignWidth="60">
 
     <Grid Background="{DynamicResource Background}"
-            VerticalAlignment="Stretch">
+            VerticalAlignment="Stretch"
+          Width="60">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="{Binding AppBar.Height}"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <iconbtn:IconButton Style="{DynamicResource BackButton}"
-                            CornerRadius="0"
-                            Width="40"
-                            ToolTip="Back"
-                            Command="{Binding NavigateBackCommand}"/>
+        <iconbtn:IconButton Style="{DynamicResource OpacityIconButton}"
+                                   Icon="{DynamicResource MenuOpen}"
+                                   Width="60"
+                                   Height="60"
+                                   IconWidth="24"
+                                   IconHeight="18"
+                                   FillColor="{DynamicResource OnPrimaryContainer}"
+                                   StrokeColor="Transparent"
+                                  Command="{Binding AppBar.ToggleMenuDrawerCommand}"/>
 
         <ItemsControl ItemsSource="{Binding Menu}"
-                      Margin="0,10"
                           HorizontalAlignment="Center"
                           Grid.Row="1">
             <ItemsControl.ItemsPanel>
@@ -37,8 +41,8 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <iconbtn:IconButton Icon="{Binding Icon}"
-                                            Width="40"
-                                            Height="50"
+                                            Width="60"
+                                            Height="60"
                                             CornerRadius="0"
                                             IconStretch="Uniform"
                                             MouseOverBackground="{DynamicResource PrimaryHover}"

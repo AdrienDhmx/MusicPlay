@@ -1,5 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:converter="clr-namespace:MusicPlayUI.Converters"
+                    xmlns:viewModel="clr-namespace:MusicPlayUI.MVVM.ViewModels">
+    <converter:ToTypeConverter x:Key="ToTypeConverter"/>
+
     <Style x:Key="Basestyle" TargetType="{x:Type Control}">
         <Setter  Property="FocusVisualStyle" Value="{x:Null}"/>
     </Style>
@@ -17,8 +21,31 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                    <Border Background="{DynamicResource Primary}" Height="4"
+                    <Border Background="{Binding DataContext.AccentColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}" Height="4"
+                            Opacity="0.6"
                             CornerRadius="2,0,0,2"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="SliderNPButtonStyle"
+       TargetType="{x:Type RepeatButton}">
+        <Setter Property="SnapsToDevicePixels"
+          Value="true" />
+        <Setter Property="OverridesDefaultStyle"
+          Value="true" />
+        <Setter Property="IsTabStop"
+          Value="false" />
+        <Setter Property="Focusable"
+          Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Height="4"
+                            Background="{Binding DataContext.VisualizerParameterStore.ObjectColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
+                            CornerRadius="2,0,0,2">
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -43,6 +70,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+   
 
     <Style x:Key="VerticalSliderButtonStyle"
        TargetType="{x:Type RepeatButton}">
@@ -98,8 +126,33 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Ellipse x:Name="Ellipse"
-                             Fill="{DynamicResource Primary}"
-                            StrokeThickness="0">
+                             Fill="{Binding DataContext.AccentColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
+                             Opacity="0.9"
+                             Stroke="{DynamicResource ScdWhiteTransparent}"
+                            StrokeThickness="1">
+                    </Ellipse>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="SliderNPThumbStyle"
+       TargetType="{x:Type Thumb}">
+        <Setter Property="SnapsToDevicePixels"
+          Value="true" />
+        <Setter Property="OverridesDefaultStyle"
+          Value="true" />
+        <Setter Property="Height"
+          Value="14" />
+        <Setter Property="Width"
+          Value="14" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Ellipse x:Name="Ellipse"
+                             Stroke="{DynamicResource ScdWhiteTransparent}"
+                             Fill="{Binding DataContext.VisualizerParameterStore.ObjectColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
+                            StrokeThickness="1">
                     </Ellipse>
                 </ControlTemplate>
             </Setter.Value>
@@ -147,8 +200,9 @@
             </TickBar>
             <Border x:Name="TrackBackground"
                     BorderBrush="Transparent"
-                    Background="{DynamicResource SurfaceVariant}"
+                    Background="{Binding DataContext.AccentColor, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
                     Margin="0"
+                    Opacity="0.3"
                     CornerRadius="2.5"
                     Height="5"
                     Grid.Row="1"
@@ -163,6 +217,78 @@
                 </Track.DecreaseRepeatButton>
                 <Track.Thumb>
                     <Thumb Style="{DynamicResource SliderThumbStyle}" />
+                </Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                    <RepeatButton Style="{DynamicResource SliderIncreaseButtonStyle}"
+                      Command="Slider.IncreaseLarge" />
+                </Track.IncreaseRepeatButton>
+            </Track>
+            <TickBar x:Name="BottomTick"
+                     SnapsToDevicePixels="True"
+                     Grid.Row="2"
+                     Fill="{TemplateBinding Foreground}"
+                     Placement="Bottom"
+                     Height="4"
+                     Visibility="Collapsed" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="TickPlacement"
+             Value="TopLeft">
+                <Setter TargetName="TopTick"
+              Property="Visibility"
+              Value="Visible" />
+            </Trigger>
+            <Trigger Property="TickPlacement"
+             Value="BottomRight">
+                <Setter TargetName="BottomTick"
+              Property="Visibility"
+              Value="Visible" />
+            </Trigger>
+            <Trigger Property="TickPlacement"
+             Value="Both">
+                <Setter TargetName="TopTick"
+              Property="Visibility"
+              Value="Visible" />
+                <Setter TargetName="BottomTick"
+              Property="Visibility"
+              Value="Visible" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="HorizontalNPSlider"
+                 TargetType="{x:Type Slider}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"
+                     MinHeight="{TemplateBinding MinHeight}" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TickBar x:Name="TopTick"
+             SnapsToDevicePixels="True"
+             Placement="Top"
+             Height="4"
+             Visibility="Collapsed">
+            </TickBar>
+            <Border x:Name="TrackBackground"
+                    BorderBrush="Transparent"
+                    Background="{DynamicResource ScdWhiteTransparent}"
+                    Margin="0"
+                    CornerRadius="2.5"
+                    Height="5"
+                    Grid.Row="1"
+                    BorderThickness="1">
+                
+            </Border>
+            <Track Grid.Row="1"
+                    x:Name="PART_Track">
+                <Track.DecreaseRepeatButton>
+                    <RepeatButton Style="{DynamicResource SliderNPButtonStyle}"
+                      Command="Slider.DecreaseLarge" />
+                </Track.DecreaseRepeatButton>
+                <Track.Thumb>
+                    <Thumb Style="{DynamicResource SliderNPThumbStyle}" />
                 </Track.Thumb>
                 <Track.IncreaseRepeatButton>
                     <RepeatButton Style="{DynamicResource SliderIncreaseButtonStyle}"
@@ -276,6 +402,7 @@
     </ControlTemplate>
 
     <Style TargetType="{x:Type Slider}"
+           x:Key="DefaultSlider"
            BasedOn="{StaticResource Basestyle}">
         <Setter Property="SnapsToDevicePixels"
           Value="true" />
@@ -303,40 +430,33 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="OnlyThumbSliderThumbStyle"
-       TargetType="{x:Type Thumb}">
+    <Style TargetType="{x:Type Slider}"
+           x:Key="NPSlider"
+           BasedOn="{StaticResource Basestyle}">
         <Setter Property="SnapsToDevicePixels"
           Value="true" />
         <Setter Property="OverridesDefaultStyle"
           Value="true" />
-        <Setter Property="Height"
-          Value="500" />
-        <Setter Property="Width"
-          Value="22" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Background="Transparent"
-                            x:Name="Border">
-                        <Path x:Name="Ellipse"
-                              Height="22"
-                          Stretch="Fill"
-                              VerticalAlignment="Center"
-                          Data="{DynamicResource UnfoldMoreHorizontal}"
-                             Fill="{DynamicResource Primary}"
-                              Stroke="{DynamicResource Primary}"
-                            StrokeThickness="1">
-
-                        </Path>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="False" SourceName="Border">
-                            <Setter Property="Opacity" Value="0" TargetName="Border"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation"
+             Value="Horizontal">
+                <Setter Property="MinWidth"
+              Value="104" />
+                <Setter Property="MinHeight"
+              Value="10" />
+                <Setter Property="Template"
+              Value="{DynamicResource HorizontalNPSlider}" />
+            </Trigger>
+            <Trigger Property="Orientation"
+             Value="Vertical">
+                <Setter Property="MinWidth"
+              Value="21" />
+                <Setter Property="MinHeight"
+              Value="104" />
+                <Setter Property="Template"
+              Value="{DynamicResource VerticalSlider}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <ControlTemplate TargetType="ProgressBar" 
@@ -373,10 +493,9 @@
     </ControlTemplate>
 
     <Style x:Key="QueueProgressBar" TargetType="{x:Type ProgressBar}">
-        <Setter Property="Foreground" Value="{DynamicResource Primary}"/>
-        <Setter Property="Background" Value="{DynamicResource WhiteTransparent}"/>
+        <Setter Property="Background" Value="{DynamicResource ScdWhiteTransparent}"/>
         <Setter Property="IsIndeterminate" Value="False"/>
-        <Setter Property="Height" Value="12"/>
+        <Setter Property="Height" Value="10"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Template" Value="{DynamicResource ProgressBarTemplate}"/>
     </Style>
